@@ -89,6 +89,8 @@ export interface SceneCopy {
   /** Rasgos que activan una variante concreta. */
   traitVariants?: Partial<Record<VisitorTrait, { title?: string; body?: string; eyebrow?: string }>>;
   cta?: { label: string; target: string; event?: string };
+  /** El CTA abre el correo de contacto con el contexto de navegación. */
+  contact?: boolean;
   product?: string;
 }
 
@@ -154,6 +156,7 @@ export const SCENES: SceneCopy[] = [
     body: 'No pedimos datos en la exploración. Cuando quieras, dejamos el contexto de lo que viste para que no tengas que repetirte. Diagnóstico, asesoría o ruta de implementación: los precios se cotizan después de entender el caso.',
     cta: { label: 'Solicitar diagnóstico', target: '#contacto', event: 'consultation_requested' },
     product: 'Asesoría · implementación',
+    contact: true,
   },
 ];
 

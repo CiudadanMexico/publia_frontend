@@ -21,6 +21,7 @@ import {
   subscribe,
 } from '../lib/experience/state';
 import { initAnalytics, track } from '../lib/experience/events';
+import { buildMailto } from '../data/site';
 import type { PrimaryRoute, VisitorState } from '../lib/experience/state';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -98,6 +99,18 @@ function applySceneVariants(state: VisitorState): void {
   });
 }
 
+/**
+ * El enlace de contacto se completa con el contexto de navegación (sólo ruta
+ * e intereses): evita que el prospecto tenga que repetir sus elecciones. No
+ * se envía ningún dato personal ni sensible.
+ */
+function applyContactContext(state: VisitorState): void {
+  const links = document.querySelectorAll<HTMLAnchorElement>('[data-contact-cta="true"]');
+  links.forEach((link) => {
+    link.href = buildMailto({ route: state.primary, traits: state.traits });
+  });
+}
+
 function bindRouteControls(prism: { setRoute: (route: PrimaryRoute) => void } | null): void {
   const choiceButtons = document.querySelectorAll<HTMLButtonElement>('[data-route-choice]');
   choiceButtons.forEach((button) => {
@@ -114,6 +127,13 @@ function bindRouteControls(prism: { setRoute: (route: PrimaryRoute) => void } | 
         const target = button.dataset['target'] ?? '#ruta-empresa';
         scrollTo(target);
       }, 160);
+    });
+  });
+
+  const contactLinks = document.querySelectorAll<HTMLAnchorElement>('[data-contact-cta="true"]');
+  contactLinks.forEach((link) => {
+    link.addEventListener('click', () => {
+      track('consultation_requested', { route: getState().primary });
     });
   });
 
@@ -304,6 +324,7 @@ export async function startExperience(): Promise<void> {
   subscribe((state) => {
     applyDocumentState(state);
     applySceneVariants(state);
+    applyContactContext(state);
     prism?.setRoute(state.primary);
     window.setTimeout(() => {
       ScrollTrigger.refresh();
@@ -312,6 +333,7 @@ export async function startExperience(): Promise<void> {
   });
 
   applySceneVariants(getState());
+  applyContactContext(getState());
 }
 
 if (document.readyState === 'loading') {

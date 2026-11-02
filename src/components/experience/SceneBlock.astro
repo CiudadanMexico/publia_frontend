@@ -8,6 +8,7 @@
  * de ruta no requiere recargar.
  */
 import type { SceneCopy } from '../../data/copy';
+import { buildMailto } from '../../data/site';
 import { getScene, resolveScene } from '../../lib/experience/scenes';
 import { getState } from '../../lib/experience/state';
 
@@ -51,7 +52,12 @@ const variants = {
         {
           resolved.cta && (
             <p>
-              <a class="button button--primary" href={resolved.cta.target} data-scene-cta={resolved.cta.target}>
+              <a
+                class="button button--primary"
+                href={resolved.contact ? buildMailto({ route: 'unclassified', traits: [] }) : resolved.cta.target}
+                data-scene-cta={resolved.cta.target}
+                data-contact-cta={resolved.contact ? 'true' : undefined}
+              >
                 {resolved.cta.label}
               </a>
             </p>

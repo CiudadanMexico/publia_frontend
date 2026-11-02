@@ -4,6 +4,7 @@ import PrismLayer from '../components/three/PrismLayer.astro';
 import Nav from '../components/ui/Nav.astro';
 import Hero from '../components/experience/Hero.astro';
 import SceneBlock from '../components/experience/SceneBlock.astro';
+import { SITE } from '../data/site';
 ---
 
 <BaseLayout
@@ -28,10 +29,23 @@ import SceneBlock from '../components/experience/SceneBlock.astro';
   <footer class="footer">
     <div class="shell footer__inner">
       <p class="footer__brand">PUBLIA</p>
-      <p class="muted">
-        Red cooperativa de desarrollo · Ciudadan.org · Cooperativismo 6.0.
-        Copia de trabajo aislada: no es el sitio de producción.
-      </p>
+      <div class="footer__contact">
+        <p>
+          <a class="footer__mail" href={`mailto:${SITE.email}`}>{SITE.email}</a>
+          <span class="muted"> · {SITE.city}, {SITE.country}</span>
+        </p>
+        <ul class="footer__socials">
+          {
+            SITE.socials.map((social) => (
+              <li>
+                <a href={social.href} rel="noopener noreferrer" target="_blank">
+                  {social.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
     </div>
   </footer>
 
@@ -68,5 +82,34 @@ import SceneBlock from '../components/experience/SceneBlock.astro';
     margin: 0;
     max-width: 42ch;
     font-size: var(--step--1);
+  }
+
+  .footer__contact {
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .footer__mail {
+    color: var(--scene-accent);
+    text-underline-offset: 0.25em;
+  }
+
+  .footer__socials {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--step--1);
+  }
+
+  .footer__socials a {
+    color: var(--ink-300);
+    text-decoration: none;
+  }
+
+  .footer__socials a:hover {
+    color: var(--paper);
   }
 </style>
