@@ -87,7 +87,7 @@ test('toda escena tiene título, propósito, etapa y módulos', () => {
   for (const scene of allScenes()) {
     assert.ok(scene.title.trim().length > 0, `${scene.id} sin título`);
     assert.ok(scene.purpose.trim().length > 0, `${scene.id} sin propósito`);
-    assert.ok(scene.stage.trim().length > 0, `${scene.id} sin etapa`);
+    assert.ok((scene.stage ?? '').trim().length > 0, `${scene.id} sin etapa`);
     assert.ok(scene.modules.length > 0, `${scene.id} sin módulos`);
   }
 });

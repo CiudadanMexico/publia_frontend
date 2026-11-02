@@ -31,12 +31,12 @@
     {
       "name": "prisma: la escena 3D se renderiza y cambia (animación real)",
       "ok": true,
-      "detail": "173195 vs 171926 bytes"
+      "detail": "173524 vs 171399 bytes"
     },
     {
       "name": "prisma: pinta una fracción útil del viewport",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.1509297839506173}"
+      "detail": "{\"paintedRatio\":0.15125}"
     },
     {
       "name": "grafo: 31 escenas montadas (E00-E30)",
