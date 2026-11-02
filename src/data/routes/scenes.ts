@@ -743,7 +743,7 @@ export const SCENES: SceneDefinition[] = [
     lead: 'Cuéntanos qué tienes en marcha y qué te está frenando. Te respondemos una persona.',
     body: 'Sin formularios eternos ni llamadas sin contexto: la ruta que elegiste viaja con tu solicitud para no repetirte.',
     purpose: 'Convertir el recorrido en una acción concreta y medible.',
-    modules: ['cta'],
+    modules: ['cta', 'form'],
     segments: [],
     route: 'shared',
     duration: 2,

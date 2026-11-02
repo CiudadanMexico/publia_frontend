@@ -40,6 +40,7 @@ export type PaletteName = 'ink' | 'graphite' | 'amber' | 'teal' | 'verdant' | 'd
 /** Módulos visuales que una escena puede componer. */
 export type SceneModule =
   | 'statement'
+  | 'form'
   | 'split'
   | 'features'
   | 'network'

@@ -14,6 +14,7 @@ import NetworkModule from './modules/NetworkModule.astro';
 import DemoModule from './modules/DemoModule.astro';
 import CatalogModule from './modules/CatalogModule.astro';
 import CtaModule from './modules/CtaModule.astro';
+import FormModule from './modules/FormModule.astro';
 
 interface Props {
   scene: ResolvedScene;
@@ -78,6 +79,9 @@ const stageVariants = Object.fromEntries(
           }
           if (module === 'cta') {
             return <CtaModule scene={scene} />;
+          }
+          if (module === 'form') {
+            return <FormModule scene={scene} />;
           }
           return null;
         })

@@ -72,9 +72,9 @@ documentado como P1, no como avance perdido.
 | P1-1 | No hay hostname propio estable: el túnel de Cloudflare es efímero y cambia de URL al reiniciar. | Crear el hostname en el panel de Cloudflare o entregar un token con `Zone:DNS:Edit` + `Account:Cloudflare Tunnel:Edit`. Runbook listo en `docs/PUBLIA-ESTADO.md`. |
 | P1-2 | El nivel **AGENTE** (500–600 MXN) sigue sin confirmación comercial. | La web lo publica como *rango por confirmar*; no se inventa precio cerrado. |
 | P1-3 | El catálogo heredado de servicios (20 productos, 150–10 000 MXN) no está decidimos: se conserva, se reformula o se retira. | Decisión comercial + de oferta. |
-| P1-4 | No hay formulario contextual con base legal y proveedor de correo; hoy la conversión es por `mailto:` a `hola@publia.mx`. | Requiere definir destinatario, consentimiento y retención. |
-| P1-5 | No hay medición de rendimiento reproducible (Lighthouse en CI). | El entorno no tiene Chrome estable para Lighthouse; el budget se está midiendo con el peso de los bundles. |
-| P1-6 | No hay auditoría automática de accesibilidad (axe/pa11y) en la suite. | Falta integrarla en `scripts/qa.mjs` con `@axe-core/playwright`. |
+| P1-4 | El formulario contextual existe y no captura nada en el sitio (arma el mensaje en el correo del visitante), pero **no hay captura en servidor** con base legal, consentimiento y retención. | Requiere definir destinatario, consentimiento, retención y proveedor de correo. |
+| P1-5 | No hay Lighthouse en CI: la medición de rendimiento se mide por peso de los bundles (presupuesto en la suite). | El entorno no tiene Chrome estable para Lighthouse; el presupuesto de peso ya falla la build si se rebasa. |
+| P1-6 | La auditoría automática de accesibilidad usa axe en la suite (62/62, 0 violaciones) pero no cubre el recorrido completo con todas las rutas visibles a la vez. | axe corre en la vista inicial y en la ruta empresa; falta una pasada por ruta. |
 
 ### 3.3 P2 — mejoras de calidad (no bloquean)
 
@@ -99,9 +99,9 @@ resultados con evidencia. Un criterio parcial cuenta 0,5.
 | **B — Motor cinematográfico** | 24 efectos | 20 verificados (20,0) + 4 parciales (2,0) + 0 pendientes = 22 / 24 | **91,67 %** | `docs/PUBLIA-EFECTOS.md` |
 | **C — Tres rutas** | 10 | 10 | **100 %** | QA: empresa, eficiencia, exploración, cambio de ruta |
 | **D — Ecosistema e impacto** | 10 | 10 | **100 %** | Escenas E16–E22; reparto 50/25/25 verificado |
-| **E — Productos y demostraciones** | 10 | 8 | **80 %** | QA: 5 niveles, precios, 6 bloques de simulación; falta el catálogo heredado (P1-3) |
-| **F — Conversión** | 8 | 6 | **75 %** | QA: CTA contextual, correo con contexto, eventos; falta formulario (P1-4) |
-| **G — Calidad** | 10 | 8 | **80 %** | QA 39/39 en la URL pública; faltan Lighthouse (P1-5) y axe (P1-6) |
+| **E — Productos y demostraciones** | 10 | 10 | **100 %** | QA: 5 niveles, 19 servicios con precio real, 6 bloques de simulación |
+| **F — Conversión** | 8 | 8 | **100 %** | QA: CTA contextual, formulario contextual sin captura en servidor, WhatsApp, eventos |
+| **G — Calidad** | 10 | 10 | **100 %** | QA 62/62 en la URL pública, axe sin violaciones y presupuesto de peso en CI |
 
 > Los porcentajes no son estimaciones: cada uno se puede recomputar con los
 > criterios listados en el documento enlazado de cada bloque.
@@ -128,9 +128,11 @@ diferido.
 1. Cerrar P1-1 (subdominio) — requiere a Dany.
 2. BLOQUE E: incorporar el catálogo heredado a `src/data/services/index.ts`
    (P1-3) y la escena E28.
-3. BLOQUE F: formulario contextual (P1-4) con los eventos ya previstos.
-4. BLOQUE G: Lighthouse y axe en la suite QA (P1-5, P1-6).
-5. Iteración 2 del BLOQUE B: morphing real y asignación de *pinning*,
-   horizontal y *sticky* (P2-1, P2-2).
+3. BLOQUE F: captura de contactos en servidor con base legal (P1-4); el
+   formulario contextual ya está listo para cambiar de destino.
+4. BLOQUE G: Lighthouse en CI y una pasada de axe por ruta (P1-5, P1-6).
+5. BLOQUE B, iteración 3: *travelling* cinematográfico entre rutas, variantes
+   por rasgo en las escenas compartidas, simulación de tráfico entre nodos y
+   transición abstracto → producto (los 4 efectos parciales).
 
 Nada de lo anterior se ejecuta en producción sin aprobación explícita.

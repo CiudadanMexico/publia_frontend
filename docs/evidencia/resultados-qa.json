@@ -1,6 +1,6 @@
 {
   "base": "http://127.0.0.1:4322",
-  "total": 48,
+  "total": 62,
   "fallos": 0,
   "resultados": [
     {
@@ -31,12 +31,12 @@
     {
       "name": "prisma: la escena 3D se renderiza y cambia (animación real)",
       "ok": true,
-      "detail": "172320 vs 168310 bytes"
+      "detail": "172422 vs 168403 bytes"
     },
     {
       "name": "prisma: pinta una fracción útil del viewport",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.14314814814814814}"
+      "detail": "{\"paintedRatio\":0.14262345679012345}"
     },
     {
       "name": "grafo: 31 escenas montadas (E00-E30)",
@@ -224,6 +224,51 @@
       "detail": "mailto:hola@publia.mx?subject=Diagn%C3%B3stico%20empresarial%20%E2%80%94%20Publi"
     },
     {
+      "name": "contacto: WhatsApp visible en la página",
+      "ok": true,
+      "detail": "2 enlace(s)"
+    },
+    {
+      "name": "contacto: número público verificado",
+      "ok": true,
+      "detail": "https://wa.me/525573724660"
+    },
+    {
+      "name": "formulario: existe con sus campos",
+      "ok": true,
+      "detail": "4 campos"
+    },
+    {
+      "name": "formulario: todos los campos tienen etiqueta",
+      "ok": true,
+      "detail": "4/4"
+    },
+    {
+      "name": "formulario: no envía datos a ningún servidor",
+      "ok": true,
+      "detail": "action=null method=get"
+    },
+    {
+      "name": "formulario: declara que no guarda la información",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "formulario: rechaza un correo inválido",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "formulario: no genera enlace con datos inválidos",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "formulario: el mensaje incluye el contexto de navegación",
+      "ok": true,
+      "detail": "mailto:hola@publia.mx?subject=Diagn%C3%B3stico%20empresarial%20%E2%80%"
+    },
+    {
       "name": "móvil: sin desbordamiento horizontal",
       "ok": true,
       "detail": "0px"
@@ -232,6 +277,31 @@
       "name": "móvil: los CTA funcionan",
       "ok": true,
       "detail": "efficiency"
+    },
+    {
+      "name": "accesibilidad: sin violaciones graves (axe wcag2aa)",
+      "ok": true,
+      "detail": "0 graves"
+    },
+    {
+      "name": "accesibilidad: sin violaciones moderadas o menores",
+      "ok": true,
+      "detail": "0 violaciones"
+    },
+    {
+      "name": "accesibilidad: ruta empresa sin violaciones",
+      "ok": true,
+      "detail": "0 violaciones"
+    },
+    {
+      "name": "rendimiento: JS + CSS inicial por debajo de 220 kB",
+      "ok": true,
+      "detail": "199 kB (JS 194 · CSS 6)"
+    },
+    {
+      "name": "rendimiento: el escenario 3D se carga sólo bajo demanda",
+      "ok": true,
+      "detail": "three.js diferido"
     },
     {
       "name": "movimiento reducido: contenido visible y sin animación",

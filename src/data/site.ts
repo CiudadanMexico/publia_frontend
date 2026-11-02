@@ -15,6 +15,8 @@ export const SITE = {
   city: 'Ciudad de México',
   country: 'México',
   whatsapp: 'https://wa.me/525573724660',
+  /** Número tal como se muestra (único número público verificado). */
+  whatsappLabel: '55 73 72 46 60',
   socials: [
     { label: 'Facebook', href: 'http://facebook.com/publiamex' },
     { label: 'Instagram', href: 'http://instagram.com/publiamex' },
@@ -24,7 +26,7 @@ export const SITE = {
 } as const;
 
 /** Enlace de correo con el contexto de navegación (sin datos personales). */
-export function buildMailto(context: { route: string; traits: string[] }): string {
+export function buildMailto(context: { route: string; traits: string[]; body?: string }): string {
   const routeLabel: Record<string, string> = {
     unclassified: 'sin ruta elegida',
     enterprise: 'empresa',
@@ -33,14 +35,22 @@ export function buildMailto(context: { route: string; traits: string[] }): strin
   };
   const route = routeLabel[context.route] ?? context.route;
   const traits = context.traits.length > 0 ? context.traits.join(', ') : 'ninguno';
-  const body = [
-    'Contexto de navegación (se comparte sólo para no repetirme):',
-    `Ruta: ${route}`,
-    `Intereses detectados: ${traits}`,
-    '',
-    'Qué quiero conseguir:',
-    '',
-  ].join('\n');
+  const body = context.body
+    ? [
+        'Contexto de navegación (se comparte sólo para no repetirme):',
+        `Ruta: ${route}`,
+        `Intereses detectados: ${traits}`,
+        '',
+        context.body,
+      ].join('\n')
+    : [
+        'Contexto de navegación (se comparte sólo para no repetirme):',
+        `Ruta: ${route}`,
+        `Intereses detectados: ${traits}`,
+        '',
+        'Qué quiero conseguir:',
+        '',
+      ].join('\n');
   const subject = encodeURIComponent(`${SITE.emailSubject} (${route})`);
   return `mailto:${SITE.email}?subject=${subject}&body=${encodeURIComponent(body)}`;
 }

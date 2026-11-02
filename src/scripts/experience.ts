@@ -172,6 +172,58 @@ function bindRouteControls(stage: StageHandle | null): void {
     });
   });
 
+  // Formulario contextual: compone el mensaje con el contexto de navegación
+  // y abre el cliente de correo. No se envía nada a ningún servidor.
+  const forms = document.querySelectorAll<HTMLFormElement>('[data-context-form]');
+  forms.forEach((form) => {
+    const status = form.querySelector<HTMLElement>('[data-form-status]');
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const data = new FormData(form);
+      const correo = String(data.get('correo') ?? '').trim();
+      const nombre = String(data.get('nombre') ?? '').trim();
+      const situacion = String(data.get('situacion') ?? '').trim();
+      const mensaje = String(data.get('mensaje') ?? '').trim();
+      const state = getState();
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(correo)) {
+        if (status) {
+          status.dataset['state'] = 'error';
+          status.textContent = 'Escribe un correo válido para continuar.';
+        }
+        return;
+      }
+
+      const rasgos = state.traits.length > 0 ? state.traits.join(', ') : 'sin rasgos';
+      const cuerpo = [
+        nombre ? `Nombre: ${nombre}` : null,
+        `Correo: ${correo}`,
+        `Situación: ${situacion}`,
+        `Ruta elegida: ${state.primary}`,
+        `Rasgos: ${rasgos}`,
+        `Recorrido: ${state.visitedScenes.length} escenas vistas`,
+        mensaje ? `Mensaje: ${mensaje}` : null,
+        '',
+        'Enviado desde el formulario contextual de publia.mx.',
+      ]
+        .filter((line): line is string => line !== null)
+        .join('\n');
+
+      const href = buildMailto({
+        route: state.primary,
+        traits: state.traits,
+        body: cuerpo,
+      });
+      if (status) {
+        status.dataset['state'] = 'ok';
+        status.textContent = 'Mensaje preparado: se abrirá tu cliente de correo.';
+      }
+      track('consultation_requested', { route: state.primary, source: 'form' });
+      form.dataset['mailto'] = href;
+      window.location.href = href;
+    });
+  });
+
   const resetButtons = document.querySelectorAll<HTMLButtonElement>('[data-route-reset]');
   resetButtons.forEach((button) => {
     button.addEventListener('click', () => {

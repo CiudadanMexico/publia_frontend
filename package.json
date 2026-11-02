@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Publia 6.0 \u2014 frontend narrativo adaptativo (Astro + Three.js + GSAP)",
+  "description": "Publia 6.0 — frontend narrativo adaptativo (Astro + Three.js + GSAP)",
   "scripts": {
     "dev": "astro dev --host 127.0.0.1 --port 4321",
     "build": "astro build",
@@ -26,6 +26,7 @@
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@types/three": "^0.187.0",
+    "axe-core": "^4.14.0",
     "typescript": "5.9.3"
   },
   "engines": {

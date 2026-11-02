@@ -12,7 +12,7 @@
  * installation local de herramientas de QA).
  */
 
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 
 const PLAYWRIGHT_PATH =
   process.env.PLAYWRIGHT_PATH ?? '/home/dsh-dany/workspace/.qa-tools/node_modules/playwright/index.mjs';
@@ -301,6 +301,88 @@ check(
   contact.href.slice(0, 80),
 );
 
+// --- contacto directo -------------------------------------------------------------
+const contactLinks = await page.evaluate(() => {
+  const whatsapp = [...document.querySelectorAll('a[href*="wa.me"]')];
+  return {
+    total: whatsapp.length,
+    visible: whatsapp.filter((link) => link.offsetHeight > 0).length,
+    number: whatsapp[0]?.getAttribute('href') ?? '',
+  };
+});
+check('contacto: WhatsApp visible en la página', contactLinks.visible >= 1, `${contactLinks.visible} enlace(s)`);
+check(
+  'contacto: número público verificado',
+  contactLinks.number === 'https://wa.me/525573724660',
+  contactLinks.number,
+);
+
+// --- formulario contextual ------------------------------------------------------
+const formInfo = await page.evaluate(() => {
+  const form = document.querySelector('#escena-e30 [data-context-form]');
+  if (!form) {
+    return null;
+  }
+  const fields = [...form.querySelectorAll('input, select, textarea')];
+  const labelled = fields.filter((field) => {
+    const id = field.getAttribute('id');
+    return Boolean(
+      (id && form.querySelector(`label[for="${id}"]`)) ||
+        field.closest('label') ||
+        field.getAttribute('aria-label'),
+    );
+  });
+  return {
+    fields: fields.length,
+    labelled: labelled.length,
+    action: form.getAttribute('action'),
+    method: (form.getAttribute('method') ?? 'get').toLowerCase(),
+    legal: (form.parentElement?.textContent ?? '')
+      .replace(/\s+/g, ' ')
+      .toLowerCase()
+      .includes('no se almacena'),
+  };
+});
+check('formulario: existe con sus campos', formInfo?.fields >= 4, `${formInfo?.fields ?? 0} campos`);
+check('formulario: todos los campos tienen etiqueta', formInfo?.labelled === formInfo?.fields, `${formInfo?.labelled}/${formInfo?.fields}`);
+check('formulario: no envía datos a ningún servidor', formInfo?.action === null && formInfo?.method === 'get', `action=${formInfo?.action} method=${formInfo?.method}`);
+check('formulario: declara que no guarda la información', formInfo?.legal === true, '');
+
+const invalid = await page.evaluate(() => {
+  const form = document.querySelector('#escena-e30 [data-context-form]');
+  const email = form?.querySelector('input[name="correo"]');
+  if (!form || !email) {
+    return { error: false, mailto: null };
+  }
+  email.value = 'no-es-un-correo';
+  form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+  const status = form.querySelector('[data-form-status]');
+  return {
+    error: (status?.dataset.state ?? '') === 'error',
+    mailto: form.dataset.mailto ?? null,
+  };
+});
+check('formulario: rechaza un correo inválido', invalid.error === true, '');
+check('formulario: no genera enlace con datos inválidos', invalid.mailto === null, '');
+
+const valid = await page.evaluate(() => {
+  const form = document.querySelector('#escena-e30 [data-context-form]');
+  const email = form?.querySelector('input[name="correo"]');
+  if (!form || !email) {
+    return { mailto: null };
+  }
+  email.value = 'persona@ejemplo.mx';
+  form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+  return { mailto: form.dataset.mailto ?? null };
+});
+check(
+  'formulario: el mensaje incluye el contexto de navegación',
+  (valid.mailto ?? '').includes('hola@publia.mx') &&
+    (valid.mailto ?? '').includes('body=') &&
+    decodeURIComponent(valid.mailto ?? '').includes('Ruta:'),
+  (valid.mailto ?? '').slice(0, 70),
+);
+
 // --- móvil --------------------------------------------------------------------
 const mobile = await browser.newContext({ viewport: { width: 390, height: 844 } });
 const mobilePage = await mobile.newPage();
@@ -315,6 +397,91 @@ await mobilePage.waitForTimeout(1400);
 const mobileRoute = await mobilePage.evaluate(() => document.documentElement.dataset.route);
 check('móvil: los CTA funcionan', mobileRoute === 'efficiency', mobileRoute);
 await mobilePage.screenshot({ path: `${OUT}/12-movil-hero.png` });
+
+// --- accesibilidad (axe-core) ------------------------------------------------------
+const axeSource = await readFile(
+  new URL('../node_modules/axe-core/axe.min.js', import.meta.url),
+  'utf-8',
+);
+const axePage = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+await axePage.goto(BASE, { waitUntil: 'networkidle', timeout: 60000 });
+await axePage.waitForTimeout(2200);
+await axePage.addScriptTag({ content: axeSource });
+const axeResult = await axePage.evaluate(async () => {
+  const run = await window.axe.run(document, {
+    runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'best-practice'] },
+  });
+  return run.violations.map((violation) => ({
+    id: violation.id,
+    impact: violation.impact,
+    nodes: violation.nodes.length,
+    help: violation.help,
+    targets: violation.nodes.slice(0, 3).map((node) => node.target.join(' ')),
+  }));
+});
+const serious = axeResult.filter((violation) => violation.impact === 'serious' || violation.impact === 'critical');
+check(
+  'accesibilidad: sin violaciones graves (axe wcag2aa)',
+  serious.length === 0,
+  serious.map((violation) => `${violation.id}×${violation.nodes}`).join(', ') || '0 graves',
+);
+check(
+  'accesibilidad: sin violaciones moderadas o menores',
+  axeResult.length === 0,
+  axeResult.map((violation) => `${violation.id}×${violation.nodes}`).join(', ') || '0 violaciones',
+);
+await axePage.evaluate(() => document.querySelector('[data-route-choice="enterprise"]')?.click());
+await axePage.waitForTimeout(1600);
+const axeEnterprise = await axePage.evaluate(async () => {
+  const run = await window.axe.run(document, {
+    runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'best-practice'] },
+  });
+  return run.violations.map((violation) => ({
+    id: violation.id,
+    impact: violation.impact,
+    nodes: violation.nodes.length,
+    help: violation.help,
+    targets: violation.nodes.slice(0, 3).map((node) => node.target.join(' ')),
+  }));
+});
+check(
+  'accesibilidad: ruta empresa sin violaciones',
+  axeEnterprise.length === 0,
+  axeEnterprise.map((violation) => `${violation.id}×${violation.nodes}`).join(', ') || '0 violaciones',
+);
+
+await writeFile(
+  `${OUT}axe-violaciones.json`,
+  JSON.stringify({ base: BASE, violaciones: axeResult, rutaEmpresa: axeEnterprise }, null, 2),
+  'utf-8',
+);
+await axePage.close();
+
+// --- presupuesto de peso -----------------------------------------------------------
+const budget = await page.evaluate(() => {
+  const entries = performance.getEntriesByType('resource');
+  const scripts = entries
+    .filter((entry) => entry.name.endsWith('.js'))
+    .reduce((total, entry) => total + (entry.encodedBodySize || 0), 0);
+  const styles = entries
+    .filter((entry) => entry.name.endsWith('.css'))
+    .reduce((total, entry) => total + (entry.encodedBodySize || 0), 0);
+  return { scripts, styles, total: scripts + styles };
+});
+check(
+  'rendimiento: JS + CSS inicial por debajo de 220 kB',
+  budget.total < 220 * 1024,
+  `${Math.round(budget.total / 1024)} kB (JS ${Math.round(budget.scripts / 1024)} · CSS ${Math.round(budget.styles / 1024)})`,
+);
+check(
+  'rendimiento: el escenario 3D se carga sólo bajo demanda',
+  await page.evaluate(() => {
+    const resources = performance.getEntriesByType('resource').map((entry) => entry.name);
+    return !resources.some((name) => /stage\.[a-z0-9]+\.js/.test(name)) ||
+      performance.getEntriesByType('resource').some((entry) => /stage\./.test(entry.name) && entry.startTime > 0);
+  }),
+  'three.js diferido',
+);
 
 // --- movimiento reducido -------------------------------------------------------
 const reduced = await browser.newContext({
