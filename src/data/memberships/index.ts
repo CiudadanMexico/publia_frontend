@@ -1,0 +1,401 @@
+/**
+ * Catálogo canónico futuro de membresías de Publia 6.0.
+ *
+ * Cuando se complete el BLOQUE E, este módulo sustituirá a
+ * `src/data/catalog.ts`. Durante la transición, ambos conservan los mismos
+ * valores y `catalog.ts` permanece intacto.
+ */
+
+import type { Membership, MembershipCatalog } from './types';
+
+export const MEMBERSHIPS: Membership[] = [
+  {
+    id: 'membership-base',
+    slug: 'base',
+    name: 'BASE',
+    status: 'disponible',
+    summary: 'Hosting para WordPress o WooCommerce y chatbot de WhatsApp orientado a clientes.',
+    price: {
+      currency: 'MXN',
+      billingPeriod: 'mensual',
+      priceFrom: 300,
+      priceTo: 300,
+      priceConfirmed: true,
+    },
+    inheritsFrom: null,
+    features: [
+      {
+        id: 'base-hosting',
+        kind: 'incluye',
+        label: 'Hosting',
+        description: 'Hosting para WordPress o WooCommerce.',
+        confirmed: true,
+      },
+      {
+        id: 'base-chatbot-whatsapp',
+        kind: 'incluye',
+        label: 'Chatbot de WhatsApp',
+        description: 'Chatbot de WhatsApp orientado a clientes.',
+        confirmed: true,
+      },
+      {
+        id: 'base-configuracion-inicial',
+        kind: 'no-incluye',
+        label: 'Configuración inicial aparte',
+        description: 'La configuración inicial se cotiza aparte.',
+        confirmed: true,
+      },
+      {
+        id: 'base-dominio',
+        kind: 'no-incluye',
+        label: 'Dominio aparte',
+        description: 'El dominio se paga aparte.',
+        confirmed: true,
+      },
+      {
+        id: 'base-laborys',
+        kind: 'incluye',
+        label: 'Laborys mensuales',
+        description: 'La asignación mensual de Laborys está incluida, pero su cantidad sigue por definirse.',
+        confirmed: false,
+        pending: 'La cantidad mensual de Laborys no está confirmada.',
+      },
+      {
+        id: 'base-sin-agente',
+        kind: 'no-incluye',
+        label: 'Sin agente personal',
+        description: 'BASE no incluye agente personal.',
+        confirmed: true,
+      },
+      {
+        id: 'base-consumo-modelos',
+        kind: 'condicion',
+        label: 'Consumo de modelos sujeto a condiciones',
+        description:
+          'El consumo de IA se paga con API propia, Laborys si el servicio lo permite o modelos gratuitos disponibles; no es una promesa de consumo ilimitado.',
+        confirmed: true,
+      },
+    ],
+    laborysMonthly: null,
+    serviceWindow: null,
+    effectiveSupportHours: null,
+    pending: ['La cantidad mensual de Laborys está pendiente de definición comercial.'],
+  },
+  {
+    id: 'membership-agente',
+    slug: 'agente',
+    name: 'AGENTE',
+    status: 'disponible',
+    summary: 'BASE más un agente personal para una persona.',
+    price: {
+      currency: 'MXN',
+      billingPeriod: 'mensual',
+      priceFrom: 500,
+      priceTo: 600,
+      priceConfirmed: false,
+      note: 'Objetivo comercial de $500–$600 MXN/mes.',
+      pending: 'El precio definitivo de AGENTE todavía no está confirmado.',
+    },
+    inheritsFrom: 'base',
+    features: [
+      {
+        id: 'agente-base',
+        kind: 'incluye',
+        label: 'Todo lo de BASE',
+        description: 'AGENTE incluye las prestaciones y condiciones de BASE.',
+        confirmed: true,
+      },
+      {
+        id: 'agente-personal',
+        kind: 'incluye',
+        label: 'Un agente personal',
+        description: 'Un agente personal para una persona.',
+        confirmed: true,
+      },
+      {
+        id: 'agente-herramientas-tareas',
+        kind: 'incluye',
+        label: 'Herramientas y tareas autorizadas',
+        description:
+          'El agente puede trabajar con herramientas y ejecutar las tareas que la persona autorice.',
+        confirmed: true,
+      },
+      {
+        id: 'agente-integraciones',
+        kind: 'incluye',
+        label: 'Integraciones según configuración',
+        description: 'Las integraciones disponibles dependen de la configuración.',
+        confirmed: true,
+      },
+      {
+        id: 'agente-sin-bolsa-horas',
+        kind: 'regla',
+        label: 'Sin límite artificial de horas',
+        description: 'AGENTE no se modela como una bolsa de horas artificial.',
+        confirmed: true,
+      },
+      {
+        id: 'agente-capacidad-real',
+        kind: 'condicion',
+        label: 'Capacidad condicionada por la infraestructura',
+        description:
+          'El tiempo de respuesta puede variar según saturación y capacidad técnica; no se promete una capacidad de cómputo ilimitada.',
+        confirmed: true,
+      },
+      {
+        id: 'agente-consumo-modelos',
+        kind: 'condicion',
+        label: 'Consumo de modelos sujeto a condiciones',
+        description:
+          'El consumo de modelos queda sujeto a la infraestructura/API y a las condiciones aplicables; no es una promesa de consumo ilimitado.',
+        confirmed: true,
+      },
+    ],
+    laborysMonthly: null,
+    serviceWindow: null,
+    effectiveSupportHours: null,
+    pending: ['El precio definitivo de AGENTE está pendiente de confirmación comercial.'],
+  },
+  {
+    id: 'membership-crecimiento',
+    slug: 'crecimiento',
+    name: 'CRECIMIENTO',
+    status: 'disponible',
+    summary: 'AGENTE con derivación a personas, presencia social y producción mensual asistida por IA.',
+    price: {
+      currency: 'MXN',
+      billingPeriod: 'mensual',
+      priceFrom: 2000,
+      priceTo: 2000,
+      priceConfirmed: true,
+    },
+    inheritsFrom: 'agente',
+    features: [
+      {
+        id: 'crecimiento-agente',
+        kind: 'incluye',
+        label: 'Todo lo de AGENTE',
+        description: 'CRECIMIENTO incluye las prestaciones y condiciones de AGENTE.',
+        confirmed: true,
+      },
+      {
+        id: 'crecimiento-derivacion',
+        kind: 'incluye',
+        label: 'Derivación a varias personas',
+        description:
+          'Chatbot con derivación hacia múltiples destinatarios humanos elegidos por el negocio.',
+        confirmed: true,
+      },
+      {
+        id: 'crecimiento-redes',
+        kind: 'incluye',
+        label: 'Gestión básica de 2–3 redes',
+        description: 'Gestión básica de dos o tres redes.',
+        confirmed: true,
+      },
+      {
+        id: 'crecimiento-piezas',
+        kind: 'incluye',
+        label: 'Aproximadamente 8 piezas mensuales',
+        description: 'Volumen aproximado de ocho piezas de contenido al mes.',
+        confirmed: true,
+      },
+      {
+        id: 'crecimiento-produccion-ia',
+        kind: 'incluye',
+        label: 'Producción principalmente con IA',
+        description: 'La producción mensual se realiza principalmente con asistencia de IA.',
+        confirmed: true,
+      },
+      {
+        id: 'crecimiento-revision-humana',
+        kind: 'incluye',
+        label: 'Revisión humana',
+        description: 'Las piezas producidas con IA pasan por revisión humana.',
+        confirmed: true,
+      },
+      {
+        id: 'crecimiento-publicacion-adaptacion',
+        kind: 'incluye',
+        label: 'Publicación y adaptación básica',
+        description: 'Incluye publicación y adaptación básica de las piezas.',
+        confirmed: true,
+      },
+      {
+        id: 'crecimiento-produccion-profesional',
+        kind: 'no-incluye',
+        label: 'Producción profesional humana aparte',
+        description: 'La producción profesional humana se cotiza y se cobra aparte.',
+        confirmed: true,
+      },
+    ],
+    laborysMonthly: null,
+    serviceWindow: null,
+    effectiveSupportHours: null,
+    pending: [],
+  },
+  {
+    id: 'membership-operacion',
+    slug: 'operacion',
+    name: 'OPERACIÓN',
+    status: 'disponible',
+    summary: 'CRECIMIENTO con mayor presencia multicanal y soporte humano compartido.',
+    price: {
+      currency: 'MXN',
+      billingPeriod: 'mensual',
+      priceFrom: 3000,
+      priceTo: 3000,
+      priceConfirmed: true,
+    },
+    inheritsFrom: 'crecimiento',
+    features: [
+      {
+        id: 'operacion-crecimiento',
+        kind: 'incluye',
+        label: 'Todo lo de CRECIMIENTO',
+        description: 'OPERACIÓN incluye las prestaciones y condiciones de CRECIMIENTO.',
+        confirmed: true,
+      },
+      {
+        id: 'operacion-multicanal',
+        kind: 'incluye',
+        label: 'Mayor presencia multicanal',
+        description: 'Amplía la presencia multicanal incluida en CRECIMIENTO.',
+        confirmed: true,
+      },
+      {
+        id: 'operacion-piezas',
+        kind: 'incluye',
+        label: 'Aproximadamente 12 piezas mensuales',
+        description: 'Volumen aproximado de doce piezas de contenido al mes.',
+        confirmed: true,
+      },
+      {
+        id: 'operacion-soporte-compartido',
+        kind: 'incluye',
+        label: 'Soporte humano compartido',
+        description: 'El soporte humano se comparte entre los clientes atendidos.',
+        confirmed: true,
+      },
+      {
+        id: 'operacion-escalamiento-becarios',
+        kind: 'incluye',
+        label: 'Escalamiento de IA a becarios',
+        description: 'Las solicitudes pueden escalarse desde IA hasta becarios capacitados.',
+        confirmed: true,
+      },
+      {
+        id: 'operacion-ventana-limitada',
+        kind: 'condicion',
+        label: 'Ventana de servicio limitada',
+        description:
+          'La atención humana tiene una ventana de servicio limitada; la ventana de 9:00–18:00 corresponde a COBERTURA, no a OPERACIÓN.',
+        confirmed: false,
+        pending: 'El horario concreto de la ventana de OPERACIÓN no está confirmado.',
+      },
+      {
+        id: 'operacion-bolsa-efectiva',
+        kind: 'condicion',
+        label: 'Bolsa de tiempo efectivo pendiente',
+        description: 'La atención humana se limita a una bolsa de tiempo efectivo por definir.',
+        confirmed: false,
+        pending: 'La cantidad de horas de la bolsa de tiempo efectivo sigue pendiente.',
+      },
+      {
+        id: 'operacion-no-exclusivo',
+        kind: 'condicion',
+        label: 'No equivale a un empleado exclusivo',
+        description: 'La disponibilidad humana compartida no equivale a un trabajador exclusivo.',
+        confirmed: true,
+      },
+    ],
+    laborysMonthly: null,
+    serviceWindow: null,
+    effectiveSupportHours: null,
+    pending: [
+      'El horario de la ventana de servicio de OPERACIÓN no está confirmado.',
+      'La cantidad de la bolsa de tiempo efectivo está pendiente.',
+    ],
+  },
+  {
+    id: 'membership-cobertura',
+    slug: 'cobertura',
+    name: 'COBERTURA',
+    status: 'disponible',
+    summary: 'OPERACIÓN con cobertura humana de 9:00–18:00 organizada entre varios becarios.',
+    price: {
+      currency: 'MXN',
+      billingPeriod: 'mensual',
+      priceFrom: 4000,
+      priceTo: 4000,
+      priceConfirmed: true,
+    },
+    inheritsFrom: 'operacion',
+    features: [
+      {
+        id: 'cobertura-operacion',
+        kind: 'incluye',
+        label: 'Todo lo de OPERACIÓN',
+        description: 'COBERTURA incluye las prestaciones y condiciones de OPERACIÓN.',
+        confirmed: true,
+      },
+      {
+        id: 'cobertura-ventana',
+        kind: 'incluye',
+        label: 'Cobertura humana de 9:00–18:00',
+        description:
+          'La cobertura humana se organiza entre varios becarios de 9:00 a 18:00, conforme al calendario de servicio.',
+        confirmed: true,
+      },
+      {
+        id: 'cobertura-tiempo-efectivo',
+        kind: 'condicion',
+        label: 'Bolsa limitada de tiempo efectivo',
+        description: 'La cobertura tiene una bolsa limitada de tiempo efectivo.',
+        confirmed: false,
+        pending: 'La cantidad concreta de la bolsa de tiempo efectivo sigue pendiente.',
+      },
+      {
+        id: 'cobertura-no-exclusivo',
+        kind: 'condicion',
+        label: 'No equivale a un empleado exclusivo',
+        description:
+          'La cobertura de varios becarios no equivale a un empleado exclusivo ni garantiza tiempo humano exclusivo durante toda la ventana.',
+        confirmed: true,
+      },
+      {
+        id: 'cobertura-incremento-disponibilidad',
+        kind: 'regla',
+        label: 'El incremento financia disponibilidad humana',
+        description:
+          'El incremento de precio financia principalmente la disponibilidad humana adicional que distingue COBERTURA de OPERACIÓN.',
+        confirmed: true,
+      },
+    ],
+    laborysMonthly: null,
+    serviceWindow: {
+      start: '09:00',
+      end: '18:00',
+      timezone: 'America/Mexico_City',
+      note: 'Ventana de cobertura conforme al calendario de servicio; no equivale a tiempo humano exclusivo.',
+    },
+    effectiveSupportHours: null,
+    pending: ['La cantidad concreta de la bolsa de tiempo efectivo está pendiente.'],
+  },
+];
+
+export const MEMBERSHIP_CATALOG: MembershipCatalog = {
+  currency: 'MXN',
+  billingPeriod: 'mensual',
+  memberships: MEMBERSHIPS,
+  replacesModule: 'src/data/catalog.ts',
+};
+
+export type {
+  Membership,
+  MembershipCatalog,
+  MembershipFeature,
+  MembershipPrice,
+  MembershipServiceWindow,
+  PlanStatus,
+} from './types';
