@@ -1,6 +1,6 @@
 {
   "base": "http://127.0.0.1:4322",
-  "total": 62,
+  "total": 64,
   "fallos": 0,
   "resultados": [
     {
@@ -31,12 +31,12 @@
     {
       "name": "prisma: la escena 3D se renderiza y cambia (animación real)",
       "ok": true,
-      "detail": "172422 vs 168403 bytes"
+      "detail": "173246 vs 173279 bytes"
     },
     {
       "name": "prisma: pinta una fracción útil del viewport",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.14262345679012345}"
+      "detail": "{\"paintedRatio\":0.15245756172839506}"
     },
     {
       "name": "grafo: 31 escenas montadas (E00-E30)",
@@ -114,6 +114,11 @@
       "detail": "Ya tienes mucho construido. El riesgo no es empezar: es que nada se conecte."
     },
     {
+      "name": "variante compartida: la ruta empresa reescribe la escena común",
+      "ok": true,
+      "detail": "Ya tienes una empresa. La pregunta es qué hace su tecnología."
+    },
+    {
       "name": "ruta eficiencia: escena propia visible",
       "ok": true,
       "detail": "653px"
@@ -124,9 +129,9 @@
       "detail": "Hacer más con menos no es trabajar más rápido. Es dejar de repetirte."
     },
     {
-      "name": "variante compartida: el texto cambia con la ruta",
+      "name": "variante compartida: la ruta eficiencia reescribe la escena común",
       "ok": true,
-      "detail": "Elige por dónde quieres entrar. El resto se arma solo."
+      "detail": "El tiempo es el cuello de botella. La pregunta es qué se elimina."
     },
     {
       "name": "cambio de ruta: vuelve al estado neutral",
@@ -167,6 +172,11 @@
       "name": "bifurcación: abre la escena cooperativa",
       "ok": true,
       "detail": "544px"
+    },
+    {
+      "name": "variante por rasgo: el rasgo reescribe la escena compartida",
+      "ok": true,
+      "detail": "Una red que se comparte, no que se subcontrata."
     },
     {
       "name": "catálogo: BASE $300",
@@ -296,7 +306,7 @@
     {
       "name": "rendimiento: JS + CSS inicial por debajo de 220 kB",
       "ok": true,
-      "detail": "199 kB (JS 194 · CSS 6)"
+      "detail": "200 kB (JS 195 · CSS 6)"
     },
     {
       "name": "rendimiento: el escenario 3D se carga sólo bajo demanda",

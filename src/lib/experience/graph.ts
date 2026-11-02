@@ -101,32 +101,30 @@ export function appliesTo(scene: SceneDefinition, state: VisitorState): boolean 
 
 /** Variante que aplica: primero por ruta, luego por rasgo, luego por segmento. */
 export function pickVariant(scene: SceneDefinition, state: VisitorState): SceneVariant | null {
-  const variants = scene.variants ?? [];
+  return pickVariantFrom(scene.variants ?? [], state);
+}
+
+/** Variante aplicable a partir de una lista de variantes y el estado actual. */
+export function pickVariantFrom(
+  variants: readonly SceneVariant[],
+  state: VisitorState,
+): SceneVariant | null {
+  if (variants.length === 0) {
+    return null;
+  }
+  // La variante de ruta y la de segmento se combinan: el segmento (rasgo)
+  // tiene prioridad porque describe mejor a la persona.
   const routeVariant = variants.find((variant) => variant.route && variant.route === state.primary);
-  if (routeVariant) {
-    return routeVariant;
+  const traitSegments = state.traits
+    .map((trait) => TRAIT_SEGMENTS[trait])
+    .filter((segment): segment is Segment => Boolean(segment));
+  const segmentVariant =
+    variants.find((variant) => variant.segment && traitSegments.includes(variant.segment)) ??
+    variants.find((variant) => variant.segment && variant.segment === ROUTE_SEGMENTS[state.primary]);
+  if (!routeVariant && !segmentVariant) {
+    return null;
   }
-  for (const trait of state.traits) {
-    const traitVariant = variants.find((variant) => variant.segment === trait);
-    if (traitVariant) {
-      return traitVariant;
-    }
-  }
-  const routeSegment: Segment | null =
-    state.primary === 'enterprise'
-      ? 'enterprise'
-      : state.primary === 'efficiency'
-        ? 'efficiency'
-        : state.primary === 'explorer'
-          ? 'explorer'
-          : null;
-  if (routeSegment) {
-    const segmentVariant = variants.find((variant) => variant.segment === routeSegment);
-    if (segmentVariant) {
-      return segmentVariant;
-    }
-  }
-  return null;
+  return { ...(routeVariant ?? {}), ...(segmentVariant ?? {}) };
 }
 
 /** Resuelve el contenido final de una escena para este visitante. */

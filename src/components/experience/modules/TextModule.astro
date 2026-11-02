@@ -21,7 +21,7 @@ const { scene } = Astro.props;
 
   {
     scene.bullets.length > 0 && (
-      <ul class="capabilities" data-reveal-group>
+      <ul class="capabilities" data-reveal-group data-role="bullets">
         {scene.bullets.map((bullet, index) => (
           <li class="capabilities__item" data-reveal style={`--index:${index}`}>
             <span class="capabilities__marker" aria-hidden="true" />

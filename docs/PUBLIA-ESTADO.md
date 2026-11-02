@@ -14,12 +14,12 @@ porcentajes se calculan con criterios verificables y están detallados en
 | Bloque | Estado | Evidencia |
 |---|---|---|
 | **A · Rescate y auditoría** | 15/16 criterios (93,75 %) | `docs/PUBLIA-RESCATE-AUDITORIA.md` |
-| **B · Motor cinematográfico** | 22/24 efectos (91,67 %) | `docs/PUBLIA-EFECTOS.md` |
+| **B · Motor cinematográfico** | 24/24 efectos (100 %) | `docs/PUBLIA-EFECTOS.md` |
 | **C · Tres rutas** | 10/10 (100 %) | QA: empresa, eficiencia, exploración + cambio de ruta |
 | **D · Ecosistema e impacto** | 10/10 (100 %) | Escenas E16–E22; reparto 50/25/25 verificado |
 | **E · Productos y demostraciones** | 10/10 (100 %) | 5 niveles con precios reales + catálogo heredado con 19 servicios publicados |
 | **F · Conversión** | 8/8 (100 %) | CTA contextual, formulario contextual sin captura en servidor, WhatsApp, eventos |
-| **G · Calidad** | 10/10 (100 %) | QA 62/62 en local y en la URL pública, axe sin violaciones, presupuesto de peso |
+| **G · Calidad** | 10/10 (100 %) | QA 64/64 en local y en la URL pública, axe sin violaciones, presupuesto de peso |
 
 ### Contenido construido
 
@@ -47,8 +47,8 @@ porcentajes se calculan con criterios verificables y están detallados en
 |---|---|
 | `npm run check` (tsc estricto) | 0 errores |
 | `npm run build` | 3,2 s · 1 página |
-| Suite QA en local | **62/62** |
-| Suite QA en la URL pública | **62/62** |
+| Suite QA en local | **64/64** |
+| Suite QA en la URL pública | **64/64** |
 | Errores de consola | 0 |
 | Desbordamiento horizontal en 390 px | 0 px |
 | axe-core (wcag2a/aa, wcag21a/aa, best-practice) | 0 violaciones en la vista inicial y en la ruta empresa |
@@ -84,7 +84,7 @@ porcentajes se calculan con criterios verificables y están detallados en
 | URL pública | `https://kitty-midi-grid-liked.trycloudflare.com` (túnel rápido de Cloudflare en el host Oracle) |
 | Origen | `127.0.0.1:4322` en el host (`publia-frontend-static.service`) → `/srv/publia-frontend/dist` |
 | Sincronización | `publia-frontend-sync.sh` + `publia-frontend-ensure.timer` (cada 2 min) |
-| Verificación | Suite QA completa **contra la URL pública**: 62/62 criterios ✔ |
+| Verificación | Suite QA completa **contra la URL pública**: 64/64 criterios ✔ |
 | URL vigente | `ssh yizuz@159.54.133.219 '/usr/local/bin/publia-quick-url.sh'` |
 
 > El túnel rápido es **efímero**: la URL cambia si el servicio se reinicia
@@ -233,9 +233,8 @@ publia-frontend/
 
 1. Cerrar **P1-1**: crear `preview-publia6.ciudadan.org` (2 minutos en el
    panel de Cloudflare) o entregar un token con permisos de DNS y túnel.
-2. **BLOQUE B, iteración 3**: *travelling* cinematográfico entre rutas,
-   variantes por rasgo en las escenas compartidas, simulación de tráfico en la
-   red y transición abstracto → producto (los 4 efectos parciales).
+2. **BLOQUE B, refinamiento**: variantes por rasgo en todas las escenas
+   compartidas, paleta por escena y pasos horizontales en móvil.
 3. **BLOQUE F**: captura de contactos en servidor con base legal (P1-4); el
    formulario contextual ya está listo para cambiar de destino.
 4. **BLOQUE G**: Lighthouse en CI y una pasada de axe por cada ruta.

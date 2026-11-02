@@ -155,6 +155,11 @@ check('efectos: columna sticky', effects.sticky >= 1, `${effects.sticky} columna
 
 const click = (selector) => page.evaluate((s) => document.querySelector(s)?.click(), selector);
 
+// --- variante compartida: texto neutral antes de elegir ruta -----------------
+const perspectiveNeutral = await page.evaluate(
+  () => document.querySelector('#escena-e02 [data-role="title"]')?.textContent?.trim() ?? '',
+);
+
 // --- ruta empresa -----------------------------------------------------------
 await click('[data-route-choice="enterprise"]');
 await page.waitForTimeout(1800);
@@ -175,7 +180,16 @@ check(
 );
 
 // --- variante compartida por ruta -------------------------------------------
-const titleBefore = enterprise.shared;
+const perspectiveEnterprise = await page.evaluate(
+  () => document.querySelector('#escena-e02 [data-role="title"]')?.textContent?.trim() ?? '',
+);
+check(
+  'variante compartida: la ruta empresa reescribe la escena común',
+  perspectiveEnterprise !== perspectiveNeutral &&
+    perspectiveEnterprise.toLowerCase().includes('empresa'),
+  perspectiveEnterprise,
+);
+
 await click('[data-route-reset]');
 await page.waitForTimeout(1400);
 await click('[data-route-choice="efficiency"]');
@@ -193,8 +207,8 @@ check(
   efficiency.title,
 );
 check(
-  'variante compartida: el texto cambia con la ruta',
-  efficiency.perspective !== titleBefore && efficiency.perspective.length > 10,
+  'variante compartida: la ruta eficiencia reescribe la escena común',
+  efficiency.perspective !== perspectiveNeutral && efficiency.perspective !== perspectiveEnterprise,
   efficiency.perspective,
 );
 
@@ -227,6 +241,9 @@ check('ruta exploración: escena visible', explorer.visible > 100, `${explorer.v
 check('ruta exploración: dos bifurcaciones', explorer.branch === 2, `${explorer.branch} opciones`);
 
 // --- bifurcación narrativa ---------------------------------------------------
+const neutralNetwork = await page.evaluate(
+  () => document.querySelector('#escena-e05 [data-role="title"]')?.textContent?.trim() ?? '',
+);
 const branchTargets = await page.evaluate(() =>
   [...document.querySelectorAll('[data-branch-target]')].map((b) => b.dataset.branchTarget),
 );
@@ -243,9 +260,15 @@ await page.waitForTimeout(1800);
 const cooperative = await page.evaluate(() => ({
   traits: document.documentElement.dataset.traits ?? '',
   visible: document.querySelector('#escena-e15')?.offsetHeight ?? 0,
+  network: document.querySelector('#escena-e05 [data-role="title"]')?.textContent?.trim() ?? '',
 }));
 check('bifurcación: el rasgo queda registrado', cooperative.traits.includes('value_driven'), cooperative.traits);
 check('bifurcación: abre la escena cooperativa', cooperative.visible > 100, `${cooperative.visible}px`);
+check(
+  'variante por rasgo: el rasgo reescribe la escena compartida',
+  cooperative.network !== neutralNetwork && cooperative.network.length > 10,
+  cooperative.network,
+);
 
 // --- catálogo y conversión ---------------------------------------------------
 const catalog = await page.evaluate(() => {

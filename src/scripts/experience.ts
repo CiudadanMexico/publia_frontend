@@ -23,10 +23,10 @@ import {
 } from '../lib/experience/state';
 import { initAnalytics, track } from '../lib/experience/events';
 import { initEffects } from '../lib/animation/effects';
-import { visitorSegments } from '../lib/experience/graph';
+import { pickVariantFrom, visitorSegments } from '../lib/experience/graph';
 import { buildMailto } from '../data/site';
 import type { PrimaryRoute, VisitorState, VisitorTrait } from '../lib/experience/state';
-import type { StageState } from '../lib/experience/types';
+import type { SceneVariant, StageState } from '../lib/experience/types';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -67,6 +67,62 @@ function applyDocumentContext(state: VisitorState): void {
   applyDocumentState(state);
   const root = document.documentElement;
   root.dataset['segments'] = visitorSegments(state).join(' ');
+}
+
+/**
+ * Intercambia el texto de las escenas compartidas según ruta y rasgos.
+ *
+ * Las variantes viajan embebidas en `data-variants`; el DOM se actualiza en
+ * los nodos marcados con `data-role`. No se recarga ni se reconstruye nada:
+ * la misma escena cuenta otra parte del relato.
+ */
+function applySceneVariants(state: VisitorState): void {
+  const sections = document.querySelectorAll<HTMLElement>('[data-scene-id]');
+  sections.forEach((section) => {
+    const payload = section.dataset['variants'];
+    if (!payload) {
+      return;
+    }
+    let variants: SceneVariant[] = [];
+    try {
+      variants = JSON.parse(payload) as SceneVariant[];
+    } catch {
+      return;
+    }
+    if (variants.length === 0) {
+      return;
+    }
+    const variant = pickVariantFrom(variants, state);
+    if (!variant) {
+      return;
+    }
+    const write = (role: string, value: string | undefined): void => {
+      if (!value) {
+        return;
+      }
+      const target = section.querySelector<HTMLElement>(`[data-role="${role}"]`);
+      if (target && target.textContent?.trim() !== value) {
+        target.textContent = value;
+      }
+    };
+    write('eyebrow', variant.eyebrow);
+    write('title', variant.title);
+    write('lead', variant.lead);
+    write('body', variant.body);
+
+    if (variant.bullets && variant.bullets.length > 0) {
+      const list = section.querySelector<HTMLElement>('[data-role="bullets"]');
+      if (list) {
+        const items = list.querySelectorAll<HTMLElement>('.capabilities__text');
+        variant.bullets.forEach((bullet, index) => {
+          const item = items[index];
+          if (item && item.textContent?.trim() !== bullet) {
+            item.textContent = bullet;
+          }
+        });
+      }
+    }
+  });
 }
 
 /**
@@ -383,6 +439,7 @@ export async function startExperience(): Promise<void> {
   let lastSegments = visitorSegments(getState()).join(' ');
   subscribe((state) => {
     applyDocumentContext(state);
+    applySceneVariants(state);
     applyContactContext(state);
     const segments = visitorSegments(state).join(' ');
     const visibilityChanged = state.primary !== lastRoute || segments !== lastSegments;
@@ -397,6 +454,7 @@ export async function startExperience(): Promise<void> {
     }, 80);
   });
 
+  applySceneVariants(getState());
   applyContactContext(getState());
   window.setTimeout(applyActiveScene, 220);
 

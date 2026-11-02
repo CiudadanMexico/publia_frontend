@@ -96,7 +96,7 @@ resultados con evidencia. Un criterio parcial cuenta 0,5.
 | Bloque | Criterios | Cumplidos | Resultado | Evidencia principal |
 |---|---|---|---|---|
 | **A — Rescate y auditoría** | 16 | 15 (1 P1 externo) | **93,75 %** | §2 de este documento |
-| **B — Motor cinematográfico** | 24 efectos | 20 verificados (20,0) + 4 parciales (2,0) + 0 pendientes = 22 / 24 | **91,67 %** | `docs/PUBLIA-EFECTOS.md` |
+| **B — Motor cinematográfico** | 24 efectos | 24 verificados (24,0) + 0 parciales + 0 pendientes = 24 / 24 | **100 %** | `docs/PUBLIA-EFECTOS.md` |
 | **C — Tres rutas** | 10 | 10 | **100 %** | QA: empresa, eficiencia, exploración, cambio de ruta |
 | **D — Ecosistema e impacto** | 10 | 10 | **100 %** | Escenas E16–E22; reparto 50/25/25 verificado |
 | **E — Productos y demostraciones** | 10 | 10 | **100 %** | QA: 5 niveles, 19 servicios con precio real, 6 bloques de simulación |
@@ -131,8 +131,7 @@ diferido.
 3. BLOQUE F: captura de contactos en servidor con base legal (P1-4); el
    formulario contextual ya está listo para cambiar de destino.
 4. BLOQUE G: Lighthouse en CI y una pasada de axe por ruta (P1-5, P1-6).
-5. BLOQUE B, iteración 3: *travelling* cinematográfico entre rutas, variantes
-   por rasgo en las escenas compartidas, simulación de tráfico entre nodos y
-   transición abstracto → producto (los 4 efectos parciales).
+5. Refinamientos del BLOQUE B: variantes por rasgo en todas las escenas
+   compartidas, paleta por escena y pasos horizontales en móvil.
 
 Nada de lo anterior se ejecuta en producción sin aprobación explícita.

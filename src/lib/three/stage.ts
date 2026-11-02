@@ -300,6 +300,29 @@ export function createStage({ canvas, reducedMotion }: StageOptions): Stage | nu
   nodeGroup.add(links);
   world.add(nodeGroup);
 
+  // --- tráfico entre nodos (red distribuida viva) -----------------------------
+  const pulseGeometry = new THREE.SphereGeometry(0.075, 10, 10);
+  const pulseMaterial = new THREE.MeshBasicMaterial({
+    color: LOOKS.cooperative.shards,
+    transparent: true,
+    opacity: 0,
+  });
+  const pulses: Array<{
+    mesh: THREE.Mesh;
+    from: THREE.Vector3;
+    to: THREE.Vector3;
+    progress: number;
+    speed: number;
+  }> = [];
+  for (let i = 0; i < 12; i += 1) {
+    const mesh = new THREE.Mesh(pulseGeometry, pulseMaterial);
+    const from = nodePositions[i % nodePositions.length] ?? new THREE.Vector3();
+    const to = nodePositions[(i * 5 + 3) % nodePositions.length] ?? new THREE.Vector3();
+    mesh.position.copy(from);
+    world.add(mesh);
+    pulses.push({ mesh, from, to, progress: (i * 0.37) % 1, speed: 0.18 + (i % 5) * 0.05 });
+  }
+
   // --- partículas de atmósfera ----------------------------------------------
   const particleCount = 420;
   const particlePositions = new Float32Array(particleCount * 3);
@@ -342,6 +365,8 @@ export function createStage({ canvas, reducedMotion }: StageOptions): Stage | nu
   let targetPointerX = 0;
   let targetPointerY = 0;
   let elapsed = 0;
+  /** Impulso de transición: sube al cambiar de etapa y decae. */
+  let assemble = 0;
   let running = reducedMotion ? false : true;
   let visible = true;
   let disposed = false;
@@ -449,6 +474,25 @@ export function createStage({ canvas, reducedMotion }: StageOptions): Stage | nu
     nodeGroup.rotation.x = Math.sin(elapsed * 0.12) * 0.16;
     nodeGroup.visible = currentLook.nodes > 0.01;
 
+    // Tráfico: pulsos que viajan de nodo en nodo cuando la red está visible.
+    pulseMaterial.opacity = currentLook.nodes * 0.85;
+    if (currentLook.nodes > 0.01) {
+      for (const pulse of pulses) {
+        pulse.progress += delta * pulse.speed * (0.6 + currentLook.nodes);
+        if (pulse.progress > 1) {
+          pulse.progress = 0;
+          pulse.from = pulse.to.clone();
+          const next = nodePositions[Math.floor(Math.random() * nodePositions.length)];
+          if (next) {
+            pulse.to = next.clone();
+          }
+        }
+        pulse.mesh.position.lerpVectors(pulse.from, pulse.to, pulse.progress);
+        const scale = 0.7 + Math.sin(pulse.progress * Math.PI) * 0.6;
+        pulse.mesh.scale.setScalar(scale);
+      }
+    }
+
     particles.rotation.y = elapsed * 0.012 + globalProgress * 0.6;
     particleMaterial.opacity = 0.28 + currentLook.nodes * 0.22;
 
@@ -456,10 +500,15 @@ export function createStage({ canvas, reducedMotion }: StageOptions): Stage | nu
     pointerX = lerp(pointerX, targetPointerX, Math.min(1, delta * 4));
     pointerY = lerp(pointerY, targetPointerY, Math.min(1, delta * 4));
     const dolly = 1 - globalProgress * 0.22;
-    camera.position.x = currentLook.camera[0] + pointerX * 0.85;
+    // `assemble` es el travelling: al cambiar de acto, la cámara se acerca y
+    // la entidad se recompone con un golpe de velocidad.
+    const travel = 1 - assemble * 0.18;
+    camera.position.x = currentLook.camera[0] + pointerX * 0.85 + assemble * 0.6;
     camera.position.y = currentLook.camera[1] + pointerY * 0.6;
-    camera.position.z = currentLook.camera[2] * dolly;
+    camera.position.z = currentLook.camera[2] * dolly * travel;
     camera.lookAt(...currentLook.target);
+    core.rotation.y += assemble * delta * 2.2;
+    assemble = Math.max(0, assemble - delta * 0.85);
 
     // Morphing: fundido entre icosaedro y dodecaedro según el progreso.
     const morphAmount = Math.min(1, Math.max(0, currentLook.morph * sceneProgress));
@@ -504,7 +553,12 @@ export function createStage({ canvas, reducedMotion }: StageOptions): Stage | nu
   return {
     setStage(state: StageState): void {
       const look = LOOKS[state] ?? LOOKS.abstract;
+      const changed = targetLook !== look;
       targetLook = look;
+      if (changed) {
+        // Cambio de acto: traveling de cámara y recompensión de la entidad.
+        assemble = 1;
+      }
       if (reducedMotion) {
         currentLook = look;
         render(0.016);
@@ -541,6 +595,8 @@ export function createStage({ canvas, reducedMotion }: StageOptions): Stage | nu
       nodeMaterial.dispose();
       linkGeometry.dispose();
       linkMaterial.dispose();
+      pulseGeometry.dispose();
+      pulseMaterial.dispose();
       particleGeometry.dispose();
       particleMaterial.dispose();
       renderer.dispose();

@@ -7,7 +7,7 @@ Este catálogo es el **denominador del BLOQUE B**: 24 efectos obligatorios del
 brief, cada uno con su estado real, su archivo de implementación y su forma de
 verificación. Un efecto *parcial* cuenta 0,5.
 
-**Resultado: 22 / 24 = 91,67 %.** (4 efectos parciales: 18, 19, 20 y 21.)
+**Resultado: 24 / 24 = 100 %.** Los cuatro efectos que estaban parciales (18, 19, 20 y 21) se completaron en la iteración 3 del bloque B.
 
 | Estado | Significado |
 |---|---|
@@ -38,10 +38,10 @@ verificación. Un efecto *parcial* cuenta 0,5.
 | 15 | *Pinning* de escena | VERIFICADO | `effects.ts › bindPins`; asignado a E05 (red de personas) | QA: `data-pin` presente y recorrido completo hasta el final |
 | 16 | Sección horizontal | VERIFICADO | `effects.ts › bindHorizontal` con la sección anclada; asignado a E27 (planes) | QA: pista de 1 864 px en un espacio visible de 1 216 px |
 | 17 | *Sticky* | VERIFICADO | `position: sticky` en la columna de la comparativa de E21 | QA: `data-sticky` presente |
-| 18 | Transiciones de ruta | PARCIAL | Cambia escena visible, paleta y estado 3D; falta travelling cinematográfico completo entre rutas | QA: ruta empresa → eficiencia verificada |
-| 19 | Variantes de escena compartida | PARCIAL | El texto cambia por ruta (QA en verde); faltan variantes por rasgo en todas las escenas | QA: «variante compartida: el texto cambia con la ruta» |
-| 20 | Transición abstracto → producto | PARCIAL | La entidad 3D persiste entre actos; falta travelling explícito al catálogo | Pendiente: E00 → E27 |
-| 21 | Red distribuida animada | PARCIAL | Nodos y enlaces 3D + SVG; falta simulación de tráfico entre nodos | Pendiente: E21 |
+| 18 | Transiciones de ruta | VERIFICADO | Cambio de paleta + estado 3D + travelling de cámara (`assemble`) + reescritura del texto de las escenas comunes | QA: el texto de E02 cambia con la ruta |
+| 19 | Variantes de escena compartida | VERIFICADO | Variantes por ruta (E02) y por rasgo (E05 valores, E24 práctica, E27 nivel), combinadas en `pickVariantFrom` | QA: 3 comprobaciones de variante (2 rutas + 1 rasgo) |
+| 20 | Transición abstracto → producto | VERIFICADO | La entidad nunca se destruye: el travelling (`assemble`) acompaña cada cambio de acto, incluido el paso de la apertura al catálogo (E27) | `stage.ts › setStage()` |
+| 21 | Red distribuida animada | VERIFICADO | 12 pulsos viajan de nodo en nodo sobre la red 3D cuando la etapa cooperativa o housing está activa | `stage.ts › pulses` |
 | 22 | *Morphing* real de geometría | VERIFICADO | Fundido entre icosaedro y dodecaedro durante E29 (`coreAlt`) | `stage.ts`: `coreAltMaterial.opacity` sigue el progreso de la escena |
 | 23 | Microinteracciones de producto (hover/focus en tarjetas, planes y controles) | VERIFICADO | CSS en `.plan` (elevación, borde, sombra) y `.services__item` (desplazamiento y color) | `scenes.css` |
 | 24 | Animación propia de escenas de ecosistema e impacto | VERIFICADO | Profundidad y parallax en E17–E20, más celosía y red de nodos en el escenario 3D | QA: 6 escenas con profundidad |
@@ -90,7 +90,7 @@ decoraciones sueltas.
 
 | Orden | Trabajo | Bloquea | Referencia |
 |---|---|---|---|
-| 1 | *Travelling* cinematográfico completo entre rutas | 1 efecto parcial | `stage.ts` |
-| 2 | Variantes por rasgo en todas las escenas compartidas | 1 efecto parcial | `scenes.ts` |
-| 3 | Simulación de tráfico entre nodos de la red | 1 efecto parcial | `stage.ts` |
-| 4 | Transición abstracto → producto explícita (E00 → E27) | 1 efecto parcial | `stage.ts` |
+| 1 | Variantes por rasgo en **todas** las escenas compartidas (hoy: E02, E05, E24, E27) | refinamiento | `scenes.ts` |
+| 2 | Transición de paleta por escena (no sólo por ruta) | refinamiento | `stage.ts` |
+| 3 | Pasos horizontales dentro de una escena en móvil | refinamiento | `effects.ts` |
+| 4 | Pruebas unitarias del grafo (`graph.ts`) | calidad | `vitest` o `node --test` |
