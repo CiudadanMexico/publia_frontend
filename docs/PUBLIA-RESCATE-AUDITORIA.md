@@ -45,7 +45,7 @@ denominador.
 | 13 | El despliegue no depende de un único proceso | arquitectura host/contenedor | **PASS** | origen estático en el host (`publia-frontend-static.service`, 4322) + build en contenedor + `publia-frontend-ensure.timer` (2 min) |
 | 14 | Dominio propio con TLS y hostname estable | panel de Cloudflare | **FALLA (P1)** | hoy se sirve por *quick tunnel* efímero; el subdominio permanente `preview-publia6.ciudadan.org` requiere acción de Dany (token o panel) |
 | 15 | La URL pública sirve exactamente el buildauditado | comparación de `data-scene-id` en el HTML público | **PASS** | 31 escenas (`E00`–`E30` + hero) en el HTML público |
-| 16 | Existe una QA automatizada y repetible | `scripts/qa.mjs` | **PASS** | 39/39 criterios en local y 39/39 en la URL pública |
+| 16 | Existe una QA automatizada y repetible | `scripts/qa.mjs` | **PASS** | 64/64 criterios en local y 64/64 en la URL pública; 15 pruebas unitarias (`npm test`) |
 
 **Resultado del bloque de verificación: 15/16 (93,75 %).** El punto 14
 depende de una acción humana externa (crear el hostname en Cloudflare) y está
@@ -83,7 +83,7 @@ documentado como P1, no como avance perdido.
 | P2-1 | No hay *morphing* real de geometría: hoy hay fragmentación y recomposición de facetas. | Añadir morph objetivo entre geometrías con `three` (BLOQUE B, iteración 2). |
 | P2-2 | *Pinning*, sección horizontal y *sticky* están implementados en la biblioteca pero sin escena asignada. | Asignarlos a E05 (red), E21 (infraestructura) y E27 (planes). |
 | P2-3 | Las imágenes heredadas no tienen AVIF/WebP ni `width/height` para evitar CLS. | Canalizar por el CMS y por `astro:assets`. |
-| P2-4 | El grafo no tiene pruebas unitarias. | `vitest` para `graph.ts` (variantes, destinos, segmentos). |
+| P2-4 | ~~El grafo no tiene pruebas unitarias.~~ **Resuelto:** 15 pruebas con `node --test` sobre el módulo empaquetado (`npm test`). | Extender las pruebas a los módulos de escena cuandoLogic tenga renderizado en Astro. |
 | P2-5 | El paso horizontal no existe en móvil: en 390 px el recorrido es vertical (correcto) pero sin resumen de pasos. | Resumen por escena en móvil. |
 
 ---

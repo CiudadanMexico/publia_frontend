@@ -19,7 +19,7 @@ porcentajes se calculan con criterios verificables y están detallados en
 | **D · Ecosistema e impacto** | 10/10 (100 %) | Escenas E16–E22; reparto 50/25/25 verificado |
 | **E · Productos y demostraciones** | 10/10 (100 %) | 5 niveles con precios reales + catálogo heredado con 19 servicios publicados |
 | **F · Conversión** | 8/8 (100 %) | CTA contextual, formulario contextual sin captura en servidor, WhatsApp, eventos |
-| **G · Calidad** | 10/10 (100 %) | QA 64/64 en local y en la URL pública, axe sin violaciones, presupuesto de peso |
+| **G · Calidad** | 11/11 (100 %) | QA 64/64 en local y en la URL pública, axe sin violaciones, presupuesto de peso, 15 pruebas unitarias |
 
 ### Contenido construido
 
@@ -46,6 +46,7 @@ porcentajes se calculan con criterios verificables y están detallados en
 | Comprobación | Resultado |
 |---|---|
 | `npm run check` (tsc estricto) | 0 errores |
+| `npm test` (pruebas del grafo y el catálogo) | 15/15 |
 | `npm run build` | 3,2 s · 1 página |
 | Suite QA en local | **64/64** |
 | Suite QA en la URL pública | **64/64** |
@@ -148,6 +149,7 @@ npm run dev          # desarrollo en http://127.0.0.1:4321
 npm run build        # compilación estática en dist/
 npm run preview      # sirve dist/ en http://127.0.0.1:4322
 npm run check        # TypeScript estricto (tsc --noEmit)
+npm test             # Pruebas unitarias del grafo y el catálogo (node --test)
 npm run sync:content # regenera el snapshot desde el REST de WordPress
 ```
 
@@ -238,7 +240,7 @@ publia-frontend/
 3. **BLOQUE F**: captura de contactos en servidor con base legal (P1-4); el
    formulario contextual ya está listo para cambiar de destino.
 4. **BLOQUE G**: Lighthouse en CI y una pasada de axe por cada ruta.
-5. Pruebas unitarias del grafo (`graph.ts`) con `vitest`.
+5. Extender las pruebas unitarias a los módulos de escena (render de Astro).
 
 Nada de lo anterior se ejecuta en producción sin aprobación explícita.
 

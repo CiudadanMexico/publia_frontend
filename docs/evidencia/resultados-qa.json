@@ -1,5 +1,5 @@
 {
-  "base": "http://127.0.0.1:4322",
+  "base": "https://kitty-midi-grid-liked.trycloudflare.com",
   "total": 64,
   "fallos": 0,
   "resultados": [
@@ -31,12 +31,12 @@
     {
       "name": "prisma: la escena 3D se renderiza y cambia (animación real)",
       "ok": true,
-      "detail": "173246 vs 173279 bytes"
+      "detail": "173195 vs 171926 bytes"
     },
     {
       "name": "prisma: pinta una fracción útil del viewport",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.15245756172839506}"
+      "detail": "{\"paintedRatio\":0.1509297839506173}"
     },
     {
       "name": "grafo: 31 escenas montadas (E00-E30)",
@@ -306,7 +306,7 @@
     {
       "name": "rendimiento: JS + CSS inicial por debajo de 220 kB",
       "ok": true,
-      "detail": "200 kB (JS 195 · CSS 6)"
+      "detail": "199 kB (JS 194 · CSS 5)"
     },
     {
       "name": "rendimiento: el escenario 3D se carga sólo bajo demanda",
