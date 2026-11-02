@@ -2,9 +2,10 @@
  * Orquestador de la experiencia en el navegador.
  *
  * Responsabilidades:
- * - Conectar el motor de estado con el DOM (paleta, contenido, navegación).
- * - Traducir scroll y puntero en movimiento del prisma.
- * - Emitir los eventos semánticos sin duplicarlos.
+ * - Conectar el motor de estado con el DOM (ruta, segmentos, navegación).
+ * - Alimentar el escenario 3D persistente con el estado narrativo.
+ * - Delegar el movimiento a la biblioteca de efectos (GSAP + ScrollTrigger).
+ * - Emitir eventos semánticos sin duplicarlos.
  *
  * Se carga como módulo y no hidrata la página: sólo el JavaScript necesario.
  */
@@ -21,8 +22,11 @@ import {
   subscribe,
 } from '../lib/experience/state';
 import { initAnalytics, track } from '../lib/experience/events';
+import { initEffects } from '../lib/animation/effects';
+import { visitorSegments } from '../lib/experience/graph';
 import { buildMailto } from '../data/site';
-import type { PrimaryRoute, VisitorState } from '../lib/experience/state';
+import type { PrimaryRoute, VisitorState, VisitorTrait } from '../lib/experience/state';
+import type { StageState } from '../lib/experience/types';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -40,12 +44,9 @@ function prefersReducedMotion(): boolean {
 }
 
 /**
- * Desplaza a un ancla.
- *
- * Se espera dos frames para que el reflujo del layout (ocultar o mostrar
- * escenas al cambiar de ruta) se estabilice: si el documento cambia de altura
- * durante una animación suave, el navegador cancela el scroll y la página
- * se queda a medio camino. Por eso el reinicio usa scroll instantáneo.
+ * Desplaza a un ancla esperando dos frames: si el documento cambia de altura
+ * durante una animación suave (al ocultar o mostrar escenas por ruta), el
+ * navegador cancela el scroll y la página se queda a medio camino.
  */
 function scrollTo(target: string, instant = false): void {
   const element = document.querySelector<HTMLElement>(target);
@@ -61,42 +62,11 @@ function scrollTo(target: string, instant = false): void {
   });
 }
 
-/** Aplica el texto de la variante correspondiente a la ruta y los rasgos. */
-function applySceneVariants(state: VisitorState): void {
-  const sections = document.querySelectorAll<HTMLElement>('[data-scene-id]');
-  sections.forEach((section) => {
-    const payload = section.querySelector('script[data-role="variants"]')?.textContent;
-    if (!payload) {
-      return;
-    }
-    let parsed: {
-      routes?: Record<string, { title?: string; body?: string; eyebrow?: string }>;
-      traits?: Record<string, { title?: string; body?: string; eyebrow?: string }>;
-    };
-    try {
-      parsed = JSON.parse(payload) as typeof parsed;
-    } catch {
-      return;
-    }
-
-    let variant = parsed.routes?.[state.primary];
-    for (const trait of state.traits) {
-      const traitVariant = parsed.traits?.[trait];
-      if (traitVariant) {
-        variant = { ...(variant ?? {}), ...traitVariant };
-      }
-    }
-    if (!variant) {
-      return;
-    }
-
-    const eyebrow = section.querySelector<HTMLElement>('[data-role="eyebrow"]');
-    const title = section.querySelector<HTMLElement>('[data-role="title"]');
-    const body = section.querySelector<HTMLElement>('[data-role="body"]');
-    if (variant.eyebrow && eyebrow) eyebrow.textContent = variant.eyebrow;
-    if (variant.title && title) title.textContent = variant.title;
-    if (variant.body && body) body.textContent = variant.body;
-  });
+/** Refleja ruta y segmentos en el documento (los usa el CSS). */
+function applyDocumentContext(state: VisitorState): void {
+  applyDocumentState(state);
+  const root = document.documentElement;
+  root.dataset['segments'] = visitorSegments(state).join(' ');
 }
 
 /**
@@ -111,7 +81,50 @@ function applyContactContext(state: VisitorState): void {
   });
 }
 
-function bindRouteControls(prism: { setRoute: (route: PrimaryRoute) => void } | null): void {
+/** Estado visual del escenario 3D para la escena activa. */
+function stageForScene(scene: HTMLElement, route: PrimaryRoute): StageState {
+  const payload = scene.dataset['stageVariants'];
+  if (payload) {
+    try {
+      const variants = JSON.parse(payload) as Partial<Record<PrimaryRoute, StageState>>;
+      const variant = variants[route];
+      if (variant) {
+        return variant;
+      }
+    } catch {
+      /* datos corruptos: se usa el estado base */
+    }
+  }
+  const base = scene.dataset['stage'];
+  return (base as StageState | undefined) ?? 'abstract';
+}
+
+interface StageHandle {
+  setStage: (state: StageState) => void;
+  setSceneProgress: (progress: number) => void;
+  setScrollProgress: (progress: number) => void;
+  setPointer: (x: number, y: number) => void;
+}
+
+async function initStage(): Promise<StageHandle | null> {
+  const canvas = document.querySelector<HTMLCanvasElement>('[data-prism-canvas]');
+  if (!canvas) {
+    return null;
+  }
+  const layer = canvas.closest<HTMLElement>('.prism-layer');
+  const reduced = prefersReducedMotion();
+
+  const { createStage } = await import('../lib/three/stage');
+  const stage = createStage({ canvas, reducedMotion: reduced });
+  if (!stage) {
+    layer?.classList.add('is-fallback');
+    return null;
+  }
+  layer?.classList.add('is-ready');
+  return stage;
+}
+
+function bindRouteControls(stage: StageHandle | null): void {
   const choiceButtons = document.querySelectorAll<HTMLButtonElement>('[data-route-choice]');
   choiceButtons.forEach((button) => {
     button.addEventListener('click', () => {
@@ -121,10 +134,32 @@ function bindRouteControls(prism: { setRoute: (route: PrimaryRoute) => void } | 
       }
       setPrimaryRoute(route);
       track(route === 'enterprise' ? 'hero_enterprise_selected' : 'hero_efficiency_selected');
-      prism?.setRoute(route);
       window.setTimeout(() => {
         ScrollTrigger.refresh();
-        const target = button.dataset['target'] ?? '#ruta-empresa';
+        scrollTo(button.dataset['target'] ?? '#escena-e03');
+      }, 160);
+    });
+  });
+
+  // Bifurcaciones narrativas (E14): eligen un rasgo y llevan a su escena.
+  const branchButtons = document.querySelectorAll<HTMLButtonElement>('[data-branch-target]');
+  branchButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      const trait = button.dataset['branchTrait'];
+      const route = button.dataset['branchRoute'];
+      const target = button.dataset['branchTarget'] ?? '#escena-e15';
+      if (route === 'enterprise' || route === 'efficiency' || route === 'explorer') {
+        setPrimaryRoute(route);
+      }
+      if (trait) {
+        // Los rasgos se añaden desde el estado del visitante.
+        void import('../lib/experience/state').then((module) =>
+          module.addTraits([trait as VisitorTrait]),
+        );
+      }
+      track('cooperative_interest', { target, trait: trait ?? 'ninguno' });
+      window.setTimeout(() => {
+        ScrollTrigger.refresh();
         scrollTo(target);
       }, 160);
     });
@@ -140,11 +175,8 @@ function bindRouteControls(prism: { setRoute: (route: PrimaryRoute) => void } | 
   const resetButtons = document.querySelectorAll<HTMLButtonElement>('[data-route-reset]');
   resetButtons.forEach((button) => {
     button.addEventListener('click', () => {
-      // Al reiniciar se vuelve al hero: se evita que el reflujo del layout
-      // reactive de inmediato la ruta de exploración.
       implicitSuppressed = true;
       resetExperience();
-      prism?.setRoute('unclassified');
       track('scene_viewed', { scene: 'route_reset' });
       window.setTimeout(() => {
         ScrollTrigger.refresh();
@@ -152,26 +184,6 @@ function bindRouteControls(prism: { setRoute: (route: PrimaryRoute) => void } | 
       }, 160);
     });
   });
-}
-
-function bindReveals(): void {
-  const targets = document.querySelectorAll<HTMLElement>('[data-reveal]');
-  if (prefersReducedMotion() || !('IntersectionObserver' in window)) {
-    targets.forEach((target) => target.classList.add('is-visible'));
-    return;
-  }
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-visible');
-          observer.unobserve(entry.target);
-        }
-      });
-    },
-    { rootMargin: '0px 0px -12% 0px', threshold: 0.15 },
-  );
-  targets.forEach((target) => observer.observe(target));
 }
 
 /**
@@ -184,8 +196,6 @@ function updateImplicitRoute(): void {
   if (hero) {
     const heroRect = hero.getBoundingClientRect();
     if (heroRect.bottom > window.innerHeight * 0.5) {
-      // El visitante ha vuelto al inicio: la ruta implícita vuelve a estar
-      // disponible.
       implicitSuppressed = false;
     }
   }
@@ -235,51 +245,19 @@ function bindSceneTracking(): void {
         if (markSceneVisited(sceneId)) {
           track('scene_viewed', { scene: sceneId, route: getState().primary });
         }
-        if (sceneId === 'hero') {
+        if (sceneId === 'E01') {
           track('hero_entered');
           implicitSuppressed = false;
         }
-        if (sceneId === 'exploracion') {
-          updateImplicitRoute();
-        }
       },
       onEnterBack: () => {
-        if (sceneId === 'hero') {
+        if (sceneId === 'E01') {
           track('hero_entered');
           implicitSuppressed = false;
         }
       },
     });
   });
-
-}
-
-async function initPrism(): Promise<{
-  setRoute: (route: PrimaryRoute) => void;
-  setScrollProgress: (progress: number) => void;
-  setPointer: (x: number, y: number) => void;
-} | null> {
-  const canvas = document.querySelector<HTMLCanvasElement>('[data-prism-canvas]');
-  if (!canvas) {
-    return null;
-  }
-  const layer = canvas.closest<HTMLElement>('.prism-layer');
-  const reduced = prefersReducedMotion();
-
-  // En móviles se reduce la resolución: el prisma es decorativo, no informativo.
-  if (!reduced && 'ontouchstart' in window) {
-    canvas.dataset['lowPower'] = 'true';
-  }
-
-  const { createPrism } = await import('../lib/three/prism');
-  const prism = createPrism(canvas, { reducedMotion: reduced });
-  if (!prism) {
-    layer?.classList.add('is-fallback');
-    return null;
-  }
-  layer?.classList.add('is-ready');
-  prism.setRoute(getState().primary);
-  return prism;
 }
 
 export async function startExperience(): Promise<void> {
@@ -289,51 +267,90 @@ export async function startExperience(): Promise<void> {
   started = true;
 
   initAnalytics();
-  applyDocumentState(getState());
+  applyDocumentContext(getState());
 
-  const prism = await initPrism();
+  const stage = await initStage();
+  const progressByScene = new Map<string, number>();
 
-  if (prism) {
-    ScrollTrigger.create({
-      trigger: document.body,
-      start: 'top top',
-      end: 'bottom bottom',
-      scrub: 0.6,
-      onUpdate: (self) => {
-        prism.setScrollProgress(self.progress);
-      },
+  const applyActiveScene = (): void => {
+    let activeId: string | null = null;
+    let bestDistance = Number.POSITIVE_INFINITY;
+    progressByScene.forEach((progress, id) => {
+      const distance = Math.abs(progress - 0.5);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        activeId = id;
+      }
     });
+    if (!activeId) {
+      return;
+    }
+    const element = document.querySelector<HTMLElement>(`[data-scene-id="${activeId}"]`);
+    if (!element) {
+      return;
+    }
+    stage?.setStage(stageForScene(element, getState().primary));
+  };
 
+  const destroyEffects = initEffects({
+    reducedMotion: prefersReducedMotion(),
+    onSceneProgress: (sceneId, progress) => {
+      progressByScene.set(sceneId, progress);
+      const element = document.querySelector<HTMLElement>(`[data-scene-id="${sceneId}"]`);
+      if (element && Math.abs(progress - 0.5) < 0.12) {
+        stage?.setSceneProgress(Math.abs(progress - 0.5) * 2);
+        stage?.setStage(stageForScene(element, getState().primary));
+      }
+    },
+    onGlobalProgress: (progress) => {
+      stage?.setScrollProgress(progress);
+    },
+  });
+
+  if (stage) {
     const hero = document.querySelector<HTMLElement>('#inicio');
     hero?.addEventListener(
       'pointermove',
       (event) => {
         const x = (event.clientX / window.innerWidth) * 2 - 1;
         const y = -((event.clientY / window.innerHeight) * 2 - 1);
-        prism.setPointer(x, y);
+        stage.setPointer(x, y);
       },
       { passive: true },
     );
   }
 
-  bindRouteControls(prism);
-  bindReveals();
+  bindRouteControls(stage);
   bindSceneTracking();
   bindImplicitRouteWatcher();
 
+  // Un refresco de ScrollTrigger recalcula el scroll y cancela los scrolls
+  // suaves en curso: sólo se hace cuando cambia la visibilidad (ruta o
+  // segmentos), nunca por cada escena visitada.
+  let lastRoute = getState().primary;
+  let lastSegments = visitorSegments(getState()).join(' ');
   subscribe((state) => {
-    applyDocumentState(state);
-    applySceneVariants(state);
+    applyDocumentContext(state);
     applyContactContext(state);
-    prism?.setRoute(state.primary);
+    const segments = visitorSegments(state).join(' ');
+    const visibilityChanged = state.primary !== lastRoute || segments !== lastSegments;
+    lastRoute = state.primary;
+    lastSegments = segments;
     window.setTimeout(() => {
-      ScrollTrigger.refresh();
+      if (visibilityChanged) {
+        ScrollTrigger.refresh();
+      }
       updateImplicitRoute();
+      applyActiveScene();
     }, 80);
   });
 
-  applySceneVariants(getState());
   applyContactContext(getState());
+  window.setTimeout(applyActiveScene, 220);
+
+  window.addEventListener('pagehide', () => {
+    destroyEffects();
+  }, { once: true });
 }
 
 if (document.readyState === 'loading') {

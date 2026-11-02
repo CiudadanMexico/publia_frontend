@@ -1,5 +1,8 @@
 {
-  "results": [
+  "base": "http://127.0.0.1:4322",
+  "total": 39,
+  "fallos": 0,
+  "resultados": [
     {
       "name": "carga inicial sin errores JS",
       "ok": true,
@@ -16,29 +19,49 @@
       "detail": "2 CTA"
     },
     {
-      "name": "prisma: canvas presente y WebGL activo",
+      "name": "hero: jerarquía tipográfica y CTA táctil",
       "ok": true,
-      "detail": "{\"present\":true,\"ready\":true,\"webgl\":true,\"size\":[1440,900]}"
+      "detail": "título 126.4px · CTA 74.21875px"
     },
     {
-      "name": "prisma: contexto WebGL disponible",
+      "name": "prisma: canvas presente y WebGL activo",
       "ok": true,
-      "detail": "{\"webgl\":true}"
+      "detail": "{\"present\":true,\"webgl\":true,\"size\":[1440,720]}"
     },
     {
       "name": "prisma: la escena 3D se renderiza y cambia (animación real)",
       "ok": true,
-      "detail": "188090 vs 189327 bytes"
+      "detail": "172310 vs 170447 bytes"
     },
     {
-      "name": "visual: el prisma pinta una fracción útil del viewport",
+      "name": "prisma: pinta una fracción útil del viewport",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.174,\"brightRatio\":0.144,\"titleSize\":126.4,\"titleWeight\":\"600\",\"ctaHeight\":74,\"ctaWidth\":324}"
+      "detail": "{\"paintedRatio\":0.14375385802469134}"
     },
     {
-      "name": "visual: jerarquía tipográfica (título grande) y CTA táctil (>=44px)",
+      "name": "grafo: 31 escenas montadas (E00-E30)",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.174,\"brightRatio\":0.144,\"titleSize\":126.4,\"titleWeight\":\"600\",\"ctaHeight\":74,\"ctaWidth\":324}"
+      "detail": "31 escenas"
+    },
+    {
+      "name": "red humana: enlaces dibujados",
+      "ok": true,
+      "detail": "8 enlaces"
+    },
+    {
+      "name": "demostraciones marcadas como simulación",
+      "ok": true,
+      "detail": "6 bloques"
+    },
+    {
+      "name": "catálogo: cinco niveles de membresía",
+      "ok": true,
+      "detail": "5 planes"
+    },
+    {
+      "name": "housing: reparto en tres bandas",
+      "ok": true,
+      "detail": "3 bandas"
     },
     {
       "name": "ruta empresa: estado aplicado",
@@ -46,24 +69,44 @@
       "detail": "enterprise"
     },
     {
-      "name": "ruta empresa: escena compartida adaptada",
+      "name": "ruta empresa: segmentos aplicados",
       "ok": true,
-      "detail": "ACTIVOS DIGITALES, CONTROL TOTAL."
+      "detail": "enterprise"
     },
     {
-      "name": "ruta empresa: su escena visible, la de exploración no",
+      "name": "ruta empresa: escena propia visible",
       "ok": true,
-      "detail": ""
+      "detail": "653px"
     },
     {
-      "name": "cambio de elección: vuelve a estado neutral",
+      "name": "ruta empresa: contenido de la escena",
+      "ok": true,
+      "detail": "Ya tienes mucho construido. El riesgo no es empezar: es que nada se conecte."
+    },
+    {
+      "name": "ruta eficiencia: escena propia visible",
+      "ok": true,
+      "detail": "653px"
+    },
+    {
+      "name": "ruta eficiencia: mensaje propio de la escena",
+      "ok": true,
+      "detail": "Hacer más con menos no es trabajar más rápido. Es dejar de repetirte."
+    },
+    {
+      "name": "variante compartida: el texto cambia con la ruta",
+      "ok": true,
+      "detail": "Elige por dónde quieres entrar. El resto se arma solo."
+    },
+    {
+      "name": "cambio de ruta: vuelve al estado neutral",
       "ok": true,
       "detail": "unclassified"
     },
     {
-      "name": "ruta eficiencia: escena compartida adaptada",
+      "name": "cambio de ruta: regresa al hero",
       "ok": true,
-      "detail": "CONECTA LO QUE YA FUNCIONA."
+      "detail": "scrollY 0"
     },
     {
       "name": "ruta exploración: se activa por scroll natural",
@@ -71,9 +114,69 @@
       "detail": "explorer"
     },
     {
-      "name": "ruta exploración: escena compartida adaptada",
+      "name": "ruta exploración: escena visible",
       "ok": true,
-      "detail": "HAY OTRA FORMA DE ORGANIZAR EL TRABAJO."
+      "detail": "594px"
+    },
+    {
+      "name": "ruta exploración: dos bifurcaciones",
+      "ok": true,
+      "detail": "2 opciones"
+    },
+    {
+      "name": "bifurcaciones: apuntan a escenas reales",
+      "ok": true,
+      "detail": "#escena-e15, #escena-e24"
+    },
+    {
+      "name": "bifurcación: el rasgo queda registrado",
+      "ok": true,
+      "detail": "value_driven"
+    },
+    {
+      "name": "bifurcación: abre la escena cooperativa",
+      "ok": true,
+      "detail": "544px"
+    },
+    {
+      "name": "catálogo: BASE $300",
+      "ok": true,
+      "detail": "$300 MXN/mes"
+    },
+    {
+      "name": "catálogo: CRECIMIENTO $2,000",
+      "ok": true,
+      "detail": "$2,000 MXN/mes"
+    },
+    {
+      "name": "catálogo: OPERACIÓN $3,000",
+      "ok": true,
+      "detail": "$3,000 MXN/mes"
+    },
+    {
+      "name": "catálogo: COBERTURA $4,000",
+      "ok": true,
+      "detail": "$4,000 MXN/mes"
+    },
+    {
+      "name": "catálogo: AGENTE como rango pendiente",
+      "ok": true,
+      "detail": "$500 MXN–$600 MXN/mes"
+    },
+    {
+      "name": "housing: reparto 50/25/25",
+      "ok": true,
+      "detail": "50/25/25"
+    },
+    {
+      "name": "conversión: CTA de contacto visible",
+      "ok": true,
+      "detail": "52px"
+    },
+    {
+      "name": "conversión: correo con contexto de navegación",
+      "ok": true,
+      "detail": "mailto:hola@publia.mx?subject=Diagn%C3%B3stico%20empresarial%20%E2%80%94%20Publi"
     },
     {
       "name": "móvil: sin desbordamiento horizontal",
@@ -88,8 +191,12 @@
     {
       "name": "movimiento reducido: contenido visible y sin animación",
       "ok": true,
-      "detail": "{\"layerReady\":true,\"revealsVisible\":true}"
+      "detail": "{\"layerReady\":true,\"reveals\":true,\"heroVisible\":true}"
+    },
+    {
+      "name": "sin errores JS al final del recorrido",
+      "ok": true,
+      "detail": ""
     }
-  ],
-  "failed": 0
+  ]
 }
