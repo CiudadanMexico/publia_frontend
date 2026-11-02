@@ -1,0 +1,75 @@
+---
+/**
+ * Catálogo en escena: `plans`, `catalog`, `coverage`.
+ * Muestra precios confirmados y marca como pendiente lo que no lo está.
+ */
+import type { ResolvedScene } from '../../../lib/experience/graph';
+
+interface Props {
+  scene: ResolvedScene;
+}
+
+const { scene } = Astro.props;
+const plans = scene.data?.plans ?? [];
+const services = scene.data?.services ?? [];
+const windows = scene.data?.windows ?? [];
+---
+
+<section class="catalog" data-module={scene.modules[0]}>
+  <div class="catalog__intro">
+    {scene.eyebrow && <p class="catalog__eyebrow" data-role="eyebrow" data-reveal>{scene.eyebrow}</p>}
+    <h2 class="catalog__title" data-role="title" data-reveal="lines">{scene.title}</h2>
+    {scene.lead && <p class="catalog__lead" data-role="lead" data-reveal>{scene.lead}</p>}
+    {scene.body && <p class="catalog__body" data-role="body" data-reveal>{scene.body}</p>}
+  </div>
+
+  {
+    plans.length > 0 && (
+      <div class="plans" data-reveal-group>
+        {plans.map((plan, index) => (
+          <article class={`plan${plan.highlight ? ' plan--highlight' : ''}`} data-reveal style={`--index:${index}`}>
+            <h3 class="plan__name">{plan.name}</h3>
+            <p class="plan__price">{plan.price}</p>
+            <ul class="plan__features">
+              {plan.features.map((feature) => (
+                <li>{feature}</li>
+              ))}
+            </ul>
+          </article>
+        ))}
+      </div>
+    )
+  }
+
+  {
+    services.length > 0 && (
+      <ul class="services" data-reveal-group>
+        {services.map((service, index) => (
+          <li class="services__item" data-reveal style={`--index:${index}`}>
+            <div class="services__main">
+              <strong class="services__name">{service.name}</strong>
+              <span class="services__detail">{service.detail}</span>
+            </div>
+            <span class={`services__price${service.price ? '' : ' services__price--pending'}`}>
+              {service.price ?? 'Cotización a medida'}
+            </span>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+
+  {
+    windows.length > 0 && (
+      <div class="coverage" data-reveal-group>
+        {windows.map((window, index) => (
+          <article class="coverage__card" data-reveal style={`--index:${index}`}>
+            <h3 class="coverage__label">{window.label}</h3>
+            <p class="coverage__value">{window.value}</p>
+            {window.note && <p class="coverage__note">{window.note}</p>}
+          </article>
+        ))}
+      </div>
+    )
+  }
+</section>

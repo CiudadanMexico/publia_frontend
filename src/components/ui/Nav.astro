@@ -1,7 +1,10 @@
 ---
 /**
  * Navegación principal. Es un header fijo, ligero y accesible por teclado.
- * Sólo enlaza a secciones que existen en esta entrega.
+ *
+ * Los enlaces apuntan a escenas del grafo narrativo. "Cambiar de ruta" reinicia
+ * el estado del visitante: el recorrido debe poder deshacerse en cualquier
+ * momento (brief §7).
  */
 ---
 
@@ -13,13 +16,17 @@
     </a>
 
     <nav class="nav__links" aria-label="Secciones">
-      <a href="#ruta-empresa">Empresa</a>
-      <a href="#ruta-eficiencia">Eficiencia</a>
-      <a href="#ruta-exploracion">Explorar</a>
-      <a href="#escena-compartida">Lo que ya tienes</a>
+      <a href="#escena-e03">Empresa</a>
+      <a href="#escena-e07">Eficiencia</a>
+      <a href="#escena-e13">Explorar</a>
+      <a href="#escena-e21">Infraestructura</a>
+      <a href="#escena-e27">Membresías</a>
     </nav>
 
-    <a class="button button--small button--ghost nav__cta" href="#escena-cierre">Conocernos</a>
+    <div class="nav__actions">
+      <button type="button" class="nav__reset" data-route-reset>Cambiar de ruta</button>
+      <a class="button button--small button--ghost nav__cta" href="#escena-e30">Conocernos</a>
+    </div>
   </div>
 </header>
 
@@ -77,14 +84,56 @@
       border-color var(--dur-fast) var(--ease-out);
   }
 
-  .nav__links a:hover {
+  .nav__links a:hover,
+  .nav__links a:focus-visible {
     color: var(--paper);
     border-color: var(--scene-accent);
   }
 
-  @media (min-width: 860px) {
+  @media (min-width: 1000px) {
     .nav__links {
       display: flex;
+    }
+  }
+
+  .nav__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .nav__reset {
+    display: none;
+    border: 1px solid var(--border-subtle);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ink-200);
+    font: inherit;
+    font-size: var(--step--1);
+    padding: 0.35rem 0.8rem;
+    cursor: pointer;
+    transition:
+      color var(--dur-fast) var(--ease-out),
+      border-color var(--dur-fast) var(--ease-out);
+  }
+
+  .nav__reset:hover,
+  .nav__reset:focus-visible {
+    color: var(--paper);
+    border-color: var(--scene-accent);
+  }
+
+  /* El control sólo aparece cuando ya hay una ruta elegida. */
+  html[data-route='enterprise'] .nav__reset,
+  html[data-route='efficiency'] .nav__reset,
+  html[data-route='explorer'] .nav__reset {
+    display: inline-flex;
+  }
+
+  @media (max-width: 520px) {
+    .nav__reset {
+      display: inline-flex !important;
+      padding: 0.3rem 0.6rem;
     }
   }
 

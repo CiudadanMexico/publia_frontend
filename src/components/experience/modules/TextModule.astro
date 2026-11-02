@@ -1,0 +1,34 @@
+---
+/**
+ * Escenas de texto: bloque dividido (split) y lista de capacidades (features).
+ */
+import type { ResolvedScene } from '../../../lib/experience/graph';
+
+interface Props {
+  scene: ResolvedScene;
+}
+
+const { scene } = Astro.props;
+---
+
+<section class="text-scene" data-module={scene.modules.includes('split') ? 'split' : 'features'}>
+  <div class="text-scene__intro">
+    {scene.eyebrow && <p class="text-scene__eyebrow" data-role="eyebrow" data-reveal>{scene.eyebrow}</p>}
+    <h2 class="text-scene__title" data-role="title" data-reveal="lines">{scene.title}</h2>
+    {scene.lead && <p class="text-scene__lead" data-role="lead" data-reveal>{scene.lead}</p>}
+    {scene.body && <p class="text-scene__body" data-role="body" data-reveal>{scene.body}</p>}
+  </div>
+
+  {
+    scene.bullets.length > 0 && (
+      <ul class="capabilities" data-reveal-group>
+        {scene.bullets.map((bullet, index) => (
+          <li class="capabilities__item" data-reveal style={`--index:${index}`}>
+            <span class="capabilities__marker" aria-hidden="true" />
+            <span class="capabilities__text">{bullet}</span>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</section>

@@ -66,13 +66,13 @@ export const HERO: HeroCopy = {
     {
       id: 'enterprise',
       label: 'Soy una gran empresa, o estoy en camino de serlo',
-      target: '#ruta-empresa',
+      target: '#escena-e03',
       hint: 'Soberanía, control y una red de especialistas a tu disposición.',
     },
     {
       id: 'efficiency',
       label: 'Quiero hacer más con menos',
-      target: '#ruta-eficiencia',
+      target: '#escena-e07',
       hint: 'Integrar lo que ya tienes en una sola operación.',
     },
   ],

@@ -1,0 +1,40 @@
+---
+/**
+ * Conversión: `cta`. El enlace de contacto arrastra el contexto de la ruta
+ * (ruta e intereses), sin datos personales ni sensibles.
+ */
+import { SITE, buildMailto } from '../../../data/site';
+import type { ResolvedScene } from '../../../lib/experience/graph';
+
+interface Props {
+  scene: ResolvedScene;
+}
+
+const { scene } = Astro.props;
+const mailto = buildMailto({ route: 'unclassified', traits: [] });
+---
+
+<section class="conversion" id="contacto-publia" data-module="cta">
+  <div class="conversion__intro">
+    {scene.eyebrow && <p class="conversion__eyebrow" data-role="eyebrow" data-reveal>{scene.eyebrow}</p>}
+    <h2 class="conversion__title" data-role="title" data-reveal="lines">{scene.title}</h2>
+    {scene.lead && <p class="conversion__lead" data-role="lead" data-reveal>{scene.lead}</p>}
+    {scene.body && <p class="conversion__body" data-role="body" data-reveal>{scene.body}</p>}
+  </div>
+
+  <div class="conversion__actions" data-reveal>
+    <a
+      class="button button--primary button--large"
+      href={mailto}
+      data-contact-cta="true"
+      data-scene-cta={mailto}
+      data-event="consultation_requested"
+    >
+      Escribir a {SITE.email}
+    </a>
+    <p class="conversion__note">
+      Atiende una persona de la red, no un bot. Si prefieres, llámanos o escríbenos por WhatsApp:
+      <a href={SITE.whatsapp} rel="noopener noreferrer" target="_blank">WhatsApp</a>.
+    </p>
+  </div>
+</section>

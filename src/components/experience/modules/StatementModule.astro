@@ -1,0 +1,44 @@
+---
+/**
+ * Declaración tipográfica de alto impacto y bifurcaciones narrativas.
+ * Cubre los módulos `statement` y `branch`.
+ */
+import type { ResolvedScene } from '../../../lib/experience/graph';
+
+interface Props {
+  scene: ResolvedScene;
+}
+
+const { scene } = Astro.props;
+const branches = scene.data?.branches ?? [];
+---
+
+<section class="statement" data-module="statement">
+  {scene.eyebrow && <p class="statement__eyebrow" data-role="eyebrow" data-reveal>{scene.eyebrow}</p>}
+  <h2 class="statement__title" data-role="title" data-reveal="lines">{scene.title}</h2>
+  {scene.lead && <p class="statement__lead" data-role="lead" data-reveal>{scene.lead}</p>}
+  {scene.body && <p class="statement__body" data-role="body" data-reveal>{scene.body}</p>}
+
+  {
+    branches.length > 0 && (
+      <div class="branch" data-module="branch">
+        {branches.map((branch) => (
+          <button
+            type="button"
+            class="branch__option"
+            data-branch-target={branch.target}
+            data-branch-trait={branch.trait}
+            data-branch-route={branch.route}
+          >
+            <span class="branch__label">{branch.label}</span>
+            <span class="branch__hint" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6">
+                <path d="M5 12h13M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+          </button>
+        ))}
+      </div>
+    )
+  }
+</section>

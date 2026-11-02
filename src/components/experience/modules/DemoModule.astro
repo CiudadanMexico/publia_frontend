@@ -1,0 +1,74 @@
+---
+/**
+ * Demostraciones de producto: `conversation`, `tasks`, `escalation`,
+ * `contentFlow`. Todas se declaran como simulación cuando no están
+ * conectadas a servicios reales (regla del brief §18).
+ */
+import type { ResolvedScene } from '../../../lib/experience/graph';
+
+interface Props {
+  scene: ResolvedScene;
+}
+
+const { scene } = Astro.props;
+const steps = scene.data?.steps ?? [];
+const isConversation = scene.modules.includes('conversation');
+const isEscalation = scene.modules.includes('escalation');
+---
+
+<section
+  class="demo demo--{isConversation ? 'conversation' : isEscalation ? 'escalation' : 'tasks'}"
+  data-module={scene.modules[0]}
+  data-simulated="true"
+>
+  <div class="demo__intro">
+    {scene.eyebrow && <p class="demo__eyebrow" data-role="eyebrow" data-reveal>{scene.eyebrow}</p>}
+    <h2 class="demo__title" data-role="title" data-reveal="lines">{scene.title}</h2>
+    {scene.lead && <p class="demo__lead" data-role="lead" data-reveal>{scene.lead}</p>}
+    {scene.body && <p class="demo__body" data-role="body" data-reveal>{scene.body}</p>}
+  </div>
+
+  {
+    isConversation ? (
+      <ol class="chat" data-reveal-group>
+        {steps.map((step, index) => (
+          <li
+            class={`chat__bubble chat__bubble--${step.actor === 'Cliente' ? 'client' : 'bot'}`}
+            data-reveal
+            style={`--index:${index}`}
+          >
+            <span class="chat__actor">{step.actor}</span>
+            <span class="chat__text">{step.label}</span>
+          </li>
+        ))}
+      </ol>
+    ) : isEscalation ? (
+      <ol class="chain" data-reveal-group>
+        {steps.map((step, index) => (
+          <li class="chain__step" data-reveal style={`--index:${index}`}>
+            <span class="chain__actor">{step.actor}</span>
+            <span class="chain__text">{step.label}</span>
+            <span class="chain__rail" aria-hidden="true" />
+          </li>
+        ))}
+      </ol>
+    ) : (
+      <ol class="steps" data-reveal-group>
+        {steps.map((step, index) => (
+          <li class="steps__step" data-reveal style={`--index:${index}`}>
+            <span class="steps__index" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+            <div class="steps__body">
+              <strong class="steps__label">{step.label}</strong>
+              {step.detail && <span class="steps__detail">{step.detail}</span>}
+              {step.actor && <span class="steps__actor">{step.actor}</span>}
+            </div>
+          </li>
+        ))}
+      </ol>
+    )
+  }
+
+  <p class="demo__disclaimer" data-reveal>
+    Simulación de interfaz para mostrar el comportamiento previsto; no ejecuta acciones ni llamadas a servicios reales.
+  </p>
+</section>

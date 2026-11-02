@@ -1,125 +1,83 @@
 ---
 /**
- * Bloque de escena reutilizable.
+ * Escena del grafo narrativo.
  *
- * El texto se resuelve en servidor para el estado por defecto y el cliente
- * intercambia la variante cuando el visitante elige ruta. Las variantes viven
- * en un JSON embebido: así el contenido sigue siendo indexable y el cambio
- * de ruta no requiere recargar.
+ * Dos capas de visibilidad para poder combinar condiciones con CSS puro
+ * (y por tanto sin JavaScript):
+ *  - capa externa: la ruta (compartida / empresa / eficiencia / exploración);
+ *  - capa interna: los segmentos (rasgos y ruta) que la escena exige.
  */
-import type { SceneCopy } from '../../data/copy';
-import { buildMailto } from '../../data/site';
-import { getScene, resolveScene } from '../../lib/experience/scenes';
-import { getState } from '../../lib/experience/state';
+import type { ResolvedScene } from '../../lib/experience/graph';
+import StatementModule from './modules/StatementModule.astro';
+import TextModule from './modules/TextModule.astro';
+import NetworkModule from './modules/NetworkModule.astro';
+import DemoModule from './modules/DemoModule.astro';
+import CatalogModule from './modules/CatalogModule.astro';
+import CtaModule from './modules/CtaModule.astro';
 
 interface Props {
-  sceneId: string;
-  /** Identificador DOM de la sección. */
+  scene: ResolvedScene;
+  /** Id de ancla estable para navegación. */
   anchor?: string;
-  /** Elementos que encabezan la escena. */
-  showRouteSwitch?: boolean;
 }
 
-const { sceneId, anchor, showRouteSwitch = false } = Astro.props;
-
-const scene = getScene(sceneId);
-if (!scene) {
-  throw new Error(`Escena desconocida: ${sceneId}`);
-}
-
-const resolved = resolveScene(sceneId, getState());
-const sectionId = anchor ?? `ruta-${sceneId}`;
-const variants = {
-  routes: scene.variants ?? {},
-  traits: scene.traitVariants ?? {},
-};
+const { scene, anchor } = Astro.props;
+const anchorId = anchor ?? `escena-${scene.id.toLowerCase()}`;
+const routeKey = scene.route === 'shared' ? 'shared' : scene.route;
+const stageVariants = Object.fromEntries(
+  (scene.variants ?? [])
+    .filter((variant) => variant.route && variant.stage)
+    .map((variant) => [variant.route as string, variant.stage as string]),
+);
 ---
 
 <section
   class="scene"
-  id={sectionId}
+  id={anchorId}
   data-scene-id={scene.id}
-  data-scene-route={scene.route}
-  aria-labelledby={`${sectionId}-titulo`}
+  data-scene-route={routeKey}
+  data-stage={scene.stage}
+  data-palette={scene.palette}
+  data-transition={scene.transition ?? 'fade'}
+  data-variants={JSON.stringify(scene.variants ?? [])}
+  data-stage-variants={Object.keys(stageVariants).length > 0 ? JSON.stringify(stageVariants) : undefined}
+  style={`--scene-duration:${scene.duration}`}
+  aria-labelledby={`${anchorId}-titulo`}
 >
-  <div class="shell scene__inner">
-    <div class="scene__grid scene__grid--split">
-      <div>
-        <p class="eyebrow" data-role="eyebrow">{resolved.resolved.eyebrow}</p>
-        <h2 id={`${sectionId}-titulo`} data-role="title">{resolved.resolved.title}</h2>
-        <p class="lead" data-role="body">{resolved.resolved.body}</p>
-
-        {
-          resolved.cta && (
-            <p>
-              <a
-                class="button button--primary"
-                href={resolved.contact ? buildMailto({ route: 'unclassified', traits: [] }) : resolved.cta.target}
-                data-scene-cta={resolved.cta.target}
-                data-contact-cta={resolved.contact ? 'true' : undefined}
-              >
-                {resolved.cta.label}
-              </a>
-            </p>
-          )
-        }
-
-        {
-          showRouteSwitch && (
-            <p class="scene__switch">
-              <button type="button" class="button button--ghost" data-route-reset>
-                Cambiar de ruta
-              </button>
-            </p>
-          )
-        }
-      </div>
-
-      <aside class="scene__aside" aria-label="Productos asociados">
-        <p class="eyebrow">Producto asociado</p>
-        <p class="scene__product">{scene.product}</p>
-        <slot name="aside" />
-      </aside>
+  <div
+    class="scene__inner"
+    data-scene-segments={scene.segments.length > 0 ? scene.segments.join(' ') : undefined}
+  >
+    <div class="scene__surface">
+      <h2 class="visually-hidden" id={`${anchorId}-titulo`}>{scene.title}</h2>
+      {
+        scene.modules.map((module) => {
+          if (module === 'statement' || module === 'branch') {
+            return <StatementModule scene={scene} />;
+          }
+          if (module === 'split' || module === 'features') {
+            return <TextModule scene={scene} />;
+          }
+          if (module === 'network' || module === 'infrastructure' || module === 'distribution') {
+            return <NetworkModule scene={scene} />;
+          }
+          if (
+            module === 'conversation' ||
+            module === 'tasks' ||
+            module === 'escalation' ||
+            module === 'contentFlow'
+          ) {
+            return <DemoModule scene={scene} />;
+          }
+          if (module === 'plans' || module === 'catalog' || module === 'coverage') {
+            return <CatalogModule scene={scene} />;
+          }
+          if (module === 'cta') {
+            return <CtaModule scene={scene} />;
+          }
+          return null;
+        })
+      }
     </div>
   </div>
-
-  <script type="application/json" data-role="variants" set:html={JSON.stringify(variants)} />
 </section>
-
-<style>
-  .scene__aside {
-    border: 1px solid var(--border-subtle);
-    background: var(--surface);
-    border-radius: var(--radius-md);
-    padding: var(--space-3);
-    backdrop-filter: blur(8px);
-  }
-
-  .scene__product {
-    font-family: var(--font-mono);
-    font-size: var(--step--1);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--scene-accent);
-    margin: 0;
-  }
-
-  .scene__switch {
-    margin-top: var(--space-4);
-  }
-
-  /* Visibilidad por ruta: la escena propia sólo aparece en su ruta; la de
-     exploración es además la ruta implícita mientras no se elija ninguna. */
-  .scene[data-scene-route='enterprise'],
-  .scene[data-scene-route='efficiency'],
-  .scene[data-scene-route='explorer'] {
-    display: none;
-  }
-
-  :global(:root[data-route='enterprise']) .scene[data-scene-route='enterprise'],
-  :global(:root[data-route='efficiency']) .scene[data-scene-route='efficiency'],
-  :global(:root[data-route='explorer']) .scene[data-scene-route='explorer'],
-  :global(:root[data-route='unclassified']) .scene[data-scene-route='explorer'] {
-    display: block;
-  }
-</style>
