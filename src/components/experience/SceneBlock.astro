@@ -1,0 +1,119 @@
+---
+/**
+ * Bloque de escena reutilizable.
+ *
+ * El texto se resuelve en servidor para el estado por defecto y el cliente
+ * intercambia la variante cuando el visitante elige ruta. Las variantes viven
+ * en un JSON embebido: así el contenido sigue siendo indexable y el cambio
+ * de ruta no requiere recargar.
+ */
+import type { SceneCopy } from '../../data/copy';
+import { getScene, resolveScene } from '../../lib/experience/scenes';
+import { getState } from '../../lib/experience/state';
+
+interface Props {
+  sceneId: string;
+  /** Identificador DOM de la sección. */
+  anchor?: string;
+  /** Elementos que encabezan la escena. */
+  showRouteSwitch?: boolean;
+}
+
+const { sceneId, anchor, showRouteSwitch = false } = Astro.props;
+
+const scene = getScene(sceneId);
+if (!scene) {
+  throw new Error(`Escena desconocida: ${sceneId}`);
+}
+
+const resolved = resolveScene(sceneId, getState());
+const sectionId = anchor ?? `ruta-${sceneId}`;
+const variants = {
+  routes: scene.variants ?? {},
+  traits: scene.traitVariants ?? {},
+};
+---
+
+<section
+  class="scene"
+  id={sectionId}
+  data-scene-id={scene.id}
+  data-scene-route={scene.route}
+  aria-labelledby={`${sectionId}-titulo`}
+>
+  <div class="shell scene__inner">
+    <div class="scene__grid scene__grid--split">
+      <div>
+        <p class="eyebrow" data-role="eyebrow">{resolved.resolved.eyebrow}</p>
+        <h2 id={`${sectionId}-titulo`} data-role="title">{resolved.resolved.title}</h2>
+        <p class="lead" data-role="body">{resolved.resolved.body}</p>
+
+        {
+          resolved.cta && (
+            <p>
+              <a class="button button--primary" href={resolved.cta.target} data-scene-cta={resolved.cta.target}>
+                {resolved.cta.label}
+              </a>
+            </p>
+          )
+        }
+
+        {
+          showRouteSwitch && (
+            <p class="scene__switch">
+              <button type="button" class="button button--ghost" data-route-reset>
+                Cambiar de ruta
+              </button>
+            </p>
+          )
+        }
+      </div>
+
+      <aside class="scene__aside" aria-label="Productos asociados">
+        <p class="eyebrow">Producto asociado</p>
+        <p class="scene__product">{scene.product}</p>
+        <slot name="aside" />
+      </aside>
+    </div>
+  </div>
+
+  <script type="application/json" data-role="variants" set:html={JSON.stringify(variants)} />
+</section>
+
+<style>
+  .scene__aside {
+    border: 1px solid var(--border-subtle);
+    background: var(--surface);
+    border-radius: var(--radius-md);
+    padding: var(--space-3);
+    backdrop-filter: blur(8px);
+  }
+
+  .scene__product {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--scene-accent);
+    margin: 0;
+  }
+
+  .scene__switch {
+    margin-top: var(--space-4);
+  }
+
+  /* Visibilidad por ruta: la escena propia sólo aparece en su ruta; la de
+     exploración es además la ruta implícita mientras no se elija ninguna. */
+  .scene[data-scene-route='enterprise'],
+  .scene[data-scene-route='efficiency'],
+  .scene[data-scene-route='explorer'] {
+    display: none;
+  }
+
+  :global(:root[data-route='enterprise']) .scene[data-scene-route='enterprise'],
+  :global(:root[data-route='efficiency']) .scene[data-scene-route='efficiency'],
+  :global(:root[data-route='explorer']) .scene[data-scene-route='explorer'],
+  :global(:root[data-route='unclassified']) .scene[data-scene-route='explorer'] {
+    display: block;
+  }
+</style>

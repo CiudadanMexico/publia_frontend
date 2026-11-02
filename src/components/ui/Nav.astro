@@ -1,0 +1,100 @@
+---
+/**
+ * Navegación principal. Es un header fijo, ligero y accesible por teclado.
+ * Sólo enlaza a secciones que existen en esta entrega.
+ */
+---
+
+<header class="nav">
+  <div class="nav__inner shell">
+    <a class="nav__brand" href="#inicio" aria-label="Publia, inicio">
+      <span class="nav__mark" aria-hidden="true"></span>
+      <span class="nav__word">PUBLIA</span>
+    </a>
+
+    <nav class="nav__links" aria-label="Secciones">
+      <a href="#ruta-empresa">Empresa</a>
+      <a href="#ruta-eficiencia">Eficiencia</a>
+      <a href="#ruta-exploracion">Explorar</a>
+      <a href="#escena-compartida">Lo que ya tienes</a>
+    </nav>
+
+    <a class="button button--small button--ghost nav__cta" href="#escena-cierre">Conocernos</a>
+  </div>
+</header>
+
+<style>
+  .nav {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 50;
+    backdrop-filter: blur(14px);
+    background: color-mix(in oklab, var(--ink-950) 72%, transparent);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .nav__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    min-height: 3.75rem;
+  }
+
+  .nav__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    text-decoration: none;
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    font-size: var(--step--1);
+  }
+
+  .nav__mark {
+    width: 0.85rem;
+    height: 0.85rem;
+    rotate: 45deg;
+    background: linear-gradient(135deg, var(--scene-accent), var(--accent-strong));
+    box-shadow: 0 0 22px -4px var(--scene-accent);
+    transition: background var(--dur-base) var(--ease-out);
+  }
+
+  .nav__links {
+    display: none;
+    gap: var(--space-3);
+    font-size: var(--step--1);
+  }
+
+  .nav__links a {
+    text-decoration: none;
+    color: var(--ink-200);
+    padding: 0.35rem 0;
+    border-bottom: 1px solid transparent;
+    transition:
+      color var(--dur-fast) var(--ease-out),
+      border-color var(--dur-fast) var(--ease-out);
+  }
+
+  .nav__links a:hover {
+    color: var(--paper);
+    border-color: var(--scene-accent);
+  }
+
+  @media (min-width: 860px) {
+    .nav__links {
+      display: flex;
+    }
+  }
+
+  .nav__cta {
+    display: none;
+  }
+
+  @media (min-width: 640px) {
+    .nav__cta {
+      display: inline-flex;
+    }
+  }
+</style>

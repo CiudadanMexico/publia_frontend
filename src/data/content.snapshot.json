@@ -1,0 +1,689 @@
+{
+  "generatedAt": "2026-11-02T08:05:33.556Z",
+  "source": "http://127.0.0.1:8080 (WordPress aislado, temporal3-agent3)",
+  "pages": [
+    {
+      "id": 29165,
+      "slug": "integraciones",
+      "title": "Integraciones",
+      "excerpt": "",
+      "link": "http://localhost:6103/integraciones/",
+      "modified": "2023-12-23T21:23:58"
+    },
+    {
+      "id": 29162,
+      "slug": "sitios",
+      "title": "Sitios Web Personalizados",
+      "excerpt": "",
+      "link": "http://localhost:6103/sitios/",
+      "modified": "2023-12-23T21:20:50"
+    },
+    {
+      "id": 29159,
+      "slug": "e-commerce",
+      "title": "E-Commerce a Medida",
+      "excerpt": "",
+      "link": "http://localhost:6103/e-commerce/",
+      "modified": "2023-12-23T21:18:36"
+    },
+    {
+      "id": 29154,
+      "slug": "basicweb",
+      "title": "Webs Básicas de Catálogo",
+      "excerpt": "",
+      "link": "http://localhost:6103/basicweb/",
+      "modified": "2023-12-23T21:17:01"
+    },
+    {
+      "id": 29133,
+      "slug": "servidores",
+      "title": "Servidores I.A.",
+      "excerpt": "",
+      "link": "http://localhost:6103/servidores/",
+      "modified": "2023-12-23T08:51:23"
+    },
+    {
+      "id": 29111,
+      "slug": "aplicaciones",
+      "title": "Desarrollo de Aplicaciones",
+      "excerpt": "",
+      "link": "http://localhost:6103/aplicaciones/",
+      "modified": "2023-12-21T03:42:13"
+    },
+    {
+      "id": 29068,
+      "slug": "multimedia",
+      "title": "Producción MultiMedia Digital",
+      "excerpt": "",
+      "link": "http://localhost:6103/multimedia/",
+      "modified": "2023-12-20T19:51:46"
+    },
+    {
+      "id": 29035,
+      "slug": "sitios-web-basicos",
+      "title": "Sitios Web Básicos",
+      "excerpt": "",
+      "link": "http://localhost:6103/sitios-web-basicos/",
+      "modified": "2023-12-14T05:40:43"
+    },
+    {
+      "id": 28475,
+      "slug": "gana",
+      "title": "Gana",
+      "excerpt": "[Gana x Referir] Para Ganar x Referir vaya a la sección Referidos de su Panel tras su inicio de sesión. Cómo ganar dinero sencillo promoviendo http://localhost:6103 Con solo crear una cuenta, podrás acceder a nuestros productos, servicios, membresías y paquetes para venderlos tanto a tus amigos y familiares como a negocios de todo tipo y [ ]",
+      "link": "http://localhost:6103/gana/",
+      "modified": "2023-05-03T04:40:36"
+    },
+    {
+      "id": 28472,
+      "slug": "trabaja",
+      "title": "Trabaja con http://localhost:6103",
+      "excerpt": "Trabaja con http://localhost:6103 ¿Eres desarrollador web o de software, creador digital o alguien con experiencia y gusto por las ventas y conocimientos generales de tecnologías digitales? Entonces, ¡te estamos buscando! En http://localhost:6103, estamos revolucionando el mundo de la inteligencia artificial colaborativa y buscamos a personas apasionadas y talentosas que quieran unirse a nuestro equipo. Ofrecemos [ ]",
+      "link": "http://localhost:6103/trabaja/",
+      "modified": "2023-05-03T06:04:21"
+    },
+    {
+      "id": 28464,
+      "slug": "ventajas",
+      "title": "Ventajas de la I.A. Colaborativa para mi Negocio",
+      "excerpt": "Ventajas de la I.A. Colaborativa para mi Negocio La Inteligencia Artificial (IA) es esencial para el éxito de cualquier negocio, y una de las formas más efectivas de aprovecharla es a través de la IA colaborativa y el uso de tecnologías de código abierto (open source). La IA colaborativa se refiere a la capacidad de [ ]",
+      "link": "http://localhost:6103/ventajas/",
+      "modified": "2023-05-03T06:43:19"
+    },
+    {
+      "id": 28456,
+      "slug": "credito-2",
+      "title": "Credito",
+      "excerpt": "Facilidades de Pago 12 MSI En http://localhost:6103, nos esforzamos por ofrecer opciones de pago flexibles y convenientes para nuestros clientes, de manera que puedan acceder a nuestros servicios de alta calidad sin preocuparse por el impacto en su presupuesto. Gracias a nuestra pasarela de pago de Stripe, ofrecemos la posibilidad de pagar con tarjeta Visa [ ]",
+      "link": "http://localhost:6103/credito-2/",
+      "modified": "2023-05-03T06:27:36"
+    },
+    {
+      "id": 27820,
+      "slug": "your-profile",
+      "title": "Your Profile",
+      "excerpt": "Tu prefil [pmpro_member_profile_edit]",
+      "link": "http://localhost:6103/membership-account/your-profile/",
+      "modified": "2023-04-27T20:31:00"
+    },
+    {
+      "id": 27819,
+      "slug": "login",
+      "title": "Log In",
+      "excerpt": "[pmpro_login]",
+      "link": "http://localhost:6103/login/",
+      "modified": "2023-04-27T04:44:10"
+    },
+    {
+      "id": 27818,
+      "slug": "membership-levels",
+      "title": "Membership Levels",
+      "excerpt": "Membership Levels [pmpro_levels]",
+      "link": "http://localhost:6103/membership-account/membership-levels/",
+      "modified": "2023-04-27T20:29:45"
+    },
+    {
+      "id": 27817,
+      "slug": "membership-invoice",
+      "title": "Membership Invoice",
+      "excerpt": "Membership Invoice [pmpro_invoice]",
+      "link": "http://localhost:6103/membership-account/membership-invoice/",
+      "modified": "2023-04-27T20:28:52"
+    },
+    {
+      "id": 27816,
+      "slug": "membership-confirmation",
+      "title": "Membership Confirmation",
+      "excerpt": "Confirmación de Membresía [pmpro_confirmation]",
+      "link": "http://localhost:6103/membership-account/membership-confirmation/",
+      "modified": "2023-04-28T16:12:39"
+    },
+    {
+      "id": 27815,
+      "slug": "membership-checkout",
+      "title": "Membership Checkout",
+      "excerpt": "Checkout/Pago [pmpro_checkout]",
+      "link": "http://localhost:6103/membership-account/membership-checkout/",
+      "modified": "2023-04-28T16:52:11"
+    },
+    {
+      "id": 27814,
+      "slug": "membership-cancel",
+      "title": "Membership Cancel",
+      "excerpt": "Cancelar Membresía [pmpro_cancel]",
+      "link": "http://localhost:6103/membership-account/membership-cancel/",
+      "modified": "2023-04-27T20:24:26"
+    },
+    {
+      "id": 27813,
+      "slug": "membership-billing",
+      "title": "Membership Billing",
+      "excerpt": "Carrito de Miembros [pmpro_billing]",
+      "link": "http://localhost:6103/membership-account/membership-billing/",
+      "modified": "2023-04-27T20:23:37"
+    },
+    {
+      "id": 27812,
+      "slug": "membership-account",
+      "title": "Membership Account",
+      "excerpt": "Membresias [pmpro_account]",
+      "link": "http://localhost:6103/membership-account/",
+      "modified": "2023-04-28T17:48:06"
+    },
+    {
+      "id": 27811,
+      "slug": "tu-cuenta",
+      "title": "Tu cuenta",
+      "excerpt": "Tu cuenta",
+      "link": "http://localhost:6103/tu-cuenta/",
+      "modified": "2023-04-27T21:02:15"
+    },
+    {
+      "id": 26113,
+      "slug": "desarrollo",
+      "title": "Desarrollo Web Apps",
+      "excerpt": "Gracias a nuestra biblioteca de repositorios {{ OPEN SOURCE }} ofrecemos sitios web [[ de catálogo ]] sumamente accesibles, modulares y escalables. En esta era digital, si no existe en Internet ~ no existe. ¡Construya su sitio web o quede fuera! ☑ CONTAMOS CON [OPCIONES] DESDE $ 150 MXN mensuales Sitios Webs Básicos de Catálogo. [ ]",
+      "link": "http://localhost:6103/servicios/desarrollo/",
+      "modified": "2023-12-14T05:23:06"
+    },
+    {
+      "id": 25927,
+      "slug": "registro",
+      "title": "Registro",
+      "excerpt": "Registro [pms-register]",
+      "link": "http://localhost:6103/registro/",
+      "modified": "2023-04-28T15:40:12"
+    },
+    {
+      "id": 25917,
+      "slug": "cuenta",
+      "title": "Mi cuenta",
+      "excerpt": "[U.Panel] ó Registre una nueva Cuenta",
+      "link": "http://localhost:6103/cuenta/",
+      "modified": "2023-05-03T04:39:04"
+    },
+    {
+      "id": 25916,
+      "slug": "checkout",
+      "title": "Checkout",
+      "excerpt": "Checkout",
+      "link": "http://localhost:6103/checkout/",
+      "modified": "2023-04-27T20:11:29"
+    },
+    {
+      "id": 25915,
+      "slug": "carrito",
+      "title": "Carrito",
+      "excerpt": "Cart",
+      "link": "http://localhost:6103/carrito/",
+      "modified": "2023-10-16T19:22:50"
+    },
+    {
+      "id": 25914,
+      "slug": "shop",
+      "title": "Shop",
+      "excerpt": "Tienda en línea",
+      "link": "http://localhost:6103/shop/",
+      "modified": "2023-04-27T21:01:44"
+    },
+    {
+      "id": 25910,
+      "slug": "products",
+      "title": "Products",
+      "excerpt": "Productos [asp_show_all_products]",
+      "link": "http://localhost:6103/products/",
+      "modified": "2023-04-27T20:33:22"
+    },
+    {
+      "id": 25909,
+      "slug": "stripe-checkout-result",
+      "title": "Checkout-Result",
+      "excerpt": "Checkout-Result [accept_stripe_payment_checkout]",
+      "link": "http://localhost:6103/stripe-checkout-result/",
+      "modified": "2023-04-27T20:14:40"
+    },
+    {
+      "id": 25824,
+      "slug": "sistemas-de-entrega-reparto-y-cobranza",
+      "title": "Sistemas de Entrega, Reparto y Cobranza",
+      "excerpt": "Sistemas de Entrega, Reparto y Cobranza",
+      "link": "http://localhost:6103/servicios/sistemas-de-entrega-reparto-y-cobranza/",
+      "modified": "2023-12-20T16:50:18"
+    },
+    {
+      "id": 25814,
+      "slug": "gestion-empresarial-movil",
+      "title": "Gestión Empresarial Móvil",
+      "excerpt": "☑ CONTAMOS CON [OPCIONES] DESDE $5,000 MXN PAGO INICIAL Y $ 200 MXN mensuales de hosting. Todo aspecto de su negocio al alcance de la palma de su mano . sin importar el giro o tamaño de su negocio Si ha contratado un paquete de ChatBot Publia, podemos ofrecerle un panel de control web personalizado [ ]",
+      "link": "http://localhost:6103/servicios/gestion-empresarial-movil/",
+      "modified": "2023-12-06T04:49:00"
+    },
+    {
+      "id": 25812,
+      "slug": "chatbots-inteligentes",
+      "title": "ChatBots Inteligentes",
+      "excerpt": "ChatBots Inteligentes",
+      "link": "http://localhost:6103/servicios/chatbots-whatsapp-y-fb-messenger/chatbots-inteligentes/",
+      "modified": "2023-04-27T20:45:19"
+    },
+    {
+      "id": 25810,
+      "slug": "chatbots-semiinteligentes",
+      "title": "ChatBots SemiInteligentes",
+      "excerpt": "ChatBots SemiInteligentes",
+      "link": "http://localhost:6103/servicios/chatbots-whatsapp-y-fb-messenger/chatbots-semiinteligentes/",
+      "modified": "2023-04-27T20:45:50"
+    },
+    {
+      "id": 25763,
+      "slug": "politica-de-privacidad",
+      "title": "Política de Privacidad",
+      "excerpt": "Política de Privacidad",
+      "link": "http://localhost:6103/politica-de-privacidad/",
+      "modified": "2023-04-27T20:32:07"
+    },
+    {
+      "id": 25689,
+      "slug": "contacto",
+      "title": "Contacto",
+      "excerpt": "Síganos en redes Sociales ó Llámenos ¿Desea una consulta personalizada? Envíenos un whatsapp [55] 73 72 46 60",
+      "link": "http://localhost:6103/contacto/",
+      "modified": "2025-10-19T17:32:07"
+    },
+    {
+      "id": 25687,
+      "slug": "puestos-de-comida",
+      "title": "Puestos de Comida",
+      "excerpt": "Puestos de Comida",
+      "link": "http://localhost:6103/info/soluciones-x-sector/puestos-de-comida/",
+      "modified": "2023-04-27T20:18:37"
+    },
+    {
+      "id": 25685,
+      "slug": "restaurantes",
+      "title": "Restaurantes",
+      "excerpt": "",
+      "link": "http://localhost:6103/info/soluciones-x-sector/restaurantes/",
+      "modified": "2023-05-03T07:41:15"
+    },
+    {
+      "id": 25683,
+      "slug": "soluciones-x-sector",
+      "title": "Soluciones x Sector",
+      "excerpt": "Soluciones x Sector Sectores:",
+      "link": "http://localhost:6103/info/soluciones-x-sector/",
+      "modified": "2023-05-04T13:43:17"
+    },
+    {
+      "id": 25681,
+      "slug": "preguntas-frecuentes",
+      "title": "Preguntas Frecuentes",
+      "excerpt": "GENERALES ¿ Qué es la Inteligencia Artificial , qué es Chat GPT ? La inteligencia artificial es una rama de la informática que se enfoca en desarrollar sistemas o programas que son capaces de realizar tareas que normalmente requieren inteligencia humana, como el razonamiento, el aprendizaje y la toma de decisiones. Estos sistemas [ ]",
+      "link": "http://localhost:6103/info/preguntas-frecuentes/",
+      "modified": "2023-12-06T19:01:05"
+    },
+    {
+      "id": 25679,
+      "slug": "catalogo-pdf",
+      "title": "Catálogo PDF",
+      "excerpt": "",
+      "link": "http://localhost:6103/info/catalogo-pdf/",
+      "modified": "2023-12-06T18:35:03"
+    },
+    {
+      "id": 25677,
+      "slug": "precios",
+      "title": "Comparativo / Precios",
+      "excerpt": "",
+      "link": "http://localhost:6103/info/precios/",
+      "modified": "2023-12-06T18:33:43"
+    },
+    {
+      "id": 25675,
+      "slug": "quienes-somos",
+      "title": "Quiénes Somos?",
+      "excerpt": "",
+      "link": "http://localhost:6103/info/quienes-somos/",
+      "modified": "2025-10-19T17:30:32"
+    },
+    {
+      "id": 25672,
+      "slug": "info",
+      "title": "Info",
+      "excerpt": "+Info",
+      "link": "http://localhost:6103/info/",
+      "modified": "2023-04-27T20:15:37"
+    },
+    {
+      "id": 25670,
+      "slug": "organizacion-de-eventos",
+      "title": "Organización de Eventos Públicos Privados",
+      "excerpt": "En un mundo cada vez más virtual, la experiencia en eventos en vivo es más valiosa que nunca. En http://localhost:6103, ofrecemos la mejor producción de eventos, desde grandes festivales hasta íntimas conferencias. Nuestro equipo experto está a la vanguardia de la tecnología y la creatividad para crear experiencias únicas e inolvidables. Ya sea un evento [ ]",
+      "link": "http://localhost:6103/servicios/organizacion-de-eventos/",
+      "modified": "2023-12-20T18:00:28"
+    },
+    {
+      "id": 25668,
+      "slug": "produccion-audiovisual",
+      "title": "Producción MultiMedia Digital",
+      "excerpt": "En el mundo digital, ¡su contenido determinará si destaca o desaparece! Carezca de una estrategia de contenido multidimensional y efectiva y su negocio corre el riesgo de evaporarse en el éter.Pero la buena noticia es que la solución está a la mano, gracias a miles de recursos Open Source y producción meramente digital asistida [ ]",
+      "link": "http://localhost:6103/servicios/produccion-audiovisual/",
+      "modified": "2023-12-06T05:34:07"
+    },
+    {
+      "id": 25666,
+      "slug": "foto-de-producto",
+      "title": "Foto de Producto y en Gral.",
+      "excerpt": "En el mundo digital, ¡su contenido visual determinará si destaca o desaparece! En http://localhost:6103, ofrecemos servicios de producción multimedia y digital para ayudarlo a destacar en línea. Ya sea que necesite fotografías de alta calidad para sus productos o servicios, o videos promocionales para su empresa, nuestro equipo de expertos está aquí para ayudarlo. ☑ [ ]",
+      "link": "http://localhost:6103/servicios/foto-de-producto/",
+      "modified": "2025-10-19T17:26:30"
+    },
+    {
+      "id": 25663,
+      "slug": "desarrollo-de-aplicaciones",
+      "title": "Desarrollo de Aplicaciones",
+      "excerpt": "Gracias a nuestra biblioteca de repositorios {{ OPEN SOURCE }} ofrecemos funciones y plantillas [[ de catálogo ]] de propósitos generales y específicos sumamente accesibles, modulares, integrables y escalables. Las aplicaciones digitales son el futuro. Son más que software: son el canal principal a través del cual se conecta con sus clientes y construye una [ ]",
+      "link": "http://localhost:6103/servicios/desarrollo-de-aplicaciones/",
+      "modified": "2023-12-20T17:27:09"
+    },
+    {
+      "id": 25661,
+      "slug": "edicion-de-video-inteligente",
+      "title": "Edición de Video Inteligente",
+      "excerpt": "¿Quiere que su negocio sea el protagonista de la gran pantalla? ¡Un video inteligente es la clave para llevarlo al estreno y asegurarse de que su historia sea contada de manera impactante, incluso con recursos superaccesibles! No se quede fuera del concurso por no alcanzar las estrellas, use las herramientas que tenemos a su alcance [ ]",
+      "link": "http://localhost:6103/servicios/edicion-de-video-inteligente/",
+      "modified": "2025-10-19T17:21:07"
+    },
+    {
+      "id": 25659,
+      "slug": "campanas-social-media-seo-y-ads",
+      "title": "Campañas Social Media, SEO y ads",
+      "excerpt": "☑ CONTAMOS CON [OPCIONES] DESDE $ 500 MXN mensuales o $100 mensuales adicionales a cualquier paquete contratado. Como proveedor líder en soluciones digitales, ofrecemos las soluciones más avanzadas en campañas SEO, social media y publicidad en línea. Nuestros servicios son mágicos, ya que le permiten a su empresa destacarse en el mercado digital de manera [ ]",
+      "link": "http://localhost:6103/servicios/campanas-social-media-seo-y-ads/",
+      "modified": "2023-12-20T19:59:32"
+    },
+    {
+      "id": 25656,
+      "slug": "servidores-i-a-empresariales",
+      "title": "Servidores I.A. Empresariales",
+      "excerpt": "Administración remota de servidores dedicados: ¡Una solución asequible y sin complicaciones para ejecutar su infraestructura crítica de IA! En la era informática: Su Data es su divisa ¿Ha cedido el monopolio ?? Como proveedor líder en soluciones de Inteligencia Artificial, http://localhost:6103 ahora ofrece administración remota de servidores dedicados, brindándole los beneficios de control sobre su [ ]",
+      "link": "http://localhost:6103/servicios/servidores-i-a-empresariales/",
+      "modified": "2023-12-21T03:43:31"
+    },
+    {
+      "id": 25654,
+      "slug": "diseno-web-personalizado",
+      "title": "Diseño Web Personalizado",
+      "excerpt": "Diseño Web Personalizado Gracias a nuestra biblioteca de repositorios {{ OPEN SOURCE }} ofrecemos sitios web [[ de catálogo ]] sumamente accesibles, modulares y escalables. En esta era digital, si no existe en Internet ~ no existe. ¡Construya su sitio web o quede fuera! ☑ CONTAMOS CON [OPCIONES] DESDE $ 5,000 MXN Pago Único",
+      "link": "http://localhost:6103/servicios/diseno-web-personalizado/",
+      "modified": "2023-05-03T00:43:50"
+    },
+    {
+      "id": 25652,
+      "slug": "asesorias-i-a",
+      "title": "Asesorías I.A.",
+      "excerpt": "Desbloquee el potencial de su negocio con nuestra consultoría en I.A.; permita que la inteligencia artificial sea el motor que impulse su éxito hacia el futuro . Como líderes nacionales en soluciones de Inteligencia Artificial, en http://localhost:6103 ofrecemos consultoría especializada en I.A. para ayudar a su empresa a alcanzar su máximo potencial. Nuestros expertos en I.A. [ ]",
+      "link": "http://localhost:6103/servicios/asesorias-i-a/",
+      "modified": "2023-12-20T20:02:06"
+    },
+    {
+      "id": 25649,
+      "slug": "sistemas-de-repartidores-y-entregas",
+      "title": "Sistemas de Repartidores y Entregas",
+      "excerpt": "¡Delivery o extinción! No importa el tamaño, ofrecer servicio a domicilio es crucial para sobrevivir en la industria restaurantera actual. ☑ No pague el 25% o hasta 30% en plataformas como Uber Eats, Rappi o Didi Food, CONTAMOS CON [OPCIONES] DESDE $ 200 MXN mensuales o $1,500 de contado. Como proveedor líder en soluciones de [ ]",
+      "link": "http://localhost:6103/servicios/sistemas-de-repartidores-y-entregas/",
+      "modified": "2025-10-19T17:20:01"
+    },
+    {
+      "id": 25646,
+      "slug": "e-commerce-a-medida",
+      "title": "E-commerce a medida",
+      "excerpt": "E-commerce a medida Gracias a nuestra biblioteca de repositorios {{ OPEN SOURCE }} ofrecemos sitios web E-Commerce [[ de catálogo ]] sumamente accesibles, modulares y escalables. En esta era digital, si no existe en Internet ~ no existe. ¡Construya su sitio web o quede fuera! ☑ CONTAMOS CON [OPCIONES] DESDE $ 200 MXN mensuales",
+      "link": "http://localhost:6103/servicios/e-commerce-a-medida/",
+      "modified": "2023-05-03T00:53:26"
+    },
+    {
+      "id": 25644,
+      "slug": "diseno-web-basico",
+      "title": "Diseño Web Básico",
+      "excerpt": "Diseño Web Básico Gracias a nuestra biblioteca de repositorios {{ OPEN SOURCE }} ofrecemos sitios web [[ de catálogo ]] sumamente accesibles, modulares y escalables. En esta era digital, si no existe en Internet ~ no existe. ¡Construya su sitio web o quede fuera! ☑ CONTAMOS CON [OPCIONES] DESDE $ 200 MXN mensuales",
+      "link": "http://localhost:6103/servicios/diseno-web-basico/",
+      "modified": "2023-05-03T03:12:10"
+    },
+    {
+      "id": 25642,
+      "slug": "chatbots-whatsapp-y-fb-messenger",
+      "title": "ChatBots Whatsapp y FB Messenger.",
+      "excerpt": "",
+      "link": "http://localhost:6103/servicios/chatbots-whatsapp-y-fb-messenger/",
+      "modified": "2023-12-05T14:49:11"
+    },
+    {
+      "id": 25603,
+      "slug": "servicios",
+      "title": "Servicios",
+      "excerpt": "Servicios",
+      "link": "http://localhost:6103/servicios/",
+      "modified": "2023-04-27T20:50:38"
+    },
+    {
+      "id": 25266,
+      "slug": "blog",
+      "title": "Blog",
+      "excerpt": "Blog",
+      "link": "http://localhost:6103/blog/",
+      "modified": "2023-04-27T20:04:55"
+    },
+    {
+      "id": 25264,
+      "slug": "inicio",
+      "title": "Inicio",
+      "excerpt": "Agencia Digital Mexicana · Inteligencia Artificial La Inteligencia Artificial aplicada a tu negocio. Convertimos TU visión en chatbots, apps, e-commerce y campañas que venden solos. Menos esfuerzo manual, más resultados medibles, desde hoy. Cotizar ahora Ver servicios Scroll La pregunta incómoda Tu competencia ya está usando Inteligencia Artificial. Mientras tú respondes 200 mensajes al día, [ ]",
+      "link": "http://localhost:6103/",
+      "modified": "2026-08-29T16:54:58"
+    }
+  ],
+  "products": [
+    {
+      "id": 29235,
+      "slug": "chatbots-semiinteligentes",
+      "title": "ChatBots SemiInteligentes",
+      "excerpt": "☑ ChatBots SemiInteligentes — desde $200 MXN mensuales Automatice la atención de su negocio con un ChatBot por menús y palabras clave, ideal para responder de forma inmediata las preguntas más frecuentes de sus clientes por WhatsApp, Facebook Messenger, su sitio web y otras plataformas. A diferencia de un ChatBot básico, el SemiInteligente incorpora lógica [ ]",
+      "currency": "MXN",
+      "link": "http://localhost:6103/product/chatbots-semiinteligentes/",
+      "price": "200",
+      "regularPrice": "200"
+    },
+    {
+      "id": 29234,
+      "slug": "foto-de-producto",
+      "title": "Foto de Producto y en Gral.",
+      "excerpt": "En el mundo digital, ¡su contenido visual determinará si destaca o desaparece! En http://localhost:6103, ofrecemos servicios de producción multimedia y digital para ayudarlo a destacar en línea. Ya sea que necesite fotografías de alta calidad para sus productos o servicios, o videos promocionales para su empresa, nuestro equipo de expertos está aquí para ayudarlo. ☑ [ ]",
+      "currency": "MXN",
+      "link": "http://localhost:6103/product/foto-de-producto/",
+      "price": "800",
+      "regularPrice": "800"
+    },
+    {
+      "id": 29233,
+      "slug": "chatbots-inteligentes",
+      "title": "ChatBots Inteligentes",
+      "excerpt": "☑ ChatBots Inteligentes — desde $200 MXN mensuales Combine toda la información de su negocio con la Inteligencia Artificial generativa y ofrezca respuestas naturales, personalizadas y en lenguaje coloquial a cada uno de sus clientes, 24/7, en su WhatsApp o en la plataforma que prefiera. Nuestros ChatBots Inteligentes están entrenados con la tecnología GPT (GPT-3.5 [ ]",
+      "currency": "MXN",
+      "link": "http://localhost:6103/product/chatbots-inteligentes/",
+      "price": "200",
+      "regularPrice": "200"
+    },
+    {
+      "id": 29232,
+      "slug": "produccion-audiovisual",
+      "title": "Producción MultiMedia Digital",
+      "excerpt": "En el mundo digital, ¡su contenido determinará si destaca o desaparece! Carezca de una estrategia de contenido multidimensional y efectiva y su negocio corre el riesgo de evaporarse en el éter.Pero la buena noticia es que la solución está a la mano, gracias a miles de recursos Open Source y producción meramente digital asistida [ ]",
+      "currency": "MXN",
+      "link": "http://localhost:6103/product/produccion-audiovisual/",
+      "price": "500",
+      "regularPrice": "500"
+    },
+    {
+      "id": 29231,
+      "slug": "gestion-empresarial-movil",
+      "title": "Gestión Empresarial Móvil",
+      "excerpt": "☑ CONTAMOS CON [OPCIONES] DESDE $5,000 MXN PAGO INICIAL Y $ 200 MXN mensuales de hosting. Todo aspecto de su negocio al alcance de la palma de su mano . sin importar el giro o tamaño de su negocio Si ha contratado un paquete de ChatBot Publia, podemos ofrecerle un panel de control web personalizado [ ]",
+      "currency": "MXN",
+      "link": "http://localhost:6103/product/gestion-empresarial-movil/",
+      "price": "5000",
+      "regularPrice": "5000"
+    },
+    {
+      "id": 29230,
+      "slug": "organizacion-de-eventos",
+      "title": "Organización de Eventos Públicos Privados",
+      "excerpt": "En un mundo cada vez más virtual, la experiencia en eventos en vivo es más valiosa que nunca. En http://localhost:6103, ofrecemos la mejor producción de eventos, desde grandes festivales hasta íntimas conferencias. Nuestro equipo experto está a la vanguardia de la tecnología y la creatividad para crear experiencias únicas e inolvidables. Ya sea un evento [ ]",
+      "currency": "MXN",
+      "link": "http://localhost:6103/product/organizacion-de-eventos/",
+      "price": "500",
+      "regularPrice": "500"
+    },
+    {
+      "id": 29229,
+      "slug": "chatbots-whatsapp-y-fb-messenger-2",
+      "title": "ChatBots Whatsapp y FB Messenger.",
+      "excerpt": "",
+      "currency": "MXN",
+      "link": "http://localhost:6103/product/chatbots-whatsapp-y-fb-messenger-2/",
+      "price": "200",
+      "regularPrice": "200"
+    },
+    {
+      "id": 29228,
+      "slug": "multimedia",
+      "title": "Producción MultiMedia Digital",
+      "excerpt": "",
+      "currency": "MXN",
+      "link": "http://localhost:6103/product/multimedia/",
+      "price": "500",
+      "regularPrice": "500"
+    },
+    {
+      "id": 29227,
+      "slug": "diseno-web-basico",
+      "title": "Diseño Web Básico",
+      "excerpt": "Diseño Web Básico Gracias a nuestra biblioteca de repositorios {{ OPEN SOURCE }} ofrecemos sitios web [[ de catálogo ]] sumamente accesibles, modulares y escalables. En esta era digital, si no existe en Internet ~ no existe. ¡Construya su sitio web o quede fuera! ☑ CONTAMOS CON [OPCIONES] DESDE $ 200 MXN mensuales",
+      "currency": "MXN",
+      "link": "http://localhost:6103/product/diseno-web-basico/",
+      "price": "200",
+      "regularPrice": "200"
+    },
+    {
+      "id": 29226,
+      "slug": "sistemas-de-repartidores-y-entregas",
+      "title": "Sistemas de Repartidores y Entregas",
+      "excerpt": "¡Delivery o extinción! No importa el tamaño, ofrecer servicio a domicilio es crucial para sobrevivir en la industria restaurantera actual. ☑ No pague el 25% o hasta 30% en plataformas como Uber Eats, Rappi o Didi Food, CONTAMOS CON [OPCIONES] DESDE $ 200 MXN mensuales o $1,500 de contado. Como proveedor líder en soluciones de [ ]",
+      "currency": "MXN",
+      "link": "http://localhost:6103/product/sistemas-de-repartidores-y-entregas/",
+      "price": "200",
+      "regularPrice": "200"
+    },
+    {
+      "id": 29225,
+      "slug": "e-commerce-a-medida",
+      "title": "E-commerce a medida",
+      "excerpt": "E-commerce a medida Gracias a nuestra biblioteca de repositorios {{ OPEN SOURCE }} ofrecemos sitios web E-Commerce [[ de catálogo ]] sumamente accesibles, modulares y escalables. En esta era digital, si no existe en Internet ~ no existe. ¡Construya su sitio web o quede fuera! ☑ CONTAMOS CON [OPCIONES] DESDE $ 200 MXN mensuales",
+      "currency": "MXN",
+      "link": "http://localhost:6103/product/e-commerce-a-medida/",
+      "price": "200",
+      "regularPrice": "200"
+    },
+    {
+      "id": 29224,
+      "slug": "desarrollo",
+      "title": "Desarrollo Web Apps",
+      "excerpt": "Gracias a nuestra biblioteca de repositorios {{ OPEN SOURCE }} ofrecemos sitios web [[ de catálogo ]] sumamente accesibles, modulares y escalables. En esta era digital, si no existe en Internet ~ no existe. ¡Construya su sitio web o quede fuera! ☑ CONTAMOS CON [OPCIONES] DESDE $ 150 MXN mensuales Sitios Webs Básicos de Catálogo. [ ]",
+      "currency": "MXN",
+      "link": "http://localhost:6103/product/desarrollo/",
+      "price": "150",
+      "regularPrice": "150"
+    },
+    {
+      "id": 29223,
+      "slug": "sistemas-de-entrega-reparto-y-cobranza",
+      "title": "Sistemas de Entrega, Reparto y Cobranza",
+      "excerpt": "☑ SISTEMAS DE ENTREGA, REPARTO Y COBRANZA — DESDE $200 MXN mensuales o $1,500 de contado Gestiona de forma profesional las entregas, el reparto y la cobranza de su negocio con una solución integral. En http://localhost:6103 integramos la tecnología Open Source adecuada para que usted coordine pedidos, asigne entregas y cobre de manera segura, sin [ ]",
+      "currency": "MXN",
+      "link": "http://localhost:6103/product/sistemas-de-entrega-reparto-y-cobranza/",
+      "price": "1500",
+      "regularPrice": "1500"
+    },
+    {
+      "id": 29222,
+      "slug": "asesorias-i-a",
+      "title": "Asesorías I.A.",
+      "excerpt": "Desbloquee el potencial de su negocio con nuestra consultoría en I.A.; permita que la inteligencia artificial sea el motor que impulse su éxito hacia el futuro . Como líderes nacionales en soluciones de Inteligencia Artificial, en http://localhost:6103 ofrecemos consultoría especializada en I.A. para ayudar a su empresa a alcanzar su máximo potencial. Nuestros expertos en I.A. [ ]",
+      "currency": "MXN",
+      "link": "http://localhost:6103/product/asesorias-i-a/",
+      "price": "800",
+      "regularPrice": "800"
+    },
+    {
+      "id": 29221,
+      "slug": "diseno-web-personalizado",
+      "title": "Diseño Web Personalizado",
+      "excerpt": "Diseño Web Personalizado Gracias a nuestra biblioteca de repositorios {{ OPEN SOURCE }} ofrecemos sitios web [[ de catálogo ]] sumamente accesibles, modulares y escalables. En esta era digital, si no existe en Internet ~ no existe. ¡Construya su sitio web o quede fuera! ☑ CONTAMOS CON [OPCIONES] DESDE $ 5,000 MXN Pago Único",
+      "currency": "MXN",
+      "link": "http://localhost:6103/product/diseno-web-personalizado/",
+      "price": "5000",
+      "regularPrice": "5000"
+    },
+    {
+      "id": 29220,
+      "slug": "servidores-i-a-empresariales",
+      "title": "Servidores I.A. Empresariales",
+      "excerpt": "Administración remota de servidores dedicados: ¡Una solución asequible y sin complicaciones para ejecutar su infraestructura crítica de IA! En la era informática: Su Data es su divisa ¿Ha cedido el monopolio ?? Como proveedor líder en soluciones de Inteligencia Artificial, http://localhost:6103 ahora ofrece administración remota de servidores dedicados, brindándole los beneficios de control sobre su [ ]",
+      "currency": "MXN",
+      "link": "http://localhost:6103/product/servidores-i-a-empresariales/",
+      "price": "800",
+      "regularPrice": "800"
+    },
+    {
+      "id": 29219,
+      "slug": "campanas-social-media-seo-y-ads",
+      "title": "Campañas Social Media, SEO y ads",
+      "excerpt": "☑ CONTAMOS CON [OPCIONES] DESDE $ 500 MXN mensuales o $100 mensuales adicionales a cualquier paquete contratado. Como proveedor líder en soluciones digitales, ofrecemos las soluciones más avanzadas en campañas SEO, social media y publicidad en línea. Nuestros servicios son mágicos, ya que le permiten a su empresa destacarse en el mercado digital de manera [ ]",
+      "currency": "MXN",
+      "link": "http://localhost:6103/product/campanas-social-media-seo-y-ads/",
+      "price": "500",
+      "regularPrice": "500"
+    },
+    {
+      "id": 29218,
+      "slug": "edicion-de-video-inteligente",
+      "title": "Edición de Video Inteligente",
+      "excerpt": "¿Quiere que su negocio sea el protagonista de la gran pantalla? ¡Un video inteligente es la clave para llevarlo al estreno y asegurarse de que su historia sea contada de manera impactante, incluso con recursos superaccesibles! No se quede fuera del concurso por no alcanzar las estrellas, use las herramientas que tenemos a su alcance [ ]",
+      "currency": "MXN",
+      "link": "http://localhost:6103/product/edicion-de-video-inteligente/",
+      "price": "500",
+      "regularPrice": "500"
+    },
+    {
+      "id": 29217,
+      "slug": "desarrollo-de-aplicaciones",
+      "title": "Desarrollo de Aplicaciones",
+      "excerpt": "Gracias a nuestra biblioteca de repositorios {{ OPEN SOURCE }} ofrecemos funciones y plantillas [[ de catálogo ]] de propósitos generales y específicos sumamente accesibles, modulares, integrables y escalables. Las aplicaciones digitales son el futuro. Son más que software: son el canal principal a través del cual se conecta con sus clientes y construye una [ ]",
+      "currency": "MXN",
+      "link": "http://localhost:6103/product/desarrollo-de-aplicaciones/",
+      "price": "10000",
+      "regularPrice": "10000"
+    },
+    {
+      "id": 25921,
+      "slug": "album",
+      "title": "Sucri",
+      "excerpt": "This is a simple, virtual product.",
+      "currency": "MXN",
+      "link": "http://localhost:6103/product/album/",
+      "price": "15",
+      "regularPrice": "15"
+    }
+  ],
+  "priceSource": "Metadatos WooCommerce (_price) leídos de la base del WordPress aislado; el REST público no expone precios sin credenciales."
+}

@@ -1,0 +1,109 @@
+/**
+ * Tokens de diseño de Publia 6.0.
+ *
+ * Paletas por ruta: la ruta define el carácter de la escena (grafito/metálico
+ * para empresa, ámbar para eficiencia, violeta/teal para exploración), pero
+ * todas comparten la misma gramática tipográfica y de movimiento.
+ */
+
+:root {
+  color-scheme: dark;
+
+  /* Base */
+  --ink-950: #07070a;
+  --ink-900: #0c0c11;
+  --ink-850: #121218;
+  --ink-800: #181820;
+  --ink-700: #23232d;
+  --ink-600: #343441;
+  --ink-400: #6d6d80;
+  --ink-300: #9c9cb0;
+  --ink-200: #c9c9d6;
+  --paper: #f4f3f7;
+
+  /* Acentos */
+  --accent: #b48bff;
+  --accent-strong: #8b5cf6;
+  --accent-soft: rgba(180, 139, 255, 0.16);
+  --signal: #ffb547;
+  --signal-soft: rgba(255, 181, 71, 0.16);
+  --teal: #4fd1c5;
+  --teal-soft: rgba(79, 209, 197, 0.14);
+  --graphite: #c8cad6;
+
+  /* Tipografía
+     No hay tipografía de marca con licencia verificada en el repositorio
+     (ver docs/PUBLIA-RECURSOS.md), así que la primera entrega usa la pila
+     del sistema: cero peticiones a terceros y render inmediato. Sustituir por
+     la tipografía definitiva en la Fase 5 (--font-display / --font-body). */
+  --font-display: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Roboto Mono', Menlo, monospace;
+
+  --step--1: clamp(0.78rem, 0.75rem + 0.15vw, 0.88rem);
+  --step-0: clamp(0.95rem, 0.9rem + 0.25vw, 1.08rem);
+  --step-1: clamp(1.15rem, 1.05rem + 0.5vw, 1.45rem);
+  --step-2: clamp(1.5rem, 1.3rem + 1vw, 2.1rem);
+  --step-3: clamp(2rem, 1.6rem + 2vw, 3.2rem);
+  --step-4: clamp(2.6rem, 1.8rem + 4vw, 5.2rem);
+  --step-5: clamp(3.2rem, 1.6rem + 7vw, 8rem);
+
+  /* Espaciado y forma */
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2.5rem;
+  --space-5: 4rem;
+  --space-6: 7rem;
+  --measure: 68ch;
+
+  --radius-sm: 6px;
+  --radius-md: 14px;
+  --radius-lg: 28px;
+  --radius-pill: 999px;
+
+  --border-subtle: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(255, 255, 255, 0.22);
+  --surface: rgba(255, 255, 255, 0.03);
+  --surface-strong: rgba(255, 255, 255, 0.06);
+  --shadow-soft: 0 24px 80px -40px rgba(0, 0, 0, 0.9);
+
+  /* Movimiento */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 220ms;
+  --dur-base: 480ms;
+  --dur-slow: 900ms;
+
+  /* Variables que cada ruta reescribe */
+  --scene-accent: var(--accent);
+  --scene-accent-soft: var(--accent-soft);
+  --scene-ink: var(--paper);
+  --scene-bg: var(--ink-950);
+}
+
+:root[data-route='enterprise'] {
+  --scene-accent: #cfd3e0;
+  --scene-accent-soft: rgba(207, 211, 224, 0.12);
+  --scene-bg: #08080a;
+  --scene-ink: #eef0f6;
+}
+
+:root[data-route='efficiency'] {
+  --scene-accent: var(--signal);
+  --scene-accent-soft: var(--signal-soft);
+  --scene-bg: #0b0a07;
+  --scene-ink: #f7f1e6;
+}
+
+:root[data-route='explorer'] {
+  --scene-accent: var(--teal);
+  --scene-accent-soft: var(--teal-soft);
+  --scene-bg: #060b0c;
+  --scene-ink: #eafaf7;
+}
+
+:root[data-route='unclassified'] {
+  --scene-accent: var(--accent);
+  --scene-accent-soft: var(--accent-soft);
+}

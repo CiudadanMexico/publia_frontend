@@ -1,0 +1,95 @@
+{
+  "results": [
+    {
+      "name": "carga inicial sin errores JS",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "hero: título correcto",
+      "ok": true,
+      "detail": "EL MUNDO ESTÁ CAMBIANDO."
+    },
+    {
+      "name": "hero: dos CTA visibles",
+      "ok": true,
+      "detail": "2 CTA"
+    },
+    {
+      "name": "prisma: canvas presente y WebGL activo",
+      "ok": true,
+      "detail": "{\"present\":true,\"ready\":true,\"webgl\":true,\"size\":[1440,900]}"
+    },
+    {
+      "name": "prisma: contexto WebGL disponible",
+      "ok": true,
+      "detail": "{\"webgl\":true}"
+    },
+    {
+      "name": "prisma: la escena 3D se renderiza y cambia (animación real)",
+      "ok": true,
+      "detail": "188316 vs 189868 bytes"
+    },
+    {
+      "name": "visual: el prisma pinta una fracción útil del viewport",
+      "ok": true,
+      "detail": "{\"paintedRatio\":0.174,\"brightRatio\":0.144,\"titleSize\":126.4,\"titleWeight\":\"600\",\"ctaHeight\":74,\"ctaWidth\":324}"
+    },
+    {
+      "name": "visual: jerarquía tipográfica (título grande) y CTA táctil (>=44px)",
+      "ok": true,
+      "detail": "{\"paintedRatio\":0.174,\"brightRatio\":0.144,\"titleSize\":126.4,\"titleWeight\":\"600\",\"ctaHeight\":74,\"ctaWidth\":324}"
+    },
+    {
+      "name": "ruta empresa: estado aplicado",
+      "ok": true,
+      "detail": "enterprise"
+    },
+    {
+      "name": "ruta empresa: escena compartida adaptada",
+      "ok": true,
+      "detail": "ACTIVOS DIGITALES, CONTROL TOTAL."
+    },
+    {
+      "name": "ruta empresa: su escena visible, la de exploración no",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "cambio de elección: vuelve a estado neutral",
+      "ok": true,
+      "detail": "unclassified"
+    },
+    {
+      "name": "ruta eficiencia: escena compartida adaptada",
+      "ok": true,
+      "detail": "CONECTA LO QUE YA FUNCIONA."
+    },
+    {
+      "name": "ruta exploración: se activa por scroll natural",
+      "ok": true,
+      "detail": "explorer"
+    },
+    {
+      "name": "ruta exploración: escena compartida adaptada",
+      "ok": true,
+      "detail": "HAY OTRA FORMA DE ORGANIZAR EL TRABAJO."
+    },
+    {
+      "name": "móvil: sin desbordamiento horizontal",
+      "ok": true,
+      "detail": "0px"
+    },
+    {
+      "name": "móvil: los CTA funcionan",
+      "ok": true,
+      "detail": "efficiency"
+    },
+    {
+      "name": "movimiento reducido: contenido visible y sin animación",
+      "ok": true,
+      "detail": "{\"layerReady\":true,\"revealsVisible\":true}"
+    }
+  ],
+  "failed": 0
+}

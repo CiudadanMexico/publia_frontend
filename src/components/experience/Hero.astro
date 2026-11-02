@@ -1,0 +1,125 @@
+---
+/**
+ * Hero principal: un viewport completo, el prisma detrás y dos decisiones.
+ * El scroll natural es la tercera ruta implícita: no se anuncia.
+ */
+import { HERO } from '../../data/copy';
+---
+
+<section class="hero" id="inicio" data-scene-id="hero" aria-labelledby="hero-titulo">
+  <div class="hero__inner shell">
+    <p class="eyebrow">Publia · red cooperativa de desarrollo</p>
+    <h1 id="hero-titulo" class="hero__title">{HERO.title}</h1>
+    <p class="hero__subtitle">{HERO.subtitle}</p>
+
+    <div class="hero__actions">
+      {
+        HERO.ctas.map((cta) => (
+          <div class="hero__action">
+            <button
+              type="button"
+              class="button button--primary"
+              data-route-choice={cta.id}
+              data-target={cta.target}
+            >
+              {cta.label}
+            </button>
+            <p class="hero__hint">{cta.hint}</p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+
+  <div class="hero__scroll" aria-hidden="true">
+    <span class="hero__scroll-line"></span>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: 100svh;
+    display: grid;
+    align-content: center;
+    padding-block: var(--space-5) var(--space-4);
+    overflow: hidden;
+  }
+
+  .hero__inner {
+    position: relative;
+    z-index: 2;
+    max-width: 60rem;
+  }
+
+  .hero__title {
+    font-size: var(--step-5);
+    max-width: 16ch;
+    margin-bottom: var(--space-3);
+    text-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+  }
+
+  .hero__subtitle {
+    font-size: var(--step-2);
+    max-width: 28ch;
+    color: color-mix(in oklab, var(--paper) 80%, transparent);
+    margin-bottom: var(--space-5);
+  }
+
+  .hero__actions {
+    display: grid;
+    gap: var(--space-3);
+    max-width: 42rem;
+  }
+
+  @media (min-width: 780px) {
+    .hero__actions {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .hero__hint {
+    margin: var(--space-1) 0 0;
+    font-size: var(--step--1);
+    color: var(--ink-300);
+  }
+
+  .hero__scroll {
+    position: absolute;
+    left: 50%;
+    bottom: var(--space-3);
+    translate: -50% 0;
+    width: 1px;
+    height: 4rem;
+    background: linear-gradient(var(--scene-accent), transparent);
+    opacity: 0.6;
+  }
+
+  .hero__scroll-line {
+    position: absolute;
+    inset: 0;
+    background: var(--scene-accent);
+    animation: hero-scroll 2.6s var(--ease-in-out) infinite;
+  }
+
+  @keyframes hero-scroll {
+    0% {
+      transform: translateY(-100%);
+      opacity: 0;
+    }
+    40% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero__scroll-line {
+      animation: none;
+      opacity: 0.5;
+    }
+  }
+</style>

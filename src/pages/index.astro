@@ -1,0 +1,72 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PrismLayer from '../components/three/PrismLayer.astro';
+import Nav from '../components/ui/Nav.astro';
+import Hero from '../components/experience/Hero.astro';
+import SceneBlock from '../components/experience/SceneBlock.astro';
+---
+
+<BaseLayout
+  title="Publia — El mundo está cambiando. Tu negocio también puede cambiar las reglas."
+  description="Red cooperativa de desarrollo: agentes de IA, infraestructura compartida, memberships en pesos mexicanos y formación práctica para negocios que quieren hacer más con menos."
+  path="/"
+>
+  <PrismLayer />
+  <Nav />
+
+  <main id="contenido">
+    <Hero />
+
+    <SceneBlock sceneId="empresa" anchor="ruta-empresa" showRouteSwitch />
+    <SceneBlock sceneId="eficiencia" anchor="ruta-eficiencia" showRouteSwitch />
+    <SceneBlock sceneId="exploracion" anchor="ruta-exploracion" showRouteSwitch />
+
+    <SceneBlock sceneId="escena-compartida" anchor="escena-compartida" />
+    <SceneBlock sceneId="escena-cierre" anchor="escena-cierre" />
+  </main>
+
+  <footer class="footer">
+    <div class="shell footer__inner">
+      <p class="footer__brand">PUBLIA</p>
+      <p class="muted">
+        Red cooperativa de desarrollo · Ciudadan.org · Cooperativismo 6.0.
+        Copia de trabajo aislada: no es el sitio de producción.
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    import '../scripts/experience';
+  </script>
+</BaseLayout>
+
+<style>
+  .footer {
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid var(--border-subtle);
+    padding-block: var(--space-4);
+    background: var(--ink-950);
+  }
+
+  .footer__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+
+  .footer__brand {
+    font-family: var(--font-display);
+    letter-spacing: 0.22em;
+    font-size: var(--step--1);
+    margin: 0;
+  }
+
+  .footer p {
+    margin: 0;
+    max-width: 42ch;
+    font-size: var(--step--1);
+  }
+</style>
