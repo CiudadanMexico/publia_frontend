@@ -243,6 +243,30 @@ check('catálogo: COBERTURA $4,000', prices['COBERTURA']?.includes('4,000'), pri
 check('catálogo: AGENTE como rango pendiente', (prices['AGENTE'] ?? '').includes('500'), prices['AGENTE']);
 check('housing: reparto 50/25/25', catalog.shares.join('/') === '50/25/25', catalog.shares.join('/'));
 
+const services = await page.evaluate(() => {
+  const items = [...document.querySelectorAll('#escena-e28 .services__item')].map((item) => ({
+    name: item.querySelector('.services__name')?.textContent?.trim() ?? '',
+    price: item.querySelector('.services__price')?.textContent?.trim() ?? '',
+  }));
+  const note = document.querySelector('#escena-e28 .services-group__note')?.textContent?.trim() ?? '';
+  return { items, note };
+});
+check(
+  'servicios: catálogo anterior con precio real',
+  services.items.some((item) => item.name.includes('Desarrollo Web') && item.price.includes('150')),
+  services.items[0]?.price ?? 'sin servicios',
+);
+check(
+  'servicios: el producto de prueba no se publica',
+  !services.items.some((item) => item.name.includes('Sucri')),
+  'Sucri excluido',
+);
+check(
+  'servicios: se aclara que es venta puntual',
+  services.note.includes('venta puntual') || services.note.includes('Venta puntual'),
+  services.note.slice(0, 60),
+);
+
 const contact = await page.evaluate(() => {
   const link = document.querySelector('[data-contact-cta="true"]');
   return { href: link?.getAttribute('href') ?? '', visible: link?.offsetHeight ?? 0 };

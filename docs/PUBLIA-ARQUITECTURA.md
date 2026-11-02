@@ -20,30 +20,42 @@ publia-frontend/
 ├─ astro.config.mjs          Astro 5.18.2 + sitemap; React se activa en Fase 4
 ├─ tsconfig.json             TypeScript estricto (noUncheckedIndexedAccess)
 ├─ scripts/
+│  ├─ qa.mjs                 Suite de QA (39 criterios, Playwright)
+│  ├─ serve-dist.mjs         Servidor estático de `dist/` sin dependencias
 │  └─ sync-wordpress-content.mjs   Snapshot del REST API → src/data/content.snapshot.json
 ├─ src/
 │  ├─ layouts/BaseLayout.astro     Metadatos, OG, JSON-LD, skip-link
-│  ├─ pages/index.astro            Composición de escenas
+│  ├─ pages/index.astro            Composición del grafo de escenas
 │  ├─ components/
-│  │  ├─ experience/               Escenas y transiciones narrativas
-│  │  │  ├─ Hero.astro
-│  │  │  └─ SceneBlock.astro       Escena reutilizable + variantes por estado
-│  │  ├─ three/PrismLayer.astro    Capa fija del prisma + fallback SVG
-│  │  └─ ui/Nav.astro              Navegación principal
+│  │  ├─ experience/
+│  │  │  ├─ Hero.astro             E01: dos decisiones de ruta
+│  │  │  ├─ SceneBlock.astro       Escena del grafo + doble puerta de visibilidad
+│  │  │  └─ modules/               Seis módulos reutilizables
+│  │  │     ├─ StatementModule.astro   · TextModule.astro
+│  │  │     ├─ NetworkModule.astro     · DemoModule.astro
+│  │  │     └─ CatalogModule.astro     · CtaModule.astro
+│  │  ├─ three/PrismLayer.astro    Capa fija del escenario + fallback SVG
+│  │  └─ ui/Nav.astro              Navegación y «cambiar de ruta»
 │  ├─ lib/
 │  │  ├─ experience/
+│  │  │  ├─ types.ts               Tipos de escena, variante, módulo y etapa
 │  │  │  ├─ state.ts               Motor de estado del visitante (sessionStorage)
-│  │  │  ├─ scenes.ts              Resolución de contenido por estado
+│  │  │  ├─ graph.ts               Resolución del grafo (variantes, segmentos, destinos)
 │  │  │  └─ events.ts              Eventos semánticos con consentimiento
-│  │  ├─ three/prism.ts            Escena Three.js del prisma
+│  │  ├─ three/stage.ts            Escenario 3D persistente y evolutivo
+│  │  ├─ animation/effects.ts      Biblioteca de efectos (GSAP + ScrollTrigger)
 │  │  └─ integrations/wordpress.ts Adaptador headless (snapshot + REST)
 │  ├─ data/
-│  │  ├─ copy.ts                   Copy del hero, rutas y escenas
-│  │  ├─ catalog.ts                Membresías, complementos, housing, asesoría…
+│  │  ├─ copy.ts                   Copy del hero
+│  │  ├─ catalog.ts                Catálogo editorial heredado
+│  │  ├─ memberships/              Niveles, Housing y reglas de precio
+│  │  ├─ services/                 Familias de servicios y servicios heredados
+│  │  ├─ routes/scenes.ts          Grafo narrativo E00–E30
 │  │  └─ content.snapshot.json     Contenido publicado del CMS
 │  ├─ scripts/experience.ts        Orquestador de cliente
-│  └─ styles/                      tokens.css · global.css
-└─ docs/                           Auditoría, arquitectura, mapa, catálogo, recursos, estado
+│  └─ styles/                      tokens.css · global.css · scenes.css
+└─ docs/                           Auditoría, rescate, arquitectura, mapa, catálogo,
+                                   efectos, assets, recursos y estado
 ```
 
 ## 3. Motor de estado
@@ -75,54 +87,124 @@ interface VisitorState {
 - **Reversible**: `resetExperience()` vuelve al estado neutro (botón
   «Cambiar de ruta»).
 
-## 4. Motor de escenas
+## 4. Motor de escenas: el grafo
 
-`src/lib/experience/scenes.ts` resuelve, para cada escena, el texto final a
-partir del estado: primero la variante de ruta, después las variantes de
-rasgos (la última aplica). El servidor renderiza la variante por defecto y
-el cliente intercambia el texto mediante un JSON embebido por escena
-(`data-role="variants"`), sin recargar y sin duplicar implementaciones.
+`src/data/routes/scenes.ts` (datos) + `src/lib/experience/graph.ts` (resolución)
 
-Visibilidad por ruta (CSS sobre `html[data-route]`):
+El grafo contiene 30 escenas (`E00`–`E30`) más el hero (`E01`). Cada escena
+declara: propósito, módulos, segmentos, ruta, duración, transición, etapa 3D,
+paleta, variantes de texto, datos y destinos.
 
-| Escena | unclassified | enterprise | efficiency | explorer |
-|---|---|---|---|---|
-| `empresa` | oculta | visible | oculta | oculta |
-| `eficiencia` | oculta | oculta | visible | oculta |
-| `exploracion` | **visible** | oculta | oculta | visible |
-| `escena-compartida` | visible | visible | visible | visible |
-| `escena-cierre` | visible | visible | visible | visible |
+```ts
+interface SceneDefinition {
+  id: string;
+  purpose: string;
+  modules: SceneModule[];
+  segments: Segment[];
+  route: 'shared' | PrimaryRoute;
+  requires?: string[];
+  produces?: string[];
+  duration?: number;
+  variants?: SceneVariant[];
+  data?: SceneData;
+  cta?: CTA;
+  destinations?: string[];
+  transition: 'fade' | 'rise' | 'slide' | 'morph';
+  stage: StageState;
+  palette: PaletteName;
+  assets?: VisualAsset[];
+}
+```
 
-## 5. Capa 3D: el prisma
+### 4.1 Dos puertas de visibilidad
 
-`src/lib/three/prism.ts`
+1. **Ruta** (capa exterior): `.scene[data-scene-route]`. El CSS decide si la
+   escena existe para la ruta actual (`html[data-route]`).
+2. **Segmentos** (capa interior): `.scene__inner[data-scene-segments]`. La
+   escena sólo muestra su contenido si el visitante tiene alguno de los
+   segmentos exigidos (`html[data-segments]`).
 
-- Núcleo `IcosahedronGeometry` con `MeshPhysicalMaterial` (transmisión 0.92,
-  IOR 1.62) y aristas con `EdgesGeometry`.
-- Siete facetas `Tetrahedron` orbitando, cada una girando sobre un eje
-  distinto (X, Y, Z), con radios y velocidades propios.
-- Movimiento sobre **los tres ejes** del conjunto (`rotation.x/y/z`), la cámara
-  avanza con el scroll (`z` de 6.2 → 4.7) y se desplaza con el puntero.
-- La paleta y la velocidad de giro dependen de la ruta: grafito metálico
-  (empresa, lenta), ámbar (eficiencia, rápida), verde azulado (exploración),
-  violeta (sin elegir).
-- Partículas para profundidad y niebla exponencial suave.
-- `prefers-reduced-motion` → una sola pasada estática, sin bucle de animación.
-- Sin WebGL → se mantiene el SVG de respaldo; el contenido sigue legible.
-- `preserveDrawingBuffer: true` permite capturar el prisma (capturas de
-  pantalla, pruebas visuales).
+El filtro por segmento **no depende de JavaScript para el estado inicial**: el
+HTML del servidor ya trae la variante neutral y el CSS resuelve el primer
+filtro. JavaScript sólo actualiza `data-segments` cuando cambia el estado.
+
+### 4.2 Segmentos
+
+| Origen | Segmento |
+|---|---|
+| Ruta `enterprise` | `enterprise` |
+| Ruta `efficiency` | `efficiency` |
+| Ruta `explorer` / sin elegir | `explorer` |
+| Rasgo `cooperative` | `cooperative` |
+| Rasgo `value_driven` | `values` |
+| Rasgo `needs_help` | `practical` |
+| Rasgo `starting` | `beginner` |
+| Rasgo `existing` | `established` |
+| Rasgo `advanced` | `advanced` |
+
+### 4.3 Variantes
+
+Una misma escena puede tener una variante por ruta y por segmento. El servidor
+renderiza la variante neutral; el cliente intercambia el texto leyendo el JSON
+embebido en `data-variants` y escribiendo en los nodos marcados con
+`data-role` (`eyebrow`, `title`, `lead`, `body`). No se duplica ningún
+componente: una escena compartida es **una** escena con textos intercambiables.
+
+## 5. Escenario 3D: la entidad persistente
+
+`src/lib/three/stage.ts`
+
+Una sola escena WebGL acompaña todo el relato. **El prisma no se recrea**: se
+transforma. Cada estado narrativo define una «mirada» completa y las
+transiciones interpolan parámetros en lugar de reconstruir objetos.
+
+| Elemento | Detalle |
+|---|---|
+| Núcleo | `IcosahedronGeometry` con `MeshPhysicalMaterial` (transmisión 0.92, IOR 1.62, clearcoat) |
+| Facetas | 7 `Tetrahedron` en órbita, cada una con eje, radio, fase y velocidad propios |
+| Celosía | `EdgesGeometry` de un cubo: aparece en empresa (precisión) |
+| Red | 26 nodos con enlaces: aparece en cooperativa y housing |
+| Atmósfera | 420 partículas y niebla exponencial |
+| Luces | direccional + luz de acento puntual + hemisférica, con color e intensidad interpolados |
+
+Siete estados: `abstract`, `enterprise`, `efficiency`, `explorer`,
+`cooperative`, `housing`, `convergence`. Cada uno define color, separación de
+facetas, velocidad, opacidad de celosía y de red, posición de cámara, objetivo
+y luz de acento.
+
+- El **scroll** desplaza la cámara (`dolly`) y abre/compone las facetas según
+  el progreso de la escena.
+- El **puntero** añade parallax a la cámara.
+- `prefers-reduced-motion` → un único fotograma estático, sin bucle.
+- Sin WebGL → permanece el SVG de respaldo y el contenido sigue legible.
+- La escena **se pausa** si la pestaña se oculta o el lienzo sale del viewport.
+- `destroy()` libera geometrías, materiales, observadores y el renderer.
 
 ## 6. Movimiento
 
-- **GSAP ScrollTrigger** para el progreso global (prisma) y el registro de
-  escenas vistas.
-- **IntersectionObserver** para las entradas `[data-reveal]` (más barato que
-  un trigger por elemento).
-- **Sin scroll-jacking**: el scroll nativo nunca se bloquea; sólo se sincroniza
-  con la narrativa.
-- La ruta implícita por scroll se decide con una comprobación de viewport
-  determinista (`updateImplicitRoute`), no con el estado interno de
-  ScrollTrigger: así un reflujo de layout no la activa por error.
+`src/lib/animation/effects.ts`
+
+Biblioteca declarativa y reversible: cada efecto se activa con atributos
+`data-*` y se revierte con `context.revert()`.
+
+| Efecto | Mecanismo |
+|---|---|
+| Revelado de bloques | `gsap.fromTo` con `ScrollTrigger` `once: true` |
+| Revelado con máscara | Envuelve cada palabra en `.mask-line__inner` y anima `yPercent` |
+| Parallax multicapa | `yPercent` ligado a `scrub` |
+| DOF simulada | `scale` + `filter: blur()` con `scrub` |
+| Contadores | Tween de un objeto de estado; sólo datos verificables |
+| Diagramas SVG | `strokeDashoffset` con retardo por enlace |
+| Progreso por escena | `onUpdate` alimenta la etapa 3D y la cámara |
+| Pinning | `ScrollTrigger` con `pin` y `anticipatePin` |
+| Sección horizontal | `x` ligado a `scrub` con `pin` |
+
+Reglas: sin *scroll-jacking* (el scroll nativo nunca se bloquea), sin contadores
+decorativos, con alternativas estáticas bajo `prefers-reduced-motion`.
+
+**Refresco condicional**: `ScrollTrigger.refresh()` recalcula el scroll y
+cancela los scrolls suaves en curso. Sólo se dispara cuando cambia la
+visibilidad (ruta o segmentos), nunca por cada escena visitada.
 
 ## 7. Integraciones
 

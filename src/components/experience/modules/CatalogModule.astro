@@ -43,19 +43,25 @@ const windows = scene.data?.windows ?? [];
 
   {
     services.length > 0 && (
-      <ul class="services" data-reveal-group>
-        {services.map((service, index) => (
-          <li class="services__item" data-reveal style={`--index:${index}`}>
-            <div class="services__main">
-              <strong class="services__name">{service.name}</strong>
-              <span class="services__detail">{service.detail}</span>
-            </div>
-            <span class={`services__price${service.price ? '' : ' services__price--pending'}`}>
-              {service.price ?? 'Cotización a medida'}
-            </span>
-          </li>
-        ))}
-      </ul>
+      <div class="services-group" data-reveal-group>
+        <p class="services-group__note">
+          Venta puntual del catálogo anterior, con precio de referencia. La operación sostenida se
+          cotiza como membresía.
+        </p>
+        <ul class="services">
+          {services.map((service, index) => (
+            <li class="services__item" data-reveal style={`--index:${index}`}>
+              <div class="services__main">
+                <strong class="services__name">{service.name}</strong>
+                <span class="services__detail">{service.detail}</span>
+              </div>
+              <span class={`services__price${service.price ? '' : ' services__price--pending'}`}>
+                {service.price ?? 'Cotización a medida'}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
     )
   }
 

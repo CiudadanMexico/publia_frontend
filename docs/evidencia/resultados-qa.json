@@ -1,6 +1,6 @@
 {
   "base": "http://127.0.0.1:4322",
-  "total": 39,
+  "total": 42,
   "fallos": 0,
   "resultados": [
     {
@@ -31,12 +31,12 @@
     {
       "name": "prisma: la escena 3D se renderiza y cambia (animación real)",
       "ok": true,
-      "detail": "172310 vs 170447 bytes"
+      "detail": "171961 vs 170606 bytes"
     },
     {
       "name": "prisma: pinta una fracción útil del viewport",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.14375385802469134}"
+      "detail": "{\"paintedRatio\":0.14238811728395062}"
     },
     {
       "name": "grafo: 31 escenas montadas (E00-E30)",
@@ -167,6 +167,21 @@
       "name": "housing: reparto 50/25/25",
       "ok": true,
       "detail": "50/25/25"
+    },
+    {
+      "name": "servicios: catálogo anterior con precio real",
+      "ok": true,
+      "detail": "$150 MXN"
+    },
+    {
+      "name": "servicios: el producto de prueba no se publica",
+      "ok": true,
+      "detail": "Sucri excluido"
+    },
+    {
+      "name": "servicios: se aclara que es venta puntual",
+      "ok": true,
+      "detail": "Venta puntual del catálogo anterior, con precio de referenci"
     },
     {
       "name": "conversión: CTA de contacto visible",

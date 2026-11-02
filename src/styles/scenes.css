@@ -605,6 +605,20 @@ html[data-segments~='advanced'] .scene__inner[data-scene-segments~='advanced'] {
   font-size: var(--step--1);
 }
 
+.services-group {
+  display: grid;
+  gap: var(--space-2);
+  max-width: 56rem;
+}
+
+.services-group__note {
+  margin: 0;
+  font-size: var(--step--1);
+  color: var(--ink-300);
+  border-left: 2px solid color-mix(in oklab, var(--scene-accent) 50%, transparent);
+  padding-left: var(--space-2);
+}
+
 .services {
   list-style: none;
   margin: 0;

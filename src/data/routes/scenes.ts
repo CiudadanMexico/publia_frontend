@@ -16,6 +16,7 @@
 
 import { MEMBERSHIPS } from '../memberships';
 import { ADVISORY, COOPERATIVES, SERVICE_FAMILIES, TRAINING } from '../catalog';
+import { PUBLISHABLE_SERVICES, SERVICE_FAMILIES as SERVICE_FAMILY_DATA } from '../services';
 import type { SceneDefinition } from '../../lib/experience/types';
 
 const money = (value: number): string => `$${value.toLocaleString('es-MX')} MXN`;
@@ -52,6 +53,23 @@ const serviceFamilies = SERVICE_FAMILIES.map((family) => ({
   detail: family.items.slice(0, 3).join(' · '),
   price: null,
 }));
+
+/**
+ * Catálogo anterior con precios reales de la base (snapshot de precios).
+ * Se presenta como venta puntual; la operación sostenida seCotiza como
+ * membresía. El producto de prueba interno queda fuera.
+ */
+const legacyServices = PUBLISHABLE_SERVICES.map((service) => {
+  const family = SERVICE_FAMILY_DATA.find((item) => item.id === service.familyId);
+  return {
+    name: service.name,
+    detail: family?.name ?? 'Servicio puntual',
+    price: `$${service.priceMxn?.toLocaleString('es-MX')} MXN`,
+    family: family?.name ?? 'Otros',
+    status: service.status,
+    priceConfirmed: service.priceConfirmed,
+  };
+});
 
 export const SCENES: SceneDefinition[] = [
   {
@@ -685,7 +703,7 @@ export const SCENES: SceneDefinition[] = [
     transition: 'slide',
     stage: 'convergence',
     palette: 'ink',
-    data: { services: serviceFamilies },
+    data: { services: legacyServices },
   },
   {
     id: 'E29',

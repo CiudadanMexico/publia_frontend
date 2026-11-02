@@ -103,7 +103,14 @@ export interface SceneData {
   /** Planes de membresía resumidos para la escena de catálogo. */
   plans?: Array<{ name: string; price: string; highlight?: boolean; features: string[] }>;
   /** Servicios resumidos. */
-  services?: Array<{ name: string; detail: string; price?: string | null }>;
+  services?: Array<{
+    name: string;
+    detail: string;
+    price?: string | null;
+    family?: string;
+    status?: 'existente' | 'en-desarrollo' | 'planeado';
+    priceConfirmed?: boolean;
+  }>;
   /** Ventanas de servicio (cobertura). */
   windows?: Array<{ label: string; value: string; note?: string }>;
   /** Comparativa centralizado vs red. */

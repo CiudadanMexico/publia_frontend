@@ -30,7 +30,7 @@ las reglas con las que se modeló; el código las aplica.
 | **BASE** | $300/mes | Hosting · WordPress o WooCommerce · chatbot de WhatsApp · integración con sitio existente o implementación inicial cotizada aparte | No incluye agente personal. Dominio aparte. Consumo de IA con API propia, Laborys si el servicio lo permite o modelos gratuitos. |
 | **AGENTE** | objetivo $500–600/mes (sin precio cerrado) | Base + un agente personal para un usuario · investigar, redactar, organizar, analizar y ejecutar tareas autorizadas · integraciones según configuración | No es bolsa de horas artificial. El tiempo de respuesta varía con saturación y capacidad técnica. Sin recursos ilimitados. |
 | **CRECIMIENTO** | $2 000/mes | Base + agente personal + chatbot con derivación a varios humanos del negocio · 2–3 redes · ~8 piezas de contenido con IA · programación, copys y adaptación básica | La producción humana especializada se cobra aparte. |
-| **OPERACIÓN** | $3 000/mes | Lo anterior + presencia multicanal ampliada · ~12 piezas con IA · soporte humano de primer nivel con red de becarios capacitados | Disponibilidad humana compartida. No es un trabajador exclusivo. Ventana ≈ 4 h/día. Bolsa limitada de atención efectiva, pendiente de fijar comercialmente. La IA clasifica; los casos humanos entran a cola. |
+| **OPERACIÓN** | $3 000/mes | Lo anterior + presencia multicanal ampliada · ~12 piezas con IA · soporte humano de primer nivel con red de becarios capacitados | Disponibilidad humana compartida. No es un trabajador exclusivo. Sin ventana horaria publicada: la cobertura se define en COBERTURA. Bolsa limitada de atención efectiva, pendiente de fijar comercialmente. La IA clasifica; los casos humanos entran a cola. |
 | **COBERTURA** | $4 000/mes | Todo lo de OPERACIÓN + cobertura organizada entre varios becarios de 9:00 a 18:00 según calendario | Atención efectiva limitada. No equivale a 9 h de trabajo humano exclusivo. La diferencia es la amplitud de la ventana, no más contenido. |
 
 > **Distinción clave** entre OPERACIÓN y COBERTURA: cambia la **ventana de
@@ -39,7 +39,7 @@ las reglas con las que se modeló; el código las aplica.
 ### Presentación
 
 - No se muestran todos los precios a la vez: la membresía se introduce tras
-  la demostración de la operación (escena `eficiencia-membresias`).
+  la demostración de la operación (escena `E27`, «Encuentra tu nivel»).
 - Cada tarjeta declara **incluye** y **no incluye** con el mismo peso visual.
 - La comparación se apoya en la **composición de la operación**, no en una
   tabla de Checking.
