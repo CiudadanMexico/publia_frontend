@@ -28,7 +28,7 @@
     {
       "name": "prisma: la escena 3D se renderiza y cambia (animación real)",
       "ok": true,
-      "detail": "188055 vs 189673 bytes"
+      "detail": "188090 vs 189327 bytes"
     },
     {
       "name": "visual: el prisma pinta una fracción útil del viewport",

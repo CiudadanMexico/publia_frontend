@@ -21,6 +21,12 @@ export default defineConfig({
   // React (224 kB) en cada página sin ningún uso.
   integrations: [sitemap()],
   vite: {
+    // El preview se publica detrás de un túnel de Cloudflare: la petición
+    // llega con el Host público (p. ej. *.trycloudflare.com) y Vite lo
+    // rechazaría por defecto con un 403. Sólo afecta a `astro preview` y
+    // `astro dev`; la salida de producción es estática y no valida Host.
+    server: { allowedHosts: true },
+    preview: { allowedHosts: true },
     build: {
       target: 'es2022',
       cssTarget: 'chrome100',

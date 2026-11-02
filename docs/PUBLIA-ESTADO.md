@@ -50,11 +50,52 @@ Verificados con Chromium headless (Playwright) sobre `npm run preview`:
 
 ## 3. Cómo revisarlo
 
+### URL pública actual (compartible)
+
+| Qué | Dónde |
+|---|---|
+| URL pública | `https://kitty-midi-grid-liked.trycloudflare.com` (túnel rápido de Cloudflare en el host Oracle) |
+| Origen local | `127.0.0.1:4322` (proxy systemd) → contenedor `8090` (`node scripts/serve-dist.mjs`) |
+| Verificación | Suite QA completa **contra la URL pública**: 18/18 criterios ✔ |
+| URL vigente | `ssh yizuz@159.54.133.219 '/usr/local/bin/publia-quick-url.sh'` |
+
+> El túnel rápido es **efímero**: la URL cambia si el servicio se reinicia
+> (`systemctl restart publia-quick-tunnel`). Para una URL estable hay que
+> crear el subdominio definitivo (ver §10).
+
+### Subdominio definitivo (pendiente de una acción en Cloudflare)
+
+Datos exactos para crearlo en el túnel `30291f10-edc9-42b1-8345-76d2a10317a0`
+(cuenta `9a00f494de172e969c6498971bcdc3aa`, túnel remoto del host Oracle):
+
+| Campo | Valor |
+|---|---|
+| Subdominio propuesto | `preview-publia6.ciudadan.org` |
+| Tipo / URL de origen | `http://127.0.0.1:4322` |
+| Registro DNS | CNAME `preview-publia6` → `30291f10-edc9-42b1-8345-76d2a10317a0.cfargotunnel.com` (proxy naranja activo) |
+
+Dos formas de hacerlo:
+
+1. **Dashboard (2 minutos):** Zero Trust → Networks → Tunnels → *Ciudadan* →
+   Public Hostnames → Add (`preview-publia6` + `ciudadan.org` + `http://127.0.0.1:4322`).
+   El flujo crea el CNAME automáticamente.
+2. **API:** con un token de Cloudflare (Zone:DNS:Edit + Account:Cloudflare
+   Tunnel:Edit sobre `ciudadan.org`) se puede dejar listo en segundos; el
+   token no se guarda en el repositorio.
+
+Mientras tanto, el sitio se sirve con `scripts/serve-dist.mjs` (servidor
+estático propio, sin validación de `Host`, con caché inmutable para los
+recursos con hash) en lugar de `astro preview`, que rechaza cualquier `Host`
+público con un 403.
+
+### Tunnel local (tú, en tu equipo)
+
+```powershell
+
 El frontend se sirve desde el agente `temporal3-agent3` y se publica en el
 host **sólo en loopback** (127.0.0.1), así que no queda expuesto a internet:
 llega por tu túnel SSH, igual que el WordPress.
 
-```powershell
 # Versión compilada (lo que se entregaría)
 ssh -L 4322:127.0.0.1:4322 yizuz@159.54.133.219
 # -> http://localhost:4322
