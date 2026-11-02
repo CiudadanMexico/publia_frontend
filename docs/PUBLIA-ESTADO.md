@@ -20,6 +20,7 @@ adaptativa).**
 | Motor de estados y navegación entre escenas | ✅ |
 | Hero con prisma 3D, dos CTA y ruta implícita por scroll | ✅ |
 | Adaptador headless de WordPress + snapshot real (60 páginas, 20 productos) | ✅ |
+| Correo canónico `hola@publia.mx` con contexto de navegación | ✅ |
 | Catálogo en pantalla (membresías, housing, servicios, cooperativas) | ⏳ Fase 4 |
 | Páginas de detalle (SEO) | ⏳ Fase 4 |
 | Formulario de conversión | ⏳ Fase 4 (requiere correo de contacto real) |
@@ -47,7 +48,34 @@ Verificados con Chromium headless (Playwright) sobre `npm run preview`:
 **Resultado de la suite: 18/18 comprobaciones correctas**
 (evidencia en `docs/evidencia/`, resultados en `docs/evidencia/resultados-qa.json`).
 
-## 3. Comandos
+## 3. Cómo revisarlo
+
+El frontend se sirve desde el agente `temporal3-agent3` y se publica en el
+host **sólo en loopback** (127.0.0.1), así que no queda expuesto a internet:
+llega por tu túnel SSH, igual que el WordPress.
+
+```powershell
+# Versión compilada (lo que se entregaría)
+ssh -L 4322:127.0.0.1:4322 yizuz@159.54.133.219
+# -> http://localhost:4322
+
+# Versión de desarrollo con recarga en caliente (para el agente Cline)
+ssh -L 4321:127.0.0.1:4321 yizuz@159.54.133.219
+# -> http://localhost:4321
+```
+
+Dentro del contenedor:
+
+```bash
+cd /workspace/publia/frontend
+npm run dev      # desarrollo (puerto 8091 dentro del contenedor)
+npm run build && npm run preview   # estático (puerto 8090)
+```
+
+En el equipo donde se syringeó el código: `/home/dsh-dany/workspace/publia-frontend`
+(rama `feature/publia-6-frontend`). En el agente: `/workspace/publia/frontend`.
+
+## 4. Comandos
 
 ```bash
 npm install          # dependencias (Node ≥ 20.3)
@@ -72,7 +100,7 @@ cd /home/dsh-dany/workspace/.qa-tools
 PLAYWRIGHT_BROWSERS_PATH=$PWD/browsers QA_BASE=http://127.0.0.1:4322 node qa.mjs
 ```
 
-## 4. Archivos creados
+## 5. Archivos creados
 
 ```text
 publia-frontend/
@@ -97,7 +125,7 @@ publia-frontend/
 └─ src/styles/tokens.css · global.css
 ```
 
-## 5. Problemas encontrados y resueltos
+## 6. Problemas encontrados y resueltos
 
 | Problema | Causa | Resolución |
 |---|---|---|
@@ -109,15 +137,17 @@ publia-frontend/
 | No había forma de medir el render 3D | `readPixels` sobre un búfer ya compuesto devuelve ceros | `preserveDrawingBuffer: true` + comparación de capturas |
 | Sin navegador en el entorno para la evidencia visual | No hay Chromium ni sudo | Chromium de Playwright con librerías extraídas en espacio de usuario (sin tocar el sistema) |
 
-## 6. Riesgos abiertos
+## 7. Riesgos abiertos
 
 1. **Memoria histórica no recuperada**: la consulta automática al consultor
    (`chatgpt-web/auto`) devolvió vacío. No se ha asumido ningún acuerdo
    histórico; las decisiones de esta entrega se limitan a lo explícito en la
    misión. Si existen acuerdos previos sobre tipos de letra, paleta o
    mensajes, hay que contrastarlos antes de la Fase 5.
-2. **Correo de contacto**: no hay dirección propia en el contenido; el
-   formulario de la Fase 4 la necesita.
+2. ~~Correo de contacto~~ → **resuelto**: `hola@publia.mx` queda como correo
+   canónico (decisión del cliente). Ya está en `src/data/site.ts`, en el pie y
+   en el CTA de diagnóstico, que además prellena el contexto de navegación
+   (ruta e intereses, sin datos personales).
 3. **Catálogo heredado**: 20 servicios con precio y 20 colisiones de títulos
    por depurar antes de migrarlos.
 4. **Tipografía de marca**: sin definir (hoy pila de sistema).
@@ -126,7 +156,7 @@ publia-frontend/
 6. **Contenido incrustado con `localhost:6103`**: hay que sustituirlo al
    migrar.
 
-## 7. Siguiente paso propuesto (no ejecutado)
+## 8. Siguiente paso propuesto (no ejecutado)
 
 **Fase 3 completa**: las dos bifurcaciones de la ruta de exploración («quiero
 crear algo que valga más que su precio» / «necesito ayuda para hacer crecer mi
@@ -134,7 +164,7 @@ negocio»), la escena de personas detrás de la tecnología y las escenas
 propias completas de empresa y eficiencia, con sus transiciones. Revisión
 previa de esta entrega antes de seguir.
 
-## 8. Notas de despliegue
+## 9. Notas de despliegue
 
 - La salida es **estática** (`dist/`): sirve en cualquier hosting; no hay
   dependencias de servidor ni de WordPress en runtime.

@@ -144,7 +144,7 @@ tipografía definitiva queda como decisión pendiente (§8).
 | Coste de Three.js (538 kB / 134 kB gzip) | Medio | Carga diferida por `import()` dinámico; fallback SVG sin WebGL; reduced-motion sin bucle |
 | Sin tipografía de marca | Bajo | Pila de sistema; decisión abierta en §8 |
 | Dos fuentes de verdad del contenido (WP y `src/data`) | Medio | El snapshot se regenera con `npm run sync:content`; la compilación nunca depende de la API |
-| Sin correo de contacto real | Alto | El formulario de conversión (Fase 4) necesita una dirección; queda pendiente de decisión |
+| ~~Sin correo de contacto real~~ | — | Resuelto: `hola@publia.mx` (decisión del cliente), ya usado en el CTA de diagnóstico y el pie |
 | 20 colisiones de título y 4 duplicados | Medio | Depurar antes de migrar contenido; canonicización por slug |
 | 1 webhook de WooCommerce activo | Medio | Revisar destino y desactivarlo en el flujo de publicación |
 | 1 874 revisiones y 1 232 archivos generados | Bajo | Depurar en la copia, no afecta al frontend |
@@ -173,6 +173,8 @@ tipografía definitiva queda como decisión pendiente (§8).
 - Ubicación configurada: Ciudad de México, México (sin calle postal pública).
 - **Consecuencia para el frontend:** hace falta una dirección de contacto real
   (correo) antes de montar el formulario de conversión de la Fase 4.
+  → **Resuelto por decisión del cliente: `hola@publia.mx`** como correo
+  canónico (no procede del contenido migrado, que está saneado).
 
 ## 6. Estado del WordPress aislado (no se modifica)
 
@@ -206,7 +208,8 @@ Detalle en `PUBLIA-ARQUITECTURA.md`.
 5. **Laborys**: cantidad mensual por membresía sin confirmar.
 6. **Housing**: mensualidad de la modalidad privada sin definir; hardware
    completo y condiciones de salida pendientes de contrato.
-7. **Memoria histórica**: la consulta automática al consultor (`chatgpt-web/auto`)
+7. **Correo de contacto**: `hola@publia.mx` (decidido por el cliente).
+8. **Memoria histórica**: la consulta automática al consultor (`chatgpt-web/auto`)
    devolvió vacío en esta sesión; **no se ha recuperado ningún acuerdo
    histórico** y no se ha asumido ninguno. Los acuerdos que se han
    respetado aquí son los explícitos en la misión.
