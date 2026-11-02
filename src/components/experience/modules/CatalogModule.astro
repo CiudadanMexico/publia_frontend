@@ -25,7 +25,11 @@ const windows = scene.data?.windows ?? [];
 
   {
     plans.length > 0 && (
-      <div class="plans" data-reveal-group>
+      <div
+        class="plans"
+        data-reveal-group
+        data-horizontal={scene.effects?.horizontal ? '' : undefined}
+      >
         {plans.map((plan, index) => (
           <article class={`plan${plan.highlight ? ' plan--highlight' : ''}`} data-reveal style={`--index:${index}`}>
             <h3 class="plan__name">{plan.name}</h3>

@@ -96,7 +96,7 @@ resultados con evidencia. Un criterio parcial cuenta 0,5.
 | Bloque | Criterios | Cumplidos | Resultado | Evidencia principal |
 |---|---|---|---|---|
 | **A — Rescate y auditoría** | 16 | 15 (1 P1 externo) | **93,75 %** | §2 de este documento |
-| **B — Motor cinematográfico** | 24 efectos | 10 verificados (10,0) + 11 parciales (5,5) + 3 pendientes (0) = 15,5 / 24 | **64,58 %** | `docs/PUBLIA-EFECTOS.md` |
+| **B — Motor cinematográfico** | 24 efectos | 20 verificados (20,0) + 4 parciales (2,0) + 0 pendientes = 22 / 24 | **91,67 %** | `docs/PUBLIA-EFECTOS.md` |
 | **C — Tres rutas** | 10 | 10 | **100 %** | QA: empresa, eficiencia, exploración, cambio de ruta |
 | **D — Ecosistema e impacto** | 10 | 10 | **100 %** | Escenas E16–E22; reparto 50/25/25 verificado |
 | **E — Productos y demostraciones** | 10 | 8 | **80 %** | QA: 5 niveles, precios, 6 bloques de simulación; falta el catálogo heredado (P1-3) |

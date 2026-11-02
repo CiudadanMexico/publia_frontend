@@ -119,6 +119,25 @@ export interface SceneData {
   branches?: Array<{ label: string; target: string; trait?: VisitorTrait; route?: PrimaryRoute }>;
 }
 
+/**
+ * Efectos declarativos que una escena activa. Los implementa
+ * `src/lib/animation/effects.ts` a partir de estos atributos.
+ */
+export interface SceneEffects {
+  /** Duración del anclaje en viewports (1 = una pantalla). */
+  pin?: number;
+  /** Recorrido horizontal de su contenido (desktop). */
+  horizontal?: boolean;
+  /** Columna sticky dentro de la escena. */
+  sticky?: boolean;
+  /** Profundidad de parallax (fracción de la altura). */
+  parallax?: number;
+  /** Intensidad de la profundidad de campo simulada. */
+  depth?: number;
+  /** Morphing de la entidad 3D durante la escena. */
+  morph?: boolean;
+}
+
 export interface SceneDefinition {
   /** Identificador del mapa narrativo (E00…E30). */
   id: string;
@@ -145,6 +164,8 @@ export interface SceneDefinition {
   variants?: SceneVariant[];
   /** Datos de los módulos (demostraciones, planes, reparto, comparativas). */
   data?: SceneData;
+  /** Efectos cinematográficos que la escena activa. */
+  effects?: SceneEffects;
   cta?: CTA;
   /** Destinos narrativos (ids de escena). */
   destinations?: string[];

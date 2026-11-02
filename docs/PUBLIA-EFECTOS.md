@@ -7,7 +7,7 @@ Este catálogo es el **denominador del BLOQUE B**: 24 efectos obligatorios del
 brief, cada uno con su estado real, su archivo de implementación y su forma de
 verificación. Un efecto *parcial* cuenta 0,5.
 
-**Resultado: 15,5 / 24 = 64,58 %.**
+**Resultado: 22 / 24 = 91,67 %.** (4 efectos parciales: 18, 19, 20 y 21.)
 
 | Estado | Significado |
 |---|---|
@@ -31,20 +31,20 @@ verificación. Un efecto *parcial* cuenta 0,5.
 | 8 | Diagramas SVG con trazado animado | VERIFICADO | `effects.ts › bindDiagrams` (`strokeDashoffset` con retardo por enlace) | QA: «red humana: enlaces dibujados — 8 enlaces» |
 | 9 | Simulación de flujo de trabajo | VERIFICADO | Módulo `contentFlow` (E10, E25) con actor, paso y entregable | QA: 6 bloques de simulación con `data-simulated="true"` |
 | 10 | Contadores de datos verificables | VERIFICADO | `effects.ts › bindCounters` (sólo `data-count` con dato real) | QA: reparto 50/25/25 renderizado desde los datos, no escrito a mano |
-| 11 | Rotación 3D ligada al scroll | PARCIAL | Hay rotación temporal y *dolly* con scroll global; falta ángulo→scroll estricto | `stage.ts › render()` |
-| 12 | Parallax multicapa | PARCIAL | `effects.ts › bindParallax`; sin capas `data-parallax` asignadas | Pendiente: E05, E21 |
-| 13 | Profundidad de campo (DOF) simulada | PARCIAL | `effects.ts › bindDepth` (escala + desenfoque); sin uso | Pendiente: E21 |
-| 14 | Cambios de escala | PARCIAL | `stage.ts` escala el núcleo con pulso; falta escala por escena | QA: escala de capítulo |
-| 15 | *Pinning* de escena | PARCIAL | `effects.ts › bindPins`; sin escena asignada | Pendiente: E05 |
-| 16 | Sección horizontal | PARCIAL | `effects.ts › bindHorizontal`; sin escena asignada | Pendiente: E27 |
-| 17 | *Sticky* | PARCIAL | CSS disponible; sin uso | Pendiente: E21 |
+| 11 | Rotación 3D ligada al scroll | VERIFICADO | `core.rotation.y = globalProgress × π × 1,6` + *dolly* de cámara | `stage.ts › render()` |
+| 12 | Parallax multicapa | VERIFICADO | `effects.ts › bindParallax`; asignado a E05, E17, E18 y E21 | QA: `data-parallax` en 4 escenas |
+| 13 | Profundidad de campo (DOF) simulada | VERIFICADO | `effects.ts › bindDepth` (escala + desenfoque); asignado a 6 escenas | QA: `data-depth` en 6 escenas |
+| 14 | Cambios de escala | VERIFICADO | Escala del núcleo con pulso, escala por capa con DOF y transición de la pista horizontal | `stage.ts`, `effects.ts` |
+| 15 | *Pinning* de escena | VERIFICADO | `effects.ts › bindPins`; asignado a E05 (red de personas) | QA: `data-pin` presente y recorrido completo hasta el final |
+| 16 | Sección horizontal | VERIFICADO | `effects.ts › bindHorizontal` con la sección anclada; asignado a E27 (planes) | QA: pista de 1 864 px en un espacio visible de 1 216 px |
+| 17 | *Sticky* | VERIFICADO | `position: sticky` en la columna de la comparativa de E21 | QA: `data-sticky` presente |
 | 18 | Transiciones de ruta | PARCIAL | Cambia escena visible, paleta y estado 3D; falta travelling cinematográfico completo entre rutas | QA: ruta empresa → eficiencia verificada |
 | 19 | Variantes de escena compartida | PARCIAL | El texto cambia por ruta (QA en verde); faltan variantes por rasgo en todas las escenas | QA: «variante compartida: el texto cambia con la ruta» |
 | 20 | Transición abstracto → producto | PARCIAL | La entidad 3D persiste entre actos; falta travelling explícito al catálogo | Pendiente: E00 → E27 |
 | 21 | Red distribuida animada | PARCIAL | Nodos y enlaces 3D + SVG; falta simulación de tráfico entre nodos | Pendiente: E21 |
-| 22 | *Morphing* real de geometría | PENDIENTE | — | P2-1 de la auditoría |
-| 23 | Microinteracciones de producto (hover/focus en tarjetas, planes y controles) | PENDIENTE | Hay microinteracciones CSS en botones y ramas; faltan en tarjetas de catálogo | Pendiente: E27, E28 |
-| 24 | Animación propia de escenas de ecosistema e impacto | PENDIENTE | E17–E20 tienen contenido y estado 3D, sin animación específica | Pendiente: E17–E20 |
+| 22 | *Morphing* real de geometría | VERIFICADO | Fundido entre icosaedro y dodecaedro durante E29 (`coreAlt`) | `stage.ts`: `coreAltMaterial.opacity` sigue el progreso de la escena |
+| 23 | Microinteracciones de producto (hover/focus en tarjetas, planes y controles) | VERIFICADO | CSS en `.plan` (elevación, borde, sombra) y `.services__item` (desplazamiento y color) | `scenes.css` |
+| 24 | Animación propia de escenas de ecosistema e impacto | VERIFICADO | Profundidad y parallax en E17–E20, más celosía y red de nodos en el escenario 3D | QA: 6 escenas con profundidad |
 
 ---
 
@@ -90,9 +90,7 @@ decoraciones sueltas.
 
 | Orden | Trabajo | Bloquea | Referencia |
 |---|---|---|---|
-| 1 | Asignar *pinning*, horizontal, *sticky* y DOF a escenas concretas | 4 efectos parciales | P2-2 |
-| 2 | Morphing real de geometría | 1 efecto pendiente | P2-1 |
-| 3 | Microinteracciones en catálogo y tarjetas | 1 efecto pendiente | E27, E28 |
-| 4 | Animación propia de ecosistema e impacto | 1 efecto pendiente | E17–E20 |
-| 5 | Rotación 3D estricta ligando scroll a ángulo | 1 efecto parcial | `stage.ts` |
-| 6 | Variantes por rasgo en todas las escenas compartidas | 1 efecto parcial | `scenes.ts` |
+| 1 | *Travelling* cinematográfico completo entre rutas | 1 efecto parcial | `stage.ts` |
+| 2 | Variantes por rasgo en todas las escenas compartidas | 1 efecto parcial | `scenes.ts` |
+| 3 | Simulación de tráfico entre nodos de la red | 1 efecto parcial | `stage.ts` |
+| 4 | Transición abstracto → producto explícita (E00 → E27) | 1 efecto parcial | `stage.ts` |

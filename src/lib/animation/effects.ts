@@ -228,22 +228,27 @@ function bindHorizontal(reducedMotion: boolean): void {
     return;
   }
   gsap.utils.toArray<HTMLElement>('[data-horizontal]').forEach((track) => {
-    const distance = track.scrollWidth - track.clientWidth;
+    // La pista tiene `width: max-content`: el recorrido es lo que sobresale
+    // del espacio visible, no la diferencia entre su scrollWidth y su clientWidth.
+    const container = track.parentElement;
+    const available = container?.clientWidth ?? window.innerWidth;
+    const distance = track.scrollWidth - available;
     if (distance <= 0) {
       return;
     }
-    gsap.to(track, {
-      x: -distance,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: track,
-        start: 'top top',
-        end: () => `+=${distance}`,
-        scrub: 0.8,
-        pin: true,
-        anticipatePin: 1,
-        invalidateOnRefresh: true,
-      },
+    // La sección completa queda anclada mientras su contenido se desplaza
+    // lateralmente: es el patrón de sección horizontal del brief.
+    const section = (track.closest('[data-scene-id]') as HTMLElement | null) ?? track;
+    const animation = gsap.to(track, { x: -distance, ease: 'none' });
+    ScrollTrigger.create({
+      trigger: section,
+      start: 'top top',
+      end: () => `+=${distance}`,
+      scrub: 0.8,
+      pin: true,
+      anticipatePin: 1,
+      invalidateOnRefresh: true,
+      animation,
     });
   });
 }

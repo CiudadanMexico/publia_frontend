@@ -36,6 +36,8 @@ interface Look {
   target: [number, number, number];
   /** Intensidad de la luz de acento. */
   accentLight: number;
+  /** Grado de morphing de la entidad (0 = icosaedro, 1 = dodecaedro). */
+  morph: number;
 }
 
 const LOOKS: Record<StageState, Look> = {
@@ -51,6 +53,7 @@ const LOOKS: Record<StageState, Look> = {
     camera: [0, 0, 7.4],
     target: [0, 0, 0],
     accentLight: 1.1,
+    morph: 0,
   },
   enterprise: {
     core: 0x9aa3b8,
@@ -64,6 +67,7 @@ const LOOKS: Record<StageState, Look> = {
     camera: [1.6, 0.4, 6.2],
     target: [0, 0, 0],
     accentLight: 0.8,
+    morph: 0,
   },
   efficiency: {
     core: 0xffb547,
@@ -77,6 +81,7 @@ const LOOKS: Record<StageState, Look> = {
     camera: [-1.4, -0.6, 6],
     target: [0, 0, 0],
     accentLight: 1.5,
+    morph: 0,
   },
   explorer: {
     core: 0x4fd1c5,
@@ -90,6 +95,7 @@ const LOOKS: Record<StageState, Look> = {
     camera: [0.8, 1.1, 6.8],
     target: [0, 0, 0],
     accentLight: 1.35,
+    morph: 0,
   },
   cooperative: {
     core: 0x6ee7a8,
@@ -103,6 +109,7 @@ const LOOKS: Record<StageState, Look> = {
     camera: [0, 0.8, 7],
     target: [0, 0, 0],
     accentLight: 1.25,
+    morph: 0,
   },
   housing: {
     core: 0x8ab4ff,
@@ -116,6 +123,7 @@ const LOOKS: Record<StageState, Look> = {
     camera: [-0.6, 1.4, 7.6],
     target: [0, 0, 0],
     accentLight: 1,
+    morph: 0,
   },
   convergence: {
     core: 0xb48bff,
@@ -129,6 +137,7 @@ const LOOKS: Record<StageState, Look> = {
     camera: [0, 0, 6.6],
     target: [0, 0, 0],
     accentLight: 1.45,
+    morph: 1,
   },
 };
 
@@ -197,6 +206,16 @@ export function createStage({ canvas, reducedMotion }: StageOptions): Stage | nu
   });
   const core = new THREE.Mesh(coreGeometry, coreMaterial);
   world.add(core);
+
+  // Segunda forma de la misma entidad: el morphing es un fundido entre las
+  // dos geometrías (misma posición, mismo material) que acompaña a la
+  // convergencia final.
+  const coreAltGeometry = new THREE.DodecahedronGeometry(1.58, 0);
+  const coreAltMaterial = coreMaterial.clone();
+  coreAltMaterial.opacity = 0;
+  coreAltMaterial.transparent = true;
+  const coreAlt = new THREE.Mesh(coreAltGeometry, coreAltMaterial);
+  world.add(coreAlt);
 
   // --- facetas orbitantes --------------------------------------------------
   const shardGeometry = new THREE.TetrahedronGeometry(0.38, 0);
@@ -380,6 +399,7 @@ export function createStage({ canvas, reducedMotion }: StageOptions): Stage | nu
         lerp(currentLook.target[2], targetLook.target[2], t),
       ],
       accentLight: lerp(currentLook.accentLight, targetLook.accentLight, t),
+      morph: lerp(currentLook.morph, targetLook.morph, t),
     };
     currentLook.core = lerpColor(currentLook.core, targetLook.core, t).getHex();
     currentLook.shards = lerpColor(currentLook.shards, targetLook.shards, t).getHex();
@@ -396,7 +416,7 @@ export function createStage({ canvas, reducedMotion }: StageOptions): Stage | nu
     const recompose = 1 - Math.min(1, Math.max(0, (sceneProgress - 0.65) / 0.35)) * 0.45;
 
     core.rotation.x += delta * currentLook.speed * 0.7;
-    core.rotation.y += delta * currentLook.speed;
+    core.rotation.y = globalProgress * Math.PI * 1.6 + delta * currentLook.speed;
     core.rotation.z += delta * currentLook.speed * 0.25;
     const pulse = 1 + Math.sin(elapsed * 1.1) * 0.03;
     core.scale.setScalar(pulse * (0.92 + (1 - spread) * 0.16));
@@ -440,6 +460,15 @@ export function createStage({ canvas, reducedMotion }: StageOptions): Stage | nu
     camera.position.y = currentLook.camera[1] + pointerY * 0.6;
     camera.position.z = currentLook.camera[2] * dolly;
     camera.lookAt(...currentLook.target);
+
+    // Morphing: fundido entre icosaedro y dodecaedro según el progreso.
+    const morphAmount = Math.min(1, Math.max(0, currentLook.morph * sceneProgress));
+    coreMaterial.opacity = 0.94 * (1 - morphAmount);
+    coreAltMaterial.opacity = 0.94 * morphAmount;
+    coreAlt.visible = morphAmount > 0.01;
+    coreAlt.rotation.copy(core.rotation);
+    coreAlt.scale.setScalar(core.scale.x);
+    coreAlt.position.copy(core.position);
 
     coreMaterial.color.setHex(currentLook.core);
     shardMaterial.color.setHex(currentLook.shards);
@@ -502,6 +531,8 @@ export function createStage({ canvas, reducedMotion }: StageOptions): Stage | nu
       document.removeEventListener('visibilitychange', onVisibility);
       coreGeometry.dispose();
       coreMaterial.dispose();
+      coreAltGeometry.dispose();
+      coreAltMaterial.dispose();
       shardGeometry.dispose();
       shardMaterial.dispose();
       latticeGeometry.dispose();

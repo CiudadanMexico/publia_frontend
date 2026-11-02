@@ -1,6 +1,6 @@
 {
   "base": "http://127.0.0.1:4322",
-  "total": 42,
+  "total": 48,
   "fallos": 0,
   "resultados": [
     {
@@ -31,12 +31,12 @@
     {
       "name": "prisma: la escena 3D se renderiza y cambia (animación real)",
       "ok": true,
-      "detail": "171961 vs 170606 bytes"
+      "detail": "172320 vs 168310 bytes"
     },
     {
       "name": "prisma: pinta una fracción útil del viewport",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.14238811728395062}"
+      "detail": "{\"paintedRatio\":0.14314814814814814}"
     },
     {
       "name": "grafo: 31 escenas montadas (E00-E30)",
@@ -62,6 +62,36 @@
       "name": "housing: reparto en tres bandas",
       "ok": true,
       "detail": "3 bandas"
+    },
+    {
+      "name": "efectos: anclaje asignado",
+      "ok": true,
+      "detail": "1 escena(s) anclada(s)"
+    },
+    {
+      "name": "efectos: sección horizontal de planes",
+      "ok": true,
+      "detail": "1 pista(s)"
+    },
+    {
+      "name": "efectos: los planes se recorren en horizontal (escritorio)",
+      "ok": true,
+      "detail": "1864px > 1216px"
+    },
+    {
+      "name": "efectos: morphing de la entidad",
+      "ok": true,
+      "detail": "1 escena(s)"
+    },
+    {
+      "name": "efectos: profundidad de campo en varias escenas",
+      "ok": true,
+      "detail": "6 capas"
+    },
+    {
+      "name": "efectos: columna sticky",
+      "ok": true,
+      "detail": "1 columna(s)"
     },
     {
       "name": "ruta empresa: estado aplicado",

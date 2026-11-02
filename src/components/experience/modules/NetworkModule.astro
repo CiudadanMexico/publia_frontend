@@ -27,7 +27,11 @@ const positions = nodes.map((_, index) => {
 });
 ---
 
-<section class="network-scene" data-module={scene.modules[0]}>
+<section
+  class="network-scene"
+  data-module={scene.modules[0]}
+  data-sticky={scene.effects?.sticky ? 'true' : undefined}
+>
   <div class="network-scene__intro">
     {scene.eyebrow && <p class="network-scene__eyebrow" data-role="eyebrow" data-reveal>{scene.eyebrow}</p>}
     <h2 class="network-scene__title" data-role="title" data-reveal="lines">{scene.title}</h2>

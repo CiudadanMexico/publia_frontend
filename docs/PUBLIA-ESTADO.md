@@ -14,7 +14,7 @@ porcentajes se calculan con criterios verificables y están detallados en
 | Bloque | Estado | Evidencia |
 |---|---|---|
 | **A · Rescate y auditoría** | 15/16 criterios (93,75 %) | `docs/PUBLIA-RESCATE-AUDITORIA.md` |
-| **B · Motor cinematográfico** | 15,5/24 efectos (64,58 %) | `docs/PUBLIA-EFECTOS.md` |
+| **B · Motor cinematográfico** | 22/24 efectos (91,67 %) | `docs/PUBLIA-EFECTOS.md` |
 | **C · Tres rutas** | 10/10 (100 %) | QA: empresa, eficiencia, exploración + cambio de ruta |
 | **D · Ecosistema e impacto** | 10/10 (100 %) | Escenas E16–E22; reparto 50/25/25 verificado |
 | **E · Productos y demostraciones** | 9/10 (90 %) | 5 niveles con precios reales + catálogo heredado con 19 servicios publicados |

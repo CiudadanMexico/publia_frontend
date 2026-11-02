@@ -763,3 +763,68 @@ html[data-segments~='advanced'] .scene__inner[data-scene-segments~='advanced'] {
     transition: none;
   }
 }
+
+/* ------------------------------------------------------------------ */
+/* Efectos cinematográficos por escena                                */
+/* ------------------------------------------------------------------ */
+
+/* Columna sticky en la comparativa de infraestructura (E21) */
+.network-scene[data-sticky='true'] .infra__column {
+  position: sticky;
+  top: 6.5rem;
+}
+
+/* Pista horizontal de planes (E27): en escritorio se recorre en horizontal */
+.plans[data-horizontal] {
+  display: grid;
+  grid-template-columns: none;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(17rem, 22rem);
+  gap: var(--space-2);
+  overflow: visible;
+  width: max-content;
+  padding-right: var(--space-4);
+}
+
+@media (max-width: 860px) {
+  .plans[data-horizontal] {
+    grid-auto-flow: row;
+    grid-auto-columns: auto;
+    width: auto;
+    padding-right: 0;
+  }
+}
+
+/* Microinteracciones de catálogo */
+.plan {
+  transition:
+    transform 240ms var(--ease-out),
+    border-color 240ms var(--ease-out),
+    box-shadow 240ms var(--ease-out);
+}
+
+.plan:hover,
+.plan:focus-within {
+  transform: translateY(-4px);
+  border-color: color-mix(in oklab, var(--scene-accent) 70%, transparent);
+  box-shadow: 0 18px 40px -28px color-mix(in oklab, var(--scene-accent) 80%, transparent);
+}
+
+.services__item {
+  transition:
+    background 220ms var(--ease-out),
+    padding-left 220ms var(--ease-out);
+}
+
+.services__item:hover {
+  background: color-mix(in oklab, var(--scene-accent) 8%, transparent);
+  padding-left: var(--space-1);
+}
+
+.services__name {
+  transition: color 220ms var(--ease-out);
+}
+
+.services__item:hover .services__name {
+  color: var(--scene-accent);
+}

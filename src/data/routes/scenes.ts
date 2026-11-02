@@ -214,7 +214,9 @@ export const SCENES: SceneDefinition[] = [
         [2, 5],
       ],
     },
+    effects: { pin: 0.85, parallax: 0.06, depth: 0.35 },
   },
+  
   {
     id: 'E06',
     eyebrow: 'Ruta empresa · Ruta eficiencia',
@@ -483,7 +485,9 @@ export const SCENES: SceneDefinition[] = [
             : 'Planeado';
       return `${capability.name} — ${status}`;
     }),
+    effects: { depth: 0.4, parallax: 0.05 },
   },
+  
   {
     id: 'E18',
     eyebrow: 'Ecosistema · Economía',
@@ -504,7 +508,9 @@ export const SCENES: SceneDefinition[] = [
       'Participación y gobernanza registradas en la plataforma',
       'Conocimiento compartido entre cooperativas',
     ],
+    effects: { depth: 0.4, parallax: 0.05 },
   },
+  
   {
     id: 'E19',
     eyebrow: 'Ecosistema · Publicidad',
@@ -524,7 +530,9 @@ export const SCENES: SceneDefinition[] = [
       'La publicidad voluntaria se ofrece, no se impone',
       'La contraprestación del programa experimental está por confirmar',
     ],
+    effects: { depth: 0.3 },
   },
+  
   {
     id: 'E20',
     eyebrow: 'Ecosistema · Impacto',
@@ -539,7 +547,9 @@ export const SCENES: SceneDefinition[] = [
     transition: 'morph',
     stage: 'housing',
     palette: 'dawn',
+    effects: { depth: 0.3 },
   },
+  
   {
     id: 'E21',
     eyebrow: 'Ecosistema · Infraestructura',
@@ -570,7 +580,9 @@ export const SCENES: SceneDefinition[] = [
         ],
       },
     },
+    effects: { sticky: true, depth: 0.55, parallax: 0.07 },
   },
+  
   {
     id: 'E22',
     eyebrow: 'Ecosistema · Housing',
@@ -688,7 +700,9 @@ export const SCENES: SceneDefinition[] = [
     stage: 'convergence',
     palette: 'ink',
     data: { plans },
+    effects: { horizontal: true },
   },
+  
   {
     id: 'E28',
     eyebrow: 'Productos · Servicios',
@@ -719,7 +733,9 @@ export const SCENES: SceneDefinition[] = [
     transition: 'morph',
     stage: 'convergence',
     palette: 'ink',
+    effects: { morph: true },
   },
+  
   {
     id: 'E30',
     eyebrow: 'Conversión',

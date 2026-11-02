@@ -130,6 +130,29 @@ check('demostraciones marcadas como simulación', structure.demos >= 4, `${struc
 check('catálogo: cinco niveles de membresía', structure.plans === 5, `${structure.plans} planes`);
 check('housing: reparto en tres bandas', structure.shares === 3, `${structure.shares} bandas`);
 
+const effects = await page.evaluate(() => {
+  const plans = document.querySelector('#escena-e27 .plans');
+  return {
+    pin: document.querySelectorAll('[data-pin]').length,
+    horizontal: document.querySelectorAll('[data-horizontal]').length,
+    morph: document.querySelectorAll('[data-morph]').length,
+    depth: document.querySelectorAll('[data-depth]').length,
+    sticky: document.querySelectorAll('[data-sticky]').length,
+    planWidth: plans?.scrollWidth ?? 0,
+    planClient: plans?.parentElement?.clientWidth ?? 0,
+  };
+});
+check('efectos: anclaje asignado', effects.pin >= 1, `${effects.pin} escena(s) anclada(s)`);
+check('efectos: sección horizontal de planes', effects.horizontal >= 1, `${effects.horizontal} pista(s)`);
+check(
+  'efectos: los planes se recorren en horizontal (escritorio)',
+  effects.planWidth > effects.planClient + 50,
+  `${effects.planWidth}px > ${effects.planClient}px`,
+);
+check('efectos: morphing de la entidad', effects.morph >= 1, `${effects.morph} escena(s)`);
+check('efectos: profundidad de campo en varias escenas', effects.depth >= 4, `${effects.depth} capas`);
+check('efectos: columna sticky', effects.sticky >= 1, `${effects.sticky} columna(s)`);
+
 const click = (selector) => page.evaluate((s) => document.querySelector(s)?.click(), selector);
 
 // --- ruta empresa -----------------------------------------------------------
