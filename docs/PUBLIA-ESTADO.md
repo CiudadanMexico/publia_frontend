@@ -19,7 +19,35 @@ porcentajes se calculan con criterios verificables y están detallados en
 | **D · Ecosistema e impacto** | 10/10 (100 %) | Escenas E16–E22; reparto 50/25/25 verificado |
 | **E · Productos y demostraciones** | 10/10 (100 %) | 5 niveles con precios reales + catálogo heredado con 19 servicios publicados |
 | **F · Conversión** | 8/8 (100 %) | CTA contextual, formulario contextual sin captura en servidor, WhatsApp, eventos |
-| **G · Calidad** | 11/11 (100 %) | QA 64/64 en local y en la URL pública, axe sin violaciones, presupuesto de peso, 15 pruebas unitarias |
+| **G · Calidad** | 11/11 (100 %) | QA 75/75 en local y en la URL pública, axe sin violaciones, presupuesto de peso, 15 pruebas unitarias |
+
+### Hero 3D aprobado (integrado)
+
+El hero entregado se integró **sin rediseñar ningún recurso**: se reutilizan
+los dos modelos GLB, la textura de fondo, las ocho tarjetas con sus iconos y
+los cuatro módulos (fondo, estelas, partículas, plataforma), portados a
+TypeScript sin cambiar sus valores.
+
+| Pieza | Dónde vive | Nota |
+|---|---|---|
+| Escena del hero | `src/lib/three/heroScene.ts` | cámara 40°, rig a la derecha, bloom, mascota, prisma facetado, ocho tarjetas |
+| Módulos originales | `src/lib/three/hero/*.ts` | puerto fiel de `src/modules/*.js` de la entrega |
+| Recursos 3D | `public/models/`, `public/textures/`, `public/icons/` | servidos tal cual |
+| Logotipo oficial | `public/brand/` | PNG recortado (44 KB) + favicon e isotipo |
+| Marcador | `src/components/experience/Hero.astro` | titular y botones a la izquierda, escena a la derecha |
+| Encabezado | `src/components/ui/Nav.astro` | se retira la marca tipográfica provisional |
+
+Reglas de integración aplicadas:
+
+- el hero tiene **su propio lienzo**; la capa global 3D cede el paso
+  (`data-hero-active`) y nunca dibujan a la vez;
+- `destroy()` libera geometrías, materiales, texturas, contexto WebGL, tweens
+  y ScrollTriggers al desmontar;
+- `prefers-reduced-motion` renderiza un único fotograma estático;
+- los controles del hero (pausar, fragmentar, reiniciar) están connected a la
+  escena;
+- la tercera ruta (cooperativismo) se añadió al hero con el mismo lenguaje
+  visual, en el mismo estilo que las dos aprobadas.
 
 ### Contenido construido
 
@@ -48,12 +76,14 @@ porcentajes se calculan con criterios verificables y están detallados en
 | `npm run check` (tsc estricto) | 0 errores |
 | `npm test` (pruebas del grafo y el catálogo) | 15/15 |
 | `npm run build` | 3,2 s · 1 página |
-| Suite QA en local | **64/64** |
-| Suite QA en la URL pública | **64/64** |
+| Suite QA en local | **75/75** |
+| Suite QA en la URL pública | **75/75** |
 | Errores de consola | 0 |
 | Desbordamiento horizontal en 390 px | 0 px |
 | axe-core (wcag2a/aa, wcag21a/aa, best-practice) | 0 violaciones en la vista inicial y en la ruta empresa |
-| Presupuesto de peso inicial | 199 kB (JS 194 kB + CSS 5 kB) por debajo del límite de 220 kB |
+| Presupuesto de peso inicial | aplicación sin 3D: 71 kB (límite 90 kB) · total con el 3D del hero: 243 kB (límite 260 kB) |
+| Hero 3D aprobado | lienzo WebGL activo, 8/8 tarjetas en encuadre, 10/10 recursos (2 GLB + 8 iconos) con HTTP 200, sin errores de carga |
+| Composición contra la captura aprobada | luminancia izq 35/35 y der 41/40; brillo 14,4 %/14,8 % (tolerancia ±12 y ±3 pp) |
 
 ---
 
@@ -85,7 +115,7 @@ porcentajes se calculan con criterios verificables y están detallados en
 | URL pública | `https://kitty-midi-grid-liked.trycloudflare.com` (túnel rápido de Cloudflare en el host Oracle) |
 | Origen | `127.0.0.1:4322` en el host (`publia-frontend-static.service`) → `/srv/publia-frontend/dist` |
 | Sincronización | `publia-frontend-sync.sh` + `publia-frontend-ensure.timer` (cada 2 min) |
-| Verificación | Suite QA completa **contra la URL pública**: 64/64 criterios ✔ |
+| Verificación | Suite QA completa **contra la URL pública**: 75/75 criterios ✔ |
 | URL vigente | `ssh yizuz@159.54.133.219 '/usr/local/bin/publia-quick-url.sh'` |
 
 > El túnel rápido es **efímero**: la URL cambia si el servicio se reinicia

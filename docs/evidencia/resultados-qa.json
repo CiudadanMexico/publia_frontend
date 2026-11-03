@@ -1,5 +1,5 @@
 {
-  "base": "http://127.0.0.1:4322",
+  "base": "https://kitty-midi-grid-liked.trycloudflare.com",
   "total": 75,
   "fallos": 0,
   "resultados": [
@@ -31,12 +31,12 @@
     {
       "name": "prisma: la escena 3D se renderiza y cambia (animación real)",
       "ok": true,
-      "detail": "575471 vs 584185 bytes"
+      "detail": "575471 vs 588348 bytes"
     },
     {
       "name": "prisma: pinta una fracción útil del viewport",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.15387345679012346}"
+      "detail": "{\"paintedRatio\":0.15697530864197531}"
     },
     {
       "name": "hero 3D: lienzo presente con WebGL activo",
@@ -61,12 +61,12 @@
     {
       "name": "hero 3D: pinta la escena (mascota, prisma, tarjetas)",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.2053125}"
+      "detail": "{\"paintedRatio\":0.20575}"
     },
     {
       "name": "hero 3D: la animación ambiental cambia entre fotogramas",
       "ok": true,
-      "detail": "670551 vs 661865 bytes"
+      "detail": "672234 vs 662587 bytes"
     },
     {
       "name": "marca: el encabezado usa el logotipo oficial",
@@ -356,7 +356,7 @@
     {
       "name": "rendimiento: JS + CSS inicial (con el 3D del hero) por debajo de 260 kB",
       "ok": true,
-      "detail": "243 kB (JS 236 · CSS 6)"
+      "detail": "241 kB (JS 235 · CSS 6)"
     },
     {
       "name": "rendimiento: la aplicación sin 3D por debajo de 90 kB",

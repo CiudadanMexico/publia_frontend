@@ -251,3 +251,36 @@ visibilidad (ruta o segmentos), nunca por cada escena visitada.
 - `npm run check` (Astro Check) valida TypeScript.
 - No se versionan secretos ni el snapshot de credenciales; el snapshot de
   contenido sólo contiene material publicado.
+
+## Hero 3D aprobado
+
+```
+src/
+  components/experience/Hero.astro   marcado del hero (titular, botones, controles)
+  lib/three/
+    heroScene.ts                     escena aprobada: cámara, rig, bloom, mascota,
+                                     prisma facetado y ocho tarjetas holográficas
+    hero/
+      fondo.ts  estelas.ts  particulas.ts  plataforma.ts
+                                     módulos originales portados a TypeScript
+public/
+  models/    PUBLIA_P_robotica_v2.glb, PUBLIA_prisma_suave_v2.glb
+  textures/  atmosfera.webp
+  icons/     icono_01.png … icono_08.png
+  brand/     logotipo oficial, isotipo y favicon
+```
+
+Flujo de ejecución:
+
+1. `experience.ts` importa el módulo del hero de forma diferida y lo inicializa
+   con su propio lienzo (`data-hero-canvas`).
+2. Un `IntersectionObserver` sobre la sección del hero escribe
+   `data-hero-active` en `<html>`: la capa global 3D se apaga (CSS) y su
+   `setActive(false)` deja de renderizar mientras el hero está en pantalla.
+3. La escena registra su estado en el lienzo (`data-hero-ready`,
+   `data-hero-errors`, `data-cards-in-view`) para que la QA pueda verificarlo
+   sin depender de la imagen.
+4. Al salir de la vista, el hero pausa su bucle y la capa global vuelve a
+   tomar el lienzo.
+5. `destroy()` (en `pagehide`) libera recursos, tweens, ScrollTriggers y el
+   contexto WebGL.

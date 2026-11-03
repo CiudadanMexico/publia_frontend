@@ -45,7 +45,8 @@ denominador.
 | 13 | El despliegue no depende de un único proceso | arquitectura host/contenedor | **PASS** | origen estático en el host (`publia-frontend-static.service`, 4322) + build en contenedor + `publia-frontend-ensure.timer` (2 min) |
 | 14 | Dominio propio con TLS y hostname estable | panel de Cloudflare | **FALLA (P1)** | hoy se sirve por *quick tunnel* efímero; el subdominio permanente `preview-publia6.ciudadan.org` requiere acción de Dany (token o panel) |
 | 15 | La URL pública sirve exactamente el buildauditado | comparación de `data-scene-id` en el HTML público | **PASS** | 31 escenas (`E00`–`E30` + hero) en el HTML público |
-| 16 | Existe una QA automatizada y repetible | `scripts/qa.mjs` | **PASS** | 64/64 criterios en local y 64/64 en la URL pública; 15 pruebas unitarias (`npm test`) |
+| 17 | El hero 3D aprobado se reproduce con sus recursos originales | `src/lib/three/heroScene.ts` | **PASS** | 8/8 tarjetas en encuadre, 10/10 recursos con HTTP 200, composición dentro de ±12 de luminancia y ±3 pp de brillo frente a la captura aprobada |
+| 16 | Existe una QA automatizada y repetible | `scripts/qa.mjs` | **PASS** | 75/75 criterios en local y 75/75 en la URL pública; 15 pruebas unitarias (`npm test`) |
 
 **Resultado del bloque de verificación: 15/16 (93,75 %).** El punto 14
 depende de una acción humana externa (crear el hostname en Cloudflare) y está
