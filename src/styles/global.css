@@ -237,3 +237,10 @@ button {
     transform: none;
   }
 }
+
+/* El hero 3D aprobado tiene su propio lienzo: la capa global se aparta
+   mientras el hero está en pantalla y vuelve al salir de él. */
+html[data-hero-active] .prism-layer {
+  opacity: 0;
+  transition: opacity 400ms var(--ease-out);
+}

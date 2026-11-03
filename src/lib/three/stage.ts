@@ -151,6 +151,8 @@ export interface StageOptions {
 }
 
 export interface Stage {
+  /** Activa o suspende el render (handoff con el hero 3D). */
+  setActive(active: boolean): void;
   setStage(state: StageState): void;
   /** Progreso dentro de la escena activa (0-1). */
   setSceneProgress(progress: number): void;
@@ -369,6 +371,8 @@ export function createStage({ canvas, reducedMotion }: StageOptions): Stage | nu
   let assemble = 0;
   let running = reducedMotion ? false : true;
   let visible = true;
+  /** `false` mientras el hero 3D aprobado tiene el lienzo; evita renderizar. */
+  let active = true;
   let disposed = false;
   let frame = 0;
 
@@ -537,7 +541,7 @@ export function createStage({ canvas, reducedMotion }: StageOptions): Stage | nu
     frame = requestAnimationFrame(loop);
     const delta = Math.min(0.05, (now - last) / 1000);
     last = now;
-    if (!visible) {
+    if (!visible || !active) {
       return;
     }
     render(delta);
@@ -551,6 +555,9 @@ export function createStage({ canvas, reducedMotion }: StageOptions): Stage | nu
   }
 
   return {
+    setActive(value: boolean): void {
+      active = value;
+    },
     setStage(state: StageState): void {
       const look = LOOKS[state] ?? LOOKS.abstract;
       const changed = targetLook !== look;

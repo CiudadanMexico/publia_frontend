@@ -1,125 +1,369 @@
 ---
 /**
- * Hero principal: un viewport completo, el prisma detrás y dos decisiones.
- * El scroll natural es la tercera ruta implícita: no se anuncia.
+ * Hero 3D aprobado.
+ *
+ * Reproduce la composición entregada y aprobada: titular y botones a la
+ * izquierda; mascota, prisma, estelas, plataforma y las ocho tarjetas
+ * holográficas a la derecha, sobre un lienzo WebGL propio.
+ *
+ * El texto y las dos decisiones principales ya existen en `data/copy`; aquí
+ * se conservan y se les da la jerarquía tipográfica de la referencia.
  */
 import { HERO } from '../../data/copy';
 ---
 
-<section class="hero" id="inicio" data-scene-id="E01" aria-labelledby="hero-titulo">
-  <div class="hero__inner shell">
-    <p class="eyebrow">Publia · red cooperativa de desarrollo</p>
-    <h1 id="hero-titulo" class="hero__title">{HERO.title}</h1>
+<section class="hero" id="inicio" data-scene-id="E01" data-hero-scene aria-labelledby="hero-titulo">
+  <canvas class="hero__canvas" data-hero-canvas aria-hidden="true"></canvas>
+  <div class="hero__vignette" aria-hidden="true"></div>
+
+  <div class="hero__inner">
+    <p class="hero__eyebrow"><i aria-hidden="true"></i> CREATIVIDAD · TECNOLOGÍA · COMUNIDAD</p>
+
+    <h1 class="hero__title" id="hero-titulo">EL MUNDO<br /> ESTÁ <span>CAMBIANDO.</span></h1>
+
     <p class="hero__subtitle">{HERO.subtitle}</p>
 
     <div class="hero__actions">
       {
-        HERO.ctas.map((cta) => (
-          <div class="hero__action">
-            <button
-              type="button"
-              class="button button--primary"
-              data-route-choice={cta.id}
-              data-target={cta.target}
-            >
-              {cta.label}
-            </button>
-            <p class="hero__hint">{cta.hint}</p>
-          </div>
+        HERO.ctas.map((cta, index) => (
+          <button
+            type="button"
+            class:list={['hero__cta', index === 0 ? 'hero__cta--primary' : 'hero__cta--ghost']}
+            data-route-choice={cta.id}
+            data-target={cta.target}
+          >
+            <span>{cta.label}</span>
+            <b aria-hidden="true">↗</b>
+          </button>
         ))
       }
+      <button
+        type="button"
+        class="hero__cta hero__cta--tertiary"
+        data-branch-target="#escena-e15"
+        data-branch-trait="cooperative"
+        data-branch-route="explorer"
+      >
+        <span>Quiero cooperar / comunidad</span>
+        <b aria-hidden="true">↗</b>
+      </button>
     </div>
+
+    <p class="hero__hint">DESPLÁZATE PARA EXPLORAR <span aria-hidden="true">↓</span></p>
   </div>
 
-  <div class="hero__scroll" aria-hidden="true">
-    <span class="hero__scroll-line"></span>
+  <p class="hero__stage-label" aria-hidden="true">
+    PUBLIA / UNIVERSO 3D <span>● EN VIVO</span>
+  </p>
+
+  <div class="hero__controls">
+    <button type="button" data-hero-control="pause" aria-pressed="false">Ⅱ Pausar</button>
+    <button type="button" data-hero-control="burst">✦ Fragmentar</button>
+    <button type="button" data-hero-control="reset">↺ Reiniciar</button>
   </div>
 </section>
 
 <style>
   .hero {
+    --hero-ink: #f5f8ff;
+    --hero-cyan: #80e5ff;
+    --hero-amber: #ffca34;
+    --hero-red: #fa5964;
     position: relative;
     min-height: 100svh;
-    display: grid;
-    align-content: center;
-    padding-block: var(--space-5) var(--space-4);
+    display: flex;
+    align-items: center;
+    padding: calc(var(--space-4) + 3.75rem) clamp(20px, 5vw, 90px) 110px;
     overflow: hidden;
+    isolation: isolate;
+  }
+
+  .hero__canvas {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    z-index: -2;
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity 500ms var(--ease-out);
+  }
+
+  :global(html:not([data-hero-active])) .hero__canvas {
+    opacity: 0;
+  }
+
+  .hero__vignette {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      linear-gradient(
+        90deg,
+        rgba(3, 8, 20, 0.92) 0%,
+        rgba(3, 8, 20, 0.77) 31%,
+        rgba(3, 8, 20, 0.09) 67%,
+        rgba(3, 8, 20, 0.12) 100%
+      ),
+      linear-gradient(0deg, rgba(3, 7, 17, 0.66), transparent 30%);
+    transition: opacity 500ms var(--ease-out);
+  }
+
+  :global(html:not([data-hero-active])) .hero__vignette {
+    opacity: 0;
   }
 
   .hero__inner {
     position: relative;
-    z-index: 2;
-    max-width: 60rem;
+    z-index: 1;
+    width: min(670px, 55vw);
+  }
+
+  .hero__eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 25px;
+    color: var(--hero-cyan);
+    letter-spacing: 3px;
+    font-size: 11px;
+    font-weight: 800;
+  }
+
+  .hero__eyebrow i {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ffd64c;
+    box-shadow: 0 0 14px #ffd64c;
   }
 
   .hero__title {
-    font-size: var(--step-5);
-    max-width: 16ch;
-    margin-bottom: var(--space-3);
-    text-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+    margin: 0;
+    max-width: 800px;
+    font-family: var(--font-hero-display);
+    font-size: clamp(43px, 5.1vw, 86px);
+    font-weight: 900;
+    line-height: 1.04;
+    letter-spacing: -3.7px;
+    color: var(--hero-ink);
+    text-shadow: 0 8px 32px #020717;
+  }
+
+  .hero__title span {
+    display: block;
+    width: fit-content;
+    color: var(--hero-amber);
+    font-style: italic;
+    letter-spacing: -3.2px;
+    text-shadow: 0 2px 30px #f6ac292c;
+    position: relative;
+  }
+
+  .hero__title span::after {
+    content: '';
+    display: block;
+    width: 78%;
+    height: 5px;
+    border-radius: 100px;
+    background: var(--hero-red);
+    transform: rotate(-2deg);
+    margin: 5px 0 0 16px;
+    box-shadow: 0 0 16px #ff456866;
   }
 
   .hero__subtitle {
-    font-size: var(--step-2);
-    max-width: 28ch;
-    color: color-mix(in oklab, var(--paper) 80%, transparent);
-    margin-bottom: var(--space-5);
+    margin: 32px 0 28px;
+    font-family: var(--font-hero-body);
+    font-size: clamp(17px, 1.55vw, 24px);
+    font-weight: 500;
+    color: #d4e2f4;
+    max-width: 30ch;
   }
 
   .hero__actions {
-    display: grid;
-    gap: var(--space-3);
-    max-width: 42rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
   }
 
-  @media (min-width: 780px) {
-    .hero__actions {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+  .hero__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 15px;
+    max-width: 330px;
+    padding: 17px 18px;
+    border-radius: 9px;
+    border: 1px solid #70cfff;
+    font-family: var(--font-hero-body);
+    font-size: 11px;
+    font-weight: 900;
+    line-height: 1.5;
+    text-align: left;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition:
+      transform var(--dur-fast) var(--ease-out),
+      filter var(--dur-fast) var(--ease-out);
+  }
+
+  .hero__cta b {
+    font-size: 20px;
+    line-height: 1;
+  }
+
+  .hero__cta--primary {
+    background: #ffd044;
+    border-color: #ffd044;
+    color: #0a1730;
+    box-shadow: 0 8px 30px #ffc73930;
+  }
+
+  .hero__cta--ghost {
+    background: #09284c66;
+    color: #d9f8ff;
+  }
+
+  .hero__cta--tertiary {
+    background: #0b2e5444;
+    color: #bfe9ff;
+    border-color: #70cfff80;
+    border-style: dashed;
+  }
+
+  .hero__cta:hover,
+  .hero__cta:focus-visible {
+    transform: translateY(-3px);
+    filter: brightness(1.1);
   }
 
   .hero__hint {
-    margin: var(--space-1) 0 0;
-    font-size: var(--step--1);
-    color: var(--ink-300);
+    margin: 75px 0 0;
+    font-family: var(--font-hero-body);
+    letter-spacing: 2.5px;
+    font-size: 10px;
+    color: #9cbbd9;
+    font-weight: 800;
   }
 
-  .hero__scroll {
+  .hero__hint span {
+    margin-left: 8px;
+    font-size: 19px;
+    color: #f5c64b;
+  }
+
+  .hero__stage-label {
     position: absolute;
-    left: 50%;
-    bottom: var(--space-3);
-    translate: -50% 0;
-    width: 1px;
-    height: 4rem;
-    background: linear-gradient(var(--scene-accent), transparent);
-    opacity: 0.6;
+    right: 5vw;
+    bottom: 27px;
+    margin: 0;
+    font-family: var(--font-hero-body);
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: #a4cbe9;
   }
 
-  .hero__scroll-line {
+  .hero__stage-label span {
+    margin-left: 12px;
+    color: #6cf6d7;
+  }
+
+  .hero__controls {
     position: absolute;
-    inset: 0;
-    background: var(--scene-accent);
-    animation: hero-scroll 2.6s var(--ease-in-out) infinite;
+    left: 5vw;
+    bottom: 23px;
+    display: flex;
+    gap: 8px;
   }
 
-  @keyframes hero-scroll {
-    0% {
-      transform: translateY(-100%);
-      opacity: 0;
+  .hero__controls button {
+    background: #091d37aa;
+    color: #b7e9ff;
+    border: 1px solid #74c7ef55;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-family: var(--font-hero-body);
+    font-size: 11px;
+    cursor: pointer;
+    transition: background var(--dur-fast) var(--ease-out);
+  }
+
+  .hero__controls button:hover,
+  .hero__controls button:focus-visible {
+    background: #17436b;
+  }
+
+  @media (max-width: 980px) {
+    .hero__inner {
+      width: 75vw;
     }
-    40% {
-      opacity: 1;
+
+    .hero__title {
+      font-size: clamp(40px, 7vw, 72px);
     }
-    100% {
-      transform: translateY(100%);
-      opacity: 0;
+
+    .hero__vignette {
+      background: linear-gradient(90deg, #030914f5 0%, #030914ba 58%, #03091455 100%);
     }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .hero__scroll-line {
-      animation: none;
-      opacity: 0.5;
+  @media (max-width: 640px) {
+    .hero {
+      align-items: flex-start;
+      padding-top: 15vh;
+      padding-bottom: 120px;
+    }
+
+    .hero__inner {
+      width: 100%;
+    }
+
+    .hero__eyebrow {
+      font-size: 9px;
+      letter-spacing: 1.4px;
+    }
+
+    .hero__title {
+      font-size: clamp(39px, 11vw, 58px);
+      letter-spacing: -2px;
+    }
+
+    .hero__title span {
+      letter-spacing: -2px;
+    }
+
+    .hero__subtitle {
+      font-size: 17px;
+      max-width: 300px;
+    }
+
+    .hero__actions {
+      flex-direction: column;
+    }
+
+    .hero__cta {
+      width: 100%;
+      max-width: 330px;
+      padding: 14px;
+    }
+
+    .hero__hint {
+      margin-top: 45px;
+    }
+
+    .hero__controls {
+      bottom: 48px;
+      left: 20px;
+    }
+
+    .hero__stage-label {
+      display: none;
+    }
+
+    .hero__vignette {
+      background: linear-gradient(180deg, #030914f0 0%, #030914c9 53%, #03091455 100%);
     }
   }
 </style>

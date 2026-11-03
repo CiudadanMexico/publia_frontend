@@ -1,6 +1,6 @@
 {
-  "base": "https://kitty-midi-grid-liked.trycloudflare.com",
-  "total": 64,
+  "base": "http://127.0.0.1:4322",
+  "total": 75,
   "fallos": 0,
   "resultados": [
     {
@@ -21,7 +21,7 @@
     {
       "name": "hero: jerarquía tipográfica y CTA táctil",
       "ok": true,
-      "detail": "título 126.4px · CTA 74.21875px"
+      "detail": "título 73.44px · CTA 69px"
     },
     {
       "name": "prisma: canvas presente y WebGL activo",
@@ -31,12 +31,62 @@
     {
       "name": "prisma: la escena 3D se renderiza y cambia (animación real)",
       "ok": true,
-      "detail": "173524 vs 171399 bytes"
+      "detail": "575471 vs 584185 bytes"
     },
     {
       "name": "prisma: pinta una fracción útil del viewport",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.15125}"
+      "detail": "{\"paintedRatio\":0.15387345679012346}"
+    },
+    {
+      "name": "hero 3D: lienzo presente con WebGL activo",
+      "ok": true,
+      "detail": "[1440,900]"
+    },
+    {
+      "name": "hero 3D: la escena carga sin errores de recursos",
+      "ok": true,
+      "detail": "sin errores"
+    },
+    {
+      "name": "hero 3D: las ocho tarjetas holográficas están en el encuadre",
+      "ok": true,
+      "detail": "8/8 tarjetas"
+    },
+    {
+      "name": "hero 3D: los dos modelos GLB y los ocho iconos se descargan",
+      "ok": true,
+      "detail": "10/10 recursos"
+    },
+    {
+      "name": "hero 3D: pinta la escena (mascota, prisma, tarjetas)",
+      "ok": true,
+      "detail": "{\"paintedRatio\":0.2053125}"
+    },
+    {
+      "name": "hero 3D: la animación ambiental cambia entre fotogramas",
+      "ok": true,
+      "detail": "670551 vs 661865 bytes"
+    },
+    {
+      "name": "marca: el encabezado usa el logotipo oficial",
+      "ok": true,
+      "detail": "oficial=true provisional=0"
+    },
+    {
+      "name": "hero: tercera ruta narrativa (cooperativismo)",
+      "ok": true,
+      "detail": "Quiero cooperar / comunidad ↗"
+    },
+    {
+      "name": "handoff: en el hero manda el lienzo del hero",
+      "ok": true,
+      "detail": "data-hero-active=true · capa global opacidad 0"
+    },
+    {
+      "name": "composición: coincide con la captura aprobada",
+      "ok": true,
+      "detail": "izq 35/35 · der 41/40 · brillo 14.4/14.8 %"
     },
     {
       "name": "grafo: 31 escenas montadas (E00-E30)",
@@ -304,9 +354,14 @@
       "detail": "0 violaciones"
     },
     {
-      "name": "rendimiento: JS + CSS inicial por debajo de 220 kB",
+      "name": "rendimiento: JS + CSS inicial (con el 3D del hero) por debajo de 260 kB",
       "ok": true,
-      "detail": "199 kB (JS 194 · CSS 5)"
+      "detail": "243 kB (JS 236 · CSS 6)"
+    },
+    {
+      "name": "rendimiento: la aplicación sin 3D por debajo de 90 kB",
+      "ok": true,
+      "detail": "63 kB de JS de aplicación"
     },
     {
       "name": "rendimiento: el escenario 3D se carga sólo bajo demanda",

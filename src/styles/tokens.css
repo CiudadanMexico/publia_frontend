@@ -38,6 +38,11 @@
      la tipografía definitiva en la Fase 5 (--font-display / --font-body). */
   --font-display: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  /* Tipografías del hero 3D aprobado (Outfit + DM Sans). Sólo se usan en el
+     hero y en la marca del encabezado; el resto del sitio conserva la del
+     sistema para no cargar peso de más. */
+  --font-hero-display: 'Outfit', var(--font-display);
+  --font-hero-body: 'DM Sans', var(--font-body);
   --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Roboto Mono', Menlo, monospace;
 
   --step--1: clamp(0.78rem, 0.75rem + 0.15vw, 0.88rem);

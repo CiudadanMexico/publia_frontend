@@ -40,6 +40,10 @@ const context = await browser.newContext({ viewport: { width: 1440, height: 900 
 const page = await context.newPage();
 
 const errors = [];
+const responses = [];
+page.on('response', (response) => {
+  responses.push({ url: response.url(), status: response.status() });
+});
 page.on('pageerror', (error) => errors.push(String(error)));
 page.on('console', (message) => {
   if (message.type() === 'error') {
@@ -115,6 +119,178 @@ const painted = await page.evaluate(() => {
   return { paintedRatio: bright / (data.length / 16) };
 });
 check('prisma: pinta una fracción útil del viewport', painted.paintedRatio > 0.02, JSON.stringify(painted));
+
+// --- hero 3D aprobado ----------------------------------------------------------
+const hero3d = await page.evaluate(() => {
+  const canvas = document.querySelector('[data-hero-canvas]');
+  if (!canvas) {
+    return null;
+  }
+  const gl = canvas.getContext('webgl2') ?? canvas.getContext('webgl');
+  return {
+    present: true,
+    webgl: Boolean(gl),
+    ready: canvas.dataset.heroReady ?? '',
+    errors: canvas.dataset.heroErrors ?? '',
+    cards: canvas.dataset.cardsInView ?? '',
+    size: [canvas.width, canvas.height],
+  };
+});
+check(
+  'hero 3D: lienzo presente con WebGL activo',
+  hero3d?.present && hero3d?.webgl,
+  JSON.stringify(hero3d?.size ?? []),
+);
+check(
+  'hero 3D: la escena carga sin errores de recursos',
+  hero3d?.ready === 'true' && hero3d?.errors === '',
+  hero3d?.errors || 'sin errores',
+);
+check(
+  'hero 3D: las ocho tarjetas holográficas están en el encuadre',
+  hero3d?.cards === '8',
+  `${hero3d?.cards ?? '0'}/8 tarjetas`,
+);
+
+const heroAssets = responses.filter(
+  (response) =>
+    /PUBLIA_P_robotica_v2\.glb/.test(response.url) ||
+    /PUBLIA_prisma_suave_v2\.glb/.test(response.url) ||
+    /\/icons\/icono_0[1-8]\.png/.test(response.url),
+);
+const heroAssetsOk = heroAssets.length === 10 && heroAssets.every((item) => item.status === 200);
+check(
+  'hero 3D: los dos modelos GLB y los ocho iconos se descargan',
+  heroAssetsOk,
+  `${heroAssets.filter((item) => item.status === 200).length}/10 recursos`,
+);
+
+const heroPainted = await page.evaluate(() => {
+  const canvas = document.querySelector('[data-hero-canvas]');
+  if (!canvas) {
+    return { paintedRatio: 0 };
+  }
+  const copy = document.createElement('canvas');
+  copy.width = 320;
+  copy.height = 200;
+  const ctx = copy.getContext('2d');
+  ctx?.drawImage(canvas, 0, 0, copy.width, copy.height);
+  const data = ctx?.getImageData(0, 0, copy.width, copy.height)?.data ?? [];
+  let bright = 0;
+  for (let i = 0; i < data.length; i += 16) {
+    if ((data[i] ?? 0) + (data[i + 1] ?? 0) + (data[i + 2] ?? 0) > 90) {
+      bright += 1;
+    }
+  }
+  return { paintedRatio: bright / (data.length / 16) };
+});
+check(
+  'hero 3D: pinta la escena (mascota, prisma, tarjetas)',
+  heroPainted.paintedRatio > 0.02,
+  JSON.stringify(heroPainted),
+);
+
+const heroShotA = await page.locator('[data-hero-canvas]').screenshot();
+await page.waitForTimeout(900);
+const heroShotB = await page.locator('[data-hero-canvas]').screenshot();
+check(
+  'hero 3D: la animación ambiental cambia entre fotogramas',
+  heroShotA.length !== heroShotB.length || !heroShotA.equals(heroShotB),
+  `${heroShotA.length} vs ${heroShotB.length} bytes`,
+);
+
+const brand = await page.evaluate(() => {
+  const logo = document.querySelector('.nav__logo');
+  return {
+    official: Boolean(logo?.getAttribute('src')?.includes('publia-logo-header')),
+    provisional: document.querySelectorAll('.nav__mark').length,
+  };
+});
+check(
+  'marca: el encabezado usa el logotipo oficial',
+  brand.official && brand.provisional === 0,
+  `oficial=${brand.official} provisional=${brand.provisional}`,
+);
+
+const cooperativeButton = await page.evaluate(() => {
+  const button = document.querySelector('[data-hero-scene] [data-branch-trait="cooperative"]');
+  return { present: Boolean(button), label: button?.textContent?.trim().slice(0, 40) ?? '' };
+});
+check(
+  'hero: tercera ruta narrativa (cooperativismo)',
+  cooperativeButton.present,
+  cooperativeButton.label,
+);
+
+const handover = await page.evaluate(() => ({
+  active: document.documentElement.dataset.heroActive ?? '',
+  prismVisible: Number.parseFloat(
+    getComputedStyle(document.querySelector('.prism-layer')).opacity,
+  ),
+}));
+check(
+  'handoff: en el hero manda el lienzo del hero',
+  handover.active === 'true' && handover.prismVisible === 0,
+  `data-hero-active=${handover.active} · capa global opacidad ${handover.prismVisible}`,
+);
+
+// --- composición contra la captura aprobada -----------------------------------
+const referencePath = new URL('../_entrega/captura_hero_referencia.png', import.meta.url).pathname;
+try {
+  const sharp = (await import('sharp')).default;
+  const profile = async (file) => {
+    const image = sharp(file).flatten({ background: '#000' });
+    const meta = await image.metadata();
+    const cols = 100;
+    const rows = Math.round(cols * (meta.height / meta.width) * 0.5);
+    const { data, info } = await image
+      .resize(cols, rows, { fit: 'fill' })
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    const cells = [];
+    for (let y = 0; y < rows; y += 1) {
+      for (let x = 0; x < cols; x += 1) {
+        const i = (y * info.width + x) * info.channels;
+        const lum = 0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2];
+        cells.push({ x, lum });
+      }
+    }
+    const side = (from, to) => cells.filter((cell) => cell.x >= from && cell.x < to);
+    const average = (list) => list.reduce((total, cell) => total + cell.lum, 0) / list.length;
+    const bright = (list) => list.filter((cell) => cell.lum > 90).length / list.length;
+    const left = side(0, Math.round(cols * 0.42));
+    const right = side(Math.round(cols * 0.55), cols);
+    return {
+      leftLum: average(left),
+      rightLum: average(right),
+      leftBright: bright(left),
+      rightBright: bright(right),
+    };
+  };
+
+  await page.setViewportSize({ width: 1360, height: 810 });
+  await page.waitForTimeout(1200);
+  const implementationShot = `${OUT}13-hero-composicion.png`;
+  await page.screenshot({ path: implementationShot });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.waitForTimeout(600);
+
+  const reference = await profile(referencePath);
+  const implementation = await profile(implementationShot);
+  const delta = (a, b) => Math.abs(a - b);
+  const close =
+    delta(reference.leftLum, implementation.leftLum) < 12 &&
+    delta(reference.rightLum, implementation.rightLum) < 12 &&
+    delta(reference.leftBright, implementation.leftBright) < 0.03 &&
+    delta(reference.rightBright, implementation.rightBright) < 0.03;
+  check(
+    'composición: coincide con la captura aprobada',
+    close,
+    `izq ${implementation.leftLum.toFixed(0)}/${reference.leftLum.toFixed(0)} · der ${implementation.rightLum.toFixed(0)}/${reference.rightLum.toFixed(0)} · brillo ${(implementation.leftBright * 100).toFixed(1)}/${(reference.leftBright * 100).toFixed(1)} %`,
+  );
+} catch (error) {
+  check('composición: coincide con la captura aprobada', false, `sin referencia: ${error.message}`);
+}
 
 // --- estructura del grafo ---------------------------------------------------
 const structure = await page.evaluate(() => ({
@@ -234,7 +410,7 @@ await page.waitForTimeout(1800);
 const explorer = await page.evaluate(() => ({
   route: document.documentElement.dataset.route,
   visible: document.querySelector('#escena-e13')?.offsetHeight ?? 0,
-  branch: document.querySelectorAll('[data-branch-target]').length,
+  branch: document.querySelectorAll('#escena-e14 [data-branch-target]').length,
 }));
 check('ruta exploración: se activa por scroll natural', explorer.route === 'explorer', explorer.route);
 check('ruta exploración: escena visible', explorer.visible > 100, `${explorer.visible}px`);
@@ -245,13 +421,13 @@ const neutralNetwork = await page.evaluate(
   () => document.querySelector('#escena-e05 [data-role="title"]')?.textContent?.trim() ?? '',
 );
 const branchTargets = await page.evaluate(() =>
-  [...document.querySelectorAll('[data-branch-target]')].map((b) => b.dataset.branchTarget),
+  [...document.querySelectorAll('#escena-e14 [data-branch-target]')].map((b) => b.dataset.branchTarget),
 );
 const branchOk = branchTargets.includes('#escena-e15') && branchTargets.includes('#escena-e24');
 check('bifurcaciones: apuntan a escenas reales', branchOk, branchTargets.join(', '));
 
 await page.evaluate(() => {
-  const button = [...document.querySelectorAll('[data-branch-target]')].find(
+  const button = [...document.querySelectorAll('#escena-e14 [data-branch-target]')].find(
     (b) => b.dataset.branchTarget === '#escena-e15',
   );
   button?.click();
@@ -486,15 +662,25 @@ const budget = await page.evaluate(() => {
   const scripts = entries
     .filter((entry) => entry.name.endsWith('.js'))
     .reduce((total, entry) => total + (entry.encodedBodySize || 0), 0);
+  // El 3D (Three.js y el escenario del hero) va aparte: el presupuesto de la
+  // aplicación es el del código propio, sin el motor gráfico.
+  const appShell = entries
+    .filter((entry) => entry.name.endsWith('.js') && !/three|heroScene|stage\./.test(entry.name))
+    .reduce((total, entry) => total + (entry.encodedBodySize || 0), 0);
   const styles = entries
     .filter((entry) => entry.name.endsWith('.css'))
     .reduce((total, entry) => total + (entry.encodedBodySize || 0), 0);
-  return { scripts, styles, total: scripts + styles };
+  return { scripts, styles, appShell, total: scripts + styles };
 });
 check(
-  'rendimiento: JS + CSS inicial por debajo de 220 kB',
-  budget.total < 220 * 1024,
+  'rendimiento: JS + CSS inicial (con el 3D del hero) por debajo de 260 kB',
+  budget.total < 260 * 1024,
   `${Math.round(budget.total / 1024)} kB (JS ${Math.round(budget.scripts / 1024)} · CSS ${Math.round(budget.styles / 1024)})`,
+);
+check(
+  'rendimiento: la aplicación sin 3D por debajo de 90 kB',
+  budget.appShell < 90 * 1024,
+  `${Math.round(budget.appShell / 1024)} kB de JS de aplicación`,
 );
 check(
   'rendimiento: el escenario 3D se carga sólo bajo demanda',

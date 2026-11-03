@@ -156,6 +156,7 @@ function stageForScene(scene: HTMLElement, route: PrimaryRoute): StageState {
 }
 
 interface StageHandle {
+  setActive: (active: boolean) => void;
   setStage: (state: StageState) => void;
   setSceneProgress: (progress: number) => void;
   setScrollProgress: (progress: number) => void;
@@ -180,7 +181,72 @@ async function initStage(): Promise<StageHandle | null> {
   return stage;
 }
 
-function bindRouteControls(stage: StageHandle | null): void {
+interface HeroHandle {
+  setActive: (active: boolean) => void;
+  setRoute: (route: 'enterprise' | 'efficiency' | 'explorer') => void;
+  burst: () => void;
+  reset: () => void;
+  setPaused: (paused: boolean) => void;
+  cardsInView: () => number;
+  errors: () => string[];
+  destroy: () => void;
+}
+
+/**
+ * Hero 3D aprobado: lienzo propio con la escena entregada.
+ *
+ * Se carga bajo demanda (igual que el resto del 3D) y cede el lienzo a la
+ * capa global cuando el hero sale de la pantalla.
+ */
+async function initHeroScene(): Promise<HeroHandle | null> {
+  const canvas = document.querySelector<HTMLCanvasElement>('[data-hero-canvas]');
+  if (!canvas) {
+    return null;
+  }
+  const trigger = document.querySelector<HTMLElement>('[data-hero-scene]');
+  const reduced = prefersReducedMotion();
+
+  const { createHeroScene } = await import('../lib/three/heroScene');
+  const hero = await createHeroScene({ canvas, trigger, reducedMotion: reduced });
+  if (!hero) {
+    return null;
+  }
+
+  const failures = hero.errors();
+  canvas.dataset['heroReady'] = 'true';
+  canvas.dataset['heroErrors'] = failures.join(' · ');
+  canvas.dataset['cardsInView'] = String(hero.cardsInView());
+  window.setTimeout(() => {
+    canvas.dataset['cardsInView'] = String(hero.cardsInView());
+  }, 1500);
+
+  if (failures.length > 0) {
+    // Fallo de carga: el hero sigue siendo legible por CSS, sin 3D.
+    console.warn('[hero] recursos incompletos:', failures.join(' · '));
+  }
+
+  // Controles del hero (pausa, fragmentación y reinicio).
+  const controls = document.querySelectorAll<HTMLButtonElement>('[data-hero-control]');
+  controls.forEach((button) => {
+    button.addEventListener('click', () => {
+      const action = button.dataset['heroControl'];
+      if (action === 'burst') {
+        hero.burst();
+      } else if (action === 'reset') {
+        hero.reset();
+      } else if (action === 'pause') {
+        const paused = button.getAttribute('aria-pressed') === 'true';
+        hero.setPaused(!paused);
+        button.setAttribute('aria-pressed', String(!paused));
+        button.textContent = paused ? 'Ⅱ Pausar' : '▶ Reanudar';
+      }
+    });
+  });
+
+  return hero;
+}
+
+function bindRouteControls(stage: StageHandle | null, hero: HeroHandle | null): void {
   const choiceButtons = document.querySelectorAll<HTMLButtonElement>('[data-route-choice]');
   choiceButtons.forEach((button) => {
     button.addEventListener('click', () => {
@@ -189,6 +255,7 @@ function bindRouteControls(stage: StageHandle | null): void {
         return;
       }
       setPrimaryRoute(route);
+      hero?.setRoute(route);
       track(route === 'enterprise' ? 'hero_enterprise_selected' : 'hero_efficiency_selected');
       window.setTimeout(() => {
         ScrollTrigger.refresh();
@@ -206,6 +273,7 @@ function bindRouteControls(stage: StageHandle | null): void {
       const target = button.dataset['branchTarget'] ?? '#escena-e15';
       if (route === 'enterprise' || route === 'efficiency' || route === 'explorer') {
         setPrimaryRoute(route);
+        hero?.setRoute(route);
       }
       if (trait) {
         // Los rasgos se añaden desde el estado del visitante.
@@ -378,7 +446,41 @@ export async function startExperience(): Promise<void> {
   applyDocumentContext(getState());
 
   const stage = await initStage();
+  const hero = await initHeroScene();
   const progressByScene = new Map<string, number>();
+
+  // Relevo de lienzo: el hero 3D aprobado y la capa global nunca dibujan a
+  // la vez. El indicador `data-hero-active` apaga la capa global por CSS.
+  const heroSection = document.querySelector<HTMLElement>('[data-hero-scene]');
+  if (heroSection) {
+    const applyHeroVisibility = (visible: boolean): void => {
+      if (visible) {
+        document.documentElement.dataset['heroActive'] = 'true';
+      } else {
+        delete document.documentElement.dataset['heroActive'];
+      }
+      hero?.setActive(visible);
+      stage?.setActive(!visible);
+    };
+    applyHeroVisibility(true);
+    const heroObserver = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          applyHeroVisibility(entry.isIntersecting);
+        }
+      },
+      { threshold: 0 },
+    );
+    heroObserver.observe(heroSection);
+    window.addEventListener(
+      'pagehide',
+      () => {
+        heroObserver.disconnect();
+        hero?.destroy();
+      },
+      { once: true },
+    );
+  }
 
   const applyActiveScene = (): void => {
     let activeId: string | null = null;
@@ -428,7 +530,7 @@ export async function startExperience(): Promise<void> {
     );
   }
 
-  bindRouteControls(stage);
+  bindRouteControls(stage, hero);
   bindSceneTracking();
   bindImplicitRouteWatcher();
 

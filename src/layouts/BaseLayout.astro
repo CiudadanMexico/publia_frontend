@@ -49,7 +49,16 @@ const organizationSchema = {
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
 
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Outfit:wght@800;900&display=swap"
+    />
+
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/brand/favicon.png" type="image/png" sizes="64x64" />
+    <link rel="apple-touch-icon" href="/brand/publia-isotipo-128.png" />
     <script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
   </head>
   <body>
