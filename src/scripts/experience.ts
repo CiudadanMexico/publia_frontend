@@ -14,6 +14,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 import {
+  addTraits,
   applyDocumentState,
   getState,
   markSceneVisited,
@@ -24,6 +25,8 @@ import {
 import { initAnalytics, track } from '../lib/experience/events';
 import { initEffects } from '../lib/animation/effects';
 import { pickVariantFrom, visitorSegments } from '../lib/experience/graph';
+import { createNarrative } from '../lib/experience/narrative';
+import type { NarrativeHandle } from '../lib/experience/narrative';
 import { buildMailto } from '../data/site';
 import type { PrimaryRoute, VisitorState, VisitorTrait } from '../lib/experience/state';
 import type { SceneVariant, StageState } from '../lib/experience/types';
@@ -155,117 +158,115 @@ function stageForScene(scene: HTMLElement, route: PrimaryRoute): StageState {
   return (base as StageState | undefined) ?? 'abstract';
 }
 
-interface StageHandle {
-  setActive: (active: boolean) => void;
-  setStage: (state: StageState) => void;
+interface UniverseHandleLike {
+  travelTo: (world: 'hero' | 'enterprise' | 'efficiency' | 'cooperative' | 'diagnosis', options?: { duration?: number; onComplete?: () => void }) => void;
+  world: () => 'hero' | 'enterprise' | 'efficiency' | 'cooperative' | 'diagnosis';
   setSceneProgress: (progress: number) => void;
-  setScrollProgress: (progress: number) => void;
   setPointer: (x: number, y: number) => void;
-}
-
-async function initStage(): Promise<StageHandle | null> {
-  const canvas = document.querySelector<HTMLCanvasElement>('[data-prism-canvas]');
-  if (!canvas) {
-    return null;
-  }
-  const layer = canvas.closest<HTMLElement>('.prism-layer');
-  const reduced = prefersReducedMotion();
-
-  const { createStage } = await import('../lib/three/stage');
-  const stage = createStage({ canvas, reducedMotion: reduced });
-  if (!stage) {
-    layer?.classList.add('is-fallback');
-    return null;
-  }
-  layer?.classList.add('is-ready');
-  return stage;
-}
-
-interface HeroHandle {
   setActive: (active: boolean) => void;
-  setRoute: (route: 'enterprise' | 'efficiency' | 'explorer') => void;
-  burst: () => void;
-  reset: () => void;
   setPaused: (paused: boolean) => void;
+  burst: () => void;
   cardsInView: () => number;
+  cameraPosition: () => [number, number, number];
+  dominantTint: () => string;
   errors: () => string[];
   destroy: () => void;
 }
 
 /**
- * Hero 3D aprobado: lienzo propio con la escena entregada.
- *
- * Se carga bajo demanda (igual que el resto del 3D) y cede el lienzo a la
- * capa global cuando el hero sale de la pantalla.
+ * Universo 3D persistente: un solo lienzo con los recursos aprobados del
+ * hero. Las rutas son mundos dentro del mismo universo y se recorren con
+ * viajes de cámara (ver `narrative.ts`).
  */
-async function initHeroScene(): Promise<HeroHandle | null> {
-  const canvas = document.querySelector<HTMLCanvasElement>('[data-hero-canvas]');
+async function initUniverse(): Promise<UniverseHandleLike | null> {
+  const canvas = document.querySelector<HTMLCanvasElement>('[data-prism-canvas]');
   if (!canvas) {
     return null;
   }
+  const layer = canvas.closest<HTMLElement>('.prism-layer');
   const trigger = document.querySelector<HTMLElement>('[data-hero-scene]');
   const reduced = prefersReducedMotion();
 
-  const { createHeroScene } = await import('../lib/three/heroScene');
-  const hero = await createHeroScene({ canvas, trigger, reducedMotion: reduced });
-  if (!hero) {
+  const { createUniverse } = await import('../lib/three/universe');
+  const universe = await createUniverse({ canvas, trigger, reducedMotion: reduced });
+  if (!universe) {
+    layer?.classList.add('is-fallback');
     return null;
   }
+  layer?.classList.add('is-ready');
 
-  const failures = hero.errors();
-  canvas.dataset['heroReady'] = 'true';
-  canvas.dataset['heroErrors'] = failures.join(' · ');
-  canvas.dataset['cardsInView'] = String(hero.cardsInView());
+  const failures = universe.errors();
+  canvas.dataset['universeReady'] = 'true';
+  canvas.dataset['universeErrors'] = failures.join(' · ');
+  canvas.dataset['cardsInView'] = String(universe.cardsInView());
+  canvas.dataset['world'] = universe.world();
+  canvas.dataset['camera'] = JSON.stringify(universe.cameraPosition());
+  canvas.dataset['tint'] = universe.dominantTint();
   window.setTimeout(() => {
-    canvas.dataset['cardsInView'] = String(hero.cardsInView());
+    canvas.dataset['cardsInView'] = String(universe.cardsInView());
+    canvas.dataset['camera'] = JSON.stringify(universe.cameraPosition());
+    canvas.dataset['tint'] = universe.dominantTint();
   }, 1500);
-
   if (failures.length > 0) {
-    // Fallo de carga: el hero sigue siendo legible por CSS, sin 3D.
-    console.warn('[hero] recursos incompletos:', failures.join(' · '));
+    console.warn('[universe] recursos incompletos:', failures.join(' · '));
   }
 
-  // Controles del hero (pausa, fragmentación y reinicio).
+  // Controles del hero (pausa, fragmentación y reinicio) sobre el universo.
   const controls = document.querySelectorAll<HTMLButtonElement>('[data-hero-control]');
   controls.forEach((button) => {
     button.addEventListener('click', () => {
       const action = button.dataset['heroControl'];
       if (action === 'burst') {
-        hero.burst();
+        universe.burst();
       } else if (action === 'reset') {
-        hero.reset();
+        universe.travelTo(universe.world(), { duration: reduced ? 0 : 1.1 });
       } else if (action === 'pause') {
         const paused = button.getAttribute('aria-pressed') === 'true';
-        hero.setPaused(!paused);
+        universe.setPaused(!paused);
         button.setAttribute('aria-pressed', String(!paused));
         button.textContent = paused ? 'Ⅱ Pausar' : '▶ Reanudar';
       }
     });
   });
 
-  return hero;
+  return universe;
 }
 
-function bindRouteControls(stage: StageHandle | null, hero: HeroHandle | null): void {
+function bindRouteControls(
+  narrative: NarrativeHandle | null,
+  universe: UniverseHandleLike | null,
+): void {
+  void universe;
+  // Las tres rutas del hero entran como actos: viaje de cámara + contenido.
   const choiceButtons = document.querySelectorAll<HTMLButtonElement>('[data-route-choice]');
   choiceButtons.forEach((button) => {
     button.addEventListener('click', () => {
       const route = button.dataset['routeChoice'];
-      if (route !== 'enterprise' && route !== 'efficiency') {
-        return;
+      if (route === 'enterprise' || route === 'efficiency') {
+        narrative?.enterAct(route);
       }
-      setPrimaryRoute(route);
-      hero?.setRoute(route);
-      track(route === 'enterprise' ? 'hero_enterprise_selected' : 'hero_efficiency_selected');
-      window.setTimeout(() => {
-        ScrollTrigger.refresh();
-        scrollTo(button.dataset['target'] ?? '#escena-e03');
-      }, 160);
     });
   });
 
-  // Bifurcaciones narrativas (E14): eligen un rasgo y llevan a su escena.
-  const branchButtons = document.querySelectorAll<HTMLButtonElement>('[data-branch-target]');
+  // El botón cooperativo del hero también es un acto.
+  const cooperativeButton = document.querySelector<HTMLButtonElement>(
+    '[data-hero-scene] [data-branch-trait="cooperative"]',
+  );
+  cooperativeButton?.addEventListener('click', () => {
+    narrative?.enterAct('cooperative');
+  });
+
+  // Control «volver»: regresa al acto anterior sin reiniciar la experiencia.
+  const backButton = document.querySelector<HTMLButtonElement>('[data-act-back]');
+  backButton?.addEventListener('click', () => {
+    narrative?.goBack();
+    window.setTimeout(() => ScrollTrigger.refresh(), 200);
+  });
+
+  // Bifurcaciones narrativas dentro de las escenas (E14): rasgo + escena.
+  const branchButtons = document.querySelectorAll<HTMLButtonElement>(
+    '#escena-e14 [data-branch-target]',
+  );
   branchButtons.forEach((button) => {
     button.addEventListener('click', () => {
       const trait = button.dataset['branchTrait'];
@@ -273,13 +274,9 @@ function bindRouteControls(stage: StageHandle | null, hero: HeroHandle | null): 
       const target = button.dataset['branchTarget'] ?? '#escena-e15';
       if (route === 'enterprise' || route === 'efficiency' || route === 'explorer') {
         setPrimaryRoute(route);
-        hero?.setRoute(route);
       }
       if (trait) {
-        // Los rasgos se añaden desde el estado del visitante.
-        void import('../lib/experience/state').then((module) =>
-          module.addTraits([trait as VisitorTrait]),
-        );
+        addTraits([trait as VisitorTrait]);
       }
       track('cooperative_interest', { target, trait: trait ?? 'ninguno' });
       window.setTimeout(() => {
@@ -353,10 +350,10 @@ function bindRouteControls(stage: StageHandle | null, hero: HeroHandle | null): 
     button.addEventListener('click', () => {
       implicitSuppressed = true;
       resetExperience();
+      narrative?.returnToHero();
       track('scene_viewed', { scene: 'route_reset' });
       window.setTimeout(() => {
         ScrollTrigger.refresh();
-        scrollTo('#inicio', true);
       }, 160);
     });
   });
@@ -368,6 +365,9 @@ function bindRouteControls(stage: StageHandle | null, hero: HeroHandle | null): 
  * (que puede consumirse durante un reflujo de layout) sino del viewport real.
  */
 function updateImplicitRoute(): void {
+  if (document.documentElement.dataset['scrolling'] === 'programmatic') {
+    return;
+  }
   const hero = document.querySelector<HTMLElement>('#inicio');
   if (hero) {
     const heroRect = hero.getBoundingClientRect();
@@ -445,42 +445,10 @@ export async function startExperience(): Promise<void> {
   initAnalytics();
   applyDocumentContext(getState());
 
-  const stage = await initStage();
-  const hero = await initHeroScene();
+  const reduced = prefersReducedMotion();
+  const universe = await initUniverse();
+  const narrative = createNarrative({ universe, reducedMotion: reduced });
   const progressByScene = new Map<string, number>();
-
-  // Relevo de lienzo: el hero 3D aprobado y la capa global nunca dibujan a
-  // la vez. El indicador `data-hero-active` apaga la capa global por CSS.
-  const heroSection = document.querySelector<HTMLElement>('[data-hero-scene]');
-  if (heroSection) {
-    const applyHeroVisibility = (visible: boolean): void => {
-      if (visible) {
-        document.documentElement.dataset['heroActive'] = 'true';
-      } else {
-        delete document.documentElement.dataset['heroActive'];
-      }
-      hero?.setActive(visible);
-      stage?.setActive(!visible);
-    };
-    applyHeroVisibility(true);
-    const heroObserver = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          applyHeroVisibility(entry.isIntersecting);
-        }
-      },
-      { threshold: 0 },
-    );
-    heroObserver.observe(heroSection);
-    window.addEventListener(
-      'pagehide',
-      () => {
-        heroObserver.disconnect();
-        hero?.destroy();
-      },
-      { once: true },
-    );
-  }
 
   const applyActiveScene = (): void => {
     let activeId: string | null = null;
@@ -499,38 +467,47 @@ export async function startExperience(): Promise<void> {
     if (!element) {
       return;
     }
-    stage?.setStage(stageForScene(element, getState().primary));
+    void stageForScene(element, getState().primary);
   };
 
   const destroyEffects = initEffects({
-    reducedMotion: prefersReducedMotion(),
+    reducedMotion: reduced,
     onSceneProgress: (sceneId, progress) => {
       progressByScene.set(sceneId, progress);
-      const element = document.querySelector<HTMLElement>(`[data-scene-id="${sceneId}"]`);
-      if (element && Math.abs(progress - 0.5) < 0.12) {
-        stage?.setSceneProgress(Math.abs(progress - 0.5) * 2);
-        stage?.setStage(stageForScene(element, getState().primary));
+      if (Math.abs(progress - 0.5) < 0.12) {
+        universe?.setSceneProgress(Math.abs(progress - 0.5) * 2);
       }
     },
-    onGlobalProgress: (progress) => {
-      stage?.setScrollProgress(progress);
+    onGlobalProgress: () => {
+      // el progreso global lo usa la biblioteca de efectos
     },
   });
 
-  if (stage) {
-    const hero = document.querySelector<HTMLElement>('#inicio');
-    hero?.addEventListener(
-      'pointermove',
-      (event) => {
-        const x = (event.clientX / window.innerWidth) * 2 - 1;
-        const y = -((event.clientY / window.innerHeight) * 2 - 1);
-        stage.setPointer(x, y);
-      },
-      { passive: true },
-    );
-  }
+  // La viñeta del hero sólo acompaña mientras el acto activo es el hero.
+  const applyActMarker = (act: string): void => {
+    document.documentElement.dataset['act'] = act;
+    const canvas = document.querySelector<HTMLCanvasElement>('[data-prism-canvas]');
+    if (canvas) {
+      canvas.dataset['world'] = universe?.world() ?? 'hero';
+      canvas.dataset['camera'] = JSON.stringify(universe?.cameraPosition() ?? []);
+      canvas.dataset['tint'] = universe?.dominantTint() ?? '';
+    }
+  };
+  applyActMarker('hero');
 
-  bindRouteControls(stage, hero);
+  // Parallax del puntero sobre la cámara del universo.
+  const hero = document.querySelector<HTMLElement>('#inicio');
+  hero?.addEventListener(
+    'pointermove',
+    (event) => {
+      const x = (event.clientX / window.innerWidth) * 2 - 1;
+      const y = -((event.clientY / window.innerHeight) * 2 - 1);
+      universe?.setPointer(x, y);
+    },
+    { passive: true },
+  );
+
+  bindRouteControls(narrative, universe);
   bindSceneTracking();
   bindImplicitRouteWatcher();
 
@@ -556,12 +533,24 @@ export async function startExperience(): Promise<void> {
     }, 80);
   });
 
+  // El acto activo también se refleja en el documento (viñeta y control volver).
+  const actObserver = setInterval(() => {
+    const act = narrative.currentAct();
+    applyActMarker(act);
+    const back = document.querySelector<HTMLElement>('[data-act-back]');
+    if (back) {
+      back.style.display = narrative.history().length > 1 ? 'inline-flex' : 'none';
+    }
+  }, 400);
+
   applySceneVariants(getState());
   applyContactContext(getState());
   window.setTimeout(applyActiveScene, 220);
 
   window.addEventListener('pagehide', () => {
     destroyEffects();
+    clearInterval(actObserver);
+    universe?.destroy();
   }, { once: true });
 }
 

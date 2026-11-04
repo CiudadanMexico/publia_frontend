@@ -13,7 +13,6 @@ import { HERO } from '../../data/copy';
 ---
 
 <section class="hero" id="inicio" data-scene-id="E01" data-hero-scene aria-labelledby="hero-titulo">
-  <canvas class="hero__canvas" data-hero-canvas aria-hidden="true"></canvas>
   <div class="hero__vignette" aria-hidden="true"></div>
 
   <div class="hero__inner">
@@ -78,24 +77,8 @@ import { HERO } from '../../data/copy';
     isolation: isolate;
   }
 
-  .hero__canvas {
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    display: block;
-    z-index: -2;
-    pointer-events: none;
-    opacity: 1;
-    transition: opacity 500ms var(--ease-out);
-  }
-
-  :global(html:not([data-hero-active])) .hero__canvas {
-    opacity: 0;
-  }
-
   .hero__vignette {
-    position: fixed;
+    position: absolute;
     inset: 0;
     z-index: -1;
     pointer-events: none;
@@ -111,9 +94,6 @@ import { HERO } from '../../data/copy';
     transition: opacity 500ms var(--ease-out);
   }
 
-  :global(html:not([data-hero-active])) .hero__vignette {
-    opacity: 0;
-  }
 
   .hero__inner {
     position: relative;

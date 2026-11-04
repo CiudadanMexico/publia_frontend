@@ -1,6 +1,6 @@
 {
   "base": "https://kitty-midi-grid-liked.trycloudflare.com",
-  "total": 75,
+  "total": 85,
   "fallos": 0,
   "resultados": [
     {
@@ -26,22 +26,27 @@
     {
       "name": "prisma: canvas presente y WebGL activo",
       "ok": true,
-      "detail": "{\"present\":true,\"webgl\":true,\"size\":[1440,720]}"
+      "detail": "{\"present\":true,\"webgl\":true,\"size\":[1440,900]}"
     },
     {
       "name": "prisma: la escena 3D se renderiza y cambia (animación real)",
       "ok": true,
-      "detail": "575471 vs 588348 bytes"
+      "detail": "658447 vs 666566 bytes"
     },
     {
       "name": "prisma: pinta una fracción útil del viewport",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.15697530864197531}"
+      "detail": "{\"paintedRatio\":0.20553703703703705}"
     },
     {
-      "name": "hero 3D: lienzo presente con WebGL activo",
+      "name": "hero 3D: lienzo único presente con WebGL activo",
       "ok": true,
       "detail": "[1440,900]"
+    },
+    {
+      "name": "hero 3D: el universo arranca en el mundo hero",
+      "ok": true,
+      "detail": "world=hero · cámara [0,2.4,11.6]"
     },
     {
       "name": "hero 3D: la escena carga sin errores de recursos",
@@ -61,12 +66,12 @@
     {
       "name": "hero 3D: pinta la escena (mascota, prisma, tarjetas)",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.20575}"
+      "detail": "{\"paintedRatio\":0.206125}"
     },
     {
       "name": "hero 3D: la animación ambiental cambia entre fotogramas",
       "ok": true,
-      "detail": "672234 vs 662587 bytes"
+      "detail": "673975 vs 665100 bytes"
     },
     {
       "name": "marca: el encabezado usa el logotipo oficial",
@@ -79,14 +84,59 @@
       "detail": "Quiero cooperar / comunidad ↗"
     },
     {
-      "name": "handoff: en el hero manda el lienzo del hero",
+      "name": "hero: viñeta activa sólo en el acto hero",
       "ok": true,
-      "detail": "data-hero-active=true · capa global opacidad 0"
+      "detail": "act=hero · viñeta 1"
     },
     {
       "name": "composición: coincide con la captura aprobada",
       "ok": true,
       "detail": "izq 35/35 · der 41/40 · brillo 14.4/14.8 %"
+    },
+    {
+      "name": "transición enterprise: la cámara viaja a otro mundo del mismo universo",
+      "ok": true,
+      "detail": "mundo hero→enterprise · cámara [0,2.4,11.6]→[1.856833,1.715904,8.472702] · tinte #050b1b→#0a0e18"
+    },
+    {
+      "name": "transición enterprise: el contenido de la escena destino aparece",
+      "ok": true,
+      "detail": "scrollY 2313 · act=enterprise"
+    },
+    {
+      "name": "transición enterprise: volver regresa al hero sin recargar",
+      "ok": true,
+      "detail": "world=hero · act=hero · scrollY 0"
+    },
+    {
+      "name": "transición efficiency: la cámara viaja a otro mundo del mismo universo",
+      "ok": true,
+      "detail": "mundo hero→efficiency · cámara [0,2.4,11.6]→[-2.1,1.9,8.8] · tinte #050b1b→#0d0a05"
+    },
+    {
+      "name": "transición efficiency: el contenido de la escena destino aparece",
+      "ok": true,
+      "detail": "scrollY 5622 · act=efficiency"
+    },
+    {
+      "name": "transición efficiency: volver regresa al hero sin recargar",
+      "ok": true,
+      "detail": "world=hero · act=hero · scrollY 0"
+    },
+    {
+      "name": "transición cooperative: la cámara viaja a otro mundo del mismo universo",
+      "ok": true,
+      "detail": "mundo hero→cooperative · cámara [0,2.4,11.6]→[0,1.9,9.4] · tinte #050b1b→#060d08"
+    },
+    {
+      "name": "transición cooperative: el contenido de la escena destino aparece",
+      "ok": true,
+      "detail": "scrollY 6878 · act=cooperative"
+    },
+    {
+      "name": "transición cooperative: volver regresa al hero sin recargar",
+      "ok": true,
+      "detail": "world=hero · act=hero · scrollY 0"
     },
     {
       "name": "grafo: 31 escenas montadas (E00-E30)",
@@ -151,7 +201,7 @@
     {
       "name": "ruta empresa: segmentos aplicados",
       "ok": true,
-      "detail": "enterprise"
+      "detail": "enterprise cooperative"
     },
     {
       "name": "ruta empresa: escena propia visible",
@@ -356,7 +406,7 @@
     {
       "name": "rendimiento: JS + CSS inicial (con el 3D del hero) por debajo de 260 kB",
       "ok": true,
-      "detail": "241 kB (JS 235 · CSS 6)"
+      "detail": "239 kB (JS 232 · CSS 6)"
     },
     {
       "name": "rendimiento: la aplicación sin 3D por debajo de 90 kB",

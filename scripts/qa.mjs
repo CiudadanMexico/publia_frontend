@@ -122,7 +122,7 @@ check('prisma: pinta una fracción útil del viewport', painted.paintedRatio > 0
 
 // --- hero 3D aprobado ----------------------------------------------------------
 const hero3d = await page.evaluate(() => {
-  const canvas = document.querySelector('[data-hero-canvas]');
+  const canvas = document.querySelector('[data-prism-canvas]');
   if (!canvas) {
     return null;
   }
@@ -130,16 +130,23 @@ const hero3d = await page.evaluate(() => {
   return {
     present: true,
     webgl: Boolean(gl),
-    ready: canvas.dataset.heroReady ?? '',
-    errors: canvas.dataset.heroErrors ?? '',
+    ready: canvas.dataset.universeReady ?? '',
+    errors: canvas.dataset.universeErrors ?? '',
+    world: canvas.dataset.world ?? '',
+    camera: canvas.dataset.camera ?? '',
     cards: canvas.dataset.cardsInView ?? '',
     size: [canvas.width, canvas.height],
   };
 });
 check(
-  'hero 3D: lienzo presente con WebGL activo',
+  'hero 3D: lienzo único presente con WebGL activo',
   hero3d?.present && hero3d?.webgl,
   JSON.stringify(hero3d?.size ?? []),
+);
+check(
+  'hero 3D: el universo arranca en el mundo hero',
+  hero3d?.ready === 'true' && hero3d?.world === 'hero',
+  `world=${hero3d?.world} · cámara ${hero3d?.camera}`,
 );
 check(
   'hero 3D: la escena carga sin errores de recursos',
@@ -166,7 +173,7 @@ check(
 );
 
 const heroPainted = await page.evaluate(() => {
-  const canvas = document.querySelector('[data-hero-canvas]');
+  const canvas = document.querySelector('[data-prism-canvas]');
   if (!canvas) {
     return { paintedRatio: 0 };
   }
@@ -190,9 +197,9 @@ check(
   JSON.stringify(heroPainted),
 );
 
-const heroShotA = await page.locator('[data-hero-canvas]').screenshot();
+const heroShotA = await page.locator('[data-prism-canvas]').screenshot();
 await page.waitForTimeout(900);
-const heroShotB = await page.locator('[data-hero-canvas]').screenshot();
+const heroShotB = await page.locator('[data-prism-canvas]').screenshot();
 check(
   'hero 3D: la animación ambiental cambia entre fotogramas',
   heroShotA.length !== heroShotB.length || !heroShotA.equals(heroShotB),
@@ -223,15 +230,15 @@ check(
 );
 
 const handover = await page.evaluate(() => ({
-  active: document.documentElement.dataset.heroActive ?? '',
-  prismVisible: Number.parseFloat(
-    getComputedStyle(document.querySelector('.prism-layer')).opacity,
+  act: document.documentElement.dataset.act ?? '',
+  vignette: Number.parseFloat(
+    getComputedStyle(document.querySelector('.hero__vignette')).opacity,
   ),
 }));
 check(
-  'handoff: en el hero manda el lienzo del hero',
-  handover.active === 'true' && handover.prismVisible === 0,
-  `data-hero-active=${handover.active} · capa global opacidad ${handover.prismVisible}`,
+  'hero: viñeta activa sólo en el acto hero',
+  handover.act === 'hero' && handover.vignette > 0.9,
+  `act=${handover.act} · viñeta ${handover.vignette}`,
 );
 
 // --- composición contra la captura aprobada -----------------------------------
@@ -290,6 +297,81 @@ try {
   );
 } catch (error) {
   check('composición: coincide con la captura aprobada', false, `sin referencia: ${error.message}`);
+}
+
+// --- transiciones inmersivas (fase 2) ------------------------------------------
+// Entrar a una ruta debe mover la cámara, cambiar el mundo 3D y mostrar el
+// contenido de la escena destino, todo dentro del mismo lienzo.
+async function transitionProbe(act) {
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+  await page.waitForTimeout(900);
+  const before = await page.evaluate(() => {
+    const canvas = document.querySelector('[data-prism-canvas]');
+    return {
+      world: canvas?.dataset.world ?? '',
+      camera: canvas?.dataset.camera ?? '',
+      tint: canvas?.dataset.tint ?? '',
+      scroll: window.scrollY,
+    };
+  });
+  const button = await page.evaluate((id) => {
+    const el =
+      id === 'cooperative'
+        ? document.querySelector('[data-hero-scene] [data-branch-trait="cooperative"]')
+        : document.querySelector(`[data-route-choice="${id}"]`);
+    el?.scrollIntoView({ block: 'center' });
+    el?.click();
+    return Boolean(el);
+  }, act);
+  await page.waitForTimeout(2600);
+  const after = await page.evaluate(() => {
+    const canvas = document.querySelector('[data-prism-canvas]');
+    return {
+      world: canvas?.dataset.world ?? '',
+      camera: canvas?.dataset.camera ?? '',
+      tint: canvas?.dataset.tint ?? '',
+      act: document.documentElement.dataset.act ?? '',
+      scroll: window.scrollY,
+    };
+  });
+  return { button, before, after };
+}
+
+for (const act of ['enterprise', 'efficiency', 'cooperative']) {
+  const probe = await transitionProbe(act);
+  const moved =
+    probe.before.camera !== probe.after.camera && probe.before.world !== probe.after.world;
+  const tintChanged = probe.before.tint !== probe.after.tint;
+  const scrolled = probe.after.scroll > 400;
+  check(
+    `transición ${act}: la cámara viaja a otro mundo del mismo universo`,
+    probe.button && moved && tintChanged,
+    `mundo ${probe.before.world}→${probe.after.world} · cámara ${probe.before.camera}→${probe.after.camera} · tinte ${probe.before.tint}→${probe.after.tint}`,
+  );
+  check(
+    `transición ${act}: el contenido de la escena destino aparece`,
+    scrolled && probe.after.act === act,
+    `scrollY ${Math.round(probe.after.scroll)} · act=${probe.after.act}`,
+  );
+
+  // volver al hero sin reiniciar
+  await page.evaluate(() => {
+    document.querySelector('[data-act-back]')?.click();
+  });
+  await page.waitForTimeout(2200);
+  const back = await page.evaluate(() => {
+    const canvas = document.querySelector('[data-prism-canvas]');
+    return {
+      world: canvas?.dataset.world ?? '',
+      act: document.documentElement.dataset.act ?? '',
+      scroll: window.scrollY,
+    };
+  });
+  check(
+    `transición ${act}: volver regresa al hero sin recargar`,
+    back.world === 'hero' && back.act === 'hero' && back.scroll < 200,
+    `world=${back.world} · act=${back.act} · scrollY ${Math.round(back.scroll)}`,
+  );
 }
 
 // --- estructura del grafo ---------------------------------------------------
@@ -630,7 +712,7 @@ check(
   axeResult.map((violation) => `${violation.id}×${violation.nodes}`).join(', ') || '0 violaciones',
 );
 await axePage.evaluate(() => document.querySelector('[data-route-choice="enterprise"]')?.click());
-await axePage.waitForTimeout(1600);
+await axePage.waitForTimeout(3800);
 const axeEnterprise = await axePage.evaluate(async () => {
   const run = await window.axe.run(document, {
     runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'best-practice'] },
@@ -665,7 +747,7 @@ const budget = await page.evaluate(() => {
   // El 3D (Three.js y el escenario del hero) va aparte: el presupuesto de la
   // aplicación es el del código propio, sin el motor gráfico.
   const appShell = entries
-    .filter((entry) => entry.name.endsWith('.js') && !/three|heroScene|stage\./.test(entry.name))
+    .filter((entry) => entry.name.endsWith('.js') && !/three|universe|heroScene|stage\./.test(entry.name))
     .reduce((total, entry) => total + (entry.encodedBodySize || 0), 0);
   const styles = entries
     .filter((entry) => entry.name.endsWith('.css'))
@@ -699,7 +781,7 @@ const reduced = await browser.newContext({
 });
 const reducedPage = await reduced.newPage();
 await reducedPage.goto(BASE, { waitUntil: 'networkidle', timeout: 60000 });
-await reducedPage.waitForTimeout(2200);
+await reducedPage.waitForTimeout(4500);
 const reducedInfo = await reducedPage.evaluate(() => ({
   layerReady: document.querySelector('.prism-layer')?.classList.contains('is-ready') ?? false,
   reveals: [...document.querySelectorAll('[data-reveal]')].every(

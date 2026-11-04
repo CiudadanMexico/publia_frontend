@@ -191,6 +191,12 @@ button {
   z-index: 1;
 }
 
+/* En el hero el universo 3D se muestra a plena intensidad: la composición
+   aprobada no lleva atenuación. Fuera del hero la capa se suaviza. */
+html[data-act='hero'] .prism-layer {
+  opacity: 1;
+}
+
 .scene__grid {
   display: grid;
   gap: var(--space-4);
@@ -236,11 +242,4 @@ button {
     opacity: 1;
     transform: none;
   }
-}
-
-/* El hero 3D aprobado tiene su propio lienzo: la capa global se aparta
-   mientras el hero está en pantalla y vuelve al salir de él. */
-html[data-hero-active] .prism-layer {
-  opacity: 0;
-  transition: opacity 400ms var(--ease-out);
 }
