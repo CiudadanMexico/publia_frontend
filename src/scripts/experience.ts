@@ -12,6 +12,7 @@
 
 import { gsap } from 'gsap';
 import { lookForScene } from '../lib/experience/sceneLooks';
+import { createPortal, type PortalHandle } from '../lib/experience/portal';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 import {
@@ -672,6 +673,28 @@ export async function startExperience(): Promise<void> {
 
   const sceneLookTriggers = bindSceneLooks(universe);
   bindDemos(universe);
+
+  // Portal prismático P0-01: acompaña la transición hero → mundo.
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const portal: PortalHandle = createPortal();
+  let lastPortalKey = '';
+  const drivePortal = (state: ReturnType<typeof getState>): void => {
+    const heroElement = document.querySelector<HTMLElement>('[data-hero-scene]');
+    const key = `${state.primary}:${state.origin}`;
+    if (key === lastPortalKey) return;
+    lastPortalKey = key;
+    if (reducedMotion || state.primary === 'unclassified') {
+      portal.reset();
+      return;
+    }
+    // Ojo: subscribe dispara ANTES de que el acto cambie en la pila; el
+    // control por acto (reset al volver al hero) vive en actObserver.
+    if (state.origin === 'scroll' && heroElement) {
+      portal.bindScrub(heroElement);
+    } else {
+      portal.playTimed(reducedMotion ? 0 : 1.9);
+    }
+  };
   const destroyEffects = initEffects({
     reducedMotion: reduced,
     onSceneProgress: (sceneId, progress) => {
@@ -721,6 +744,7 @@ export async function startExperience(): Promise<void> {
   let lastRoute = getState().primary;
   let lastSegments = visitorSegments(getState()).join(' ');
   subscribe((state) => {
+    drivePortal(state);
     applyDocumentContext(state);
     applySceneVariants(state);
     applyContactContext(state);
@@ -740,6 +764,7 @@ export async function startExperience(): Promise<void> {
   // El acto activo también se refleja en el documento (viñeta y control volver).
   const actObserver = setInterval(() => {
     const act = narrative.currentAct();
+    if (act === 'hero') portal.reset();
     applyActMarker(act);
     const back = document.querySelector<HTMLElement>('[data-act-back]');
     if (back) {

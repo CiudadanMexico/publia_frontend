@@ -1034,6 +1034,54 @@ check('v3 demo geonodos: el nodo explica qué se comparte', geo.detail.includes(
 check('v3 demo geonodos: scroll enciende conexiones (progreso)', Number(geo.progress) >= 1, `progreso=${geo.progress}`);
 check('v3 demo geonodos: nodo activo marcado', geo.active === 1, `${geo.active}`);
 
+// --- portal prismático P0-01 -----------------------------------------------------
+const portalLayers = await page.evaluate(() =>
+  [...document.querySelectorAll('[data-portal-layer]')].map((el) => el.getAttribute('src')),
+);
+check('portal: 4 capas SVG presentes', portalLayers.length === 4 && portalLayers.every((s) => s?.includes('/assets/portal/')), portalLayers.join(','));
+
+const portalState = () =>
+  page.evaluate(() => {
+    const overlay = document.querySelector('[data-portal-overlay]');
+    const ops = [...document.querySelectorAll('[data-portal-layer]')].map((l) => Number(getComputedStyle(l).opacity));
+    return { progress: overlay?.dataset.portalProgress ?? '0', maxOp: Math.max(...ops), visible: ops.some((o) => o > 0.05) };
+  });
+
+// ruta por scroll libre: mitad del scrub → portal visible; final → oculto; vuelta → visible
+await page.addInitScript(() => { try { history.scrollRestoration = 'manual'; } catch {} });
+await page.evaluate(() => { try { sessionStorage.clear(); } catch {} });
+await page.goto(BASE, { waitUntil: 'networkidle' });
+await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+await page.waitForTimeout(2600);
+await page.mouse.move(680, 400);
+for (let i = 0; i < 4; i++) { await page.mouse.wheel(0, 300); await page.waitForTimeout(200); }
+await page.waitForTimeout(1200);
+const portalMid = await portalState();
+check('portal: visible a mitad del recorrido por scroll', portalMid.visible && Number(portalMid.progress) > 0.05, JSON.stringify(portalMid));
+for (let i = 0; i < 8; i++) { await page.mouse.wheel(0, 600); await page.waitForTimeout(160); }
+await page.waitForTimeout(1400);
+const portalEnd = await portalState();
+check('portal: se disuelve al aterrizar en el mundo', !portalEnd.visible, JSON.stringify(portalEnd));
+await page.evaluate(() => window.scrollTo({ top: Math.round(window.innerHeight * 0.75), behavior: 'instant' }));
+await page.waitForTimeout(900);
+const portalBack = await portalState();
+check('portal: reversible — a mitad del scrub otra vez es visible', portalBack.visible && Number(portalBack.progress) > 0.05, JSON.stringify(portalBack));
+await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+await page.waitForTimeout(900);
+const portalTop = await portalState();
+check('portal: al volver al inicio (progreso 0) queda oculto', !portalTop.visible, JSON.stringify(portalTop));
+
+// ruta por botón: pulso durante la transición y oculto después
+await page.evaluate(() => document.querySelector('[data-act-back]')?.click());
+await page.waitForTimeout(2600);
+await click('[data-route-choice="enterprise"]');
+await page.waitForTimeout(900);
+const portalBtn = await portalState();
+check('portal: pulso visible durante transición por botón', portalBtn.visible, JSON.stringify(portalBtn));
+await page.waitForTimeout(2600);
+const portalBtnAfter = await portalState();
+check('portal: oculto tras aterrizar (ruta botón)', !portalBtnAfter.visible, JSON.stringify(portalBtnAfter));
+
 // --- cierre ---------------------------------------------------------------------
 await page.screenshot({ path: `${OUT}/13-cierre.png` });
 check('sin errores JS al final del recorrido', errors.length === 0, errors.slice(0, 2).join(' | '));

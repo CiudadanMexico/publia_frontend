@@ -1,6 +1,6 @@
 {
   "base": "https://kitty-midi-grid-liked.trycloudflare.com",
-  "total": 110,
+  "total": 117,
   "fallos": 0,
   "resultados": [
     {
@@ -31,12 +31,12 @@
     {
       "name": "prisma: la escena 3D se renderiza y cambia (animación real)",
       "ok": true,
-      "detail": "663943 vs 679472 bytes"
+      "detail": "666216 vs 679685 bytes"
     },
     {
       "name": "prisma: pinta una fracción útil del viewport",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.2027067901234568}"
+      "detail": "{\"paintedRatio\":0.2014783950617284}"
     },
     {
       "name": "hero 3D: lienzo único presente con WebGL activo",
@@ -66,12 +66,12 @@
     {
       "name": "hero 3D: pinta la escena (mascota, prisma, tarjetas)",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.2066875}"
+      "detail": "{\"paintedRatio\":0.205875}"
     },
     {
       "name": "hero 3D: la animación ambiental cambia entre fotogramas",
       "ok": true,
-      "detail": "689463 vs 683216 bytes"
+      "detail": "691828 vs 682499 bytes"
     },
     {
       "name": "marca: el encabezado usa el logotipo oficial",
@@ -96,7 +96,7 @@
     {
       "name": "transición enterprise: la cámara viaja a otro mundo del mismo universo",
       "ok": true,
-      "detail": "mundo hero→enterprise · cámara [0,2.4,11.6]→[2.0938225799151344,1.7403279674681753,8.164967096181048] · tinte #050b1b→#0a0e18"
+      "detail": "mundo hero→enterprise · cámara [0,2.4,11.6]→[1.8475258429985857,2.0178178161244698,9.20696293493635] · tinte #050b1b→#090e18"
     },
     {
       "name": "transición enterprise: el contenido de la escena destino aparece",
@@ -446,12 +446,12 @@
     {
       "name": "rendimiento: JS + CSS inicial (con el 3D del hero) por debajo de 260 kB",
       "ok": true,
-      "detail": "246 kB (JS 236 · CSS 10)"
+      "detail": "246 kB (JS 237 · CSS 10)"
     },
     {
       "name": "rendimiento: la aplicación sin 3D por debajo de 90 kB",
       "ok": true,
-      "detail": "66 kB de JS de aplicación"
+      "detail": "67 kB de JS de aplicación"
     },
     {
       "name": "rendimiento: el escenario 3D se carga sólo bajo demanda",
@@ -547,6 +547,41 @@
       "name": "v3 demo geonodos: nodo activo marcado",
       "ok": true,
       "detail": "1"
+    },
+    {
+      "name": "portal: 4 capas SVG presentes",
+      "ok": true,
+      "detail": "/assets/portal/01_umbral.svg,/assets/portal/02_marco_cristalino.svg,/assets/portal/03_fragmentos.svg,/assets/portal/04_energia_destellos.svg"
+    },
+    {
+      "name": "portal: visible a mitad del recorrido por scroll",
+      "ok": true,
+      "detail": "{\"progress\":\"0.889\",\"maxOp\":0.9,\"visible\":true}"
+    },
+    {
+      "name": "portal: se disuelve al aterrizar en el mundo",
+      "ok": true,
+      "detail": "{\"progress\":\"1.000\",\"maxOp\":0,\"visible\":false}"
+    },
+    {
+      "name": "portal: reversible — a mitad del scrub otra vez es visible",
+      "ok": true,
+      "detail": "{\"progress\":\"0.500\",\"maxOp\":1,\"visible\":true}"
+    },
+    {
+      "name": "portal: al volver al inicio (progreso 0) queda oculto",
+      "ok": true,
+      "detail": "{\"progress\":\"0.000\",\"maxOp\":0,\"visible\":false}"
+    },
+    {
+      "name": "portal: pulso visible durante transición por botón",
+      "ok": true,
+      "detail": "{\"progress\":\"0\",\"maxOp\":0.95,\"visible\":true}"
+    },
+    {
+      "name": "portal: oculto tras aterrizar (ruta botón)",
+      "ok": true,
+      "detail": "{\"progress\":\"0\",\"maxOp\":0,\"visible\":false}"
     },
     {
       "name": "sin errores JS al final del recorrido",

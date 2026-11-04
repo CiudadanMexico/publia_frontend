@@ -1,0 +1,33 @@
+---
+/**
+ * Portal prismático P0-01: 4 capas SVG transparentes superpuestas sobre el
+ * lienzo 3D durante la transición hero → mundo. Sin texto, logos ni botones;
+ * decorativo (aria-hidden). Las anima `src/lib/experience/portal.ts`.
+ */
+---
+
+<div class="portal-overlay" data-portal-overlay data-portal-progress="0" aria-hidden="true">
+  <img class="portal-overlay__layer" data-portal-layer="0" src="/assets/portal/01_umbral.svg" alt="" loading="eager" decoding="async" />
+  <img class="portal-overlay__layer" data-portal-layer="1" src="/assets/portal/02_marco_cristalino.svg" alt="" loading="eager" decoding="async" />
+  <img class="portal-overlay__layer" data-portal-layer="2" src="/assets/portal/03_fragmentos.svg" alt="" loading="eager" decoding="async" />
+  <img class="portal-overlay__layer" data-portal-layer="3" src="/assets/portal/04_energia_destellos.svg" alt="" loading="eager" decoding="async" />
+</div>
+
+<style>
+  .portal-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .portal-overlay__layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+</style>

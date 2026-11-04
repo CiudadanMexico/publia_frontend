@@ -97,6 +97,23 @@ export const SCENE_ASSETS: readonly AssetSlot[] = [
   },
 ];
 
+/**
+ * Recurso P0-01 «Portal de transformación»: 4 capas SVG 1400×900 (mismo
+ * viewBox, píxel a píxel) servidas desde /assets/portal/ y animadas como
+ * overlay durante la transición hero → mundo (ver `lib/experience/portal.ts`).
+ * No sustituye al prisma GLB aprobado.
+ */
+export const PORTAL_P0_01 = {
+  id: 'P0-01',
+  layers: [
+    { file: '/assets/portal/01_umbral.svg', orden: 0, animacion: 'zoom, brillo, entrada a mundo' },
+    { file: '/assets/portal/02_marco_cristalino.svg', orden: 1, animacion: 'escala, rotación suave, aperturas' },
+    { file: '/assets/portal/03_fragmentos.svg', orden: 2, animacion: 'parallax y dispersión' },
+    { file: '/assets/portal/04_energia_destellos.svg', orden: 3, animacion: 'glow, recorrido y ráfagas' },
+  ],
+  completo: '/assets/portal/00_portal_completo.svg',
+} as const;
+
 /** Devuelve el slot declarado para una escena, si existe. */
 export function assetSlotFor(sceneId: string): AssetSlot | undefined {
   return SCENE_ASSETS.find((slot) => slot.scenes.includes(sceneId));

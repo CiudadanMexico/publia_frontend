@@ -2,12 +2,15 @@
 /**
  * Capa del prisma: objeto 3D persistente que acompaña el recorrido.
  * Se monta una sola vez, detrás del contenido, y cambia de orientación y
- * paleta según la ruta y el avance del scroll.
+ * paleta según la ruta y el avance del scroll. Encima vive el portal
+ * prismático P0-01 (solo durante transiciones hero → mundo).
  */
+import PortalOverlay from './PortalOverlay.astro';
 ---
 
 <div class="prism-layer" aria-hidden="true">
   <canvas class="prism-layer__canvas" data-prism-canvas></canvas>
+  <PortalOverlay />
   <div class="prism-layer__fallback" data-prism-fallback>
     <svg viewBox="0 0 200 200" role="presentation" focusable="false">
       <defs>
