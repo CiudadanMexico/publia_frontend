@@ -1,0 +1,81 @@
+---
+/**
+ * Demo D3 — Ruta cooperativa: GeoNodos que comparten conocimiento.
+ * El scroll enciende las conexiones por pasos (vía data-geo-progress en el
+ * contenedor); al pulsar un nodo se muestra qué se comparte. Sin cifras
+ * inventadas de socios ni nodos (doc 02).
+ */
+import type { ResolvedScene } from '../../../lib/experience/graph';
+
+interface Props {
+  scene: ResolvedScene;
+}
+
+const { scene } = Astro.props;
+const nodes = [
+  { id: 'aprender', icon: '📚', label: 'Aprender juntos', detail: 'Manuales y cursos abiertos: cada comunidad adapta lo que necesita.' },
+  { id: 'construir', icon: '🛠️', label: 'Construir herramientas', detail: 'Código y diseños compartidos que cualquiera puede revisar y mejorar.' },
+  { id: 'compartir', icon: '🧩', label: 'Compartir capacidades', detail: 'Talleres, maquinaria y tiempo de gente conectado con quien lo necesita.' },
+  { id: 'cultivar', icon: '🌱', label: 'Cultivar y cuidar', detail: 'Conocimiento de producción local que circula entre quienes cultivan.' },
+  { id: 'decidir', icon: '🗳️', label: 'Decidir en común', detail: 'Las decisiones sobre recursos compartidos se toman en asamblea.' },
+];
+const links: Array<[number, number]> = [
+  [0, 1], [0, 2], [1, 2], [2, 3], [2, 4], [0, 4],
+];
+const POS: Record<string, [number, number]> = {
+  aprender: [110, 80],
+  construir: [410, 70],
+  compartir: [260, 170],
+  cultivar: [120, 270],
+  decidir: [420, 260],
+};
+---
+
+<div class="geo-demo" data-module="geoDemo" data-demo="geo" data-geo-progress="0">
+  <p class="geo-demo__hint" data-reveal>Un nodo comparte algo y la red lo conecta. Toca un nodo:</p>
+  <svg class="geo-demo__map" viewBox="0 0 520 340" role="group" aria-label="Mapa de GeoNodos conectados">
+    <g class="geo-demo__links" stroke="currentColor" stroke-width="2.5" fill="none">
+      {links.map(([a, b], i) => {
+        const pa = POS[nodes[a]!.id] ?? [260, 170];
+        const pb = POS[nodes[b]!.id] ?? [260, 170];
+        return <line class="geo-demo__link" data-geo-link={String(i)} x1={pa[0]} y1={pa[1]} x2={pb[0]} y2={pb[1]} />;
+      })}
+    </g>
+    {nodes.map((node) => {
+      const p = POS[node.id] ?? [260, 170];
+      return (
+        <g class="geo-demo__node" data-geo-node={node.id} data-geo-detail={node.detail} tabindex="0" role="button" aria-label={`${node.label}: ${node.detail}`}>
+          <circle class="geo-demo__halo" cx={p[0]} cy={p[1]} r="30" />
+          <circle class="geo-demo__core" cx={p[0]} cy={p[1]} r="22" />
+          <text class="geo-demo__icon" x={p[0]} y={p[1] + 7} text-anchor="middle" aria-hidden="true">{node.icon}</text>
+          <text class="geo-demo__label" x={p[0]} y={p[1] + 48} text-anchor="middle">{node.label}</text>
+        </g>
+      );
+    })}
+  </svg>
+  <p class="geo-demo__detail" data-geo-detail aria-live="polite">{nodes[2]?.detail}</p>
+</div>
+
+<style>
+  .geo-demo { display: grid; gap: 0.8rem; justify-items: center; text-align: center; }
+  .geo-demo__hint { margin: 0; font-weight: 800; color: var(--tone-muted, #bfe8d8); }
+  .geo-demo__map { width: min(100%, 560px); height: auto; color: rgba(141, 255, 192, 0.6); }
+  .geo-demo__link { stroke-dasharray: 6 8; opacity: 0.12; transition: opacity 0.4s, stroke 0.4s; }
+  .geo-demo[data-geo-progress='1'] .geo-demo__link,
+  .geo-demo[data-geo-progress='2'] .geo-demo__link,
+  .geo-demo[data-geo-progress='3'] .geo-demo__link { opacity: 0.85; stroke: var(--publia-green); }
+  .geo-demo[data-geo-progress='2'] .geo-demo__link[data-geo-link='3'],
+  .geo-demo[data-geo-progress='2'] .geo-demo__link[data-geo-link='4'],
+  .geo-demo[data-geo-progress='3'] .geo-demo__link { opacity: 0.9; }
+  .geo-demo__node { cursor: pointer; outline: none; }
+  .geo-demo__halo { fill: rgba(141, 255, 192, 0.12); transition: fill 0.3s; }
+  .geo-demo__core { fill: #0c614a; stroke: var(--publia-green); stroke-width: 2; transition: fill 0.3s, r 0.3s; }
+  .geo-demo__node:hover .geo-demo__core,
+  .geo-demo__node:focus-visible .geo-demo__core,
+  .geo-demo__node.is-active .geo-demo__core { fill: var(--publia-green); }
+  .geo-demo__node:hover .geo-demo__halo,
+  .geo-demo__node:focus-visible .geo-demo__halo { fill: rgba(141, 255, 192, 0.3); }
+  .geo-demo__icon { font-size: 20px; pointer-events: none; }
+  .geo-demo__label { fill: var(--tone-ink, #f4f7ff); font-size: 13px; font-weight: 700; }
+  .geo-demo__detail { margin: 0; max-width: 52ch; min-height: 3.2em; line-height: 1.5; }
+</style>

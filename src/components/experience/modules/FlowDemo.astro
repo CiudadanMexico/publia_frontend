@@ -1,0 +1,123 @@
+---
+/**
+ * Demo D3 — Ruta eficiencia: flujo simulado consulta → agente → persona →
+ * seguimiento. El visitante elige qué le quita más tiempo; un punto viaja
+ * por las etapas y el resultado cambia. Siempre se etiqueta como simulación
+ * conceptual (doc 02: no prometer ventas automáticas).
+ */
+import type { ResolvedScene } from '../../../lib/experience/graph';
+
+interface Props {
+  scene: ResolvedScene;
+}
+
+const { scene } = Astro.props;
+const focuses = [
+  { id: 'mensajes', icon: '💬', label: 'Responder mensajes', result: 'La consulta se ordena, el agente prepara una respuesta y una persona la revisa antes de enviarla.' },
+  { id: 'marketing', icon: '🎬', label: 'Crear contenido', result: 'El agente propone borradores a partir de lo que ya publicaste; tú eliges qué se difunde.' },
+  { id: 'ventas', icon: '🛒', label: 'Vender y cobrar', result: 'Los pedidos se registran solos y llegan a tu bandeja con prioridad clara; tú confirmas cada venta.' },
+  { id: 'operacion', icon: '📋', label: 'Organizar pedidos', result: 'Cada pedido entra a un tablero con estado visible y recordatorios automáticos.' },
+  { id: 'explorando', icon: '🧩', label: 'Estoy empezando', result: 'Empezamos por lo esencial: presencia digital y respuestas automáticas básicas, sin prometer resultados.' },
+];
+const stages = [
+  { icon: '📩', label: 'Llega una consulta' },
+  { icon: '🤖', label: 'El agente la ordena' },
+  { icon: '🧑', label: 'Participa una persona' },
+  { icon: '✅', label: 'Queda seguimiento' },
+];
+---
+
+<div class="flow-demo" data-module="flowDemo" data-demo="flow">
+  <p class="flow-demo__hint" data-reveal>¿Qué te quita más tiempo hoy?</p>
+  <div class="flow-demo__chips" role="group" aria-label="¿Qué te quita más tiempo hoy?">
+    {
+      focuses.map((f, i) => (
+        <button
+          type="button"
+          class="flow-demo__chip"
+          data-flow-focus={f.id}
+          data-flow-result={f.result}
+          aria-pressed={i === 0 ? 'true' : 'false'}
+        >
+          <span aria-hidden="true">{f.icon}</span> {f.label}
+        </button>
+      ))
+    }
+  </div>
+  <ol class="flow-demo__pipeline" data-flow-pipeline aria-label="Flujo de atención simulado">
+    {stages.map((st, i) => (
+      <li class="flow-demo__stage" data-flow-stage={String(i)}>
+        <span class="flow-demo__stage-icon" aria-hidden="true">{st.icon}</span>
+        <span class="flow-demo__stage-label">{st.label}</span>
+        {i < stages.length - 1 && <span class="flow-demo__arrow" aria-hidden="true">→</span>}
+      </li>
+    ))}
+    <span class="flow-demo__dot" data-flow-dot aria-hidden="true" />
+  </ol>
+  <p class="flow-demo__result" data-flow-result aria-live="polite">{focuses[0]?.result}</p>
+  <p class="flow-demo__note">Una simulación conceptual, no una promesa de ventas automáticas.</p>
+</div>
+
+<style>
+  .flow-demo { display: grid; gap: 1rem; justify-items: start; }
+  .flow-demo__hint { font-weight: 800; margin: 0; font-size: 1.1rem; }
+  .flow-demo__chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .flow-demo__chip {
+    border: 1px solid var(--tone-border, rgba(255, 255, 255, 0.25));
+    background: rgba(8, 27, 58, 0.55);
+    color: inherit;
+    border-radius: 999px;
+    padding: 0.5rem 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.2s;
+  }
+  .flow-demo__chip:hover { transform: translateY(-2px); }
+  .flow-demo__chip[aria-pressed='true'] { background: var(--publia-yellow); color: #03254f; border-color: transparent; }
+  .flow-demo__pipeline {
+    position: relative;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 0.6rem;
+    margin: 0;
+    padding: 0;
+  }
+  .flow-demo__stage {
+    position: relative;
+    display: grid;
+    place-items: center;
+    gap: 0.3rem;
+    min-width: 120px;
+    padding: 0.8rem 0.9rem;
+    background: rgba(8, 27, 58, 0.9);
+    border: 1px solid rgba(108, 250, 255, 0.45);
+    border-radius: 1rem;
+    text-align: center;
+    transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+  }
+  .flow-demo__stage-icon { font-size: 1.6rem; }
+  .flow-demo__stage-label { font-size: 0.78rem; font-weight: 700; }
+  .flow-demo__stage.is-active {
+    border-color: var(--publia-yellow);
+    box-shadow: 0 0 24px rgba(255, 205, 37, 0.35);
+    transform: translateY(-4px);
+  }
+  .flow-demo__arrow { position: absolute; right: -0.85rem; top: 50%; translate: 0 -50%; color: var(--publia-yellow); font-weight: 900; z-index: 1; }
+  .flow-demo__dot {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--publia-yellow);
+    box-shadow: 0 0 14px var(--publia-yellow);
+    left: 0;
+    top: 50%;
+    translate: 0 -50%;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .flow-demo__result { margin: 0; max-width: 52ch; font-size: 1.05rem; line-height: 1.5; min-height: 3.2em; }
+  .flow-demo__note { margin: 0; font-size: 0.8rem; opacity: 0.85; border-left: 3px solid var(--publia-yellow); padding-left: 0.6rem; }
+</style>

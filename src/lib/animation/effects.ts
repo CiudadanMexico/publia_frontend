@@ -22,23 +22,31 @@ export interface EffectsOptions {
   onGlobalProgress?: (progress: number) => void;
 }
 
-/** Envuelve cada palabra en una máscara para el revelado tipográfico. */
+/** Envuelve cada palabra en una máscara; conserva elementos inline (p. ej. <em> de acento). */
 function splitWords(element: HTMLElement): HTMLElement[] {
-  const words = element.textContent?.split(/\s+/).filter(Boolean) ?? [];
-  element.textContent = '';
+  const children = [...element.childNodes];
   const masks: HTMLElement[] = [];
-  words.forEach((word, index) => {
+  element.textContent = '';
+  let needSpace = false;
+  const appendUnit = (content: Node | string, isElement: boolean): void => {
+    if (needSpace) element.appendChild(document.createTextNode(' '));
     const mask = document.createElement('span');
     mask.className = 'mask-line';
     const inner = document.createElement('span');
     inner.className = 'mask-line__inner';
-    inner.textContent = word;
+    if (isElement) inner.appendChild(content as Node);
+    else inner.textContent = String(content);
     mask.appendChild(inner);
     element.appendChild(mask);
-    if (index < words.length - 1) {
-      element.appendChild(document.createTextNode(' '));
-    }
     masks.push(mask);
+    needSpace = true;
+  };
+  children.forEach((node) => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      (node.textContent ?? '').split(/\s+/).filter(Boolean).forEach((word) => appendUnit(word, false));
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+      appendUnit(node, true);
+    }
   });
   return masks;
 }

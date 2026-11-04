@@ -1,0 +1,137 @@
+---
+/**
+ * Arte protagonista de una escena (dirección de arte v3).
+ *
+ * Mientras llegan los assets A01–A10 (producidos en paralelo) se muestra un
+ * placeholder procedural de calidad (gradientes/SVG, sin texto ni botones).
+ * Cuando exista `public/assets/scenes/...` basta con marcar data-asset-ready
+ * y la imagen real cubre al placeholder sin tocar este componente.
+ */
+import { existsSync } from 'node:fs';
+import { assetSlotFor } from '../../data/sceneAssets';
+
+interface Props {
+  sceneId: string;
+}
+
+const { sceneId } = Astro.props;
+const slot = assetSlotFor(sceneId);
+const slotId = slot?.id ?? 'A00';
+// Si el asset real ya está en public/, se sirve directamente (build-time);
+// si no, queda el placeholder procedural sin pedir nada por red.
+const assetReady = slot ? existsSync(`public${slot.desktop}`) : false;
+---
+
+<div class="scene__art" data-art-slot={slotId} data-scene-art={sceneId} data-asset-ready={assetReady ? 'true' : 'false'}>
+  <div class={`art-placeholder art-${slotId}`} aria-hidden="true">
+    {slotId === 'A01' && (
+      <div class="art-tunnel">
+        <span class="art-tunnel__ring r1" /><span class="art-tunnel__ring r2" />
+        <span class="art-tunnel__ring r3" /><span class="art-tunnel__ring r4" />
+        <span class="art-tunnel__core" />
+      </div>
+    )}
+    {slotId === 'A02' && (
+      <div class="art-galaxy">
+        <span class="art-orb o1" /><span class="art-orb o2" /><span class="art-orb o3" />
+        <span class="art-orb o4" /><span class="art-orb o5" /><span class="art-orb o6" />
+        <span class="art-orb core">P</span>
+      </div>
+    )}
+    {slotId === 'A03' && (
+      <div class="art-flow">
+        <span class="art-flow__node n1">💬</span><i class="art-flow__link" />
+        <span class="art-flow__node n2">🤖</span><i class="art-flow__link" />
+        <span class="art-flow__node n3">🧑</span><i class="art-flow__link" />
+        <span class="art-flow__node n4">✅</span>
+      </div>
+    )}
+    {slotId === 'A04' && (
+      <div class="art-rack">
+        <span class="art-rack__unit u1" /><span class="art-rack__unit u2" />
+        <span class="art-rack__unit u3" /><span class="art-rack__unit u4" />
+        <span class="art-rack__beam" />
+      </div>
+    )}
+    {slotId === 'A05' && (
+      <div class="art-geonodes">
+        <svg viewBox="0 0 400 260" preserveAspectRatio="xMidYMid meet">
+          <g stroke="rgba(141,255,192,.55)" stroke-width="2" fill="none">
+            <path d="M200 130 L90 60" /><path d="M200 130 L310 70" />
+            <path d="M200 130 L80 190" /><path d="M200 130 L320 200" />
+            <path d="M90 60 L310 70" /><path d="M80 190 L320 200" />
+          </g>
+          <g fill="#8dffc0">
+            <circle cx="200" cy="130" r="14" /><circle cx="90" cy="60" r="10" />
+            <circle cx="310" cy="70" r="10" /><circle cx="80" cy="190" r="10" />
+            <circle cx="320" cy="200" r="10" />
+          </g>
+          <g fill="#042724" font-size="13" text-anchor="middle" font-weight="700">
+            <text x="200" y="135">P</text><text x="90" y="64">📚</text>
+            <text x="310" y="74">🛠️</text><text x="80" y="194">🌱</text><text x="320" y="204">🧩</text>
+          </g>
+        </svg>
+      </div>
+    )}
+    {(slotId === 'A06' || slotId === 'A08' || slotId === 'A09' || slotId === 'A00') && (
+      <div class="art-generic">
+        <span class="art-generic__tile t1" /><span class="art-generic__tile t2" />
+        <span class="art-generic__tile t3" />
+      </div>
+    )}
+  </div>
+  {slot && (
+    <img
+      data-asset-img
+      src={assetReady ? slot.desktop : undefined}
+      data-asset-src={slot.desktop}
+      alt={slot.alt}
+      loading={slot.preload ? 'eager' : 'lazy'}
+      decoding="async"
+    />
+  )}
+  <span class="art-slot-tag">arte {slotId} · placeholder</span>
+</div>
+
+<style>
+  .art-placeholder { position: absolute; inset: 0; }
+  /* A01 — túnel prismático */
+  .art-tunnel { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 55%, #1d5fbf 0%, #0a2a66 45%, #020817 100%); overflow: hidden; }
+  .art-tunnel__ring { position: absolute; left: 50%; top: 55%; translate: -50% -50%; border: 2px solid rgba(98,234,255,.5); border-radius: 50%; }
+  .art-tunnel__ring.r1 { width: 34%; aspect-ratio: 1; box-shadow: 0 0 30px rgba(98,234,255,.35) inset; }
+  .art-tunnel__ring.r2 { width: 52%; aspect-ratio: 1; border-color: rgba(255,205,37,.55); }
+  .art-tunnel__ring.r3 { width: 72%; aspect-ratio: 1; border-color: rgba(98,234,255,.35); }
+  .art-tunnel__ring.r4 { width: 94%; aspect-ratio: 1; border-color: rgba(255,205,37,.3); }
+  .art-tunnel__core { position: absolute; left: 50%; top: 55%; translate: -50% -50%; width: 16%; aspect-ratio: 1; background: linear-gradient(140deg, #62eaff, #ffcd25 60%, #965dff); border-radius: 24% 76% 70% 30% / 40% 40% 60% 60%; box-shadow: 0 0 60px rgba(98,234,255,.8); }
+  /* A02 — galaxia de soluciones */
+  .art-galaxy { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 45%, #2c1a7a 0%, #090b25 70%); }
+  .art-orb { position: absolute; border-radius: 50%; background: linear-gradient(140deg, #168de8, #62eaff); box-shadow: 0 8px 24px rgba(0,0,0,.4); }
+  .art-orb.o1 { width: 13%; aspect-ratio: 1; left: 12%; top: 18%; background: linear-gradient(140deg,#ffcd25,#ff9f1c); }
+  .art-orb.o2 { width: 9%; aspect-ratio: 1; left: 70%; top: 14%; }
+  .art-orb.o3 { width: 11%; aspect-ratio: 1; left: 22%; top: 62%; background: linear-gradient(140deg,#965dff,#62eaff); }
+  .art-orb.o4 { width: 8%; aspect-ratio: 1; left: 78%; top: 58%; background: linear-gradient(140deg,#54e5a4,#0c614a); }
+  .art-orb.o5 { width: 10%; aspect-ratio: 1; left: 46%; top: 76%; background: linear-gradient(140deg,#ff4d60,#965dff); }
+  .art-orb.o6 { width: 7%; aspect-ratio: 1; left: 55%; top: 10%; }
+  .art-orb.core { width: 22%; aspect-ratio: 1; left: 39%; top: 34%; display: grid; place-items: center; background: linear-gradient(140deg,#ffdf26,#ffcd25); color: #0d57a9; font-weight: 900; font-size: clamp(2rem, 5vw, 4rem); box-shadow: 0 0 50px rgba(255,205,37,.6); }
+  /* A03 — flujo automatización */
+  .art-flow { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 1.2vw; background: linear-gradient(160deg,#03254f,#0951b4 70%,#2a77d7); transform: rotate(-4deg) scale(1.06); }
+  .art-flow__node { width: clamp(44px, 7vw, 84px); aspect-ratio: 1; display: grid; place-items: center; font-size: clamp(1.4rem, 3vw, 2.4rem); background: #081b3ae8; border: 1px solid rgba(108,250,255,.55); border-radius: 18px; box-shadow: 0 14px 30px rgba(0,0,0,.45); }
+  .art-flow__link { width: clamp(14px, 2.4vw, 34px); height: 3px; background: var(--publia-yellow); }
+  /* A04 — rack */
+  .art-rack { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 20%, #12306b 0%, #020910 70%); display: grid; place-items: center; }
+  .art-rack { width: 100%; }
+  .art-rack { position: absolute; inset: 0; }
+  .art-rack__unit { position: absolute; left: 50%; translate: -50%; width: 46%; height: 12%; background: linear-gradient(180deg,#1c3a6e,#0d1a31); border: 1px solid rgba(98,234,255,.4); border-radius: 6px; }
+  .art-rack__unit::after { content: ''; position: absolute; right: 8%; top: 30%; width: 8%; height: 40%; border-radius: 50%; background: #62eaff; box-shadow: 0 0 12px #62eaff; }
+  .art-rack__unit.u1 { top: 18%; } .art-rack__unit.u2 { top: 36%; } .art-rack__unit.u3 { top: 54%; } .art-rack__unit.u4 { top: 72%; }
+  .art-rack__beam { position: absolute; left: 50%; top: 12%; translate: -50%; width: 58%; height: 2px; background: linear-gradient(90deg, transparent, #ffe057, transparent); }
+  /* A05 — geonodos */
+  .art-geonodes { position: absolute; inset: 0; background: linear-gradient(130deg,#042724,#0c614a 62%,#03151b); display: grid; place-items: center; }
+  .art-geonodes svg { width: 86%; height: auto; }
+  /* genérico */
+  .art-generic { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.02)); }
+  .art-generic__tile { position: absolute; border-radius: 1rem; background: linear-gradient(140deg, var(--publia-blue), var(--publia-cyan)); opacity: .8; }
+  .art-generic__tile.t1 { width: 34%; aspect-ratio: 1; left: 10%; top: 16%; rotate: -8deg; }
+  .art-generic__tile.t2 { width: 26%; aspect-ratio: 1; right: 14%; top: 30%; rotate: 10deg; background: linear-gradient(140deg, var(--publia-yellow), var(--publia-coral)); }
+  .art-generic__tile.t3 { width: 20%; aspect-ratio: 1; left: 38%; bottom: 12%; rotate: 4deg; background: linear-gradient(140deg, var(--publia-violet), var(--publia-blue)); }
+</style>

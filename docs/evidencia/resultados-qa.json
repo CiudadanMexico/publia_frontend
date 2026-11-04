@@ -1,6 +1,6 @@
 {
   "base": "https://kitty-midi-grid-liked.trycloudflare.com",
-  "total": 93,
+  "total": 110,
   "fallos": 0,
   "resultados": [
     {
@@ -31,12 +31,12 @@
     {
       "name": "prisma: la escena 3D se renderiza y cambia (animación real)",
       "ok": true,
-      "detail": "662889 vs 677737 bytes"
+      "detail": "663943 vs 679472 bytes"
     },
     {
       "name": "prisma: pinta una fracción útil del viewport",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.20326234567901236}"
+      "detail": "{\"paintedRatio\":0.2027067901234568}"
     },
     {
       "name": "hero 3D: lienzo único presente con WebGL activo",
@@ -66,12 +66,12 @@
     {
       "name": "hero 3D: pinta la escena (mascota, prisma, tarjetas)",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.205625}"
+      "detail": "{\"paintedRatio\":0.2066875}"
     },
     {
       "name": "hero 3D: la animación ambiental cambia entre fotogramas",
       "ok": true,
-      "detail": "689540 vs 684263 bytes"
+      "detail": "689463 vs 683216 bytes"
     },
     {
       "name": "marca: el encabezado usa el logotipo oficial",
@@ -96,12 +96,12 @@
     {
       "name": "transición enterprise: la cámara viaja a otro mundo del mismo universo",
       "ok": true,
-      "detail": "mundo hero→enterprise · cámara [0,2.4,11.6]→[1.781998,1.743474,8.598739] · tinte #050b1b→#0a0e18"
+      "detail": "mundo hero→enterprise · cámara [0,2.4,11.6]→[2.0938225799151344,1.7403279674681753,8.164967096181048] · tinte #050b1b→#0a0e18"
     },
     {
       "name": "transición enterprise: el contenido de la escena destino aparece",
       "ok": true,
-      "detail": "scrollY 2344 · act=enterprise"
+      "detail": "scrollY 3262 · act=enterprise"
     },
     {
       "name": "transición enterprise: volver regresa al hero sin recargar",
@@ -111,12 +111,12 @@
     {
       "name": "transición efficiency: la cámara viaja a otro mundo del mismo universo",
       "ok": true,
-      "detail": "mundo hero→efficiency · cámara [0,2.4,11.6]→[-2.1,1.9,8.8] · tinte #050b1b→#0d0a05"
+      "detail": "mundo hero→efficiency · cámara [0,2.4,11.6]→[-2.7314410480349345,1.9375545851528384,8.893886462882097] · tinte #050b1b→#0d0a05"
     },
     {
       "name": "transición efficiency: el contenido de la escena destino aparece",
       "ok": true,
-      "detail": "scrollY 5653 · act=efficiency"
+      "detail": "scrollY 6979 · act=efficiency"
     },
     {
       "name": "transición efficiency: volver regresa al hero sin recargar",
@@ -126,7 +126,7 @@
     {
       "name": "transición cooperative: la cámara viaja a otro mundo del mismo universo",
       "ok": true,
-      "detail": "mundo hero→cooperative · cámara [0,2.4,11.6]→[-0.016666666666666673,1.9086643333333333,9.401456] · tinte #050b1b→#060d08"
+      "detail": "mundo hero→cooperative · cámara [0,2.4,11.6]→[-0.016666666666666673,1.8712555742092456,9.348779600973236] · tinte #050b1b→#060d08"
     },
     {
       "name": "transición cooperative: el contenido de la escena destino aparece",
@@ -156,7 +156,7 @@
     {
       "name": "P0: el scroll conduce la cámara (scrub) hacia el mundo cooperativo",
       "ok": true,
-      "detail": "world=cooperative · cámara=[-0.016666666666666673,1.9083333333333332,9.4] · scrollY=1400"
+      "detail": "world=cooperative · cámara=[-0.016666666666666673,2.413225934765314,9.949880668257757] · scrollY=1400"
     },
     {
       "name": "P0: tras elegir empresa, el scroll NO cambia a exploración",
@@ -246,12 +246,12 @@
     {
       "name": "ruta empresa: escena propia visible",
       "ok": true,
-      "detail": "653px"
+      "detail": "918px"
     },
     {
       "name": "ruta empresa: contenido de la escena",
       "ok": true,
-      "detail": "Ya tienes mucho construido. El riesgo no es empezar: es que nada se conecte."
+      "detail": "TU INFRAESTRUCTURA. TUS REGLAS."
     },
     {
       "name": "variante compartida: la ruta empresa reescribe la escena común",
@@ -261,12 +261,12 @@
     {
       "name": "ruta eficiencia: escena propia visible",
       "ok": true,
-      "detail": "653px · route=efficiency act=efficiency world=efficiency scrollY=5653"
+      "detail": "973px · route=efficiency act=efficiency world=efficiency scrollY=6979"
     },
     {
       "name": "ruta eficiencia: mensaje propio de la escena",
       "ok": true,
-      "detail": "Hacer más con menos no es trabajar más rápido. Es dejar de repetirte."
+      "detail": "MENOS TAREAS REPETIDAS. MÁS TIEMPO PARA CRECER."
     },
     {
       "name": "variante compartida: la ruta eficiencia reescribe la escena común",
@@ -291,7 +291,7 @@
     {
       "name": "ruta exploración: escena visible",
       "ok": true,
-      "detail": "594px"
+      "detail": "599px"
     },
     {
       "name": "ruta exploración: dos bifurcaciones",
@@ -311,7 +311,7 @@
     {
       "name": "bifurcación: abre la escena cooperativa",
       "ok": true,
-      "detail": "544px"
+      "detail": "864px"
     },
     {
       "name": "variante por rasgo: el rasgo reescribe la escena compartida",
@@ -446,12 +446,12 @@
     {
       "name": "rendimiento: JS + CSS inicial (con el 3D del hero) por debajo de 260 kB",
       "ok": true,
-      "detail": "240 kB (JS 233 · CSS 7)"
+      "detail": "246 kB (JS 236 · CSS 10)"
     },
     {
       "name": "rendimiento: la aplicación sin 3D por debajo de 90 kB",
       "ok": true,
-      "detail": "64 kB de JS de aplicación"
+      "detail": "66 kB de JS de aplicación"
     },
     {
       "name": "rendimiento: el escenario 3D se carga sólo bajo demanda",
@@ -462,6 +462,91 @@
       "name": "movimiento reducido: contenido visible y sin animación",
       "ok": true,
       "detail": "{\"layerReady\":true,\"reveals\":true,\"heroVisible\":true}"
+    },
+    {
+      "name": "v3: >=5 composiciones distintas",
+      "ok": true,
+      "detail": "7"
+    },
+    {
+      "name": "v3: >=4 atmósferas de fondo distintas",
+      "ok": true,
+      "detail": "8"
+    },
+    {
+      "name": "v3: acentos amarillos en titulares (em)",
+      "ok": true,
+      "detail": "6 em"
+    },
+    {
+      "name": "v3: slots de arte A01-A05 preparados",
+      "ok": true,
+      "detail": "A01,A01,A04,A04,A03,A03,A03,A03,A05,A05,A05,A04,A08,A02,A06,A09"
+    },
+    {
+      "name": "v3: eyebrows con emoji semántico",
+      "ok": true,
+      "detail": "9 eyebrows"
+    },
+    {
+      "name": "v3: escena clara con tinta oscura (contraste real)",
+      "ok": true,
+      "detail": "{\"color\":\"rgb(9, 25, 51)\",\"bg\":\"rgba(0, 0, 0, 0)\"}"
+    },
+    {
+      "name": "v3 scroll: la cámara se transforma en 30/60/90% (ida)",
+      "ok": true,
+      "detail": "30=[1.9,1.6709270620313565,8.320313565098841] 60=[1.7797047970479705,1.5915129151291512,8.12878228782288] 90=[1.9,1.7008467400508043,8.468077900084674]"
+    },
+    {
+      "name": "v3 scroll: recorrido inverso restaura transformación (reversible)",
+      "ok": true,
+      "detail": "90=[1.9,1.7008467400508043,8.468077900084674] vuelta60=[1.7797047970479705,1.5915129151291512,8.12878228782288]"
+    },
+    {
+      "name": "v3 demo empresa: la capa cambia el texto",
+      "ok": true,
+      "detail": "Agentes conectados a tareas concretas y supervisables: clasi"
+    },
+    {
+      "name": "v3 demo empresa: la capa mueve la cámara 3D",
+      "ok": true,
+      "detail": "[2.140642303433001,1.7277408637873752,8.101771871539313] -> [2.45,1.5,7.95]"
+    },
+    {
+      "name": "v3 demo empresa: estado accesible aria-pressed",
+      "ok": true,
+      "detail": "true"
+    },
+    {
+      "name": "v3 demo eficiencia: resultado según foco",
+      "ok": true,
+      "detail": "Los pedidos se registran solos y llegan a tu bandeja con pri"
+    },
+    {
+      "name": "v3 demo eficiencia: respuesta guardada (foco=ventas)",
+      "ok": true,
+      "detail": "ventas"
+    },
+    {
+      "name": "v3 demo eficiencia: el flujo se ilumina por etapas",
+      "ok": true,
+      "detail": "3 etapas"
+    },
+    {
+      "name": "v3 demo geonodos: el nodo explica qué se comparte",
+      "ok": true,
+      "detail": "Manuales y cursos abiertos: cada comunidad adapta lo que nec"
+    },
+    {
+      "name": "v3 demo geonodos: scroll enciende conexiones (progreso)",
+      "ok": true,
+      "detail": "progreso=2"
+    },
+    {
+      "name": "v3 demo geonodos: nodo activo marcado",
+      "ok": true,
+      "detail": "1"
     },
     {
       "name": "sin errores JS al final del recorrido",

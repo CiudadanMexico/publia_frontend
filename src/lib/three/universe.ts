@@ -42,6 +42,22 @@ export interface UniverseOptions {
   reducedMotion?: boolean;
 }
 
+/** Modulación continua de la escena activa (conduce ScrollTrigger por scrub). */
+export interface SceneLook {
+  camX: number;
+  camY: number;
+  camZ: number;
+  /** Matiz hacia el que se desplaza el fondo (mezcla 0-1). */
+  tint: THREE.Color;
+  tintMix: number;
+  /** Refuerzo de la red de nodos (0-1). */
+  network: number;
+  /** Apertura extra del prisma/estelas. */
+  spread: number;
+  /** Multiplicador de la luz clave. */
+  lightBoost: number;
+}
+
 export interface TravelOptions {
   duration?: number;
   onComplete?: () => void;
@@ -61,6 +77,8 @@ export interface UniverseHandle {
   world(): UniverseWorld;
   /** Modulación por escena (progreso 0-1 dentro de la escena activa). */
   setSceneProgress(progress: number): void;
+  /** Modulación continua de la escena visible (camera/tinte/red/luz). */
+  setSceneLook(look: Partial<SceneLook> & { tintHex?: number }): void;
   setPointer(x: number, y: number): void;
   /** Pausa el render cuando el lienzo no se usa. */
   setActive(active: boolean): void;
@@ -561,6 +579,17 @@ export async function createUniverse({
   let paused = reducedMotion;
   let elapsed = 0;
   let scrollProgress = 0;
+  const sceneLook: SceneLook = {
+    camX: 0,
+    camY: 0,
+    camZ: 0,
+    tint: new THREE.Color(0x020817),
+    tintMix: 0,
+    network: 0,
+    spread: 0,
+    lightBoost: 1,
+  };
+  const tmpTint = new THREE.Color();
   let travel: gsap.core.Timeline | null = null;
   let scrollTriggerTravel: ScrollTrigger | null = null;
   const gestureOffset = { x: 0, y: 0, rz: 0 };
@@ -582,7 +611,11 @@ export async function createUniverse({
   });
 
   const applyCurrent = (): void => {
-    camera.position.set(current.camera.x, current.camera.y, current.camera.z);
+    camera.position.set(
+      current.camera.x + sceneLook.camX,
+      current.camera.y + sceneLook.camY,
+      current.camera.z + sceneLook.camZ,
+    );
     lookTarget.set(current.target.x, current.target.y, current.target.z);
     camera.lookAt(lookTarget);
 
@@ -590,30 +623,31 @@ export async function createUniverse({
     rig.position.y = current.rig.y;
     rig.scale.setScalar(current.rig.scale);
 
-    hemi.intensity = current.lights.hemi;
-    key.intensity = current.lights.key;
+    hemi.intensity = current.lights.hemi * sceneLook.lightBoost;
+    key.intensity = current.lights.key * sceneLook.lightBoost;
     key.color.copy(current.lights.keyColor);
     rim.intensity = current.lights.rim;
     rim.color.copy(current.lights.rimColor);
     amber.intensity = current.lights.amber;
     amber.color.copy(current.lights.amberColor);
 
-    scene.background = current.background;
+    scene.background = tmpTint.copy(new THREE.Color(current.background)).lerp(sceneLook.tint, sceneLook.tintMix);
     if ('fog' in scene) {
       // sin niebla densa: el fondo espacial ya da profundidad
     }
 
-    nodeMaterial.opacity = current.network * 0.95;
-    linkMaterial.opacity = current.network * 0.35;
-    pulseMaterial.opacity = current.network * 0.85;
-    nodeGroup.visible = current.network > 0.01;
+    const network = Math.max(current.network, sceneLook.network);
+    nodeMaterial.opacity = network * 0.95;
+    linkMaterial.opacity = network * 0.35;
+    pulseMaterial.opacity = network * 0.85;
+    nodeGroup.visible = network > 0.01;
 
     // La modulación por escena no toca el hero: su composición está aprobada.
-    const sceneBoost = current.world === 'hero' ? 0 : sceneProgress;
+    const sceneBoost = current.world === 'hero' ? 0 : sceneProgress + sceneLook.spread;
     platform.state.expansion = current.platform.expansion + sceneBoost * 0.12;
     platform.state.intensity = current.platform.intensity;
     trails.configurar({
-      expandir: current.prism.spread + sceneBoost * 0.2,
+      expandir: current.prism.spread + sceneBoost * 0.2 + sceneLook.spread * 0.5,
       intensidad: 1.15,
     });
     particles.state.intensity = current.particles.intensity;
@@ -627,7 +661,7 @@ export async function createUniverse({
     if (!paused && !reducedMotion) elapsed += dt;
     const t = elapsed;
     const sceneBoost = current.world === 'hero' ? 0 : sceneProgress;
-    const spread = current.prism.spread + sceneBoost * 0.25;
+    const spread = current.prism.spread + sceneBoost * 0.25 + sceneLook.spread;
 
     if (mascot) {
       mascot.rotation.y = 0.13 * Math.sin(t * 0.5) + spread * 0.65;
@@ -756,6 +790,26 @@ export async function createUniverse({
     frame();
   }
 
+  const setSceneLook = (look: Partial<SceneLook> & { tintHex?: number }): void => {
+    if (typeof look.tintHex === 'number') sceneLook.tint.set(look.tintHex);
+    // La composición del hero está aprobada: ahí la modulación es neutra.
+    if (current.world === 'hero') {
+      sceneLook.camX = 0; sceneLook.camY = 0; sceneLook.camZ = 0;
+      sceneLook.tintMix = 0; sceneLook.network = 0; sceneLook.spread = 0; sceneLook.lightBoost = 1;
+      if (reducedMotion) frame();
+      return;
+    }
+    if (typeof look.camX === 'number') sceneLook.camX = look.camX;
+    if (typeof look.camY === 'number') sceneLook.camY = look.camY;
+    if (typeof look.camZ === 'number') sceneLook.camZ = look.camZ;
+    if (look.tint) sceneLook.tint.copy(look.tint);
+    if (typeof look.tintMix === 'number') sceneLook.tintMix = look.tintMix;
+    if (typeof look.network === 'number') sceneLook.network = look.network;
+    if (typeof look.spread === 'number') sceneLook.spread = look.spread;
+    if (typeof look.lightBoost === 'number') sceneLook.lightBoost = look.lightBoost;
+    if (reducedMotion) frame();
+  };
+
   return {
     travelTo(world, options = {}) {
       const duration = options.duration ?? (reducedMotion ? 0 : 1.9);
@@ -842,6 +896,7 @@ export async function createUniverse({
       sceneProgress = Math.min(1, Math.max(0, progress));
       if (reducedMotion) frame();
     },
+    setSceneLook,
     setPointer(x: number, y: number): void {
       pointer.set(
         Math.min(1, Math.max(-1, x)),

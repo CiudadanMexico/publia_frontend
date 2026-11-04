@@ -11,6 +11,7 @@
  */
 
 import { gsap } from 'gsap';
+import { lookForScene } from '../lib/experience/sceneLooks';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 import {
@@ -19,12 +20,14 @@ import {
   getState,
   markSceneVisited,
   resetExperience,
+  setAnswer,
   setPrimaryRoute,
   subscribe,
 } from '../lib/experience/state';
 import { initAnalytics, track } from '../lib/experience/events';
 import { initEffects } from '../lib/animation/effects';
 import { pickVariantFrom, visitorSegments } from '../lib/experience/graph';
+import { accentify } from '../lib/experience/accent';
 import { createNarrative } from '../lib/experience/narrative';
 import type { NarrativeHandle } from '../lib/experience/narrative';
 import { buildMailto } from '../data/site';
@@ -105,7 +108,7 @@ function applySceneVariants(state: VisitorState): void {
       }
       const target = section.querySelector<HTMLElement>(`[data-role="${role}"]`);
       if (target && target.textContent?.trim() !== value) {
-        target.textContent = value;
+        target.innerHTML = accentify(value);
       }
     };
     write('eyebrow', variant.eyebrow);
@@ -165,6 +168,7 @@ interface UniverseHandleLike {
   gesture: () => void;
   world: () => 'hero' | 'enterprise' | 'efficiency' | 'cooperative' | 'diagnosis';
   setSceneProgress: (progress: number) => void;
+  setSceneLook: (look: Record<string, unknown>) => void;
   setPointer: (x: number, y: number) => void;
   setActive: (active: boolean) => void;
   setPaused: (paused: boolean) => void;
@@ -272,6 +276,120 @@ function bindFreeScrollIntent(narrative: NarrativeHandle | null): void {
 }
 
 /** Las ocho tarjetas del hero responden a hover, foco y tap (nivel 2). */
+/**
+ * Demos interactivas D3: cada decisión cambia el contenido Y el entorno 3D.
+ */
+function bindDemos(universe: UniverseHandleLike | null): void {
+  // Empresa — capas de infraestructura
+  document.querySelectorAll<HTMLButtonElement>('[data-infra-layer]').forEach((chip) => {
+    chip.addEventListener('click', () => {
+      const wrap = chip.closest('[data-demo="infra"]');
+      wrap?.querySelectorAll('[data-infra-layer]').forEach((c) => c.setAttribute('aria-pressed', 'false'));
+      chip.setAttribute('aria-pressed', 'true');
+      const detail = wrap?.querySelector('[data-infra-detail]');
+      const text = chip.dataset['infraDetail'] ?? chip.textContent ?? '';
+      const texts: Record<string, string> = {
+        datos: 'Tus sistemas actuales se conectan con acceso controlado: quién ve qué, y cuándo. No tienes que empezar de cero.',
+        agentes: 'Agentes conectados a tareas concretas y supervisables: clasifican, responden borradores, registran seguimiento. Tú decides.',
+        operacion: 'Tu equipo mantiene el control de las decisiones. La infraestructura registra, propone y avisa; no decide por ti.',
+      };
+      if (detail) detail.textContent = texts[chip.dataset['infraLayer'] ?? ''] ?? text;
+      universe?.setSceneLook({ network: 0.95, spread: 0.35, lightBoost: 1.15, tintMix: 0.5, camX: 0.55, camY: -0.2, camZ: -0.45 } as Record<string, unknown>);
+      universe?.gesture();
+      track('demo_infra_capa', { capa: chip.dataset['infraLayer'] ?? '' });
+    });
+  });
+
+  // Eficiencia — flujo consulta → agente → persona → seguimiento
+  document.querySelectorAll<HTMLButtonElement>('[data-flow-focus]').forEach((chip) => {
+    chip.addEventListener('click', () => {
+      const wrap = chip.closest('[data-demo="flow"]');
+      wrap?.querySelectorAll('[data-flow-focus]').forEach((c) => c.setAttribute('aria-pressed', 'false'));
+      chip.setAttribute('aria-pressed', 'true');
+      const result = wrap?.querySelector('[data-flow-result]');
+      if (result) result.textContent = chip.dataset['flowResult'] ?? '';
+      setAnswer('foco', chip.dataset['flowFocus'] ?? '');
+      // el punto viaja por las etapas
+      const stages = [...(wrap?.querySelectorAll('[data-flow-stage]') ?? [])] as HTMLElement[];
+      const dot = wrap?.querySelector('[data-flow-dot]') as HTMLElement | null;
+      stages.forEach((st) => st.classList.remove('is-active'));
+      if (dot) {
+        const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        gsap.killTweensOf(dot);
+        gsap.set(dot, { opacity: 1, left: 0 });
+        const tl = gsap.timeline({ defaults: { duration: reduced ? 0 : 0.55, ease: 'power1.inOut' } });
+        stages.forEach((st, i) => {
+          const target = st.offsetLeft + st.offsetWidth / 2;
+          tl.to(dot, { left: target }, i * 0.55);
+          tl.add(() => st.classList.add('is-active'), i * 0.55);
+        });
+        tl.to(dot, { opacity: 0 });
+      }
+      universe?.setSceneLook({ network: 0.85, spread: 0.5, lightBoost: 1.1, tintMix: 0.45, camX: -0.5, camY: 0.25, camZ: -0.5 } as Record<string, unknown>);
+      universe?.cardPulse(2);
+      track('demo_flujo_foco', { foco: chip.dataset['flowFocus'] ?? '' });
+    });
+  });
+
+  // Cooperativa — GeoNodos: el scroll enciende conexiones, el clic explica
+  document.querySelectorAll<HTMLElement>('[data-demo="geo"]').forEach((wrap) => {
+    ScrollTrigger.create({
+      trigger: wrap,
+      start: 'top 85%',
+      end: 'bottom 35%',
+      scrub: 0.8,
+      onUpdate: (self) => {
+        const step = self.progress > 0.75 ? 3 : self.progress > 0.4 ? 2 : self.progress > 0.1 ? 1 : 0;
+        wrap.dataset['geoProgress'] = String(step);
+        if (step >= 2) universe?.setSceneLook({ network: 1, spread: 0.5, tintMix: 0.5 } as Record<string, unknown>);
+      },
+    });
+    wrap.querySelectorAll<SVGGElement>('[data-geo-node]').forEach((node) => {
+      const activate = (): void => {
+        wrap.querySelectorAll('[data-geo-node]').forEach((n) => n.classList.remove('is-active'));
+        node.classList.add('is-active');
+        const detail = wrap.querySelector('[data-geo-detail]');
+        if (detail) detail.textContent = node.dataset['geoDetail'] ?? '';
+        universe?.setSceneLook({ network: 1, spread: 0.6, lightBoost: 1.2, tintMix: 0.55, camY: 0.45, camZ: 0.6 } as Record<string, unknown>);
+        universe?.gesture();
+        track('demo_geonodo', { nodo: node.dataset['geoNode'] ?? '' });
+      };
+      node.addEventListener('click', activate);
+      node.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          activate();
+        }
+      });
+    });
+  });
+}
+
+/**
+ * Modulación 3D continua por escena (v3): cada escena visible conduce con
+ * scrub su propio «look» (cámara, tinte, red, apertura). Al ser scrub, el
+ * recorrido inverso invierte la transformación sin regenerar recursos.
+ */
+function bindSceneLooks(universe: UniverseHandleLike | null): ScrollTrigger[] {
+  if (!universe) return [];
+  const triggers: ScrollTrigger[] = [];
+  document.querySelectorAll<HTMLElement>('[data-scene-id]').forEach((el) => {
+    if (el.closest('[data-scene-route]') === null && el.dataset['sceneRoute'] === undefined) return;
+    triggers.push(
+      ScrollTrigger.create({
+        trigger: el,
+        start: 'top 85%',
+        end: 'bottom 30%',
+        scrub: 0.8,
+        onUpdate: (self) => {
+          universe.setSceneLook(lookForScene(el, self.progress) as Record<string, unknown>);
+        },
+      }),
+    );
+  });
+  return triggers;
+}
+
 function bindHeroCards(universe: UniverseHandleLike | null): void {
   const chips = document.querySelectorAll<HTMLButtonElement>('[data-card-index]');
   const canvas = document.querySelector<HTMLCanvasElement>('[data-prism-canvas]');
@@ -552,6 +670,8 @@ export async function startExperience(): Promise<void> {
     void stageForScene(element, getState().primary);
   };
 
+  const sceneLookTriggers = bindSceneLooks(universe);
+  bindDemos(universe);
   const destroyEffects = initEffects({
     reducedMotion: reduced,
     onSceneProgress: (sceneId, progress) => {

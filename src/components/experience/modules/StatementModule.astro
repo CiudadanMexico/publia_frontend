@@ -4,6 +4,7 @@
  * Cubre los módulos `statement` y `branch`.
  */
 import type { ResolvedScene } from '../../../lib/experience/graph';
+import { accentify } from '../../../lib/experience/accent';
 
 interface Props {
   scene: ResolvedScene;
@@ -14,9 +15,9 @@ const branches = scene.data?.branches ?? [];
 ---
 
 <section class="statement" data-module="statement">
-  {scene.eyebrow && <p class="statement__eyebrow" data-role="eyebrow" data-reveal>{scene.eyebrow}</p>}
-  <h2 class="statement__title" data-role="title" data-reveal="lines">{scene.title}</h2>
-  {scene.lead && <p class="statement__lead" data-role="lead" data-reveal>{scene.lead}</p>}
+  {scene.eyebrow && <p class="statement__eyebrow" data-role="eyebrow" data-reveal set:html={accentify(scene.eyebrow)} />}
+  <h2 class="statement__title" data-role="title" data-reveal="lines" set:html={accentify(scene.title)} />
+  {scene.lead && <p class="statement__lead" data-role="lead" data-reveal set:html={accentify(scene.lead)} />}
   {scene.body && <p class="statement__body" data-role="body" data-reveal>{scene.body}</p>}
 
   {

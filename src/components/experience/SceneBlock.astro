@@ -15,6 +15,10 @@ import DemoModule from './modules/DemoModule.astro';
 import CatalogModule from './modules/CatalogModule.astro';
 import CtaModule from './modules/CtaModule.astro';
 import FormModule from './modules/FormModule.astro';
+import ArtPlaceholder from './ArtPlaceholder.astro';
+import InfraDemo from './modules/InfraDemo.astro';
+import FlowDemo from './modules/FlowDemo.astro';
+import GeoDemo from './modules/GeoDemo.astro';
 
 interface Props {
   scene: ResolvedScene;
@@ -39,6 +43,9 @@ const stageVariants = Object.fromEntries(
   data-scene-route={routeKey}
   data-stage={scene.stage}
   data-palette={scene.palette}
+  data-tone={scene.tone}
+  data-layout={scene.layout}
+  data-art={scene.art}
   data-transition={scene.transition ?? 'fade'}
   data-variants={JSON.stringify(scene.variants ?? [])}
   data-pin={scene.effects?.pin ? String(scene.effects.pin) : undefined}
@@ -55,6 +62,7 @@ const stageVariants = Object.fromEntries(
   >
     <div class="scene__surface">
       <h2 class="visually-hidden" id={`${anchorId}-titulo`}>{scene.title}</h2>
+      {scene.art && <ArtPlaceholder sceneId={scene.id} />}
       {
         scene.modules.map((module) => {
           if (module === 'statement' || module === 'branch') {
@@ -73,6 +81,15 @@ const stageVariants = Object.fromEntries(
             module === 'contentFlow'
           ) {
             return <DemoModule scene={scene} />;
+          }
+          if (module === 'infraDemo') {
+            return <InfraDemo scene={scene} />;
+          }
+          if (module === 'flowDemo') {
+            return <FlowDemo scene={scene} />;
+          }
+          if (module === 'geoDemo') {
+            return <GeoDemo scene={scene} />;
           }
           if (module === 'plans' || module === 'catalog' || module === 'coverage') {
             return <CatalogModule scene={scene} />;

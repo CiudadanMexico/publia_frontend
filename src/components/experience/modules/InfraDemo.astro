@@ -1,0 +1,87 @@
+---
+/**
+ * Demo D3 — Ruta empresa: tres capas conectables de infraestructura.
+ * Al elegir una capa cambia el texto, la red 3D (vía data-event) y el
+ * énfasis del arte. Es conceptual: no afirma equipos físicos concretos.
+ */
+import type { ResolvedScene } from '../../../lib/experience/graph';
+
+interface Props {
+  scene: ResolvedScene;
+}
+
+const { scene } = Astro.props;
+const layers = [
+  {
+    id: 'datos',
+    icon: '🔗',
+    label: 'Datos',
+    detail:
+      'Tus sistemas actuales se conectan con acceso controlado: quién ve qué, y cuándo. No tienes que empezar de cero.',
+  },
+  {
+    id: 'agentes',
+    icon: '🤖',
+    label: 'Agentes',
+    detail:
+      'Agentes conectados a tareas concretas y supervisables: clasifican, responden borradores, registran seguimiento. Tú decides.',
+  },
+  {
+    id: 'operacion',
+    icon: '🛡️',
+    label: 'Operación',
+    detail:
+      'Tu equipo mantiene el control de las decisiones. La infraestructura registra, propone y avisa; no decide por ti.',
+  },
+];
+---
+
+<div class="infra-demo" data-module="infraDemo" data-demo="infra">
+  <p class="infra-demo__hint" data-reveal>Elige una capa para ver cómo se conecta:</p>
+  <div class="infra-demo__chips" role="group" aria-label="Capas de infraestructura">
+    {
+      layers.map((layer, i) => (
+        <button
+          type="button"
+          class="infra-demo__chip"
+          data-infra-layer={layer.id}
+          aria-pressed={i === 0 ? 'true' : 'false'}
+        >
+          <span aria-hidden="true">{layer.icon}</span> {layer.label}
+        </button>
+      ))
+    }
+  </div>
+  <p class="infra-demo__detail" data-infra-detail aria-live="polite">{layers[0]?.detail}</p>
+  <p class="infra-demo__note">Representación conceptual: los equipos y alcances dependen del plan y la configuración.</p>
+</div>
+
+<style>
+  .infra-demo { display: grid; gap: 0.9rem; justify-items: start; }
+  .infra-demo__hint { font-weight: 700; color: var(--tone-muted, #b7c8db); margin: 0; }
+  .infra-demo__chips { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+  .infra-demo__chip {
+    border: 1px solid var(--tone-border, rgba(255, 255, 255, 0.2));
+    background: var(--tone-card, rgba(255, 255, 255, 0.05));
+    color: inherit;
+    border-radius: 999px;
+    padding: 0.55rem 1rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.2s, border-color 0.2s;
+  }
+  .infra-demo__chip:hover { transform: translateY(-2px); }
+  .infra-demo__chip[aria-pressed='true'] {
+    background: var(--tone-accent);
+    color: var(--tone-accent-ink);
+    border-color: transparent;
+  }
+  .infra-demo__detail {
+    margin: 0;
+    max-width: 46ch;
+    font-size: 1.05rem;
+    line-height: 1.5;
+    min-height: 3.2em;
+  }
+  .infra-demo__note { margin: 0; font-size: 0.8rem; color: var(--tone-muted, #b7c8db); opacity: 0.85; }
+</style>

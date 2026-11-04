@@ -37,6 +37,27 @@ export type StageState =
 /** Paleta narrativa activa (se aplica al documento y al escenario 3D). */
 export type PaletteName = 'ink' | 'graphite' | 'amber' | 'teal' | 'verdant' | 'dawn';
 
+/** Atmósfera luminosa de la escena (dirección de arte v3). */
+export type SceneTone =
+  | 'cosmos'
+  | 'cream'
+  | 'electric'
+  | 'petrol'
+  | 'emerald'
+  | 'violet'
+  | 'graphite'
+  | 'sun';
+
+/** Silueta compositiva de la escena (dirección de arte v3). */
+export type SceneLayout =
+  | 'split'
+  | 'center'
+  | 'mosaic'
+  | 'pipeline'
+  | 'map'
+  | 'editorial'
+  | 'plans';
+
 /** Módulos visuales que una escena puede componer. */
 export type SceneModule =
   | 'statement'
@@ -54,6 +75,9 @@ export type SceneModule =
   | 'catalog'
   | 'distribution'
   | 'infrastructure'
+  | 'infraDemo'
+  | 'flowDemo'
+  | 'geoDemo'
   | 'cta';
 
 export interface CTA {
@@ -175,6 +199,12 @@ export interface SceneDefinition {
   /** Estado visual de la escena 3D. */
   stage?: StageState;
   palette?: PaletteName;
+  /** Atmósfera luminosa (v3). */
+  tone?: SceneTone;
+  /** Silueta compositiva (v3). */
+  layout?: SceneLayout;
+  /** Slot de arte protagonista (A01–A10); placeholder sustituible sin refactor. */
+  art?: string;
   assets?: VisualAsset[];
 }
 

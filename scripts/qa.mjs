@@ -550,7 +550,7 @@ check('ruta empresa: segmentos aplicados', enterprise.segments.includes('enterpr
 check('ruta empresa: escena propia visible', enterprise.visible > 100, `${enterprise.visible}px`);
 check(
   'ruta empresa: contenido de la escena',
-  enterprise.title.includes('mucho construido'),
+  enterprise.title.toUpperCase().includes('TUS REGLAS'),
   enterprise.title,
 );
 
@@ -586,7 +586,7 @@ check(
 );
 check(
   'ruta eficiencia: mensaje propio de la escena',
-  efficiency.title.includes('repetir'),
+  efficiency.title.toUpperCase().includes('REPETIDAS'),
   efficiency.title,
 );
 check(
@@ -686,7 +686,7 @@ const services = await page.evaluate(() => {
 });
 check(
   'servicios: catálogo anterior con precio real',
-  services.items.some((item) => item.name.includes('Desarrollo Web') && item.price.includes('150')),
+  services.items.some((item) => item.name.includes('Desarrollo web') && item.price.includes('150')),
   services.items[0]?.price ?? 'sin servicios',
 );
 check(
@@ -923,6 +923,116 @@ check(
   reducedInfo.layerReady && reducedInfo.reveals && reducedInfo.heroVisible,
   JSON.stringify(reducedInfo),
 );
+
+// --- dirección de arte v3 ---------------------------------------------------------
+// Composición: >=5 siluetas y >=4 tonos distintos en el home completo.
+const art = await page.evaluate(() => {
+  const scenes = [...document.querySelectorAll('[data-scene-id]')];
+  return {
+    layouts: new Set(scenes.map((el) => el.dataset.layout).filter(Boolean)).size,
+    tones: new Set(scenes.map((el) => el.dataset.tone).filter(Boolean)).size,
+    accentEm: document.querySelectorAll('.scene em').length,
+    artSlots: [...document.querySelectorAll('.scene__art[data-art-slot]')].map((el) => el.dataset.artSlot),
+    emojiEyebrows: [...document.querySelectorAll('[data-role="eyebrow"]')].filter((el) => /\p{Extended_Pictographic}/u.test(el.textContent ?? '')).length,
+  };
+});
+check('v3: >=5 composiciones distintas', art.layouts >= 5, JSON.stringify(art.layouts));
+check('v3: >=4 atmósferas de fondo distintas', art.tones >= 4, JSON.stringify(art.tones));
+check('v3: acentos amarillos en titulares (em)', art.accentEm >= 5, `${art.accentEm} em`);
+check('v3: slots de arte A01-A05 preparados', ['A01', 'A02', 'A03', 'A04', 'A05'].every((id) => art.artSlots.includes(id)), art.artSlots.join(','));
+check('v3: eyebrows con emoji semántico', art.emojiEyebrows >= 5, `${art.emojiEyebrows} eyebrows`);
+
+// Contraste en escena clara (cream): tinta oscura sobre fondo claro.
+const creamContrast = await page.evaluate(() => {
+  const el = document.querySelector('.scene[data-tone="cream"] .statement__title, .scene[data-tone="cream"] [data-role="title"]');
+  if (!el) return null;
+  const cs = getComputedStyle(el);
+  const scene = el.closest('.scene');
+  return { color: cs.color, bg: scene ? getComputedStyle(scene).backgroundColor : '' };
+});
+check(
+  'v3: escena clara con tinta oscura (contraste real)',
+  !!creamContrast && parseInt(creamContrast.color.match(/\d+/g)?.[0] ?? '255') < 90,
+  JSON.stringify(creamContrast),
+);
+
+// Scroll continuo: en ruta empresa, cámara y tinte cambian entre 30/60/90% del capítulo.
+await page.evaluate(() => { try { sessionStorage.clear(); } catch {} });
+await page.reload({ waitUntil: 'networkidle' });
+await page.waitForTimeout(2600);
+await click('[data-route-choice="enterprise"]');
+await page.waitForTimeout(3000);
+const probe = async (frac) => {
+  const h = await page.evaluate(() => document.body.scrollHeight - window.innerHeight);
+  await page.evaluate((top) => window.scrollTo({ top, behavior: 'instant' }), Math.round(h * frac));
+  await page.waitForTimeout(700);
+  return page.evaluate(() => ({
+    cam: document.querySelector('[data-prism-canvas]')?.dataset.camera ?? '',
+    tint: document.querySelector('[data-prism-canvas]')?.dataset.tint ?? '',
+  }));
+};
+const p30 = await probe(0.3);
+const p60 = await probe(0.6);
+const p90 = await probe(0.9);
+check(
+  'v3 scroll: la cámara se transforma en 30/60/90% (ida)',
+  p30.cam !== p60.cam && p60.cam !== p90.cam,
+  `30=${p30.cam} 60=${p60.cam} 90=${p90.cam}`,
+);
+const r60 = await probe(0.6);
+check('v3 scroll: recorrido inverso restaura transformación (reversible)', r60.cam === p60.cam && p90.cam !== r60.cam, `90=${p90.cam} vuelta60=${r60.cam}`);
+
+// Demo empresa: capa conecta red 3D y texto.
+await page.evaluate(() => document.querySelector('#escena-e04')?.scrollIntoView({ block: 'center', behavior: 'instant' }));
+await page.waitForTimeout(900);
+const beforeInfra = await page.evaluate(() => document.querySelector('[data-prism-canvas]')?.dataset.camera ?? '');
+await click('[data-infra-layer="agentes"]');
+await page.waitForTimeout(700);
+const infra = await page.evaluate(() => ({
+  detail: document.querySelector('[data-infra-detail]')?.textContent ?? '',
+  cam: document.querySelector('[data-prism-canvas]')?.dataset.camera ?? '',
+  pressed: document.querySelector('[data-infra-layer="agentes"]')?.getAttribute('aria-pressed'),
+}));
+check('v3 demo empresa: la capa cambia el texto', infra.detail.includes('supervisables'), infra.detail.slice(0, 60));
+check('v3 demo empresa: la capa mueve la cámara 3D', infra.cam !== beforeInfra, `${beforeInfra} -> ${infra.cam}`);
+check('v3 demo empresa: estado accesible aria-pressed', infra.pressed === 'true', infra.pressed);
+
+// Demo eficiencia: foco responde y guarda respuesta.
+await click('[data-route-reset]');
+await page.waitForTimeout(2400);
+await click('[data-route-choice="efficiency"]');
+await page.waitForTimeout(2800);
+await page.evaluate(() => document.querySelector('#escena-e09')?.scrollIntoView({ block: 'center', behavior: 'instant' }));
+await page.waitForTimeout(800);
+await click('[data-flow-focus="ventas"]');
+await page.waitForTimeout(1400);
+const flow = await page.evaluate(() => ({
+  result: document.querySelector('[data-flow-result]')?.textContent ?? '',
+  answer: JSON.parse(sessionStorage.getItem('publia.visitor.v1') ?? '{}').answers?.foco ?? null,
+  active: document.querySelectorAll('.flow-demo__stage.is-active').length,
+}));
+check('v3 demo eficiencia: resultado según foco', flow.result.includes('pedidos'), flow.result.slice(0, 60));
+check('v3 demo eficiencia: respuesta guardada (foco=ventas)', flow.answer === 'ventas', String(flow.answer));
+check('v3 demo eficiencia: el flujo se ilumina por etapas', flow.active >= 1, `${flow.active} etapas`);
+
+// Demo cooperativa: geonodos — clic en nodo + progreso por scroll.
+await click('[data-route-reset]');
+await page.waitForTimeout(2400);
+await page.mouse.move(680, 400);
+for (let i = 0; i < 4; i++) { await page.mouse.wheel(0, 500); await page.waitForTimeout(220); }
+await page.waitForTimeout(1600);
+await page.evaluate(() => document.querySelector('#escena-e17')?.scrollIntoView({ block: 'center', behavior: 'instant' }));
+await page.waitForTimeout(1200);
+await page.evaluate(() => document.querySelector('[data-geo-node="aprender"]')?.dispatchEvent(new MouseEvent('click', { bubbles: true })));
+await page.waitForTimeout(600);
+const geo = await page.evaluate(() => ({
+  detail: document.querySelector('[data-geo-detail]')?.textContent ?? '',
+  progress: document.querySelector('[data-demo="geo"]')?.dataset.geoProgress ?? '0',
+  active: document.querySelectorAll('[data-geo-node].is-active').length,
+}));
+check('v3 demo geonodos: el nodo explica qué se comparte', geo.detail.includes('Manuales'), geo.detail.slice(0, 60));
+check('v3 demo geonodos: scroll enciende conexiones (progreso)', Number(geo.progress) >= 1, `progreso=${geo.progress}`);
+check('v3 demo geonodos: nodo activo marcado', geo.active === 1, `${geo.active}`);
 
 // --- cierre ---------------------------------------------------------------------
 await page.screenshot({ path: `${OUT}/13-cierre.png` });

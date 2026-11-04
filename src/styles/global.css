@@ -243,3 +243,193 @@ html[data-act='hero'] .prism-layer {
     transform: none;
   }
 }
+
+/* ==========================================================================
+   Dirección de arte v3 — tonos luminosos por escena (post-hero)
+   El cosmos sólo se reserva para hero, umbral y cierre.
+   ========================================================================== */
+.scene[data-tone='cosmos'] {
+  --tone-bg: radial-gradient(ellipse at 70% 30%, #0b4b85 0%, transparent 40%), #020817;
+  --tone-ink: var(--publia-white);
+  --tone-muted: var(--publia-gray);
+  --tone-accent: var(--publia-yellow);
+  --tone-accent-ink: #091b34;
+  --tone-card: rgba(255, 255, 255, 0.04);
+  --tone-border: rgba(255, 255, 255, 0.14);
+}
+.scene[data-tone='cream'] {
+  --tone-bg: linear-gradient(125deg, #fff4ca 0%, #f2faff 45%, #d3edf9 100%);
+  --tone-ink: #091933;
+  --tone-muted: #3d5878;
+  --tone-accent: #e8a400;
+  --tone-accent-ink: #091933;
+  --tone-card: rgba(9, 25, 51, 0.05);
+  --tone-border: rgba(9, 25, 51, 0.16);
+}
+.scene[data-tone='electric'] {
+  --tone-bg: linear-gradient(160deg, #03254f 0%, #0951b4 70%, #2a77d7 100%);
+  --tone-ink: #ffffff;
+  --tone-muted: #c8dcff;
+  --tone-accent: var(--publia-yellow);
+  --tone-accent-ink: #03254f;
+  --tone-card: rgba(8, 27, 58, 0.9);
+  --tone-border: rgba(108, 250, 255, 0.4);
+}
+.scene[data-tone='petrol'] {
+  --tone-bg: radial-gradient(ellipse at 78% 42%, rgba(49, 98, 169, 0.63) 0%, transparent 37%), linear-gradient(135deg, #020910 0%, #0d1a31 60%, #302410 100%);
+  --tone-ink: var(--publia-white);
+  --tone-muted: var(--publia-gray);
+  --tone-accent: #ffe057;
+  --tone-accent-ink: #1a1204;
+  --tone-card: rgba(13, 26, 49, 0.8);
+  --tone-border: rgba(72, 240, 236, 0.35);
+}
+.scene[data-tone='emerald'] {
+  --tone-bg: radial-gradient(ellipse at 70% 30%, rgba(18, 143, 127, 0.9) 0%, transparent 55%), linear-gradient(130deg, #042724 0%, #0c614a 62%, #03151b 100%);
+  --tone-ink: var(--publia-white);
+  --tone-muted: #bfe8d8;
+  --tone-accent: #8dffc0;
+  --tone-accent-ink: #042724;
+  --tone-card: rgba(4, 39, 36, 0.75);
+  --tone-border: rgba(135, 255, 170, 0.35);
+}
+.scene[data-tone='violet'] {
+  --tone-bg: linear-gradient(125deg, #4811b8 0%, #120c4c 58%, #090b25 100%);
+  --tone-ink: #ffffff;
+  --tone-muted: #d9ccff;
+  --tone-accent: var(--publia-cyan);
+  --tone-accent-ink: #120c4c;
+  --tone-card: rgba(17, 20, 56, 0.65);
+  --tone-border: rgba(255, 255, 255, 0.18);
+}
+.scene[data-tone='graphite'] {
+  --tone-bg: linear-gradient(150deg, #0d1420 0%, #1a2436 100%);
+  --tone-ink: var(--publia-white);
+  --tone-muted: var(--publia-gray);
+  --tone-accent: var(--publia-cyan);
+  --tone-accent-ink: #0d1420;
+  --tone-card: rgba(255, 255, 255, 0.05);
+  --tone-border: rgba(98, 234, 255, 0.25);
+}
+.scene[data-tone='sun'] {
+  --tone-bg: radial-gradient(ellipse at top right, #fffb83 0%, #ffca25 75%);
+  --tone-ink: #091b34;
+  --tone-muted: #3d5878;
+  --tone-accent: #1655bc;
+  --tone-accent-ink: #ffffff;
+  --tone-card: #091b37;
+  --tone-border: #07162b;
+}
+
+.scene[data-tone] {
+  background: var(--tone-bg);
+  color: var(--tone-ink);
+  transition: background-color var(--dur-slow) var(--ease-in-out), color var(--dur-slow) var(--ease-in-out);
+}
+
+.scene[data-tone] .statement__eyebrow,
+.scene[data-tone] .text__eyebrow,
+.scene[data-tone] .network__eyebrow,
+.scene[data-tone] .demo__eyebrow,
+.scene[data-tone] .catalog__eyebrow,
+.scene[data-tone] .cta__eyebrow {
+  color: var(--tone-accent);
+}
+
+.scene[data-tone] .statement__title em,
+.scene[data-tone] .text__title em {
+  font-style: normal;
+  color: var(--tone-accent);
+}
+
+.scene[data-tone] .statement__lead,
+.scene[data-tone] .statement__body,
+.scene[data-tone] .text__lead,
+.scene[data-tone] .text__body {
+  color: var(--tone-muted);
+}
+
+/* Tipografía dominante v3: 1 mensaje grande por escena */
+.scene[data-tone] .statement__title,
+.scene[data-tone] .text__title {
+  font-size: clamp(2.4rem, 6.2vw, 6.4rem);
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+  font-weight: 900;
+  max-width: 16ch;
+}
+
+/* Composición por silueta */
+.scene__inner[data-layout],
+.scene[data-layout] .scene__inner {
+  display: grid;
+  gap: var(--space-4);
+  align-items: center;
+}
+.scene[data-layout='split'] .scene__inner {
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+}
+.scene[data-layout='center'] .scene__inner,
+.scene[data-layout='pipeline'] .scene__inner,
+.scene[data-layout='map'] .scene__inner,
+.scene[data-layout='plans'] .scene__inner {
+  grid-template-columns: 1fr;
+  justify-items: center;
+  text-align: center;
+}
+.scene[data-layout='center'] .statement__title,
+.scene[data-layout='center'] .text__title { max-width: 22ch; }
+.scene[data-layout='editorial'] .scene__inner {
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  align-items: start;
+}
+.scene[data-layout='mosaic'] .scene__inner {
+  grid-template-columns: 1fr;
+  justify-items: stretch;
+  text-align: left;
+}
+
+/* Arte protagonista (placeholder sustituible por A01–A10) */
+.scene__art {
+  position: relative;
+  border-radius: 1.4rem;
+  overflow: hidden;
+  border: 1px solid var(--tone-border, rgba(255, 255, 255, 0.14));
+  background: var(--tone-card, rgba(255, 255, 255, 0.04));
+  min-height: 320px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+}
+.scene__art img[data-asset-img] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+}
+.scene__art[data-asset-ready='true'] img[data-asset-img] { display: block; }
+.scene__art[data-asset-ready='true'] .art-placeholder { display: none; }
+.scene__art .art-slot-tag {
+  position: absolute;
+  left: 0.8rem;
+  bottom: 0.7rem;
+  z-index: 2;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45);
+  color: var(--publia-white);
+}
+
+@media (max-width: 900px) {
+  .scene[data-layout='split'] .scene__inner,
+  .scene[data-layout='editorial'] .scene__inner {
+    grid-template-columns: 1fr;
+  }
+  .scene[data-layout] .scene__inner { text-align: left; justify-items: stretch; }
+  .scene__art { min-height: 240px; order: -1; }
+  .scene[data-tone] .statement__title,
+  .scene[data-tone] .text__title { font-size: clamp(2.2rem, 10vw, 4.4rem); }
+}

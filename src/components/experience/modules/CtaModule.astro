@@ -5,6 +5,7 @@
  */
 import { SITE, buildMailto } from '../../../data/site';
 import type { ResolvedScene } from '../../../lib/experience/graph';
+import { accentify } from '../../../lib/experience/accent';
 
 interface Props {
   scene: ResolvedScene;
@@ -16,8 +17,8 @@ const mailto = buildMailto({ route: 'unclassified', traits: [] });
 
 <section class="conversion" id="contacto-publia" data-module="cta">
   <div class="conversion__intro">
-    {scene.eyebrow && <p class="conversion__eyebrow" data-role="eyebrow" data-reveal>{scene.eyebrow}</p>}
-    <h2 class="conversion__title" data-role="title" data-reveal="lines">{scene.title}</h2>
+    {scene.eyebrow && <p class="conversion__eyebrow" data-role="eyebrow" data-reveal set:html={accentify(scene.eyebrow)} />}
+    <h2 class="conversion__title" data-role="title" data-reveal="lines" set:html={accentify(scene.title)} />
     {scene.lead && <p class="conversion__lead" data-role="lead" data-reveal>{scene.lead}</p>}
     {scene.body && <p class="conversion__body" data-role="body" data-reveal>{scene.body}</p>}
   </div>

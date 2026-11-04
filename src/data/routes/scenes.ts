@@ -17,7 +17,45 @@
 import { MEMBERSHIPS } from '../memberships';
 import { ADVISORY, COOPERATIVES, SERVICE_FAMILIES, TRAINING } from '../catalog';
 import { PUBLISHABLE_SERVICES, SERVICE_FAMILIES as SERVICE_FAMILY_DATA } from '../services';
-import type { SceneDefinition } from '../../lib/experience/types';
+import type { SceneDefinition, SceneLayout, SceneTone } from '../../lib/experience/types';
+
+/**
+ * Dirección de arte v3 por escena: tono luminoso, silueta compositiva y
+ * slot de arte protagonista (los assets A01–A05 se producen en paralelo;
+ * aquí queda el placeholder con API estable).
+ */
+const ART_DIRECTION: Record<string, { tone: SceneTone; layout: SceneLayout; art?: string }> = {
+  E00: { tone: 'cream', layout: 'split', art: 'A01' },
+  E02: { tone: 'cream', layout: 'split', art: 'A01' },
+  E03: { tone: 'petrol', layout: 'split', art: 'A04' },
+  E04: { tone: 'petrol', layout: 'split', art: 'A04' },
+  E05: { tone: 'petrol', layout: 'editorial' },
+  E06: { tone: 'petrol', layout: 'pipeline', art: 'A04' },
+  E07: { tone: 'electric', layout: 'split', art: 'A03' },
+  E08: { tone: 'electric', layout: 'pipeline', art: 'A03' },
+  E09: { tone: 'electric', layout: 'pipeline', art: 'A03' },
+  E10: { tone: 'electric', layout: 'split' },
+  E11: { tone: 'electric', layout: 'editorial' },
+  E12: { tone: 'electric', layout: 'split' },
+  E13: { tone: 'emerald', layout: 'center' },
+  E14: { tone: 'emerald', layout: 'center' },
+  E15: { tone: 'emerald', layout: 'split', art: 'A05' },
+  E16: { tone: 'emerald', layout: 'map', art: 'A05' },
+  E17: { tone: 'emerald', layout: 'map', art: 'A05' },
+  E18: { tone: 'emerald', layout: 'center' },
+  E19: { tone: 'violet', layout: 'split' },
+  E20: { tone: 'emerald', layout: 'split' },
+  E21: { tone: 'graphite', layout: 'split', art: 'A04' },
+  E22: { tone: 'graphite', layout: 'split', art: 'A08' },
+  E23: { tone: 'cream', layout: 'editorial' },
+  E24: { tone: 'cream', layout: 'split' },
+  E25: { tone: 'violet', layout: 'mosaic', art: 'A02' },
+  E26: { tone: 'violet', layout: 'mosaic', art: 'A06' },
+  E27: { tone: 'sun', layout: 'plans', art: 'A09' },
+  E28: { tone: 'sun', layout: 'plans' },
+  E29: { tone: 'cosmos', layout: 'center' },
+  E30: { tone: 'cosmos', layout: 'split' },
+};
 
 const money = (value: number): string => `$${value.toLocaleString('es-MX')} MXN`;
 
@@ -71,11 +109,11 @@ const legacyServices = PUBLISHABLE_SERVICES.map((service) => {
   };
 });
 
-export const SCENES: SceneDefinition[] = [
+const SCENES_RAW: SceneDefinition[] = [
   {
     id: 'E00',
-    eyebrow: 'Publia 6.0',
-    title: 'Antes de empezar: qué es esto.',
+    eyebrow: '✨ HOLA, SOMOS PUBLIA',
+    title: 'HABLEMOS DE **LO QUE QUIERES LOGRAR.**',
     lead: 'No somos una agencia que vende horas. Somos una red cooperativa que construye capacidad.',
     body: 'Publia reúne desarrolladores, especialistas, mentores, becarios y agentes de inteligencia artificial dentro del ecosistema Ciudadan. Lo que sigue no es un catálogo: es una forma de entender tu negocio y decidir, contigo, qué se construye.',
     purpose: 'Presentar el universo y el tono antes de pedir ninguna decisión.',
@@ -130,8 +168,8 @@ export const SCENES: SceneDefinition[] = [
   },
   {
     id: 'E03',
-    eyebrow: 'Ruta empresa',
-    title: 'Ya tienes mucho construido. El riesgo no es empezar: es que nada se conecte.',
+    eyebrow: '🧠 TECNOLOGÍA CON CONTROL',
+    title: 'TU INFRAESTRUCTURA. **TUS REGLAS.**',
     lead: 'ERP, CRM, e-commerce, agenda, facturación, legacy. Todo funciona y casi nada se habla.',
     body: 'Publia no te pide que reemplaces tu stack: lo conectamos y hacemos que se entienda entre sí. IA privada, integraciones y automatización sobre lo que ya es tuyo.',
     purpose: 'Validar que la ruta empresarial habla de su realidad antes de proponer nada.',
@@ -163,7 +201,7 @@ export const SCENES: SceneDefinition[] = [
     lead: 'Soberanía tecnológica: el código, los datos y la infraestructura pueden quedar de tu lado.',
     body: 'Trabajamos con software libre, modelos locales y redes de personas que puedes conocer. Un proveedor que se va no se lleva tu negocio con él.',
     purpose: 'Marcar el diferenciador de Publia frente a una agencia clásica.',
-    modules: ['features'],
+    modules: ['features', 'infraDemo'],
     segments: ['enterprise', 'established', 'advanced'],
     route: 'enterprise',
     duration: 2,
@@ -261,8 +299,8 @@ export const SCENES: SceneDefinition[] = [
   },
   {
     id: 'E07',
-    eyebrow: 'Ruta eficiencia',
-    title: 'Hacer más con menos no es trabajar más rápido. Es dejar de repetirte.',
+    eyebrow: '⚡ CADA MINUTO CUENTA',
+    title: 'MENOS TAREAS REPETIDAS. **MÁS TIEMPO PARA CRECER.**',
     lead: 'Cada tarea repetida es una decisión que alguien ya tomó antes. La quitamos de en medio.',
     body: 'Chatbot que responde siempre lo mismo, contenido que se rehace cada mes, información que vive en tres lugares. Ahí es donde aparece el margen.',
     purpose: 'Poner nombre al costo invisible de la operación manual.',
@@ -310,9 +348,9 @@ export const SCENES: SceneDefinition[] = [
     eyebrow: 'Ruta eficiencia · Demostración',
     title: 'Un chatbot responde. Un asistente avanza.',
     lead: 'Simulación de una sesión de trabajo con un agente personal.',
-    body: 'El agente no es una persona makeup: es software con contexto, herramientas y límites. Lo que autorizas, lo hace; lo demás, lo propone.',
+    body: 'El agente no finge ser persona: es software con contexto, herramientas y límites. Lo que autorizas, lo hace; lo demás, lo propone.',
     purpose: 'Separar con claridad chatbot de agente.',
-    modules: ['tasks'],
+    modules: ['tasks', 'flowDemo'],
     segments: ['efficiency', 'practical', 'growing', 'advanced'],
     route: 'efficiency',
     duration: 2,
@@ -359,8 +397,8 @@ export const SCENES: SceneDefinition[] = [
   },
   {
     id: 'E11',
-    eyebrow: 'Ruta eficiencia · Ruta empresa',
-    title: 'Detrás de la IA hay personas. Y son una red, no unbuzz de atención.',
+    eyebrow: '🤝 NO TODO SE RESUELVE CON UN BOT',
+    title: 'LA IA AYUDA. **LAS PERSONAS DECIDEN.**',
     lead: 'Cuando la máquina no alcanza, entra una persona con criterio y contexto.',
     body: 'Los becarios de Publia trabajan dentro de una red supervisada por mentores y especialistas. No son un(resource) infinito: son capacidad organizada.',
     purpose: 'Cerrar el ciclo: la tecnología no sustituye a la red, la ordena.',
@@ -440,7 +478,7 @@ export const SCENES: SceneDefinition[] = [
   },
   {
     id: 'E15',
-    eyebrow: 'Exploración · Cooperativas',
+    eyebrow: '🌱 TAMBIÉN HAY OTRA FORMA',
     title: 'Otra forma de colaborar.',
     lead: 'Producir juntos no es la excepción: es la forma normal de trabajar aquí.',
     body: 'En Publia el desarrollo, la asesoría, la comunicación y la infraestructura se reparten entre personas que comparten resultados, no entre áreas grandes que delegan.',
@@ -461,7 +499,7 @@ export const SCENES: SceneDefinition[] = [
   },
   {
     id: 'E16',
-    eyebrow: 'Ecosistema',
+    eyebrow: '🌐 CONOCIMIENTO QUE CIRCULA',
     title: 'Ciudadan: la plataforma que da contexto al cooperativismo.',
     lead: 'Organización, economía e intercambios: las piezas que un negocio cooperativo necesita para funcionar.',
     body: 'Publia opera dentro de Ciudadan. Ahí viven las herramientas de organización, la economía conectada y los programas experimentales que hoy son promesa y mañana servicio.',
@@ -487,7 +525,7 @@ export const SCENES: SceneDefinition[] = [
     lead: 'No hace falta cambiar de figura jurídica para explorar el modelo.',
     body: 'Lo que sigue es el mapa de capacidades del programa con su estado real: lo que ya existe, lo que está en desarrollo y lo que está planeado.',
     purpose: 'Mostrar el catálogo cooperativo con estados verificables, sin prometer lo que no existe.',
-    modules: ['features'],
+    modules: ['features', 'geoDemo'],
     segments: [],
     route: 'shared',
     duration: 2,
@@ -570,8 +608,8 @@ export const SCENES: SceneDefinition[] = [
   
   {
     id: 'E21',
-    eyebrow: 'Ecosistema · Infraestructura',
-    title: 'De un centro a una red.',
+    eyebrow: '🖥️ INFRAESTRUCTURA A TU MANERA',
+    title: 'TUS DATOS, **CON MÁS CONTROL.**',
     lead: 'Una estructura centralizada, masiva y pesada. Después: nodos locales que se conectan y producen.',
     body: 'El futuro no tiene por qué estar concentrado en un solo lugar. Esa es la idea del housing: tu propio espacio en un servidor administrado, compartido o privado según lo que necesites.',
     purpose: 'Visualizar la transformación de infraestructura centralizada a distribuida.',
@@ -666,7 +704,7 @@ export const SCENES: SceneDefinition[] = [
   },
   {
     id: 'E25',
-    eyebrow: 'Productos · Comunicación',
+    eyebrow: '🧩 LAS OCHO SOLUCIONES',
     title: 'Tu comunicación también evoluciona.',
     lead: 'Gestión integral: redes, campañas, contenido, producción y estrategia en un mismo circuito.',
     body: 'Para quien quiere externalizar gran parte del marketing sin perder el criterio de su marca.',
@@ -714,8 +752,8 @@ export const SCENES: SceneDefinition[] = [
   },
   {
     id: 'E27',
-    eyebrow: 'Productos · Membresías',
-    title: 'Encuentra tu nivel.',
+    eyebrow: '🧩 EMPIEZA POR LO QUE NECESITAS',
+    title: 'NO TIENES QUE **CONTRATARLO TODO.**',
     lead: 'Cinco niveles con precios mensuales en MXN. Lo que no está confirmado, no lo escondemos.',
     body: 'Cada nivel añade capacidad real: más contacto con el negocio, más presencia multicanal y más disponibilidad humana.',
     variants: [
@@ -801,3 +839,9 @@ export const SCENES: SceneDefinition[] = [
     },
   },
 ];
+
+/** Escenas con su dirección de arte v3 aplicada. */
+export const SCENES: SceneDefinition[] = SCENES_RAW.map((scene) => ({
+  ...scene,
+  ...(ART_DIRECTION[scene.id] ?? {}),
+}));

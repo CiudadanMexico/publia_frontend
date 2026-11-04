@@ -4,6 +4,7 @@
  * Todo es SVG procedimental: sin imágenes de stock.
  */
 import type { ResolvedScene } from '../../../lib/experience/graph';
+import { accentify } from '../../../lib/experience/accent';
 
 interface Props {
   scene: ResolvedScene;
@@ -33,8 +34,8 @@ const positions = nodes.map((_, index) => {
   data-sticky={scene.effects?.sticky ? 'true' : undefined}
 >
   <div class="network-scene__intro">
-    {scene.eyebrow && <p class="network-scene__eyebrow" data-role="eyebrow" data-reveal>{scene.eyebrow}</p>}
-    <h2 class="network-scene__title" data-role="title" data-reveal="lines">{scene.title}</h2>
+    {scene.eyebrow && <p class="network-scene__eyebrow" data-role="eyebrow" data-reveal set:html={accentify(scene.eyebrow)} />}
+    <h2 class="network-scene__title" data-role="title" data-reveal="lines" set:html={accentify(scene.title)} />
     {scene.lead && <p class="network-scene__lead" data-role="lead" data-reveal>{scene.lead}</p>}
     {scene.body && <p class="network-scene__body" data-role="body" data-reveal>{scene.body}</p>}
   </div>
