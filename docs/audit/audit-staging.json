@@ -1,0 +1,689 @@
+{
+  "base": "https://kitty-midi-grid-liked.trycloudflare.com",
+  "fecha": "2026-11-04T03:56:41.771Z",
+  "inventory": {
+    "scenes": [
+      {
+        "id": "E01",
+        "route": "",
+        "segments": "",
+        "stage": "",
+        "title": "EL MUNDO ESTÁ CAMBIANDO.",
+        "buttons": [
+          {
+            "kind": "button",
+            "text": "Soy una gran empresa, o estoy en camino de serlo ↗",
+            "data": "routeChoice=enterprise target=#escena-e03 astroCidAb7wmxfa=",
+            "href": ""
+          },
+          {
+            "kind": "button",
+            "text": "Quiero hacer más con menos ↗",
+            "data": "routeChoice=efficiency target=#escena-e07 astroCidAb7wmxfa=",
+            "href": ""
+          },
+          {
+            "kind": "button",
+            "text": "Quiero cooperar / comunidad ↗",
+            "data": "branchTarget=#escena-e15 branchTrait=cooperative branchRoute=explorer astroCidAb7wmxfa=",
+            "href": ""
+          },
+          {
+            "kind": "button",
+            "text": "Ⅱ Pausar",
+            "data": "heroControl=pause astroCidAb7wmxfa=",
+            "href": ""
+          },
+          {
+            "kind": "button",
+            "text": "✦ Fragmentar",
+            "data": "heroControl=burst astroCidAb7wmxfa=",
+            "href": ""
+          },
+          {
+            "kind": "button",
+            "text": "↺ Reiniciar",
+            "data": "heroControl=reset astroCidAb7wmxfa=",
+            "href": ""
+          }
+        ],
+        "hasForm": false,
+        "reveals": 0
+      },
+      {
+        "id": "E00",
+        "route": "shared",
+        "segments": "",
+        "stage": "",
+        "title": "Antes de empezar: qué es esto.",
+        "buttons": [],
+        "hasForm": false,
+        "reveals": 4
+      },
+      {
+        "id": "E02",
+        "route": "shared",
+        "segments": "",
+        "stage": "",
+        "title": "Elige por dónde quieres entrar. El resto se arma solo.",
+        "buttons": [],
+        "hasForm": false,
+        "reveals": 4
+      },
+      {
+        "id": "E03",
+        "route": "enterprise",
+        "segments": "",
+        "stage": "",
+        "title": "Ya tienes mucho construido. El riesgo no es empezar: es que nada se conecte.",
+        "buttons": [],
+        "hasForm": false,
+        "reveals": 8
+      },
+      {
+        "id": "E04",
+        "route": "enterprise",
+        "segments": "",
+        "stage": "",
+        "title": "El control es tuyo.",
+        "buttons": [],
+        "hasForm": false,
+        "reveals": 10
+      },
+      {
+        "id": "E05",
+        "route": "shared",
+        "segments": "",
+        "stage": "",
+        "title": "Una red de talento, no una plantilla de consultores.",
+        "buttons": [],
+        "hasForm": false,
+        "reveals": 5
+      },
+      {
+        "id": "E06",
+        "route": "shared",
+        "segments": "",
+        "stage": "",
+        "title": "Inteligencia en tus procesos, no en un chat aparte.",
+        "buttons": [],
+        "hasForm": false,
+        "reveals": 10
+      },
+      {
+        "id": "E07",
+        "route": "efficiency",
+        "segments": "",
+        "stage": "",
+        "title": "Hacer más con menos no es trabajar más rápido. Es dejar de repetirte.",
+        "buttons": [],
+        "hasForm": false,
+        "reveals": 8
+      },
+      {
+        "id": "E08",
+        "route": "efficiency",
+        "segments": "",
+        "stage": "",
+        "title": "Tu negocio responde mientras tú atiendes lo importante.",
+        "buttons": [],
+        "hasForm": false,
+        "reveals": 11
+      },
+      {
+        "id": "E09",
+        "route": "efficiency",
+        "segments": "",
+        "stage": "",
+        "title": "Un chatbot responde. Un asistente avanza.",
+        "buttons": [],
+        "hasForm": false,
+        "reveals": 9
+      },
+      {
+        "id": "E10",
+        "route": "efficiency",
+        "segments": "",
+        "stage": "",
+        "title": "Tu negocio se mantiene activo sin que estés pegado al celular.",
+        "buttons": [],
+        "hasForm": false,
+        "reveals": 9
+      },
+      {
+        "id": "E11",
+        "route": "shared",
+        "segments": "",
+        "stage": "",
+        "title": "Detrás de la IA hay personas. Y son una red, no unbuzz de atención.",
+        "buttons": [],
+        "hasForm": false,
+        "reveals": 10
+      },
+      {
+        "id": "E12",
+        "route": "efficiency",
+        "segments": "",
+        "stage": "",
+        "title": "La cobertura importa: no es más contenido, es más ventana.",
+        "buttons": [],
+        "hasForm": false,
+        "reveals": 6
+      },
+      {
+        "id": "E13",
+        "route": "explorer",
+        "segments": "",
+        "stage": "",
+        "title": "Todos quieren venderte algo.",
+        "buttons": [],
+        "hasForm": false,
+        "reveals": 4
+      },
+      {
+        "id": "E14",
+        "route": "explorer",
+        "segments": "",
+        "stage": "",
+        "title": "Nosotros queremos conocerte.",
+        "buttons": [
+          {
+            "kind": "button",
+            "text": "QUIERO GENERAR VALOR, NO SÓLO INGRESOS.",
+            "data": "branchTarget=#escena-e15 branchTrait=value_driven",
+            "href": ""
+          },
+          {
+            "kind": "button",
+            "text": "NECESITO AYUDA CON MI NEGOCIO.",
+            "data": "branchTarget=#escena-e24 branchTrait=needs_help",
+            "href": ""
+          }
+        ],
+        "hasForm": false,
+        "reveals": 4
+      },
+      {
+        "id": "E15",
+        "route": "explorer",
+        "segments": "",
+        "stage": "",
+        "title": "Otra forma de colaborar.",
+        "buttons": [],
+        "hasForm": false,
+        "reveals": 8
+      },
+      {
+        "id": "E16",
+        "route": "shared",
+        "segments": "",
+        "stage": "",
+        "title": "Ciudadan: la plataforma que da contexto al cooperativismo.",
+        "buttons": [],
+        "hasForm": false,
+        "reveals": 8
+      },
+      {
+        "id": "E17",
+        "route": "shared",
+        "segments": "",
+        "stage": "",
+        "title": "Cooperativas 6.0: herramientas para consume en común.",
+        "buttons": [],
+        "hasForm": false,
+        "reveals": 16
+      },
+      {
+        "id": "E18",
+        "route": "shared",
+        "segments": "",
+        "stage": "",
+        "title": "Una economía conectada, no una promesa de rendimiento.",
+        "buttons": [],
+        "hasForm": false,
+        "reveals": 8
+      },
+      {
+        "id": "E19",
+        "route": "shared",
+        "segments": "",
+        "stage": "",
+        "title": "Publicidad por elección, no por interrupción.",
+        "buttons": [],
+        "hasForm": false,
+        "reveals": 7
+      },
+      {
+        "id": "E20",
+        "route": "shared",
+        "segments": "",
+        "stage": "",
+        "title": "El cómputo también tiene una huella.",
+        "buttons": [],
+        "hasForm": false,
+        "reveals": 4
+      },
+      {
+        "id": "E21",
+        "route": "shared",
+        "segments": "",
+        "stage": "",
+        "title": "De un centro a una red.",
+        "buttons": [],
+        "hasForm": false,
+        "reveals": 6
+      },
+      {
+        "id": "E22",
+        "route": "shared",
+        "segments": "",
+        "stage": "",
+        "title": "Tu propio nodo.",
+        "buttons": [],
+        "hasForm": false,
+        "reveals": 7
+      },
+      {
+        "id": "E23",
+        "route": "shared",
+        "segments": "",
+        "stage": "",
+        "title": "Aprende a usar lo que contrataste.",
+        "buttons": [],
+        "hasForm": false,
+        "reveals": 10
+      },
+      {
+        "id": "E24",
+        "route": "shared",
+        "segments": "",
+        "stage": "",
+        "title": "Antes de construir.",
+        "buttons": [],
+        "hasForm": false,
+        "reveals": 8
+      },
+      {
+        "id": "E25",
+        "route": "shared",
+        "segments": "",
+        "stage": "",
+        "title": "Tu comunicación también evoluciona.",
+        "buttons": [],
+        "hasForm": false,
+        "reveals": 9
+      },
+      {
+        "id": "E26",
+        "route": "shared",
+        "segments": "",
+        "stage": "",
+        "title": "Eventos, activaciones y producción con manos.",
+        "buttons": [],
+        "hasForm": false,
+        "reveals": 16
+      },
+      {
+        "id": "E27",
+        "route": "shared",
+        "segments": "",
+        "stage": "",
+        "title": "Encuentra tu nivel.",
+        "buttons": [],
+        "hasForm": false,
+        "reveals": 9
+      },
+      {
+        "id": "E28",
+        "route": "shared",
+        "segments": "",
+        "stage": "",
+        "title": "Completa tu operación.",
+        "buttons": [],
+        "hasForm": false,
+        "reveals": 22
+      },
+      {
+        "id": "E29",
+        "route": "shared",
+        "segments": "",
+        "stage": "",
+        "title": "Una misma esencia, distintas posibilidades.",
+        "buttons": [],
+        "hasForm": false,
+        "reveals": 4
+      },
+      {
+        "id": "E30",
+        "route": "shared",
+        "segments": "",
+        "stage": "",
+        "title": "Vamos a conocernos.",
+        "buttons": [
+          {
+            "kind": "a",
+            "text": "Escribir a hola@publia.mx",
+            "data": "contactCta=true sceneCta=mailto:hola@publia.mx?subject=Diagn%C3%B3stico%20empresarial%20%E2%80%94%20Publia%20(sin%20ruta%20elegida)&body=Contexto%20de%20navegaci%C3%B3n%20(se%20comparte%20s%C3%B3lo%20para%20no%20repetirme)%3A%0ARuta%3A%20sin%20ruta%20elegida%0AIntereses%20detectados%3A%20ninguno%0A%0AQu%C3%A9%20quiero%20conseguir%3A%0A event=consultation_requested",
+            "href": "mailto:hola@publia.mx?subject=Diagn%C3%B3stico%20empresarial%20%E2%80%94%20Publia%20(sin%20ruta%20elegida)&body=Contexto%20de%20navegaci%C3%B3n%20(se%20comparte%20s%C3%B3lo%20para%20no%20repetirme)%3A%0ARuta%3A%20sin%20ruta%20elegida%0AIntereses%20detectados%3A%20ninguno%0A%0AQu%C3%A9%20quiero%20conseguir%3A%0A"
+          },
+          {
+            "kind": "a",
+            "text": "WhatsApp",
+            "data": "",
+            "href": "https://wa.me/525573724660"
+          },
+          {
+            "kind": "button",
+            "text": "Preparar mensaje",
+            "data": "astroCidP2i5wjiu=",
+            "href": ""
+          },
+          {
+            "kind": "a",
+            "text": "hola@publia.mx",
+            "data": "astroCidP2i5wjiu=",
+            "href": "mailto:hola@publia.mx"
+          }
+        ],
+        "hasForm": true,
+        "reveals": 5
+      }
+    ],
+    "nav": [
+      {
+        "text": "Empresa",
+        "data": "astroCidUg5eb3am=",
+        "href": "#escena-e03"
+      },
+      {
+        "text": "Eficiencia",
+        "data": "astroCidUg5eb3am=",
+        "href": "#escena-e07"
+      },
+      {
+        "text": "Explorar",
+        "data": "astroCidUg5eb3am=",
+        "href": "#escena-e13"
+      },
+      {
+        "text": "Infraestructura",
+        "data": "astroCidUg5eb3am=",
+        "href": "#escena-e21"
+      },
+      {
+        "text": "Membresías",
+        "data": "astroCidUg5eb3am=",
+        "href": "#escena-e27"
+      },
+      {
+        "text": "← Volver",
+        "data": "actBack= astroCidUg5eb3am=",
+        "href": ""
+      },
+      {
+        "text": "Cambiar de ruta",
+        "data": "routeReset= astroCidUg5eb3am=",
+        "href": ""
+      }
+    ],
+    "hero": {
+      "title": "EL MUNDO ESTÁ CAMBIANDO.",
+      "ctas": [
+        {
+          "text": "Soy una gran empresa, o estoy en camino de serlo ↗",
+          "route": "enterprise",
+          "trait": ""
+        },
+        {
+          "text": "Quiero hacer más con menos ↗",
+          "route": "efficiency",
+          "trait": ""
+        },
+        {
+          "text": "Quiero cooperar / comunidad ↗",
+          "route": "",
+          "trait": "cooperative"
+        }
+      ],
+      "controls": [
+        "pause",
+        "burst",
+        "reset"
+      ]
+    },
+    "universe": {
+      "world": "hero",
+      "ready": "true",
+      "errors": "",
+      "cards": "8"
+    },
+    "totals": {
+      "scenes": 31,
+      "buttons": 12,
+      "forms": 1,
+      "reveals": 249
+    }
+  },
+  "scrollReport": {
+    "scrollHeight": 22464,
+    "samples": 34,
+    "lastRoute": "explorer",
+    "lastAct": "hero",
+    "lastWorld": "hero",
+    "scenesSeen": [
+      "E01",
+      "E00",
+      "E02",
+      "E05",
+      "E06",
+      "E11",
+      "E13",
+      "E14",
+      "E15",
+      "E16",
+      "E17",
+      "E18",
+      "E19",
+      "E20",
+      "E21",
+      "E22",
+      "E23",
+      "E24",
+      "E25",
+      "E26",
+      "E27",
+      "E28",
+      "E29",
+      "E30"
+    ]
+  },
+  "interactions": [
+    {
+      "label": "hero → enterprise",
+      "before": {
+        "act": "hero",
+        "world": "hero",
+        "scroll": 0,
+        "route": "explorer"
+      },
+      "after": {
+        "act": "enterprise",
+        "world": "enterprise",
+        "scroll": 2228,
+        "route": "enterprise",
+        "camera": "[1.9,1.7,8.4]"
+      },
+      "changed": true
+    },
+    {
+      "label": "volver → hero",
+      "before": {
+        "act": "enterprise",
+        "world": "enterprise",
+        "scroll": 2228,
+        "route": "enterprise"
+      },
+      "after": {
+        "act": "hero",
+        "world": "hero",
+        "scroll": 0,
+        "route": "enterprise",
+        "camera": "[0,2.4,11.6]"
+      },
+      "changed": true
+    },
+    {
+      "label": "hero → efficiency",
+      "before": {
+        "act": "hero",
+        "world": "hero",
+        "scroll": 0,
+        "route": "enterprise"
+      },
+      "after": {
+        "act": "efficiency",
+        "world": "efficiency",
+        "scroll": 5459,
+        "route": "efficiency",
+        "camera": "[-2.1,1.9,8.8]"
+      },
+      "changed": true
+    },
+    {
+      "label": "volver → hero",
+      "before": {
+        "act": "efficiency",
+        "world": "efficiency",
+        "scroll": 5459,
+        "route": "efficiency"
+      },
+      "after": {
+        "act": "hero",
+        "world": "hero",
+        "scroll": 0,
+        "route": "efficiency",
+        "camera": "[0,2.4,11.6]"
+      },
+      "changed": true
+    },
+    {
+      "label": "hero → cooperativo",
+      "before": {
+        "act": "hero",
+        "world": "hero",
+        "scroll": 0,
+        "route": "efficiency"
+      },
+      "after": {
+        "act": "cooperative",
+        "world": "cooperative",
+        "scroll": 6714,
+        "route": "explorer",
+        "camera": "[0,1.9,9.4]"
+      },
+      "changed": true
+    },
+    {
+      "label": "volver → hero",
+      "before": {
+        "act": "cooperative",
+        "world": "cooperative",
+        "scroll": 6714,
+        "route": "explorer"
+      },
+      "after": {
+        "act": "hero",
+        "world": "hero",
+        "scroll": 0,
+        "route": "explorer",
+        "camera": "[0,2.4,11.6]"
+      },
+      "changed": true
+    },
+    {
+      "label": "cambiar de ruta → hero",
+      "before": {
+        "act": "hero",
+        "world": "hero",
+        "scroll": 0,
+        "route": "explorer"
+      },
+      "after": {
+        "act": "hero",
+        "world": "hero",
+        "scroll": 0,
+        "route": "unclassified",
+        "camera": "[0,2.4,11.6]"
+      },
+      "changed": false
+    },
+    {
+      "label": "hero control pause",
+      "changed": true
+    },
+    {
+      "label": "hero control burst",
+      "changed": true
+    },
+    {
+      "label": "hero control reset",
+      "changed": true
+    },
+    {
+      "label": "E14 bifurcación",
+      "changed": true
+    }
+  ],
+  "branchButtons": [
+    {
+      "text": "QUIERO GENERAR VALOR, NO SÓLO INGRESOS.",
+      "trait": "value_driven",
+      "target": "#escena-e15"
+    },
+    {
+      "text": "NECESITO AYUDA CON MI NEGOCIO.",
+      "trait": "needs_help",
+      "target": "#escena-e24"
+    }
+  ],
+  "mobile": {
+    "horizontalOverflow": false,
+    "scrollWidth": 390,
+    "innerWidth": 390,
+    "heroTitleVisible": true,
+    "ctasInViewport": 3,
+    "world": "hero",
+    "cards": "4",
+    "universeErrors": "",
+    "afterTransition": {
+      "act": "enterprise",
+      "world": "enterprise",
+      "overflow": false
+    }
+  },
+  "reducedMotion": {
+    "layerReady": true,
+    "world": "hero",
+    "revealsOk": true
+  },
+  "form": {
+    "present": true,
+    "inputs": [
+      "nombre",
+      "correo",
+      "situacion",
+      "mensaje"
+    ],
+    "action": "(mailto cliente)",
+    "invalidSubmit": {
+      "state": "error",
+      "text": "Escribe un correo válido para continuar."
+    }
+  },
+  "errors": {
+    "desktop": [],
+    "mobile": [],
+    "reduced": [],
+    "form": []
+  }
+}
