@@ -21,7 +21,34 @@ porcentajes se calculan con criterios verificables y están detallados en
 | **F · Conversión** | 8/8 (100 %) | CTA contextual, formulario contextual sin captura en servidor, WhatsApp, eventos |
 | **G · Calidad** | 11/11 (100 %) | QA 75/75 en local y en la URL pública, axe sin violaciones, presupuesto de peso, 15 pruebas unitarias |
 
-### Hero 3D aprobado (integrado)
+### Fase 2 — experiencia inmersiva (entregada)
+
+URL de vista previa: https://kitty-midi-grid-liked.trycloudflare.com (mismo túnel efímero).
+
+**Primera entrega de la fase 2: la primera transición desde cada una de las tres rutas.**
+
+- Un único lienzo WebGL (`src/lib/three/universe.ts`) contiene los recursos aprobados del hero
+  (mascota GLB, prisma GLB facetado, plataforma, estelas, partículas, fondo espacial y las 8
+  tarjetas holográficas) más la red de nodos de las escenas de cooperativa/housing.
+- Cada ruta es un **mundo** con cámara, iluminación, disposición de tarjetas y comportamiento del
+  prisma propios (`WORLDS` en universe.ts). `travelTo()` anima todos los parámetros a la vez en una
+  timeline GSAP: al activar una ruta la cámara viaja, las luces cambian de mundo, el prisma se
+  recompone, las tarjetas se reorganizan (arco empresarial / espiral de eficiencia / anillo
+  cooperativo) y las partículas reaccionan con un estallido.
+- El contenido cambia en sincronía: scroll suave a la escena destino + revelado GSAP de sus
+  elementos. Los modelos nunca se destruyen ni sustituyen durante el viaje.
+- `src/lib/experience/narrative.ts` guarda la pila de actos: el botón «← Volver» (Nav) regresa al
+  acto anterior con otro viaje de cámara, sin recargar. Las respuestas (ruta y rasgos) quedan en
+  el estado del visitante para adaptar escenas posteriores.
+- Verificado en QA (85/85 local y 85/85 en la URL pública): mundo/cámara/tinte cambian por ruta
+  (enterprise [1.9,1.7,8.4] #0a0e18 · efficiency [-2.1,1.9,8.8] #0d0a05 · cooperative
+  [0,1.9,9.4] #060d08), volver regresa a hero con scrollY 0, 0 errores JS, composición del hero
+  intacta contra la captura aprobada, axe sin violaciones, móvil OK, movimiento reducido OK.
+- Evidencia: docs/evidencia/14-hero-universo.png, 15-transicion-empresa-mitad.png,
+  16-mundo-empresa.png, 17-vuelta-al-hero.png, 18-mundo-eficiencia.png, 19-mundo-cooperativo.png,
+  20-movil-hero-universo.png, 21-movil-mundo-empresa.png.
+
+## Hero 3D aprobado (integrado)
 
 El hero entregado se integró **sin rediseñar ningún recurso**: se reutilizan
 los dos modelos GLB, la textura de fondo, las ocho tarjetas con sus iconos y
