@@ -151,7 +151,18 @@ export function scenesForState(state: VisitorState): ResolvedScene[] {
 
 /** Todas las escenas que el render debe emitir (visibles u ocultas por ruta). */
 export function renderableScenes(): ResolvedScene[] {
-  return SCENES.map((scene) => resolveScene(scene, { primary: 'unclassified', traits: [], visitedScenes: [], lastScene: null, updatedAt: 0 }));
+  return SCENES.map((scene) =>
+    resolveScene(scene, {
+      primary: 'unclassified',
+      origin: null,
+      traits: [],
+      answers: {},
+      visitedScenes: [],
+      lastScene: null,
+      transitioning: false,
+      updatedAt: 0,
+    }),
+  );
 }
 
 /** Siguiente escena visible a partir de una escena dada. */

@@ -19,15 +19,32 @@ export type VisitorTrait =
   | 'existing'
   | 'advanced';
 
+export type RouteOrigin = 'button' | 'scroll' | null;
+
+export interface VisitorAnswers {
+  /** Ruta A2: ¿ya hay sistemas o se empieza desde cero? */
+  arranque?: 'existente' | 'desde_cero';
+  /** Ruta B2: ¿qué consume más tiempo? */
+  foco?: 'mensajes' | 'marketing' | 'ventas' | 'operacion' | 'explorando';
+  /** Ruta B4: escala del negocio. */
+  escala?: 'solo' | 'equipo_pequeno' | 'creciendo' | 'operacion_grande';
+}
+
 export interface VisitorState {
   /** Ruta elegida de forma explícita; `unclassified` mientras no elija. */
   primary: PrimaryRoute;
+  /** Cómo se eligió la ruta: por botón o por scroll libre. */
+  origin: RouteOrigin;
   /** Rasgos inferidos o declarados, acumulables. */
   traits: VisitorTrait[];
+  /** Respuestas guardadas para adaptar escenas posteriores. */
+  answers: VisitorAnswers;
   /** Escenas ya vistas, para no repetir la misma entrada. */
   visitedScenes: string[];
   /** Última escena visitada. */
   lastScene: string | null;
+  /** Semáforo de transición en curso (evita tweens peleando). */
+  transitioning: boolean;
   /** Marca de tiempo de la última actualización. */
   updatedAt: number;
 }
@@ -57,9 +74,12 @@ const listeners = new Set<Listener>();
 function emptyState(): VisitorState {
   return {
     primary: 'unclassified',
+    origin: null,
     traits: [],
+    answers: {},
     visitedScenes: [],
     lastScene: null,
+    transitioning: false,
     updatedAt: Date.now(),
   };
 }
@@ -93,11 +113,20 @@ function load(): VisitorState {
     const visitedScenes = Array.isArray(candidate.visitedScenes)
       ? candidate.visitedScenes.filter((id): id is string => typeof id === 'string')
       : [];
+    const origin: RouteOrigin =
+      candidate.origin === 'button' || candidate.origin === 'scroll' ? candidate.origin : null;
+    const answers: VisitorAnswers =
+      typeof candidate.answers === 'object' && candidate.answers !== null
+        ? (candidate.answers as VisitorAnswers)
+        : {};
     return {
       primary,
+      origin,
       traits,
+      answers,
       visitedScenes,
       lastScene: typeof candidate.lastScene === 'string' ? candidate.lastScene : null,
+      transitioning: false,
       updatedAt: typeof candidate.updatedAt === 'number' ? candidate.updatedAt : Date.now(),
     };
   } catch {
@@ -146,8 +175,8 @@ export function subscribe(listener: Listener): () => void {
   return () => listeners.delete(listener);
 }
 
-/** Elige (o cambia) la ruta principal. */
-export function setPrimaryRoute(route: PrimaryRoute): void {
+/** Elige (o cambia) la ruta principal, con su origen. */
+export function setPrimaryRoute(route: PrimaryRoute, origin: RouteOrigin = 'button'): void {
   if (!isRoute(route) || route === 'unclassified') {
     return;
   }
@@ -157,8 +186,35 @@ export function setPrimaryRoute(route: PrimaryRoute): void {
   commit({
     ...state,
     primary: route,
+    origin,
     updatedAt: Date.now(),
   });
+}
+
+/** Guarda una respuesta del visitante para adaptar las escenas posteriores. */
+export function setAnswer(key: keyof VisitorAnswers, value: string): void {
+  const allowed: Record<keyof VisitorAnswers, readonly string[]> = {
+    arranque: ['existente', 'desde_cero'],
+    foco: ['mensajes', 'marketing', 'ventas', 'operacion', 'explorando'],
+    escala: ['solo', 'equipo_pequeno', 'creciendo', 'operacion_grande'],
+  };
+  const values = allowed[key];
+  if (!values.includes(value)) {
+    return;
+  }
+  commit({
+    ...state,
+    answers: { ...state.answers, [key]: value },
+    updatedAt: Date.now(),
+  });
+}
+
+/** Marca/desmarca una transición en curso. */
+export function setTransitioning(value: boolean): void {
+  if (state.transitioning === value) {
+    return;
+  }
+  commit({ ...state, transitioning: value, updatedAt: Date.now() });
 }
 
 /** Añade rasgos sin eliminar los previos. */

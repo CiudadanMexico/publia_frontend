@@ -165,7 +165,9 @@ const heroAssets = responses.filter(
     /PUBLIA_prisma_suave_v2\.glb/.test(response.url) ||
     /\/icons\/icono_0[1-8]\.png/.test(response.url),
 );
-const heroAssetsOk = heroAssets.length === 10 && heroAssets.every((item) => item.status === 200);
+const heroAssetUrls = new Set(heroAssets.map((item) => item.url));
+const heroAssetsOk =
+  heroAssetUrls.size === 10 && heroAssets.every((item) => item.status === 200);
 check(
   'hero 3D: los dos modelos GLB y los ocho iconos se descargan',
   heroAssetsOk,
@@ -219,14 +221,15 @@ check(
   `oficial=${brand.official} provisional=${brand.provisional}`,
 );
 
-const cooperativeButton = await page.evaluate(() => {
-  const button = document.querySelector('[data-hero-scene] [data-branch-trait="cooperative"]');
-  return { present: Boolean(button), label: button?.textContent?.trim().slice(0, 40) ?? '' };
-});
+const cooperativePath = await page.evaluate(() => ({
+  heroThirdButton: Boolean(document.querySelector('[data-hero-scene] [data-branch-trait="cooperative"]')),
+  branchE14: document.querySelectorAll('#escena-e14 [data-branch-target]').length,
+  escenaE15: Boolean(document.querySelector('#escena-e15')),
+}));
 check(
-  'hero: tercera ruta narrativa (cooperativismo)',
-  cooperativeButton.present,
-  cooperativeButton.label,
+  'hero: la ruta cooperativa se descubre por scroll/bifurcación, sin tercer botón',
+  cooperativePath.heroThirdButton === false && cooperativePath.branchE14 >= 1 && cooperativePath.escenaE15,
+  JSON.stringify(cooperativePath),
 );
 
 const handover = await page.evaluate(() => ({
@@ -314,15 +317,26 @@ async function transitionProbe(act) {
       scroll: window.scrollY,
     };
   });
-  const button = await page.evaluate((id) => {
-    const el =
-      id === 'cooperative'
-        ? document.querySelector('[data-hero-scene] [data-branch-trait="cooperative"]')
-        : document.querySelector(`[data-route-choice="${id}"]`);
-    el?.scrollIntoView({ block: 'center' });
-    el?.click();
-    return Boolean(el);
-  }, act);
+  let button = true;
+  if (act === 'cooperative') {
+    // Ruta C: estado fresco + scroll manual real desde el hero, SIN botón.
+    await page.evaluate(() => {
+      try { sessionStorage.clear(); } catch {}
+    });
+    await page.reload({ waitUntil: 'networkidle' });
+    await page.waitForTimeout(3200);
+    await page.mouse.move(680, 400);
+    await page.mouse.wheel(0, 620);
+    await page.waitForTimeout(400);
+    await page.mouse.wheel(0, 620);
+  } else {
+    button = await page.evaluate((id) => {
+      const el = document.querySelector(`[data-route-choice="${id}"]`);
+      el?.scrollIntoView({ block: 'center' });
+      el?.click();
+      return Boolean(el);
+    }, act);
+  }
   await page.waitForTimeout(2600);
   const after = await page.evaluate(() => {
     const canvas = document.querySelector('[data-prism-canvas]');
@@ -374,6 +388,103 @@ for (const act of ['enterprise', 'efficiency', 'cooperative']) {
   );
 }
 
+// --- P0: dos botones visibles, la tercera ruta entra por scroll libre ----------
+const heroButtons = await page.evaluate(() => ({
+  routeChoices: document.querySelectorAll('.hero__actions [data-route-choice]').length,
+  thirdButton: document.querySelectorAll('.hero__actions [data-branch-trait]').length,
+  hint: document.querySelector('.hero__hint')?.textContent?.trim() ?? '',
+}));
+check(
+  'P0: sólo dos botones principales en el hero (la tercera ruta es por scroll)',
+  heroButtons.routeChoices === 2 && heroButtons.thirdButton === 0,
+  `routeChoices=${heroButtons.routeChoices} · tercer botón=${heroButtons.thirdButton} · pista="${heroButtons.hint.slice(0, 40)}…"`,
+);
+check(
+  'P0: la pista de scroll invita a explorar sin botón',
+  /desplázate/i.test(heroButtons.hint),
+  heroButtons.hint,
+);
+
+// scroll libre sin elegir botón → ruta exploración (origen scroll)
+await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+await page.evaluate(() => {
+  try { sessionStorage.clear(); } catch {}
+  location.reload();
+});
+await page.waitForLoadState('networkidle');
+await page.waitForTimeout(3200);
+await page.mouse.move(680, 400);
+await page.mouse.wheel(0, 700);
+await page.waitForTimeout(600);
+const freeScroll = await page.evaluate(() => ({
+  route: document.documentElement.dataset.route ?? '',
+  act: document.documentElement.dataset.act ?? '',
+  world: document.querySelector('[data-prism-canvas]')?.dataset.world ?? '',
+}));
+await page.mouse.wheel(0, 700);
+await page.waitForTimeout(1200);
+const freeScroll2 = await page.evaluate(() => ({
+  route: document.documentElement.dataset.route ?? '',
+  world: document.querySelector('[data-prism-canvas]')?.dataset.world ?? '',
+  camera: document.querySelector('[data-prism-canvas]')?.dataset.camera ?? '',
+  scroll: Math.round(window.scrollY),
+}));
+check(
+  'P0: scroll manual sin clic entra inequívocamente en la ruta exploración',
+  freeScroll.route === 'explorer' && freeScroll.act === 'cooperative',
+  `tras rueda: route=${freeScroll.route} · act=${freeScroll.act} · world=${freeScroll.world}`,
+);
+check(
+  'P0: el scroll conduce la cámara (scrub) hacia el mundo cooperativo',
+  freeScroll2.world === 'cooperative' && freeScroll2.camera !== '[0,2.4,11.6]' && freeScroll2.scroll > 200,
+  `world=${freeScroll2.world} · cámara=${freeScroll2.camera} · scrollY=${freeScroll2.scroll}`,
+);
+
+// elegir empresa y después hacer scroll: NO deriva a exploración
+await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+await page.waitForTimeout(600);
+await page.evaluate(() => document.querySelector('[data-route-choice="enterprise"]')?.click());
+await page.waitForTimeout(2600);
+await page.mouse.wheel(0, 900);
+await page.waitForTimeout(1500);
+const afterChoice = await page.evaluate(() => ({
+  route: document.documentElement.dataset.route ?? '',
+  act: document.documentElement.dataset.act ?? '',
+  world: document.querySelector('[data-prism-canvas]')?.dataset.world ?? '',
+}));
+check(
+  'P0: tras elegir empresa, el scroll NO cambia a exploración',
+  afterChoice.route === 'enterprise' && afterChoice.world === 'enterprise',
+  `route=${afterChoice.route} · act=${afterChoice.act} · world=${afterChoice.world}`,
+);
+
+// tarjetas: 8 chips accesibles, hover/foco muestran información
+const cardsDom = await page.evaluate(() => {
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  const chips = [...document.querySelectorAll('[data-card-index]')];
+  return { count: chips.length };
+});
+check('P0: las ocho tarjetas tienen control DOM accesible', cardsDom.count === 8, `chips=${cardsDom.count}`);
+await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+await page.waitForTimeout(400);
+const chip = page.locator('[data-card-index="0"]');
+await chip.focus();
+await page.waitForTimeout(300);
+const chipFocus = await page.evaluate(() => ({
+  tooltip: !document.getElementById('hero-card-info-0')?.hasAttribute('hidden'),
+  focusedCard: document.querySelector('[data-prism-canvas]')?.dataset.focusedCard ?? '',
+  expanded: document.querySelector('[data-card-index="0"]')?.getAttribute('aria-expanded') ?? '',
+}));
+check(
+  'P0: foco de teclado en tarjeta muestra información y resalta la tarjeta 3D',
+  chipFocus.tooltip && chipFocus.expanded === 'true' && chipFocus.focusedCard === '0',
+  JSON.stringify(chipFocus),
+);
+await chip.press('Enter');
+await page.waitForTimeout(250);
+const chipClick = await page.evaluate(() => document.querySelector('[data-card-index="0"]')?.getAttribute('aria-expanded'));
+check('P0: Enter sobre tarjeta abre/cierra la información contextual', chipClick === 'false' || chipClick === 'true', `aria-expanded=${chipClick}`);
+
 // --- estructura del grafo ---------------------------------------------------
 const structure = await page.evaluate(() => ({
   scenes: document.querySelectorAll('[data-scene-id]').length,
@@ -414,6 +525,12 @@ check('efectos: columna sticky', effects.sticky >= 1, `${effects.sticky} columna
 const click = (selector) => page.evaluate((s) => document.querySelector(s)?.click(), selector);
 
 // --- variante compartida: texto neutral antes de elegir ruta -----------------
+// Estado fresco: sin ruta en sesión para capturar la variante neutral real.
+await page.evaluate(() => {
+  try { sessionStorage.clear(); } catch {}
+});
+await page.reload({ waitUntil: 'networkidle' });
+await page.waitForTimeout(3000);
 const perspectiveNeutral = await page.evaluate(
   () => document.querySelector('#escena-e02 [data-role="title"]')?.textContent?.trim() ?? '',
 );
@@ -449,16 +566,24 @@ check(
 );
 
 await click('[data-route-reset]');
-await page.waitForTimeout(1400);
+await page.waitForTimeout(2600);
 await click('[data-route-choice="efficiency"]');
-await page.waitForTimeout(1800);
+await page.waitForTimeout(2600);
 const efficiency = await page.evaluate(() => ({
   route: document.documentElement.dataset.route,
+  act: document.documentElement.dataset.act ?? '',
+  world: document.querySelector('[data-prism-canvas]')?.dataset.world ?? '',
+  scroll: Math.round(window.scrollY),
+  traveling: document.documentElement.dataset.scrolling ?? '',
   visible: document.querySelector('#escena-e07')?.offsetHeight ?? 0,
   title: document.querySelector('#escena-e07 [data-role="title"]')?.textContent?.trim() ?? '',
   perspective: document.querySelector('#escena-e02 [data-role="title"]')?.textContent?.trim() ?? '',
 }));
-check('ruta eficiencia: escena propia visible', efficiency.visible > 100, `${efficiency.visible}px`);
+check(
+  'ruta eficiencia: escena propia visible',
+  efficiency.visible > 100,
+  `${efficiency.visible}px · route=${efficiency.route} act=${efficiency.act} world=${efficiency.world} scrollY=${efficiency.scroll}`,
+);
 check(
   'ruta eficiencia: mensaje propio de la escena',
   efficiency.title.includes('repetir'),
@@ -480,14 +605,18 @@ const reset = await page.evaluate(() => ({
 check('cambio de ruta: vuelve al estado neutral', reset.route === 'unclassified', reset.route);
 check('cambio de ruta: regresa al hero', reset.scroll < 120, `scrollY ${reset.scroll}`);
 
-// --- ruta exploradora por scroll ---------------------------------------------
+// --- ruta exploradora por scroll libre (rueda real, sin botón) ----------------
 await page.evaluate(() => {
-  const element = document.querySelector('#escena-e13');
-  if (element) {
-    const top = element.getBoundingClientRect().top + window.scrollY;
-    window.scrollTo({ top, behavior: 'instant' });
-  }
+  try { sessionStorage.clear(); } catch {}
+  window.scrollTo({ top: 0, behavior: 'instant' });
 });
+await page.reload({ waitUntil: 'networkidle' });
+await page.waitForTimeout(3000);
+await page.mouse.move(680, 400);
+for (let i = 0; i < 6; i += 1) {
+  await page.mouse.wheel(0, 500);
+  await page.waitForTimeout(220);
+}
 await page.waitForTimeout(1800);
 const explorer = await page.evaluate(() => ({
   route: document.documentElement.dataset.route,

@@ -13,7 +13,7 @@ import gsap from 'gsap';
 
 import type { UniverseHandle, UniverseWorld } from '../three/universe';
 import type { PrimaryRoute, VisitorTrait } from './state';
-import { addTraits, getState, setPrimaryRoute } from './state';
+import { addTraits, getState, setPrimaryRoute, setTransitioning } from './state';
 import { track } from './events';
 
 export type ActId = 'hero' | 'enterprise' | 'efficiency' | 'cooperative';
@@ -69,6 +69,12 @@ interface NarrativeOptions {
 export interface NarrativeHandle {
   /** Entra a un acto: viaje de cámara + scroll + estado. */
   enterAct(act: ActId): void;
+  /**
+   * Ruta C por scroll silencioso: el visitante desplaza la página desde el
+   * hero SIN elegir botón. El viaje de cámara lo conduce el propio scroll
+   * (pin + scrub), no un desplazamiento programático.
+   */
+  enterFreeRoute(): void;
   /** Vuelve al acto anterior (sin reiniciar). */
   goBack(): void;
   /** Acto actual. */
@@ -89,15 +95,19 @@ export function createNarrative({ universe, reducedMotion }: NarrativeOptions): 
     const top = element.getBoundingClientRect().top + window.scrollY;
     const proxy = { value: window.scrollY };
     const root = document.documentElement;
+    const w = window as unknown as { __publiaLastProgrammaticScroll?: number };
     root.dataset['scrolling'] = 'programmatic';
+    w.__publiaLastProgrammaticScroll = performance.now();
     gsap.to(proxy, {
       value: top,
       duration: reducedMotion ? 0 : 1.5,
       ease: 'power2.inOut',
       onUpdate: () => {
+        w.__publiaLastProgrammaticScroll = performance.now();
         window.scrollTo({ top: proxy.value, behavior: 'instant' as ScrollBehavior });
       },
       onComplete: () => {
+        w.__publiaLastProgrammaticScroll = performance.now();
         root.dataset['scrolling'] = '';
       },
     });
@@ -130,10 +140,12 @@ export function createNarrative({ universe, reducedMotion }: NarrativeOptions): 
     if (!act) return;
     if (traveling) return;
     traveling = true;
+    setTransitioning(true);
 
-    setPrimaryRoute(act.route);
+    setPrimaryRoute(act.route, 'button');
     if (act.traits) addTraits(act.traits);
     track(act.event as 'hero_enterprise_selected' | 'hero_efficiency_selected' | 'hero_cooperative_selected', { world: act.world });
+    universe?.gesture();
 
     stack.push(act.id);
     if (stack.length > 12) stack.shift();
@@ -142,6 +154,7 @@ export function createNarrative({ universe, reducedMotion }: NarrativeOptions): 
       duration: reducedMotion ? 0 : 1.9,
       onComplete: () => {
         traveling = false;
+        setTransitioning(false);
       },
     });
     scrollTo(act.anchor);
@@ -151,7 +164,52 @@ export function createNarrative({ universe, reducedMotion }: NarrativeOptions): 
     document.documentElement.dataset['act'] = act.id;
     window.setTimeout(() => {
       traveling = false;
+      setTransitioning(false);
     }, reducedMotion ? 0 : 2000);
+  };
+
+  const enterFreeRoute = (): void => {
+    // Guardas innegociables: sólo sin ruta elegida, sólo desde el hero, sólo
+    // con scroll de intención real (el llamador ya filtró rueda/touch/teclado
+    // y excluyó desplazamientos programáticos) y sin transición en curso.
+    const state = getState();
+    if (state.primary !== 'unclassified') return;
+    if (state.transitioning) return;
+    if (stack[stack.length - 1] !== 'hero') return;
+    if (window.scrollY > window.innerHeight * 0.8) return;
+    if (traveling) return;
+    traveling = true;
+    setTransitioning(true);
+
+    const heroElement = document.querySelector<HTMLElement>('[data-hero-scene]');
+    setPrimaryRoute('explorer', 'scroll');
+    track('iniciar_scroll_libre', { world: 'cooperative' });
+    universe?.gesture();
+
+    stack.push('cooperative');
+    if (stack.length > 12) stack.shift();
+
+    // El scroll del visitante conduce la transición (pin + scrub sobre el hero):
+    // la cámara atraviesa el prisma hacia el mundo cooperativo mientras bajan.
+    universe?.travelTo('cooperative', {
+      scrub: heroElement
+        ? { trigger: heroElement, start: 'top top', end: '+=150%' }
+        : undefined,
+      duration: reducedMotion ? 0 : 1.9,
+      onComplete: () => {
+        traveling = false;
+        setTransitioning(false);
+      },
+    });
+    if (reducedMotion || !heroElement) {
+      universe?.travelTo('cooperative', { duration: 0 });
+    }
+
+    document.documentElement.dataset['act'] = 'cooperative';
+    window.setTimeout(() => {
+      traveling = false;
+      setTransitioning(false);
+    }, reducedMotion ? 0 : 3000);
   };
 
   const goBack = (): void => {
@@ -191,6 +249,7 @@ export function createNarrative({ universe, reducedMotion }: NarrativeOptions): 
 
   return {
     enterAct,
+    enterFreeRoute,
     goBack,
     currentAct(): ActId {
       return stack[stack.length - 1] ?? 'hero';

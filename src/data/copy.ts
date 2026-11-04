@@ -78,6 +78,25 @@ export const HERO: HeroCopy = {
   ],
 };
 
+/** Las ocho tarjetas holográficas del hero, como lista accesible (S1). */
+export interface HeroCard {
+  icon: string;
+  label: string;
+  blurb: string;
+  target: string;
+}
+
+export const HERO_CARDS: readonly HeroCard[] = [
+  { icon: 'icono_01.png', label: 'Inteligencia artificial', blurb: 'IA dentro de tus procesos, no en un chat aparte.', target: '#escena-e06' },
+  { icon: 'icono_02.png', label: 'Desarrollo web', blurb: 'Sitios y comunicación que evolucionan con tu negocio.', target: '#escena-e25' },
+  { icon: 'icono_03.png', label: 'Agentes de IA', blurb: 'Un asistente que avanza, no solo un chatbot que responde.', target: '#escena-e09' },
+  { icon: 'icono_04.png', label: 'Cooperativismo', blurb: 'Otra forma de colaborar: tecnología abierta y comunidades con autonomía.', target: '#escena-e15' },
+  { icon: 'icono_05.png', label: 'Multimedia', blurb: 'Producción con manos: eventos, activaciones y contenido.', target: '#escena-e26' },
+  { icon: 'icono_06.png', label: 'Marketing', blurb: 'Publicidad por elección, no por interrupción.', target: '#escena-e19' },
+  { icon: 'icono_07.png', label: 'Ecología', blurb: 'El cómputo también tiene una huella; la medimos y la reducimos.', target: '#escena-e20' },
+  { icon: 'icono_08.png', label: 'Infraestructura', blurb: 'De un centro a una red: tu propio nodo, con control de tus datos.', target: '#escena-e21' },
+];
+
 export interface SceneCopy {
   id: string;
   route: PrimaryRoute | 'shared';

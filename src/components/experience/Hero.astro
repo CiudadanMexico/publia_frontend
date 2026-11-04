@@ -9,7 +9,7 @@
  * El texto y las dos decisiones principales ya existen en `data/copy`; aquí
  * se conservan y se les da la jerarquía tipográfica de la referencia.
  */
-import { HERO } from '../../data/copy';
+import { HERO, HERO_CARDS } from '../../data/copy';
 ---
 
 <section class="hero" id="inicio" data-scene-id="E01" data-hero-scene aria-labelledby="hero-titulo">
@@ -36,19 +36,31 @@ import { HERO } from '../../data/copy';
           </button>
         ))
       }
-      <button
-        type="button"
-        class="hero__cta hero__cta--tertiary"
-        data-branch-target="#escena-e15"
-        data-branch-trait="cooperative"
-        data-branch-route="explorer"
-      >
-        <span>Quiero cooperar / comunidad</span>
-        <b aria-hidden="true">↗</b>
-      </button>
     </div>
 
-    <p class="hero__hint">DESPLÁZATE PARA EXPLORAR <span aria-hidden="true">↓</span></p>
+    <p class="hero__hint">¿Prefieres explorar a tu manera? <span>Desplázate</span> <span aria-hidden="true">↓</span></p>
+
+    <ul class="hero__cards" aria-label="Ocho soluciones de Publia">
+      {
+        HERO_CARDS.map((card, index) => (
+          <li>
+            <button
+              type="button"
+              class="hero__card-chip"
+              data-card-index={index}
+              aria-describedby={`hero-card-info-${index}`}
+            >
+              <img src={`/icons/${card.icon}`} alt="" width="18" height="18" loading="lazy" />
+              <span>{card.label}</span>
+            </button>
+            <span class="hero__card-info" id={`hero-card-info-${index}`} role="tooltip" hidden>
+              {card.blurb}{' '}
+              <a href={card.target} data-card-link={index}>Ver en el recorrido ↓</a>
+            </span>
+          </li>
+        ))
+      }
+    </ul>
   </div>
 
   <p class="hero__stage-label" aria-hidden="true">
@@ -219,6 +231,95 @@ import { HERO } from '../../data/copy';
     filter: brightness(1.1);
   }
 
+  .hero__hint span {
+    color: var(--hero-cyan);
+  }
+
+  .hero__cards {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    padding: 0;
+    margin: 1.4rem 0 0;
+    max-width: 30rem;
+  }
+
+  .hero__cards li {
+    position: relative;
+  }
+
+  .hero__card-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border: 1px solid rgba(128, 229, 255, 0.25);
+    border-radius: 999px;
+    background: rgba(5, 11, 27, 0.55);
+    color: var(--hero-ink);
+    font: inherit;
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
+    padding: 0.32rem 0.65rem;
+    cursor: pointer;
+    backdrop-filter: blur(6px);
+    transition:
+      border-color 180ms var(--ease-out),
+      background-color 180ms var(--ease-out),
+      transform 180ms var(--ease-out);
+  }
+
+  .hero__card-chip img {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+  }
+
+  .hero__card-chip:hover,
+  .hero__card-chip:focus-visible {
+    border-color: var(--hero-cyan);
+    background: rgba(11, 46, 84, 0.75);
+    transform: translateY(-2px);
+    outline: none;
+  }
+
+  .hero__card-chip:focus-visible {
+    box-shadow: 0 0 0 2px var(--hero-amber);
+  }
+
+  .hero__card-info a {
+    color: var(--hero-cyan);
+    text-decoration: none;
+    border-bottom: 1px dotted currentColor;
+  }
+
+  .hero__card-info {
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + 0.4rem);
+    z-index: 3;
+    max-width: 15rem;
+    background: rgba(3, 8, 20, 0.92);
+    border: 1px solid rgba(128, 229, 255, 0.3);
+    border-radius: 0.5rem;
+    padding: 0.45rem 0.6rem;
+    font-size: 0.72rem;
+    line-height: 1.35;
+    color: var(--hero-ink);
+    pointer-events: none;
+  }
+
+  @media (max-width: 640px) {
+    .hero__cards {
+      max-width: 100%;
+    }
+
+    .hero__card-chip {
+      font-size: 0.66rem;
+      padding: 0.28rem 0.5rem;
+    }
+  }
+
   .hero__hint {
     margin: 75px 0 0;
     font-family: var(--font-hero-body);
@@ -329,7 +430,96 @@ import { HERO } from '../../data/copy';
       padding: 14px;
     }
 
-    .hero__hint {
+    .hero__hint span {
+    color: var(--hero-cyan);
+  }
+
+  .hero__cards {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    padding: 0;
+    margin: 1.4rem 0 0;
+    max-width: 30rem;
+  }
+
+  .hero__cards li {
+    position: relative;
+  }
+
+  .hero__card-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border: 1px solid rgba(128, 229, 255, 0.25);
+    border-radius: 999px;
+    background: rgba(5, 11, 27, 0.55);
+    color: var(--hero-ink);
+    font: inherit;
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
+    padding: 0.32rem 0.65rem;
+    cursor: pointer;
+    backdrop-filter: blur(6px);
+    transition:
+      border-color 180ms var(--ease-out),
+      background-color 180ms var(--ease-out),
+      transform 180ms var(--ease-out);
+  }
+
+  .hero__card-chip img {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+  }
+
+  .hero__card-chip:hover,
+  .hero__card-chip:focus-visible {
+    border-color: var(--hero-cyan);
+    background: rgba(11, 46, 84, 0.75);
+    transform: translateY(-2px);
+    outline: none;
+  }
+
+  .hero__card-chip:focus-visible {
+    box-shadow: 0 0 0 2px var(--hero-amber);
+  }
+
+  .hero__card-info a {
+    color: var(--hero-cyan);
+    text-decoration: none;
+    border-bottom: 1px dotted currentColor;
+  }
+
+  .hero__card-info {
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + 0.4rem);
+    z-index: 3;
+    max-width: 15rem;
+    background: rgba(3, 8, 20, 0.92);
+    border: 1px solid rgba(128, 229, 255, 0.3);
+    border-radius: 0.5rem;
+    padding: 0.45rem 0.6rem;
+    font-size: 0.72rem;
+    line-height: 1.35;
+    color: var(--hero-ink);
+    pointer-events: none;
+  }
+
+  @media (max-width: 640px) {
+    .hero__cards {
+      max-width: 100%;
+    }
+
+    .hero__card-chip {
+      font-size: 0.66rem;
+      padding: 0.28rem 0.5rem;
+    }
+  }
+
+  .hero__hint {
       margin-top: 45px;
     }
 

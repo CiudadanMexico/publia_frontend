@@ -1,6 +1,6 @@
 {
   "base": "https://kitty-midi-grid-liked.trycloudflare.com",
-  "total": 85,
+  "total": 93,
   "fallos": 0,
   "resultados": [
     {
@@ -31,12 +31,12 @@
     {
       "name": "prisma: la escena 3D se renderiza y cambia (animación real)",
       "ok": true,
-      "detail": "658447 vs 666566 bytes"
+      "detail": "662889 vs 677737 bytes"
     },
     {
       "name": "prisma: pinta una fracción útil del viewport",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.20553703703703705}"
+      "detail": "{\"paintedRatio\":0.20326234567901236}"
     },
     {
       "name": "hero 3D: lienzo único presente con WebGL activo",
@@ -61,17 +61,17 @@
     {
       "name": "hero 3D: los dos modelos GLB y los ocho iconos se descargan",
       "ok": true,
-      "detail": "10/10 recursos"
+      "detail": "18/10 recursos"
     },
     {
       "name": "hero 3D: pinta la escena (mascota, prisma, tarjetas)",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.206125}"
+      "detail": "{\"paintedRatio\":0.205625}"
     },
     {
       "name": "hero 3D: la animación ambiental cambia entre fotogramas",
       "ok": true,
-      "detail": "673975 vs 665100 bytes"
+      "detail": "689540 vs 684263 bytes"
     },
     {
       "name": "marca: el encabezado usa el logotipo oficial",
@@ -79,9 +79,9 @@
       "detail": "oficial=true provisional=0"
     },
     {
-      "name": "hero: tercera ruta narrativa (cooperativismo)",
+      "name": "hero: la ruta cooperativa se descubre por scroll/bifurcación, sin tercer botón",
       "ok": true,
-      "detail": "Quiero cooperar / comunidad ↗"
+      "detail": "{\"heroThirdButton\":false,\"branchE14\":2,\"escenaE15\":true}"
     },
     {
       "name": "hero: viñeta activa sólo en el acto hero",
@@ -91,17 +91,17 @@
     {
       "name": "composición: coincide con la captura aprobada",
       "ok": true,
-      "detail": "izq 35/35 · der 41/40 · brillo 14.4/14.8 %"
+      "detail": "izq 36/35 · der 41/40 · brillo 14.4/14.8 %"
     },
     {
       "name": "transición enterprise: la cámara viaja a otro mundo del mismo universo",
       "ok": true,
-      "detail": "mundo hero→enterprise · cámara [0,2.4,11.6]→[1.856833,1.715904,8.472702] · tinte #050b1b→#0a0e18"
+      "detail": "mundo hero→enterprise · cámara [0,2.4,11.6]→[1.781998,1.743474,8.598739] · tinte #050b1b→#0a0e18"
     },
     {
       "name": "transición enterprise: el contenido de la escena destino aparece",
       "ok": true,
-      "detail": "scrollY 2313 · act=enterprise"
+      "detail": "scrollY 2344 · act=enterprise"
     },
     {
       "name": "transición enterprise: volver regresa al hero sin recargar",
@@ -116,7 +116,7 @@
     {
       "name": "transición efficiency: el contenido de la escena destino aparece",
       "ok": true,
-      "detail": "scrollY 5622 · act=efficiency"
+      "detail": "scrollY 5653 · act=efficiency"
     },
     {
       "name": "transición efficiency: volver regresa al hero sin recargar",
@@ -126,17 +126,57 @@
     {
       "name": "transición cooperative: la cámara viaja a otro mundo del mismo universo",
       "ok": true,
-      "detail": "mundo hero→cooperative · cámara [0,2.4,11.6]→[0,1.9,9.4] · tinte #050b1b→#060d08"
+      "detail": "mundo hero→cooperative · cámara [0,2.4,11.6]→[-0.016666666666666673,1.9086643333333333,9.401456] · tinte #050b1b→#060d08"
     },
     {
       "name": "transición cooperative: el contenido de la escena destino aparece",
       "ok": true,
-      "detail": "scrollY 6878 · act=cooperative"
+      "detail": "scrollY 1240 · act=cooperative"
     },
     {
       "name": "transición cooperative: volver regresa al hero sin recargar",
       "ok": true,
       "detail": "world=hero · act=hero · scrollY 0"
+    },
+    {
+      "name": "P0: sólo dos botones principales en el hero (la tercera ruta es por scroll)",
+      "ok": true,
+      "detail": "routeChoices=2 · tercer botón=0 · pista=\"¿Prefieres explorar a tu manera? Despláz…\""
+    },
+    {
+      "name": "P0: la pista de scroll invita a explorar sin botón",
+      "ok": true,
+      "detail": "¿Prefieres explorar a tu manera? Desplázate ↓"
+    },
+    {
+      "name": "P0: scroll manual sin clic entra inequívocamente en la ruta exploración",
+      "ok": true,
+      "detail": "tras rueda: route=explorer · act=cooperative · world=cooperative"
+    },
+    {
+      "name": "P0: el scroll conduce la cámara (scrub) hacia el mundo cooperativo",
+      "ok": true,
+      "detail": "world=cooperative · cámara=[-0.016666666666666673,1.9083333333333332,9.4] · scrollY=1400"
+    },
+    {
+      "name": "P0: tras elegir empresa, el scroll NO cambia a exploración",
+      "ok": true,
+      "detail": "route=enterprise · act=enterprise · world=enterprise"
+    },
+    {
+      "name": "P0: las ocho tarjetas tienen control DOM accesible",
+      "ok": true,
+      "detail": "chips=8"
+    },
+    {
+      "name": "P0: foco de teclado en tarjeta muestra información y resalta la tarjeta 3D",
+      "ok": true,
+      "detail": "{\"tooltip\":true,\"focusedCard\":\"0\",\"expanded\":\"true\"}"
+    },
+    {
+      "name": "P0: Enter sobre tarjeta abre/cierra la información contextual",
+      "ok": true,
+      "detail": "aria-expanded=false"
     },
     {
       "name": "grafo: 31 escenas montadas (E00-E30)",
@@ -201,7 +241,7 @@
     {
       "name": "ruta empresa: segmentos aplicados",
       "ok": true,
-      "detail": "enterprise cooperative"
+      "detail": "enterprise"
     },
     {
       "name": "ruta empresa: escena propia visible",
@@ -221,7 +261,7 @@
     {
       "name": "ruta eficiencia: escena propia visible",
       "ok": true,
-      "detail": "653px"
+      "detail": "653px · route=efficiency act=efficiency world=efficiency scrollY=5653"
     },
     {
       "name": "ruta eficiencia: mensaje propio de la escena",
@@ -406,12 +446,12 @@
     {
       "name": "rendimiento: JS + CSS inicial (con el 3D del hero) por debajo de 260 kB",
       "ok": true,
-      "detail": "239 kB (JS 232 · CSS 6)"
+      "detail": "240 kB (JS 233 · CSS 7)"
     },
     {
       "name": "rendimiento: la aplicación sin 3D por debajo de 90 kB",
       "ok": true,
-      "detail": "63 kB de JS de aplicación"
+      "detail": "64 kB de JS de aplicación"
     },
     {
       "name": "rendimiento: el escenario 3D se carga sólo bajo demanda",

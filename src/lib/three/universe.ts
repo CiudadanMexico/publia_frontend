@@ -42,9 +42,22 @@ export interface UniverseOptions {
   reducedMotion?: boolean;
 }
 
+export interface TravelOptions {
+  duration?: number;
+  onComplete?: () => void;
+  /** Si se indica, el viaje lo conduce el scroll (pin + scrub) en vez del tiempo. */
+  scrub?: { trigger: HTMLElement; start?: string; end?: string };
+}
+
 export interface UniverseHandle {
   /** Viaje cinematográfico a otro mundo del mismo universo. */
-  travelTo(world: UniverseWorld, options?: { duration?: number; onComplete?: () => void }): void;
+  travelTo(world: UniverseWorld, options?: TravelOptions): void;
+  /** Pulso temporal sobre una tarjeta (hover/tap). */
+  cardPulse(index: number): void;
+  /** Resalta una tarjeta de forma sostenida (foco/hover). */
+  cardFocus(index: number, on: boolean): void;
+  /** Gesto sutil de la P ante una decisión. */
+  gesture(): void;
   world(): UniverseWorld;
   /** Modulación por escena (progreso 0-1 dentro de la escena activa). */
   setSceneProgress(progress: number): void;
@@ -549,6 +562,9 @@ export async function createUniverse({
   let elapsed = 0;
   let scrollProgress = 0;
   let travel: gsap.core.Timeline | null = null;
+  let scrollTriggerTravel: ScrollTrigger | null = null;
+  const gestureOffset = { x: 0, y: 0, rz: 0 };
+  const cardFocusSet = new Set<number>();
 
   const pointer = new THREE.Vector2();
   const clock = new THREE.Clock();
@@ -616,7 +632,9 @@ export async function createUniverse({
     if (mascot) {
       mascot.rotation.y = 0.13 * Math.sin(t * 0.5) + spread * 0.65;
       mascot.rotation.x = 0.045 * Math.sin(t * 0.7);
-      mascot.position.y = 2.18 + Math.sin(t * 1.1) * 0.095;
+      mascot.position.y = 2.18 + Math.sin(t * 1.1) * 0.095 + gestureOffset.y;
+      mascot.position.x = gestureOffset.x;
+      mascot.rotation.z = gestureOffset.rz;
     }
     if (prism) {
       prism.rotation.y = t * 0.085;
@@ -661,8 +679,11 @@ export async function createUniverse({
         card.base.z,
       );
       card.group.rotation.y = Math.sin(t * 0.42 + i) * 0.17;
-      card.group.scale.setScalar(card.scale * (1 + spread * 0.06));
+      const focused = cardFocusSet.has(i) ? 1.18 : 1;
+      card.group.scale.setScalar(card.scale * (1 + spread * 0.06) * focused);
       card.group.lookAt(camera.position);
+      const borderMat = (card.group.children[1] as THREE.LineSegments).material as THREE.LineBasicMaterial;
+      borderMat.opacity = cardFocusSet.has(i) ? 1 : 0.7;
       void phase;
     });
 
@@ -741,11 +762,13 @@ export async function createUniverse({
       const spec = WORLDS[world];
       if (!spec) return;
       travel?.kill();
+      scrollTriggerTravel?.kill();
       current.world = world;
 
       const tl = gsap.timeline({
         defaults: { duration, ease: 'power2.inOut' },
         onComplete: () => options.onComplete?.(),
+        paused: Boolean(options.scrub),
       });
       travel = tl;
 
@@ -772,10 +795,45 @@ export async function createUniverse({
       tl.to(particles.state, { explode: 0.8, duration: duration * 0.4, ease: 'power2.out' }, 0)
         .to(particles.state, { explode: 0, duration: duration * 0.6, ease: 'power2.inOut' }, duration * 0.4);
 
-      if (reducedMotion) {
+      if (options.scrub && !reducedMotion) {
+        scrollTriggerTravel = ScrollTrigger.create({
+          trigger: options.scrub.trigger,
+          start: options.scrub.start ?? 'top top',
+          end: options.scrub.end ?? '+=150%',
+          scrub: 1,
+          animation: tl,
+        });
+      } else if (reducedMotion) {
         tl.progress(1);
+      } else {
+        tl.play();
       }
       applyCurrent();
+    },
+    cardPulse(index: number): void {
+      const card = cards[index];
+      if (!card || reducedMotion) return;
+      gsap.fromTo(
+        card,
+        { scale: card.scale },
+        { scale: card.scale * 1.3, duration: 0.28, ease: 'power2.out', yoyo: true, repeat: 1 },
+      );
+    },
+    cardFocus(index: number, on: boolean): void {
+      if (on) cardFocusSet.add(index);
+      else cardFocusSet.delete(index);
+    },
+    gesture(): void {
+      if (reducedMotion || !mascot) return;
+      gsap.to(gestureOffset, {
+        x: -0.32,
+        y: 0.12,
+        rz: -0.08,
+        duration: 0.5,
+        ease: 'power2.out',
+        yoyo: true,
+        repeat: 1,
+      });
     },
     world(): UniverseWorld {
       return current.world;
@@ -844,6 +902,7 @@ export async function createUniverse({
       disposed = true;
       renderer.setAnimationLoop(null);
       travel?.kill();
+      scrollTriggerTravel?.kill();
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('resize', onResize);
       document.removeEventListener('visibilitychange', onVisibility);

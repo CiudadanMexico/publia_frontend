@@ -159,7 +159,10 @@ function stageForScene(scene: HTMLElement, route: PrimaryRoute): StageState {
 }
 
 interface UniverseHandleLike {
-  travelTo: (world: 'hero' | 'enterprise' | 'efficiency' | 'cooperative' | 'diagnosis', options?: { duration?: number; onComplete?: () => void }) => void;
+  travelTo: (world: 'hero' | 'enterprise' | 'efficiency' | 'cooperative' | 'diagnosis', options?: { duration?: number; onComplete?: () => void; scrub?: { trigger: HTMLElement; start?: string; end?: string } }) => void;
+  cardPulse: (index: number) => void;
+  cardFocus: (index: number, on: boolean) => void;
+  gesture: () => void;
   world: () => 'hero' | 'enterprise' | 'efficiency' | 'cooperative' | 'diagnosis';
   setSceneProgress: (progress: number) => void;
   setPointer: (x: number, y: number) => void;
@@ -232,6 +235,93 @@ async function initUniverse(): Promise<UniverseHandleLike | null> {
   return universe;
 }
 
+/**
+ * Scroll libre sin elegir botón = ruta C (exploración).
+ *
+ * Guardas innegociables: sólo cuando no hay ruta elegida, sólo desde el hero,
+ * sólo con intención real del visitante (rueda, touch, teclado o arrastre de
+ * barra) y nunca durante un desplazamiento programático ni una transición.
+ */
+function bindFreeScrollIntent(narrative: NarrativeHandle | null): void {
+  let armed = true;
+  const tryFreeRoute = (fromRealInput: boolean): void => {
+    if (!armed) return;
+    const root = document.documentElement;
+    if (root.dataset['scrolling'] === 'programmatic') return;
+    if (!fromRealInput) {
+      // Un evento scroll suelto sólo cuenta como intención si pasó tiempo
+      // desde el último desplazamiento programático (evita rezagos).
+      const w = window as unknown as { __publiaLastProgrammaticScroll?: number };
+      const last = w.__publiaLastProgrammaticScroll ?? 0;
+      if (performance.now() - last < 500) return;
+    }
+    const state = getState();
+    if (state.primary !== 'unclassified' || state.transitioning) return;
+    if (narrative?.currentAct() !== 'hero') return;
+    if (window.scrollY > window.innerHeight * 0.8) return;
+    armed = false;
+    narrative?.enterFreeRoute();
+  };
+  window.addEventListener('wheel', () => tryFreeRoute(true), { passive: true });
+  window.addEventListener('touchmove', () => tryFreeRoute(true), { passive: true });
+  window.addEventListener('keydown', (event) => {
+    const keys = ['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', ' ', 'Home', 'End'];
+    if (keys.includes(event.key)) tryFreeRoute(true);
+  });
+  window.addEventListener('scroll', () => tryFreeRoute(false), { passive: true });
+}
+
+/** Las ocho tarjetas del hero responden a hover, foco y tap (nivel 2). */
+function bindHeroCards(universe: UniverseHandleLike | null): void {
+  const chips = document.querySelectorAll<HTMLButtonElement>('[data-card-index]');
+  const canvas = document.querySelector<HTMLCanvasElement>('[data-prism-canvas]');
+  chips.forEach((chip) => {
+    const index = Number(chip.dataset['cardIndex'] ?? -1);
+    const info = document.getElementById(`hero-card-info-${index}`);
+    const show = (): void => {
+      chips.forEach((other) => {
+        const otherIndex = Number(other.dataset['cardIndex'] ?? -1);
+        const otherInfo = document.getElementById(`hero-card-info-${otherIndex}`);
+        if (other !== chip) {
+          otherInfo?.setAttribute('hidden', '');
+          other.setAttribute('aria-expanded', 'false');
+        }
+      });
+      info?.removeAttribute('hidden');
+      chip.setAttribute('aria-expanded', 'true');
+      universe?.cardFocus(index, true);
+      universe?.cardPulse(index);
+      if (canvas) canvas.dataset['focusedCard'] = String(index);
+    };
+    const hide = (): void => {
+      if (chip.getAttribute('aria-expanded') !== 'true') {
+        info?.setAttribute('hidden', '');
+      }
+      universe?.cardFocus(index, false);
+    };
+    chip.addEventListener('mouseenter', show);
+    chip.addEventListener('focus', show);
+    chip.addEventListener('click', () => {
+      const wasOpen = chip.getAttribute('aria-expanded') === 'true';
+      chips.forEach((other) => {
+        const otherIndex = Number(other.dataset['cardIndex'] ?? -1);
+        document.getElementById(`hero-card-info-${otherIndex}`)?.setAttribute('hidden', '');
+        other.setAttribute('aria-expanded', 'false');
+        universe?.cardFocus(otherIndex, false);
+      });
+      if (wasOpen) {
+        info?.setAttribute('hidden', '');
+        chip.setAttribute('aria-expanded', 'false');
+        universe?.cardFocus(index, false);
+      } else {
+        show();
+      }
+    });
+    chip.addEventListener('mouseleave', hide);
+    chip.addEventListener('blur', hide);
+  });
+}
+
 function bindRouteControls(
   narrative: NarrativeHandle | null,
   universe: UniverseHandleLike | null,
@@ -246,14 +336,6 @@ function bindRouteControls(
         narrative?.enterAct(route);
       }
     });
-  });
-
-  // El botón cooperativo del hero también es un acto.
-  const cooperativeButton = document.querySelector<HTMLButtonElement>(
-    '[data-hero-scene] [data-branch-trait="cooperative"]',
-  );
-  cooperativeButton?.addEventListener('click', () => {
-    narrative?.enterAct('cooperative');
   });
 
   // Control «volver»: regresa al acto anterior sin reiniciar la experiencia.
@@ -510,6 +592,8 @@ export async function startExperience(): Promise<void> {
   bindRouteControls(narrative, universe);
   bindSceneTracking();
   bindImplicitRouteWatcher();
+  bindFreeScrollIntent(narrative);
+  bindHeroCards(universe);
 
   // Un refresco de ScrollTrigger recalcula el scroll y cancela los scrolls
   // suaves en curso: sólo se hace cuando cambia la visibilidad (ruta o

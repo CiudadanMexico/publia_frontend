@@ -30,6 +30,9 @@ import type { VisitorState } from '../src/lib/experience/state';
 
 const baseState: VisitorState = {
   primary: 'unclassified',
+  origin: null,
+  answers: {},
+  transitioning: false,
   traits: [],
   visitedScenes: [],
   lastScene: null,
