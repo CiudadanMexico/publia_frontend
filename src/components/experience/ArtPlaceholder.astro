@@ -19,8 +19,12 @@ const slot = assetSlotFor(sceneId);
 const slotId = slot?.id ?? 'A00';
 // Si el asset real ya está en public/, se sirve directamente (build-time);
 // si no, queda el placeholder procedural sin pedir nada por red.
-const assetReady = slot ? existsSync(`public${slot.desktop}`) : false;
-const mobileReady = slot ? existsSync(`public${slot.mobile}`) : false;
+// El recurso real se muestra únicamente en la escena primaria del slot
+// (la de llegada); el resto de escenas del slot conservan el placeholder
+// procedural para no duplicar el póster completo en cada capítulo.
+const isPrimary = slot ? slot.scenes[0] === sceneId : false;
+const assetReady = slot ? isPrimary && existsSync(`public${slot.desktop}`) : false;
+const mobileReady = slot ? isPrimary && existsSync(`public${slot.mobile}`) : false;
 ---
 
 <div class="scene__art" data-art-slot={slotId} data-scene-art={sceneId} data-asset-ready={assetReady ? 'true' : 'false'}>

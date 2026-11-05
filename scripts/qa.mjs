@@ -1039,7 +1039,7 @@ const assetsInfo = await page.evaluate(async () => {
   const slots = ['A02', 'A03', 'A04', 'A05'];
   const out = {};
   for (const id of slots) {
-    const art = document.querySelector(`[data-art-slot="${id}"]`);
+    const art = document.querySelector(`[data-art-slot="${id}"][data-asset-ready="true"]`) ?? document.querySelector(`[data-art-slot="${id}"]`);
     const img = art?.querySelector('img[data-asset-img]');
     const src = img?.getAttribute('data-asset-src') ?? '';
     const head = src ? await fetch(src, { method: 'HEAD' }).then((r) => r.headers.get('content-type') + ' ' + r.status).catch(() => 'fetch-fail') : 'no-src';
@@ -1050,6 +1050,30 @@ const assetsInfo = await page.evaluate(async () => {
 for (const id of ['A02', 'A03', 'A04', 'A05']) {
   check(`V4-B asset ${id}: data-asset-ready=true y servido como image/avif`, assetsInfo[id].ready === 'true' && assetsInfo[id].head.startsWith('image/avif'), JSON.stringify(assetsInfo[id]));
 }
+// Auditoría de imágenes (desktop): el asset real aparece UNA sola vez (escena primaria) y sin recortes agresivos
+const imgAudit = await page.evaluate(() => {
+  const res = [];
+  document.querySelectorAll('.scene__art[data-asset-ready="true"]').forEach((art) => {
+    const img = art.querySelector('img[data-asset-img]');
+    const cs = getComputedStyle(art);
+    const [aw, ah] = cs.aspectRatio.split('/').map((v) => parseFloat(v));
+    res.push({
+      slot: art.dataset.artSlot,
+      scene: art.closest('section[id]')?.id,
+      artAspect: +(aw / Math.max(1, ah)).toFixed(2),
+      objectFit: img ? getComputedStyle(img).objectFit : null,
+      natural: img ? img.naturalWidth + 'x' + img.naturalHeight : null,
+      display: cs.display,
+    });
+  });
+  const readyCount = {};
+  document.querySelectorAll('.scene__art[data-asset-ready="true"]').forEach((a) => { readyCount[a.dataset.artSlot] = (readyCount[a.dataset.artSlot] ?? 0) + 1; });
+  const dupSlots = Object.entries(readyCount).filter(([, n]) => n > 1).map(([k]) => k);
+  return { arts: res, readyCount, dupSlots };
+});
+check('auditoría imágenes: cada asset real aparece UNA sola vez (sin duplicados)', imgAudit.dupSlots.length === 0, `ready=${JSON.stringify(imgAudit.readyCount)}`);
+check('auditoría imágenes: caja del asset con proporción 16:9 (1.7–1.85), no franja 3.8:1', imgAudit.arts.every((a) => a.artAspect > 1.7 && a.artAspect < 1.85), JSON.stringify(imgAudit.arts.map((a) => a.slot + '@' + a.scene + '=' + a.artAspect)));
+check('auditoría imágenes: asset real usa contain (póster completo, sin recorte)', imgAudit.arts.every((a) => a.objectFit === 'contain'), JSON.stringify(imgAudit.arts.map((a) => a.objectFit)));
 // mosaico E25: 8 familias seleccionables
 await page.evaluate(() => document.querySelector('#escena-e25')?.scrollIntoView({ behavior: 'instant' }));
 await page.waitForTimeout(900);

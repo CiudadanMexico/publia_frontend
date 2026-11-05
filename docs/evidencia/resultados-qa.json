@@ -1,6 +1,6 @@
 {
   "base": "https://kitty-midi-grid-liked.trycloudflare.com",
-  "total": 133,
+  "total": 136,
   "fallos": 0,
   "resultados": [
     {
@@ -31,7 +31,7 @@
     {
       "name": "prisma: la escena 3D se renderiza y cambia (animación real)",
       "ok": true,
-      "detail": "672821 vs 683467 bytes"
+      "detail": "672820 vs 683466 bytes"
     },
     {
       "name": "prisma: pinta una fracción útil del viewport",
@@ -71,7 +71,7 @@
     {
       "name": "hero 3D: la animación ambiental cambia entre fotogramas",
       "ok": true,
-      "detail": "690848 vs 682574 bytes"
+      "detail": "690850 vs 682574 bytes"
     },
     {
       "name": "marca: el encabezado usa el logotipo oficial",
@@ -96,7 +96,7 @@
     {
       "name": "transición enterprise: la cámara viaja a otro mundo del mismo universo",
       "ok": true,
-      "detail": "mundo hero→enterprise · cámara [0,2.4,11.6]→[2.3901234567901235,1.8212962962962962,8.304475308641976] · tinte #050b1b→#0a0e18"
+      "detail": "mundo hero→enterprise · cámara [0,2.4,11.6]→[2.425025025025025,1.8343843843843843,8.332832832832834] · tinte #050b1b→#0a0e18"
     },
     {
       "name": "transición enterprise: el contenido de la escena destino aparece",
@@ -111,7 +111,7 @@
     {
       "name": "transición efficiency: la cámara viaja a otro mundo del mismo universo",
       "ok": true,
-      "detail": "mundo hero→efficiency · cámara [0,2.4,11.6]→[-1.7216494845360824,1.649042709867452,8.172606774668632] · tinte #050b1b→#0d0a05"
+      "detail": "mundo hero→efficiency · cámara [0,2.4,11.6]→[-1.7624103299856528,1.6606886657101865,8.201721664275468] · tinte #050b1b→#0d0a05"
     },
     {
       "name": "transición efficiency: el contenido de la escena destino aparece",
@@ -246,7 +246,7 @@
     {
       "name": "ruta empresa: escena propia visible",
       "ok": true,
-      "detail": "1449px"
+      "detail": "1503px"
     },
     {
       "name": "ruta empresa: contenido de la escena",
@@ -261,7 +261,7 @@
     {
       "name": "ruta eficiencia: escena propia visible",
       "ok": true,
-      "detail": "1541px · route=efficiency act=efficiency world=efficiency scrollY=6652"
+      "detail": "1595px · route=efficiency act=efficiency world=efficiency scrollY=6652"
     },
     {
       "name": "ruta eficiencia: mensaje propio de la escena",
@@ -311,7 +311,7 @@
     {
       "name": "bifurcación: abre la escena cooperativa",
       "ok": true,
-      "detail": "1711px"
+      "detail": "1765px"
     },
     {
       "name": "variante por rasgo: el rasgo reescribe la escena compartida",
@@ -496,12 +496,12 @@
     {
       "name": "v3 scroll: la cámara se transforma en 30/60/90% (ida)",
       "ok": true,
-      "detail": "30=[2.042798353909465,1.6910493827160493,8.022273662551441] 60=[1.8294871794871794,1.5772893772893772,8.093223443223444] 90=[1.9,1.5649172846548773,8.24152880775813]"
+      "detail": "30=[1.9,1.8321745057941377,8.557941376959782] 60=[1.9987179487179487,1.5289377289377288,7.972344322344322] 90=[1.9,1.5808328579577866,8.268054763262978]"
     },
     {
       "name": "v3 scroll: recorrido inverso restaura transformación (reversible)",
       "ok": true,
-      "detail": "90=[1.9,1.5649172846548773,8.24152880775813] vuelta60=[1.8294871794871794,1.5772893772893772,8.093223443223444]"
+      "detail": "90=[1.9,1.5808328579577866,8.268054763262978] vuelta60=[1.9987179487179487,1.5289377289377288,7.972344322344322]"
     },
     {
       "name": "v3 demo empresa: la capa cambia el texto",
@@ -569,6 +569,21 @@
       "detail": "{\"ready\":\"true\",\"src\":\"/assets/scenes/A05-geonodos-2560x1440.avif\",\"head\":\"image/avif 200\",\"hasMobile\":true}"
     },
     {
+      "name": "auditoría imágenes: cada asset real aparece UNA sola vez (sin duplicados)",
+      "ok": true,
+      "detail": "ready={\"A04\":1,\"A03\":1,\"A05\":1,\"A02\":1}"
+    },
+    {
+      "name": "auditoría imágenes: caja del asset con proporción 16:9 (1.7–1.85), no franja 3.8:1",
+      "ok": true,
+      "detail": "[\"A04@escena-e03=1.78\",\"A03@escena-e07=1.78\",\"A05@escena-e15=1.78\",\"A02@escena-e25=1.78\"]"
+    },
+    {
+      "name": "auditoría imágenes: asset real usa contain (póster completo, sin recorte)",
+      "ok": true,
+      "detail": "[\"contain\",\"contain\",\"contain\",\"contain\"]"
+    },
+    {
       "name": "V4-B mosaico E25: 7 familias renderizadas",
       "ok": true,
       "detail": "7 items"
@@ -616,12 +631,12 @@
     {
       "name": "v4-A transición botón: cámara cambia en 3 momentos (inicio/medio/fin)",
       "ok": true,
-      "detail": "0=[0,2.4,11.6] mid=[1.458584,1.862627,9.14343 fin=[2.3703703703703702,1.8138"
+      "detail": "0=[0,2.4,11.6] mid=[1.16964,1.96908,9.63008] fin=[2.3873873873873874,1.8202"
     },
     {
       "name": "v4-A transición botón: portal visible a mitad del viaje",
       "ok": true,
-      "detail": "maxOp=0.63"
+      "detail": "maxOp=0.56"
     },
     {
       "name": "v4-A transición botón: portal disuelto al aterrizar",

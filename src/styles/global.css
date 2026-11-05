@@ -419,6 +419,30 @@ html[data-act='hero'] .prism-layer {
 }
 .scene__art[data-asset-ready='true'] img[data-asset-img] { display: block; }
 .scene__art[data-asset-ready='true'] .art-placeholder { display: none; }
+/* Asset real: la caja adopta la proporción del póster (16:9 escritorio,
+   4:5 móvil con el recorte vertical) y la imagen se muestra COMPLETA
+   (contain), nunca recortada como fondo indiscriminado. */
+.scene__art[data-asset-ready='true'] {
+  aspect-ratio: 16 / 9;
+  min-height: 0;
+  max-height: min(64vh, 620px);
+  background:
+    radial-gradient(ellipse at 50% 30%, var(--tone-glow, rgba(98, 234, 255, 0.18)), transparent 60%),
+    var(--tone-bg, #061126);
+}
+.scene__art[data-asset-ready='true'] img[data-asset-img] {
+  object-fit: contain;
+  background: transparent;
+}
+@media (max-width: 900px) {
+  .scene__art[data-asset-ready='true'] { aspect-ratio: 4 / 5; max-height: none; }
+}
+/* en split, la caja del asset real abraza 16:9 (sin min-height forzado) */
+.scene[data-layout='split'] .scene__art[data-asset-ready='true'],
+.scene[data-layout='editorial'] .scene__art[data-asset-ready='true'] {
+  min-height: 0;
+  align-self: center;
+}
 .scene__art .art-slot-tag {
   position: absolute;
   left: 0.8rem;
