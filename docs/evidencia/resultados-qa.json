@@ -1,6 +1,6 @@
 {
   "base": "https://kitty-midi-grid-liked.trycloudflare.com",
-  "total": 117,
+  "total": 125,
   "fallos": 0,
   "resultados": [
     {
@@ -31,12 +31,12 @@
     {
       "name": "prisma: la escena 3D se renderiza y cambia (animación real)",
       "ok": true,
-      "detail": "666216 vs 679685 bytes"
+      "detail": "672821 vs 683467 bytes"
     },
     {
       "name": "prisma: pinta una fracción útil del viewport",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.2014783950617284}"
+      "detail": "{\"paintedRatio\":0.20553703703703705}"
     },
     {
       "name": "hero 3D: lienzo único presente con WebGL activo",
@@ -66,12 +66,12 @@
     {
       "name": "hero 3D: pinta la escena (mascota, prisma, tarjetas)",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.205875}"
+      "detail": "{\"paintedRatio\":0.206125}"
     },
     {
       "name": "hero 3D: la animación ambiental cambia entre fotogramas",
       "ok": true,
-      "detail": "691828 vs 682499 bytes"
+      "detail": "690848 vs 682574 bytes"
     },
     {
       "name": "marca: el encabezado usa el logotipo oficial",
@@ -96,12 +96,12 @@
     {
       "name": "transición enterprise: la cámara viaja a otro mundo del mismo universo",
       "ok": true,
-      "detail": "mundo hero→enterprise · cámara [0,2.4,11.6]→[1.8475258429985857,2.0178178161244698,9.20696293493635] · tinte #050b1b→#090e18"
+      "detail": "mundo hero→enterprise · cámara [0,2.4,11.6]→[2.3728395061728396,1.8148148148148147,8.290432098765432] · tinte #050b1b→#0a0e18"
     },
     {
       "name": "transición enterprise: el contenido de la escena destino aparece",
       "ok": true,
-      "detail": "scrollY 3262 · act=enterprise"
+      "detail": "scrollY 3022 · act=enterprise"
     },
     {
       "name": "transición enterprise: volver regresa al hero sin recargar",
@@ -111,12 +111,12 @@
     {
       "name": "transición efficiency: la cámara viaja a otro mundo del mismo universo",
       "ok": true,
-      "detail": "mundo hero→efficiency · cámara [0,2.4,11.6]→[-2.7314410480349345,1.9375545851528384,8.893886462882097] · tinte #050b1b→#0d0a05"
+      "detail": "mundo hero→efficiency · cámara [0,2.4,11.6]→[-1.7216494845360824,1.649042709867452,8.172606774668632] · tinte #050b1b→#0d0a05"
     },
     {
       "name": "transición efficiency: el contenido de la escena destino aparece",
       "ok": true,
-      "detail": "scrollY 6979 · act=efficiency"
+      "detail": "scrollY 6652 · act=efficiency"
     },
     {
       "name": "transición efficiency: volver regresa al hero sin recargar",
@@ -126,7 +126,7 @@
     {
       "name": "transición cooperative: la cámara viaja a otro mundo del mismo universo",
       "ok": true,
-      "detail": "mundo hero→cooperative · cámara [0,2.4,11.6]→[-0.016666666666666673,1.8712555742092456,9.348779600973236] · tinte #050b1b→#060d08"
+      "detail": "mundo hero→cooperative · cámara [0,2.4,11.6]→[-0.016666666666666673,2.4332144618680376,9.97317836503856] · tinte #050b1b→#060d08"
     },
     {
       "name": "transición cooperative: el contenido de la escena destino aparece",
@@ -156,7 +156,7 @@
     {
       "name": "P0: el scroll conduce la cámara (scrub) hacia el mundo cooperativo",
       "ok": true,
-      "detail": "world=cooperative · cámara=[-0.016666666666666673,2.413225934765314,9.949880668257757] · scrollY=1400"
+      "detail": "world=cooperative · cámara=[-0.016666666666666673,2.340338474721508,9.868894601542417] · scrollY=1400"
     },
     {
       "name": "P0: tras elegir empresa, el scroll NO cambia a exploración",
@@ -246,7 +246,7 @@
     {
       "name": "ruta empresa: escena propia visible",
       "ok": true,
-      "detail": "918px"
+      "detail": "1449px"
     },
     {
       "name": "ruta empresa: contenido de la escena",
@@ -261,12 +261,12 @@
     {
       "name": "ruta eficiencia: escena propia visible",
       "ok": true,
-      "detail": "973px · route=efficiency act=efficiency world=efficiency scrollY=6979"
+      "detail": "1541px · route=efficiency act=efficiency world=efficiency scrollY=6652"
     },
     {
       "name": "ruta eficiencia: mensaje propio de la escena",
       "ok": true,
-      "detail": "MENOS TAREAS REPETIDAS. MÁS TIEMPO PARA CRECER."
+      "detail": "EL TIEMPO NO VUELVE. RECUPÉRALO."
     },
     {
       "name": "variante compartida: la ruta eficiencia reescribe la escena común",
@@ -311,7 +311,7 @@
     {
       "name": "bifurcación: abre la escena cooperativa",
       "ok": true,
-      "detail": "864px"
+      "detail": "1711px"
     },
     {
       "name": "variante por rasgo: el rasgo reescribe la escena compartida",
@@ -446,7 +446,7 @@
     {
       "name": "rendimiento: JS + CSS inicial (con el 3D del hero) por debajo de 260 kB",
       "ok": true,
-      "detail": "246 kB (JS 237 · CSS 10)"
+      "detail": "247 kB (JS 237 · CSS 10)"
     },
     {
       "name": "rendimiento: la aplicación sin 3D por debajo de 90 kB",
@@ -476,7 +476,7 @@
     {
       "name": "v3: acentos amarillos en titulares (em)",
       "ok": true,
-      "detail": "6 em"
+      "detail": "7 em"
     },
     {
       "name": "v3: slots de arte A01-A05 preparados",
@@ -496,12 +496,12 @@
     {
       "name": "v3 scroll: la cámara se transforma en 30/60/90% (ida)",
       "ok": true,
-      "detail": "30=[1.9,1.6709270620313565,8.320313565098841] 60=[1.7797047970479705,1.5915129151291512,8.12878228782288] 90=[1.9,1.7008467400508043,8.468077900084674]"
+      "detail": "30=[2.3695473251028805,1.8135802469135802,8.287757201646091] 60=[1.7035055350553505,1.6132841328413283,8.183210332103322] 90=[1.9,1.6802709568162575,8.433784928027096]"
     },
     {
       "name": "v3 scroll: recorrido inverso restaura transformación (reversible)",
       "ok": true,
-      "detail": "90=[1.9,1.7008467400508043,8.468077900084674] vuelta60=[1.7797047970479705,1.5915129151291512,8.12878228782288]"
+      "detail": "90=[1.9,1.6802709568162575,8.433784928027096] vuelta60=[1.7035055350553505,1.6132841328413283,8.183210332103322]"
     },
     {
       "name": "v3 demo empresa: la capa cambia el texto",
@@ -511,7 +511,7 @@
     {
       "name": "v3 demo empresa: la capa mueve la cámara 3D",
       "ok": true,
-      "detail": "[2.140642303433001,1.7277408637873752,8.101771871539313] -> [2.45,1.5,7.95]"
+      "detail": "[2.143519494204426,1.7288198103266597,8.104109589041096] -> [2.1249736564805057,1.7218651211801896,8.089041095890412]"
     },
     {
       "name": "v3 demo empresa: estado accesible aria-pressed",
@@ -541,12 +541,52 @@
     {
       "name": "v3 demo geonodos: scroll enciende conexiones (progreso)",
       "ok": true,
-      "detail": "progreso=2"
+      "detail": "progreso=3"
     },
     {
       "name": "v3 demo geonodos: nodo activo marcado",
       "ok": true,
       "detail": "1"
+    },
+    {
+      "name": "v4-A empresa: llegada con demo infra + arte A04 + capítulo mundo",
+      "ok": true,
+      "detail": "{\"demo\":true,\"art\":\"A04\",\"chapter\":\"mundo\",\"tone\":\"petrol\",\"title\":\"TU INFRAESTRUCTURA. TUS REGLAS.\"}"
+    },
+    {
+      "name": "v4-A eficiencia: llegada con demo flujo + arte A03",
+      "ok": true,
+      "detail": "{\"demo\":true,\"art\":\"A03\",\"chapter\":\"mundo\",\"tone\":\"electric\"}"
+    },
+    {
+      "name": "v4-A exploración: llegada con demo geonodos + arte A05",
+      "ok": true,
+      "detail": "{\"demo\":true,\"art\":\"A05\",\"chapter\":\"mundo\",\"tone\":\"emerald\"}"
+    },
+    {
+      "name": "v4-A: los 3 mundos usan tonos distintos (petrol/electric/emerald)",
+      "ok": true,
+      "detail": "petrol/electric/emerald"
+    },
+    {
+      "name": "v4-A: capítulos narrativos presentes (>=5)",
+      "ok": true,
+      "detail": "5 capítulos"
+    },
+    {
+      "name": "v4-A transición botón: cámara cambia en 3 momentos (inicio/medio/fin)",
+      "ok": true,
+      "detail": "0=[0,2.4,11.6] mid=[1.188366,1.962181,9.59854 fin=[2.3703703703703702,1.8138"
+    },
+    {
+      "name": "v4-A transición botón: portal visible a mitad del viaje",
+      "ok": true,
+      "detail": "maxOp=0.11"
+    },
+    {
+      "name": "v4-A transición botón: portal disuelto al aterrizar",
+      "ok": true,
+      "detail": "maxOp=0.00"
     },
     {
       "name": "portal: 4 capas SVG presentes",

@@ -64,6 +64,7 @@ const HERO_ACT: Act = {
 interface NarrativeOptions {
   universe: UniverseHandle | null;
   reducedMotion: boolean;
+  portal?: { playOnTimeline(tl: gsap.core.Timeline, duration: number): void } | null;
 }
 
 export interface NarrativeHandle {
@@ -85,7 +86,7 @@ export interface NarrativeHandle {
   returnToHero(): void;
 }
 
-export function createNarrative({ universe, reducedMotion }: NarrativeOptions): NarrativeHandle {
+export function createNarrative({ universe, reducedMotion, portal }: NarrativeOptions): NarrativeHandle {
   const stack: ActId[] = ['hero'];
   let traveling = false;
 
@@ -113,11 +114,22 @@ export function createNarrative({ universe, reducedMotion }: NarrativeOptions): 
     });
   };
 
-  const reveal = (anchor: string): void => {
+  const reveal = (anchor: string, tl?: gsap.core.Timeline): void => {
     const element = document.querySelector<HTMLElement>(anchor);
     if (!element) return;
+    const items = element.querySelectorAll('[data-reveal]');
+    if (tl && !reducedMotion) {
+      // dentro de la transición unificada: el contenido emerge mientras el portal cruza
+      tl.fromTo(
+        items,
+        { opacity: 0, y: 34 },
+        { opacity: 1, y: 0, duration: 0.9, stagger: 0.09, ease: 'power3.out', overwrite: 'auto' },
+        1.9 * 0.45,
+      );
+      return;
+    }
     gsap.fromTo(
-      element.querySelectorAll('[data-reveal]'),
+      items,
       { opacity: 0, y: 34 },
       {
         opacity: 1,
@@ -150,15 +162,19 @@ export function createNarrative({ universe, reducedMotion }: NarrativeOptions): 
     stack.push(act.id);
     if (stack.length > 12) stack.shift();
 
-    universe?.travelTo(act.world, {
-      duration: reducedMotion ? 0 : 1.9,
+    // UNA sola línea de tiempo conduce la transición por botón:
+    // cámara 3D + capas del portal + contenido de llegada (p 0→1 temporal).
+    const duration = reducedMotion ? 0 : 1.9;
+    const tl = gsap.timeline({
       onComplete: () => {
         traveling = false;
         setTransitioning(false);
       },
     });
+    portal?.playOnTimeline(tl, duration);
+    universe?.travelTo(act.world, { duration, timeline: tl });
+    reveal(act.anchor, tl);
     scrollTo(act.anchor);
-    reveal(act.anchor);
 
     // marca el acto en el documento para la UI (control «volver», viñeta)
     document.documentElement.dataset['act'] = act.id;

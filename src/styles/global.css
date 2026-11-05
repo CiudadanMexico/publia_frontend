@@ -369,6 +369,16 @@ html[data-act='hero'] .prism-layer {
 .scene[data-layout='split'] .scene__inner {
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
 }
+.scene[data-layout='split'] .scene__surface { display: contents; }
+.scene[data-layout='split'] .scene__art {
+  grid-column: 2;
+  grid-row: 1 / span 6;
+  min-height: min(58vh, 560px);
+}
+.scene[data-layout='split'] .scene__surface > section,
+.scene[data-layout='split'] .scene__surface > div[data-module] {
+  grid-column: 1;
+}
 .scene[data-layout='center'] .scene__inner,
 .scene[data-layout='pipeline'] .scene__inner,
 .scene[data-layout='map'] .scene__inner,

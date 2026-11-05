@@ -586,7 +586,7 @@ check(
 );
 check(
   'ruta eficiencia: mensaje propio de la escena',
-  efficiency.title.toUpperCase().includes('REPETIDAS'),
+  efficiency.title.toUpperCase().includes('RECUPÉRALO'),
   efficiency.title,
 );
 check(
@@ -1033,6 +1033,43 @@ const geo = await page.evaluate(() => ({
 check('v3 demo geonodos: el nodo explica qué se comparte', geo.detail.includes('Manuales'), geo.detail.slice(0, 60));
 check('v3 demo geonodos: scroll enciende conexiones (progreso)', Number(geo.progress) >= 1, `progreso=${geo.progress}`);
 check('v3 demo geonodos: nodo activo marcado', geo.active === 1, `${geo.active}`);
+
+// --- v4-A: mundos de llegada diferenciados ------------------------------------------
+const arrivals = await page.evaluate(() => ({
+  e03: { demo: !!document.querySelector('#escena-e03 [data-demo="infra"]'), art: document.querySelector('#escena-e03 .scene__art')?.dataset.artSlot ?? null, chapter: document.querySelector('#escena-e03')?.dataset.chapter ?? null, tone: document.querySelector('#escena-e03')?.dataset.tone ?? null, title: document.querySelector('#escena-e03 [data-role="title"]')?.textContent ?? '' },
+  e07: { demo: !!document.querySelector('#escena-e07 [data-demo="flow"]'), art: document.querySelector('#escena-e07 .scene__art')?.dataset.artSlot ?? null, chapter: document.querySelector('#escena-e07')?.dataset.chapter ?? null, tone: document.querySelector('#escena-e07')?.dataset.tone ?? null },
+  e15: { demo: !!document.querySelector('#escena-e15 [data-demo="geo"]'), art: document.querySelector('#escena-e15 .scene__art')?.dataset.artSlot ?? null, chapter: document.querySelector('#escena-e15')?.dataset.chapter ?? null, tone: document.querySelector('#escena-e15')?.dataset.tone ?? null },
+  chapters: new Set([...document.querySelectorAll('[data-chapter]')].map((el) => el.dataset.chapter)).size,
+}));
+check('v4-A empresa: llegada con demo infra + arte A04 + capítulo mundo', arrivals.e03.demo && arrivals.e03.art === 'A04' && arrivals.e03.chapter === 'mundo', JSON.stringify(arrivals.e03));
+check('v4-A eficiencia: llegada con demo flujo + arte A03', arrivals.e07.demo && arrivals.e07.art === 'A03' && arrivals.e07.chapter === 'mundo', JSON.stringify(arrivals.e07));
+check('v4-A exploración: llegada con demo geonodos + arte A05', arrivals.e15.demo && arrivals.e15.art === 'A05' && arrivals.e15.chapter === 'mundo', JSON.stringify(arrivals.e15));
+check('v4-A: los 3 mundos usan tonos distintos (petrol/electric/emerald)', arrivals.e03.tone === 'petrol' && arrivals.e07.tone === 'electric' && arrivals.e15.tone === 'emerald', `${arrivals.e03.tone}/${arrivals.e07.tone}/${arrivals.e15.tone}`);
+check('v4-A: capítulos narrativos presentes (>=5)', arrivals.chapters >= 5, `${arrivals.chapters} capítulos`);
+
+// transición unificada por botón: cámara en 3 momentos distintos + portal a mitad
+await page.evaluate(() => { try { sessionStorage.clear(); } catch {} });
+await page.goto(BASE, { waitUntil: 'networkidle' });
+await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+await page.waitForTimeout(2600);
+const camAt = async () => page.evaluate(() => document.querySelector('[data-prism-canvas]')?.dataset.camera ?? '');
+const cam0 = await camAt();
+await click('[data-route-choice="enterprise"]');
+await page.waitForTimeout(900);
+const camMid = await camAt();
+const portalMidBtn = await page.evaluate(() => {
+  const ops = [...document.querySelectorAll('[data-portal-layer]')].map((l) => Number(getComputedStyle(l).opacity));
+  return Math.max(...ops);
+});
+await page.waitForTimeout(2400);
+const cam1 = await camAt();
+const portalEndBtn = await page.evaluate(() => {
+  const ops = [...document.querySelectorAll('[data-portal-layer]')].map((l) => Number(getComputedStyle(l).opacity));
+  return Math.max(...ops);
+});
+check('v4-A transición botón: cámara cambia en 3 momentos (inicio/medio/fin)', cam0 !== camMid && camMid !== cam1 && cam0 !== cam1, `0=${cam0.slice(0, 26)} mid=${camMid.slice(0, 26)} fin=${cam1.slice(0, 26)}`);
+check('v4-A transición botón: portal visible a mitad del viaje', portalMidBtn > 0.1, `maxOp=${portalMidBtn.toFixed(2)}`);
+check('v4-A transición botón: portal disuelto al aterrizar', portalEndBtn < 0.05, `maxOp=${portalEndBtn.toFixed(2)}`);
 
 // --- portal prismático P0-01 -----------------------------------------------------
 const portalLayers = await page.evaluate(() =>

@@ -16,6 +16,8 @@ export interface PortalHandle {
   bindScrub(trigger: HTMLElement): void;
   /** Pulso temporizado para transiciones por botón. */
   playTimed(duration: number): void;
+  /** Agrega el pulso a una timeline existente (transición unificada botón). */
+  playOnTimeline(tl: gsap.core.Timeline, duration: number): void;
   /** Estado estático (movimiento reducido) o reposo en hero. */
   reset(): void;
   kill(): void;
@@ -101,6 +103,20 @@ export function createPortal(root: Document = document): PortalHandle {
           0,
         );
         tl.to(layer, { opacity: 0, scale: 1.35, duration: duration * 0.4, delay: duration * 0.55 + i * 0.03 }, 0);
+      });
+    },
+    playOnTimeline(tl, duration) {
+      scrubTrigger?.kill();
+      if (timed) { timed.kill(); timed = null; }
+      if (!overlay || layers.length === 0) return;
+      layers.forEach((layer, i) => {
+        tl.fromTo(
+          layer,
+          { opacity: 0, scale: 0.8 + i * 0.08, rotation: i === 1 ? -6 : 0 },
+          { opacity: i === 3 ? 0.9 : 0.95, scale: 1.12 + i * 0.05, rotation: i === 1 ? 3 : 0, duration: duration * 0.45, delay: i * 0.05, ease: 'power2.inOut' },
+          0,
+        );
+        tl.to(layer, { opacity: 0, scale: 1.35, duration: duration * 0.4, ease: 'power2.inOut' }, duration * 0.55 + i * 0.03);
       });
     },
     reset() {

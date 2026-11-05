@@ -205,6 +205,8 @@ export interface SceneDefinition {
   layout?: SceneLayout;
   /** Slot de arte protagonista (A01–A10); placeholder sustituible sin refactor. */
   art?: string;
+  /** Capítulo narrativo (hero, descubrimiento, mundo, interaccion, convergencia, cierre). */
+  chapter?: string;
   assets?: VisualAsset[];
 }
 

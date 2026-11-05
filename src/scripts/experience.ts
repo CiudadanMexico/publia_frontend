@@ -648,7 +648,9 @@ export async function startExperience(): Promise<void> {
 
   const reduced = prefersReducedMotion();
   const universe = await initUniverse();
-  const narrative = createNarrative({ universe, reducedMotion: reduced });
+  // Portal prismático P0-01 (se crea antes que la narrativa para unificar transiciones)
+  const portal: PortalHandle = createPortal();
+  const narrative = createNarrative({ universe, reducedMotion: reduced, portal });
   const progressByScene = new Map<string, number>();
 
   const applyActiveScene = (): void => {
@@ -671,12 +673,9 @@ export async function startExperience(): Promise<void> {
     void stageForScene(element, getState().primary);
   };
 
+  const reducedMotion = reduced;
   const sceneLookTriggers = bindSceneLooks(universe);
   bindDemos(universe);
-
-  // Portal prismático P0-01: acompaña la transición hero → mundo.
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const portal: PortalHandle = createPortal();
   let lastPortalKey = '';
   const drivePortal = (state: ReturnType<typeof getState>): void => {
     const heroElement = document.querySelector<HTMLElement>('[data-hero-scene]');

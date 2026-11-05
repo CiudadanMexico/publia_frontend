@@ -61,6 +61,8 @@ export interface SceneLook {
 export interface TravelOptions {
   duration?: number;
   onComplete?: () => void;
+  /** Si se indica, los tweens de cámara se agregan a esta timeline (transición unificada). */
+  timeline?: gsap.core.Timeline;
   /** Si se indica, el viaje lo conduce el scroll (pin + scrub) en vez del tiempo. */
   scrub?: { trigger: HTMLElement; start?: string; end?: string };
 }
@@ -815,16 +817,21 @@ export async function createUniverse({
       const duration = options.duration ?? (reducedMotion ? 0 : 1.9);
       const spec = WORLDS[world];
       if (!spec) return;
-      travel?.kill();
-      scrollTriggerTravel?.kill();
+      const external = options.timeline ?? null;
+      if (!external) {
+        travel?.kill();
+        scrollTriggerTravel?.kill();
+      }
       current.world = world;
 
-      const tl = gsap.timeline({
-        defaults: { duration, ease: 'power2.inOut' },
-        onComplete: () => options.onComplete?.(),
-        paused: Boolean(options.scrub),
-      });
-      travel = tl;
+      const tl =
+        external ??
+        gsap.timeline({
+          defaults: { duration, ease: 'power2.inOut' },
+          onComplete: () => options.onComplete?.(),
+          paused: Boolean(options.scrub),
+        });
+      if (!external) travel = tl;
 
       tl.to(current.camera, { x: spec.camera[0], y: spec.camera[1], z: spec.camera[2] }, 0)
         .to(current.target, { x: spec.target[0], y: spec.target[1], z: spec.target[2] }, 0)
@@ -858,8 +865,8 @@ export async function createUniverse({
           animation: tl,
         });
       } else if (reducedMotion) {
-        tl.progress(1);
-      } else {
+        if (!external) tl.progress(1);
+      } else if (!external) {
         tl.play();
       }
       applyCurrent();
