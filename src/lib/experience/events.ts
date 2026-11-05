@@ -24,6 +24,8 @@ export type ExperienceEvent =
   | 'explorer_path_entered'
   | 'cooperative_interest'
   | 'scene_viewed'
+  | 'solution_selected'
+  | 'recommendation_rendered'
   | 'membership_viewed'
   | 'membership_selected'
   | 'housing_interest'

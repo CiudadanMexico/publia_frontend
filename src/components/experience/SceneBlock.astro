@@ -13,6 +13,7 @@ import TextModule from './modules/TextModule.astro';
 import NetworkModule from './modules/NetworkModule.astro';
 import DemoModule from './modules/DemoModule.astro';
 import CatalogModule from './modules/CatalogModule.astro';
+import RecommendationModule from './modules/RecommendationModule.astro';
 import CtaModule from './modules/CtaModule.astro';
 import FormModule from './modules/FormModule.astro';
 import ArtPlaceholder from './ArtPlaceholder.astro';
@@ -100,6 +101,9 @@ const stageVariants = Object.fromEntries(
           }
           if (module === 'form') {
             return <FormModule scene={scene} />;
+          }
+          if (module === 'recommendation') {
+            return <RecommendationModule scene={scene} />;
           }
           return null;
         })

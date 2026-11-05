@@ -28,6 +28,8 @@ export interface VisitorAnswers {
   foco?: 'mensajes' | 'marketing' | 'ventas' | 'operacion' | 'explorando';
   /** Ruta B4: escala del negocio. */
   escala?: 'solo' | 'equipo_pequeno' | 'creciendo' | 'operacion_grande';
+  /** Mosaico de soluciones (E25): familia seleccionada. */
+  servicio?: string;
 }
 
 export interface VisitorState {
@@ -193,13 +195,14 @@ export function setPrimaryRoute(route: PrimaryRoute, origin: RouteOrigin = 'butt
 
 /** Guarda una respuesta del visitante para adaptar las escenas posteriores. */
 export function setAnswer(key: keyof VisitorAnswers, value: string): void {
-  const allowed: Record<keyof VisitorAnswers, readonly string[]> = {
+  const allowed: Partial<Record<keyof VisitorAnswers, readonly string[]>> = {
     arranque: ['existente', 'desde_cero'],
     foco: ['mensajes', 'marketing', 'ventas', 'operacion', 'explorando'],
     escala: ['solo', 'equipo_pequeno', 'creciendo', 'operacion_grande'],
+    // servicio: cualquier nombre de familia del catálogo (cadena no vacía)
   };
   const values = allowed[key];
-  if (!values.includes(value)) {
+  if (values ? !values.includes(value) : !value.trim()) {
     return;
   }
   commit({

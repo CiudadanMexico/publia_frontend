@@ -20,6 +20,7 @@ const slotId = slot?.id ?? 'A00';
 // Si el asset real ya está en public/, se sirve directamente (build-time);
 // si no, queda el placeholder procedural sin pedir nada por red.
 const assetReady = slot ? existsSync(`public${slot.desktop}`) : false;
+const mobileReady = slot ? existsSync(`public${slot.mobile}`) : false;
 ---
 
 <div class="scene__art" data-art-slot={slotId} data-scene-art={sceneId} data-asset-ready={assetReady ? 'true' : 'false'}>
@@ -81,16 +82,20 @@ const assetReady = slot ? existsSync(`public${slot.desktop}`) : false;
     )}
   </div>
   {slot && (
-    <img
-      data-asset-img
-      src={assetReady ? slot.desktop : undefined}
-      data-asset-src={slot.desktop}
-      alt={slot.alt}
-      loading={slot.preload ? 'eager' : 'lazy'}
-      decoding="async"
-    />
+    <picture>
+      {mobileReady && <source media="(max-width: 760px)" srcset={slot.mobile} type="image/avif" />}
+      <img
+        data-asset-img
+        src={assetReady ? slot.desktop : undefined}
+        data-asset-src={slot.desktop}
+        data-asset-mobile={slot.mobile}
+        alt={slot.alt}
+        loading={slot.preload ? 'eager' : 'lazy'}
+        decoding="async"
+      />
+    </picture>
   )}
-  <span class="art-slot-tag">arte {slotId} · placeholder</span>
+  <span class="art-slot-tag">{assetReady ? `arte ${slotId} · recurso real` : `arte ${slotId} · placeholder`}</span>
 </div>
 
 <style>

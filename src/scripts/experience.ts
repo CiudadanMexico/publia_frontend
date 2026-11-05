@@ -30,6 +30,7 @@ import { initEffects } from '../lib/animation/effects';
 import { pickVariantFrom, visitorSegments } from '../lib/experience/graph';
 import { accentify } from '../lib/experience/accent';
 import { createNarrative } from '../lib/experience/narrative';
+import { bindPostHero } from '../lib/experience/postHero';
 import type { NarrativeHandle } from '../lib/experience/narrative';
 import { buildMailto } from '../data/site';
 import type { PrimaryRoute, VisitorState, VisitorTrait } from '../lib/experience/state';
@@ -676,6 +677,7 @@ export async function startExperience(): Promise<void> {
   const reducedMotion = reduced;
   const sceneLookTriggers = bindSceneLooks(universe);
   bindDemos(universe);
+  bindPostHero(universe);
   let lastPortalKey = '';
   const drivePortal = (state: ReturnType<typeof getState>): void => {
     const heroElement = document.querySelector<HTMLElement>('[data-hero-scene]');
@@ -745,6 +747,7 @@ export async function startExperience(): Promise<void> {
   subscribe((state) => {
     drivePortal(state);
     applyDocumentContext(state);
+    window.dispatchEvent(new CustomEvent('publia:state'));
     applySceneVariants(state);
     applyContactContext(state);
     const segments = visitorSegments(state).join(' ');

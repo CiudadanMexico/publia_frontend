@@ -1034,6 +1034,53 @@ check('v3 demo geonodos: el nodo explica qué se comparte', geo.detail.includes(
 check('v3 demo geonodos: scroll enciende conexiones (progreso)', Number(geo.progress) >= 1, `progreso=${geo.progress}`);
 check('v3 demo geonodos: nodo activo marcado', geo.active === 1, `${geo.active}`);
 
+// --- V4-B: assets AVIF reales + mosaico + recomendación --------------------------------
+const assetsInfo = await page.evaluate(async () => {
+  const slots = ['A02', 'A03', 'A04', 'A05'];
+  const out = {};
+  for (const id of slots) {
+    const art = document.querySelector(`[data-art-slot="${id}"]`);
+    const img = art?.querySelector('img[data-asset-img]');
+    const src = img?.getAttribute('data-asset-src') ?? '';
+    const head = src ? await fetch(src, { method: 'HEAD' }).then((r) => r.headers.get('content-type') + ' ' + r.status).catch(() => 'fetch-fail') : 'no-src';
+    out[id] = { ready: art?.dataset.assetReady, src, head, hasMobile: !!img?.getAttribute('data-asset-mobile') };
+  }
+  return out;
+});
+for (const id of ['A02', 'A03', 'A04', 'A05']) {
+  check(`V4-B asset ${id}: data-asset-ready=true y servido como image/avif`, assetsInfo[id].ready === 'true' && assetsInfo[id].head.startsWith('image/avif'), JSON.stringify(assetsInfo[id]));
+}
+// mosaico E25: 8 familias seleccionables
+await page.evaluate(() => document.querySelector('#escena-e25')?.scrollIntoView({ behavior: 'instant' }));
+await page.waitForTimeout(900);
+const mosaicCount = await page.evaluate(() => document.querySelectorAll('#escena-e25 .services__item').length);
+check('V4-B mosaico E25: 7 familias renderizadas', mosaicCount === 7, `${mosaicCount} items`);
+await click('#escena-e25 .services__item[data-service-item]');
+await page.waitForTimeout(400);
+const sel = await page.evaluate(() => ({
+  selected: document.querySelectorAll('#escena-e25 .services__item.is-selected').length,
+  pressed: document.querySelector('#escena-e25 .services__item[aria-pressed="true"]')?.getAttribute('data-service-item') ?? null,
+  answer: JSON.parse(sessionStorage.getItem('publia.visitor.v1') ?? '{}').answers?.servicio ?? null,
+}));
+check('V4-B mosaico: click selecciona (clase + aria-pressed + respuesta persistida)', sel.selected === 1 && !!sel.pressed && sel.answer === sel.pressed, JSON.stringify(sel));
+// E11 marfil
+const e11tone = await page.evaluate(() => document.querySelector('#escena-e11')?.dataset.tone);
+check('V4-B E11 personas+IA en marfil (cream)', e11tone === 'cream', `tone=${e11tone}`);
+// recomendación en E29 según ruta empresa
+await page.evaluate(() => { try { sessionStorage.clear(); } catch {} });
+await page.goto(BASE, { waitUntil: 'networkidle' });
+await page.waitForTimeout(2600);
+await click('[data-route-choice="enterprise"]');
+await page.waitForTimeout(3400);
+await page.evaluate(() => document.querySelector('#escena-e29')?.scrollIntoView({ behavior: 'instant' }));
+await page.waitForTimeout(900);
+const rec = await page.evaluate(() => ({
+  items: document.querySelectorAll('[data-recommendation-list] .recommendation__item').length,
+  text: document.querySelector('[data-recommendation-list]')?.textContent ?? '',
+  status: document.querySelector('[data-recommendation-status]')?.textContent ?? '',
+}));
+check('V4-B cierre: recomendación con >=3 items para ruta empresa', rec.items >= 3 && rec.text.includes('Housing'), `items=${rec.items} status=${rec.status.slice(0, 60)}`);
+
 // --- v4-A: mundos de llegada diferenciados ------------------------------------------
 const arrivals = await page.evaluate(() => ({
   e03: { demo: !!document.querySelector('#escena-e03 [data-demo="infra"]'), art: document.querySelector('#escena-e03 .scene__art')?.dataset.artSlot ?? null, chapter: document.querySelector('#escena-e03')?.dataset.chapter ?? null, tone: document.querySelector('#escena-e03')?.dataset.tone ?? null, title: document.querySelector('#escena-e03 [data-role="title"]')?.textContent ?? '' },
@@ -1055,7 +1102,7 @@ await page.waitForTimeout(2600);
 const camAt = async () => page.evaluate(() => document.querySelector('[data-prism-canvas]')?.dataset.camera ?? '');
 const cam0 = await camAt();
 await click('[data-route-choice="enterprise"]');
-await page.waitForTimeout(900);
+await page.waitForTimeout(1400);
 const camMid = await camAt();
 const portalMidBtn = await page.evaluate(() => {
   const ops = [...document.querySelectorAll('[data-portal-layer]')].map((l) => Number(getComputedStyle(l).opacity));

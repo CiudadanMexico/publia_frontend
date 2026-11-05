@@ -1,6 +1,6 @@
 {
   "base": "https://kitty-midi-grid-liked.trycloudflare.com",
-  "total": 125,
+  "total": 133,
   "fallos": 0,
   "resultados": [
     {
@@ -96,7 +96,7 @@
     {
       "name": "transición enterprise: la cámara viaja a otro mundo del mismo universo",
       "ok": true,
-      "detail": "mundo hero→enterprise · cámara [0,2.4,11.6]→[2.3728395061728396,1.8148148148148147,8.290432098765432] · tinte #050b1b→#0a0e18"
+      "detail": "mundo hero→enterprise · cámara [0,2.4,11.6]→[2.3901234567901235,1.8212962962962962,8.304475308641976] · tinte #050b1b→#0a0e18"
     },
     {
       "name": "transición enterprise: el contenido de la escena destino aparece",
@@ -191,7 +191,7 @@
     {
       "name": "demostraciones marcadas como simulación",
       "ok": true,
-      "detail": "6 bloques"
+      "detail": "5 bloques"
     },
     {
       "name": "catálogo: cinco niveles de membresía",
@@ -446,12 +446,12 @@
     {
       "name": "rendimiento: JS + CSS inicial (con el 3D del hero) por debajo de 260 kB",
       "ok": true,
-      "detail": "247 kB (JS 237 · CSS 10)"
+      "detail": "248 kB (JS 238 · CSS 10)"
     },
     {
       "name": "rendimiento: la aplicación sin 3D por debajo de 90 kB",
       "ok": true,
-      "detail": "67 kB de JS de aplicación"
+      "detail": "68 kB de JS de aplicación"
     },
     {
       "name": "rendimiento: el escenario 3D se carga sólo bajo demanda",
@@ -476,7 +476,7 @@
     {
       "name": "v3: acentos amarillos en titulares (em)",
       "ok": true,
-      "detail": "7 em"
+      "detail": "12 em"
     },
     {
       "name": "v3: slots de arte A01-A05 preparados",
@@ -496,12 +496,12 @@
     {
       "name": "v3 scroll: la cámara se transforma en 30/60/90% (ida)",
       "ok": true,
-      "detail": "30=[2.3695473251028805,1.8135802469135802,8.287757201646091] 60=[1.7035055350553505,1.6132841328413283,8.183210332103322] 90=[1.9,1.6802709568162575,8.433784928027096]"
+      "detail": "30=[2.042798353909465,1.6910493827160493,8.022273662551441] 60=[1.8294871794871794,1.5772893772893772,8.093223443223444] 90=[1.9,1.5649172846548773,8.24152880775813]"
     },
     {
       "name": "v3 scroll: recorrido inverso restaura transformación (reversible)",
       "ok": true,
-      "detail": "90=[1.9,1.6802709568162575,8.433784928027096] vuelta60=[1.7035055350553505,1.6132841328413283,8.183210332103322]"
+      "detail": "90=[1.9,1.5649172846548773,8.24152880775813] vuelta60=[1.8294871794871794,1.5772893772893772,8.093223443223444]"
     },
     {
       "name": "v3 demo empresa: la capa cambia el texto",
@@ -549,6 +549,46 @@
       "detail": "1"
     },
     {
+      "name": "V4-B asset A02: data-asset-ready=true y servido como image/avif",
+      "ok": true,
+      "detail": "{\"ready\":\"true\",\"src\":\"/assets/scenes/A02-galaxia-soluciones-2560x1440.avif\",\"head\":\"image/avif 200\",\"hasMobile\":true}"
+    },
+    {
+      "name": "V4-B asset A03: data-asset-ready=true y servido como image/avif",
+      "ok": true,
+      "detail": "{\"ready\":\"true\",\"src\":\"/assets/scenes/A03-flujo-automatizacion-1920x1080.avif\",\"head\":\"image/avif 200\",\"hasMobile\":true}"
+    },
+    {
+      "name": "V4-B asset A04: data-asset-ready=true y servido como image/avif",
+      "ok": true,
+      "detail": "{\"ready\":\"true\",\"src\":\"/assets/scenes/A04-infraestructura-2560x1440.avif\",\"head\":\"image/avif 200\",\"hasMobile\":true}"
+    },
+    {
+      "name": "V4-B asset A05: data-asset-ready=true y servido como image/avif",
+      "ok": true,
+      "detail": "{\"ready\":\"true\",\"src\":\"/assets/scenes/A05-geonodos-2560x1440.avif\",\"head\":\"image/avif 200\",\"hasMobile\":true}"
+    },
+    {
+      "name": "V4-B mosaico E25: 7 familias renderizadas",
+      "ok": true,
+      "detail": "7 items"
+    },
+    {
+      "name": "V4-B mosaico: click selecciona (clase + aria-pressed + respuesta persistida)",
+      "ok": true,
+      "detail": "{\"selected\":1,\"pressed\":\"Marketing y comunicación\",\"answer\":\"Marketing y comunicación\"}"
+    },
+    {
+      "name": "V4-B E11 personas+IA en marfil (cream)",
+      "ok": true,
+      "detail": "tone=cream"
+    },
+    {
+      "name": "V4-B cierre: recomendación con >=3 items para ruta empresa",
+      "ok": true,
+      "detail": "items=4 status=Tu recorrido: ruta Empresa. Estas son las 2–3 siguientes pas"
+    },
+    {
       "name": "v4-A empresa: llegada con demo infra + arte A04 + capítulo mundo",
       "ok": true,
       "detail": "{\"demo\":true,\"art\":\"A04\",\"chapter\":\"mundo\",\"tone\":\"petrol\",\"title\":\"TU INFRAESTRUCTURA. TUS REGLAS.\"}"
@@ -576,12 +616,12 @@
     {
       "name": "v4-A transición botón: cámara cambia en 3 momentos (inicio/medio/fin)",
       "ok": true,
-      "detail": "0=[0,2.4,11.6] mid=[1.188366,1.962181,9.59854 fin=[2.3703703703703702,1.8138"
+      "detail": "0=[0,2.4,11.6] mid=[1.458584,1.862627,9.14343 fin=[2.3703703703703702,1.8138"
     },
     {
       "name": "v4-A transición botón: portal visible a mitad del viaje",
       "ok": true,
-      "detail": "maxOp=0.11"
+      "detail": "maxOp=0.63"
     },
     {
       "name": "v4-A transición botón: portal disuelto al aterrizar",

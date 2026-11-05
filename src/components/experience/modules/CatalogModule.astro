@@ -55,14 +55,21 @@ const windows = scene.data?.windows ?? [];
         </p>
         <ul class="services">
           {services.map((service, index) => (
-            <li class="services__item" data-reveal style={`--index:${index}`}>
-              <div class="services__main">
-                <strong class="services__name">{service.name}</strong>
-                <span class="services__detail">{service.detail}</span>
-              </div>
-              <span class={`services__price${service.price ? '' : ' services__price--pending'}`}>
-                {service.price ?? 'Cotización a medida'}
-              </span>
+            <li class="services__cell" data-reveal style={`--index:${index}`}>
+              <button
+                type="button"
+                class="services__item"
+                data-service-item={service.name}
+                aria-pressed="false"
+              >
+                <span class="services__main">
+                  <strong class="services__name">{service.name}</strong>
+                  <span class="services__detail">{service.detail}</span>
+                </span>
+                <span class={`services__price${service.price ? '' : ' services__price--pending'}`}>
+                  {service.price ?? 'Cotización a medida'}
+                </span>
+              </button>
             </li>
           ))}
         </ul>

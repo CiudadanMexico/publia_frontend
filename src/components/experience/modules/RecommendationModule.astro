@@ -1,0 +1,39 @@
+---
+/**
+ * Cierre personalizado (V4-B): el cliente (recommendation.ts) rellena las
+ * sugerencias a partir de la ruta elegida y las respuestas de la sesión.
+ */
+import type { ResolvedScene } from '../../../lib/experience/graph';
+import { accentify } from '../../../lib/experience/accent';
+
+interface Props {
+  scene: ResolvedScene;
+}
+
+const { scene } = Astro.props;
+---
+
+<section class="recommendation" data-module="recommendation" data-recommendation>
+  <div class="catalog__intro">
+    {scene.eyebrow && <p class="catalog__eyebrow" data-role="eyebrow" data-reveal set:html={accentify(scene.eyebrow)} />}
+    <h2 class="catalog__title" data-role="title" data-reveal="lines" set:html={accentify(scene.title)} />
+    {scene.lead && <p class="catalog__lead" data-role="lead" data-reveal>{scene.lead}</p>}
+  </div>
+  <p class="recommendation__status" data-recommendation-status data-reveal>Preparando tu resumen…</p>
+  <ul class="recommendation__list" data-recommendation-list data-reveal-group></ul>
+  <p class="recommendation__hint" data-reveal>
+    ¿Quieres revisar tus respuestas? Vuelve arriba con <kbd>←</kbd> o el botón de regreso: nada se pierde.
+  </p>
+</section>
+
+<style>
+  .recommendation { display: grid; gap: 1.1rem; }
+  .recommendation__status { opacity: .75; font-size: .95rem; }
+  .recommendation__list { list-style: none; margin: 0; padding: 0; display: grid; gap: .8rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .recommendation__item { border: 1px solid rgba(98, 234, 255, .35); background: rgba(6, 17, 38, .55); border-radius: 1rem; padding: 1rem 1.1rem; display: grid; gap: .35rem; }
+  .recommendation__item strong { color: var(--publia-yellow); font-size: 1.05rem; }
+  .recommendation__item span { color: #cfe3ff; font-size: .92rem; line-height: 1.45; }
+  .recommendation__item em { font-style: normal; color: var(--publia-cyan); font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; }
+  .recommendation__hint { font-size: .85rem; opacity: .7; }
+  .recommendation__hint kbd { background: rgba(255,255,255,.12); border-radius: .35rem; padding: .05rem .4rem; }
+</style>
