@@ -21,6 +21,10 @@ const { scene } = Astro.props;
   </div>
   <p class="recommendation__status" data-recommendation-status data-reveal>Preparando tu resumen…</p>
   <ul class="recommendation__list" data-recommendation-list data-reveal-group></ul>
+  <div class="recommendation__actions" data-reveal>
+    <button type="button" class="recommendation__copy" data-rec-copy>⧉ Copiar resumen de mi recorrido</button>
+    <span class="recommendation__copied" data-rec-copied role="status"></span>
+  </div>
   <p class="recommendation__hint" data-reveal>
     ¿Quieres revisar tus respuestas? Vuelve arriba con <kbd>←</kbd> o el botón de regreso: nada se pierde.
   </p>
@@ -35,5 +39,7 @@ const { scene } = Astro.props;
   .recommendation__item span { color: #cfe3ff; font-size: .92rem; line-height: 1.45; }
   .recommendation__item em { font-style: normal; color: var(--publia-cyan); font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; }
   .recommendation__hint { font-size: .85rem; opacity: .7; }
+  .recommendation__copy { background: var(--publia-yellow); color: #061126; border: none; border-radius: 999px; padding: .55rem 1rem; font-weight: 800; cursor: pointer; }
+  .recommendation__copied { font-size: .8rem; color: var(--publia-mint); min-height: 1.2em; }
   .recommendation__hint kbd { background: rgba(255,255,255,.12); border-radius: .35rem; padding: .05rem .4rem; }
 </style>

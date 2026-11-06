@@ -79,7 +79,8 @@ export type SceneModule =
   | 'flowDemo'
   | 'geoDemo'
   | 'cta'
-  | 'recommendation';
+  | 'recommendation'
+  | 'ecosystem';
 
 export interface CTA {
   label: string;

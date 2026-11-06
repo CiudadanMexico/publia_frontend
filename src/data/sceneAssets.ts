@@ -36,7 +36,7 @@ export const SCENE_ASSETS: readonly AssetSlot[] = [
   },
   {
     id: 'A02',
-    scenes: ['E25'],
+    scenes: ['E20'],
     desktop: '/assets/scenes/A02-galaxia-soluciones-2560x1440.avif',
     mobile: '/assets/scenes/A02-galaxia-soluciones-1080x1350.avif',
     layers: ['/assets/scenes/A02-cluster-1.png', '/assets/scenes/A02-cluster-2.png', '/assets/scenes/A02-cluster-3.png', '/assets/scenes/A02-cluster-4.png'],
@@ -136,7 +136,7 @@ export const RECEIVED_ASSETS = [
   },
   {
     origen: 'P0_04_Ecosistema.png', sha256: 'e3cf70c72a9e2640a1df51daf938f67aac33bb389c3f460525010ef58025a00f',
-    bytes: 2139942, resolucion: '1672x941', formato: 'PNG', slot: 'A02', escena: 'E25',
+    bytes: 2139942, resolucion: '1672x941', formato: 'PNG', slot: 'A02', escena: 'E20',
     desktop: '/assets/scenes/A02-galaxia-soluciones-2560x1440.avif', mobile: '/assets/scenes/A02-galaxia-soluciones-1080x1350.avif',
     contenido: 'Ecosistema de soluciones: violeta/majenta con azules (mosaico E25).',
   },

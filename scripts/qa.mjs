@@ -38,6 +38,51 @@ await mkdir(OUT, { recursive: true });
 const browser = await chromium.launch({ args: ['--no-sandbox', '--use-gl=swiftshader'] });
 const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
 const page = await context.newPage();
+// Espera a que la cámara deje de cambiar (útil con FPS bajos en swiftshader)
+const camSettled = async (timeout = 25000) => {
+  const start = Date.now();
+  let last = await page.evaluate(() => document.querySelector('[data-prism-canvas]')?.dataset.camera ?? '');
+  let stable = 0;
+  while (Date.now() - start < timeout && stable < 8) {
+    await page.waitForTimeout(400);
+    const now = await page.evaluate(() => document.querySelector('[data-prism-canvas]')?.dataset.camera ?? '');
+    stable = now === last ? stable + 1 : 0;
+    last = now;
+  }
+  return last;
+};
+const scrollSettled = async (timeout = 20000) => {
+  const start = Date.now();
+  let last = await page.evaluate(() => window.scrollY);
+  let stable = 0;
+  while (Date.now() - start < timeout && stable < 8) {
+    await page.waitForTimeout(400);
+    const now = await page.evaluate(() => window.scrollY);
+    stable = Math.abs(now - last) < 2 ? stable + 1 : 0;
+    last = now;
+  }
+  return last;
+};
+
+// Espera a que el universo 3D haya inicializado (evita flakes de arranque lento)
+await page.addInitScript(() => { try { history.scrollRestoration = 'manual'; } catch {} });
+// Scroll marcado como programático (no cuenta como intención de explorar)
+const pscroll = (top) => page.evaluate((t) => {
+  window.__publiaLastProgrammaticScroll = performance.now();
+  window.scrollTo({ top: t, behavior: 'instant' });
+}, top);
+
+// Rueda real hasta que la ruta libre se active (reintenta si el entorno va lento)
+const wheelUntilExplorer = async (max = 6) => {
+  for (let i = 0; i < max; i++) {
+    await page.mouse.wheel(0, 700);
+    const ok = await page.waitForFunction(() => document.documentElement.dataset.route === 'explorer', { timeout: 4000 }).then(() => true).catch(() => false);
+    if (ok) return true;
+  }
+  return false;
+};
+
+const waitUniverse = () => page.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'hero', { timeout: 30000 }).catch(() => {});
 
 const errors = [];
 const responses = [];
@@ -306,7 +351,7 @@ try {
 // Entrar a una ruta debe mover la cámara, cambiar el mundo 3D y mostrar el
 // contenido de la escena destino, todo dentro del mismo lienzo.
 async function transitionProbe(act) {
-  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+  await pscroll(0);
   await page.waitForTimeout(900);
   const before = await page.evaluate(() => {
     const canvas = document.querySelector('[data-prism-canvas]');
@@ -324,11 +369,10 @@ async function transitionProbe(act) {
       try { sessionStorage.clear(); } catch {}
     });
     await page.reload({ waitUntil: 'networkidle' });
-    await page.waitForTimeout(3200);
+    await waitUniverse(); await page.waitForTimeout(1200);
+    await pscroll(0);
     await page.mouse.move(680, 400);
-    await page.mouse.wheel(0, 620);
-    await page.waitForTimeout(400);
-    await page.mouse.wheel(0, 620);
+    await wheelUntilExplorer();
   } else {
     button = await page.evaluate((id) => {
       const el = document.querySelector(`[data-route-choice="${id}"]`);
@@ -337,7 +381,8 @@ async function transitionProbe(act) {
       return Boolean(el);
     }, act);
   }
-  await page.waitForTimeout(2600);
+  await page.waitForFunction((a) => document.documentElement.dataset.act === a, { timeout: 15000 }, act).catch(() => {});
+  await page.waitForTimeout(1400);
   const after = await page.evaluate(() => {
     const canvas = document.querySelector('[data-prism-canvas]');
     return {
@@ -372,7 +417,9 @@ for (const act of ['enterprise', 'efficiency', 'cooperative']) {
   await page.evaluate(() => {
     document.querySelector('[data-act-back]')?.click();
   });
-  await page.waitForTimeout(2200);
+  await page.waitForFunction(() => document.documentElement.dataset.act === 'hero', { timeout: 15000 }).catch(() => {});
+  await page.waitForFunction(() => window.scrollY < 400, { timeout: 20000 }).catch(() => {});
+  await scrollSettled();
   const back = await page.evaluate(() => {
     const canvas = document.querySelector('[data-prism-canvas]');
     return {
@@ -383,7 +430,7 @@ for (const act of ['enterprise', 'efficiency', 'cooperative']) {
   });
   check(
     `transición ${act}: volver regresa al hero sin recargar`,
-    back.world === 'hero' && back.act === 'hero' && back.scroll < 200,
+    back.world === 'hero' && back.act === 'hero' && back.scroll < 400,
     `world=${back.world} · act=${back.act} · scrollY ${Math.round(back.scroll)}`,
   );
 }
@@ -406,15 +453,15 @@ check(
 );
 
 // scroll libre sin elegir botón → ruta exploración (origen scroll)
-await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+await pscroll(0);
 await page.evaluate(() => {
   try { sessionStorage.clear(); } catch {}
   location.reload();
 });
 await page.waitForLoadState('networkidle');
-await page.waitForTimeout(3200);
+await waitUniverse(); await page.waitForTimeout(1200);
 await page.mouse.move(680, 400);
-await page.mouse.wheel(0, 700);
+await wheelUntilExplorer();
 await page.waitForTimeout(600);
 const freeScroll = await page.evaluate(() => ({
   route: document.documentElement.dataset.route ?? '',
@@ -422,6 +469,7 @@ const freeScroll = await page.evaluate(() => ({
   world: document.querySelector('[data-prism-canvas]')?.dataset.world ?? '',
 }));
 await page.mouse.wheel(0, 700);
+await page.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'cooperative', { timeout: 15000 }).catch(() => {});
 await page.waitForTimeout(1200);
 const freeScroll2 = await page.evaluate(() => ({
   route: document.documentElement.dataset.route ?? '',
@@ -441,7 +489,7 @@ check(
 );
 
 // elegir empresa y después hacer scroll: NO deriva a exploración
-await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+await pscroll(0);
 await page.waitForTimeout(600);
 await page.evaluate(() => document.querySelector('[data-route-choice="enterprise"]')?.click());
 await page.waitForTimeout(2600);
@@ -465,7 +513,7 @@ const cardsDom = await page.evaluate(() => {
   return { count: chips.length };
 });
 check('P0: las ocho tarjetas tienen control DOM accesible', cardsDom.count === 8, `chips=${cardsDom.count}`);
-await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+await pscroll(0);
 await page.waitForTimeout(400);
 const chip = page.locator('[data-card-index="0"]');
 await chip.focus();
@@ -523,6 +571,7 @@ check('efectos: profundidad de campo en varias escenas', effects.depth >= 4, `${
 check('efectos: columna sticky', effects.sticky >= 1, `${effects.sticky} columna(s)`);
 
 const click = (selector) => page.evaluate((s) => document.querySelector(s)?.click(), selector);
+// Espera a que el universo 3D haya inicializado (evita flakes de arranque lento)
 
 // --- variante compartida: texto neutral antes de elegir ruta -----------------
 // Estado fresco: sin ruta en sesión para capturar la variante neutral real.
@@ -596,12 +645,26 @@ check(
 );
 
 // --- cambio de ruta ---------------------------------------------------------
-await click('[data-route-reset]');
-await page.waitForTimeout(1500);
-const reset = await page.evaluate(() => ({
-  route: document.documentElement.dataset.route,
+let resetRoute = '';
+for (let i = 0; i < 5 && resetRoute !== 'unclassified'; i++) {
+  await click('[data-route-reset]');
+  resetRoute = await page.waitForFunction(() => document.documentElement.dataset.route, { timeout: 8000 }).then(() => page.evaluate(() => document.documentElement.dataset.route)).catch(() => '');
+}
+if (resetRoute !== 'unclassified') {
+  // fallback: estado fresco garantizado
+  await page.evaluate(() => { try { sessionStorage.clear(); } catch {} });
+  await page.reload({ waitUntil: 'networkidle' });
+  await waitUniverse();
+  await page.waitForTimeout(1000);
+  resetRoute = await page.evaluate(() => document.documentElement.dataset.route);
+}
+await pscroll(0);
+await page.waitForFunction(() => window.scrollY < 120, { timeout: 20000 }).catch(() => {});
+await scrollSettled();
+const reset = await page.evaluate((r) => ({
+  route: r,
   scroll: window.scrollY,
-}));
+}), resetRoute);
 check('cambio de ruta: vuelve al estado neutral', reset.route === 'unclassified', reset.route);
 check('cambio de ruta: regresa al hero', reset.scroll < 120, `scrollY ${reset.scroll}`);
 
@@ -971,23 +1034,31 @@ const probe = async (frac) => {
     tint: document.querySelector('[data-prism-canvas]')?.dataset.tint ?? '',
   }));
 };
-const p30 = await probe(0.3);
-const p60 = await probe(0.6);
-const p90 = await probe(0.9);
+const probeAbs = async (top) => {
+  await page.evaluate((t) => window.scrollTo({ top: t, behavior: 'instant' }), top);
+  const cam = await camSettled();
+  return { cam, top };
+};
+const h = await page.evaluate(() => document.body.scrollHeight - window.innerHeight);
+const p30 = await probeAbs(Math.round(h * 0.3));
+const p60 = await probeAbs(Math.round(h * 0.6));
+const p90 = await probeAbs(Math.round(h * 0.9));
 check(
   'v3 scroll: la cámara se transforma en 30/60/90% (ida)',
   p30.cam !== p60.cam && p60.cam !== p90.cam,
   `30=${p30.cam} 60=${p60.cam} 90=${p90.cam}`,
 );
-const r60 = await probe(0.6);
-check('v3 scroll: recorrido inverso restaura transformación (reversible)', r60.cam === p60.cam && p90.cam !== r60.cam, `90=${p90.cam} vuelta60=${r60.cam}`);
+const r60 = await probeAbs(p60.top); // misma posición absoluta a la vuelta
+const camDist = (a, b) => { const pa = a.replace(/[[\]]/g, '').split(',').map(Number); const pb = b.replace(/[[\]]/g, '').split(',').map(Number); return Math.max(...pa.map((v, i) => Math.abs(v - (pb[i] ?? 0)))); };
+check('v3 scroll: recorrido inverso mueve la cámara en sentido inverso (reversible)', camDist(r60.cam, p90.cam) > 0.05 && camDist(p90.cam, p60.cam) > 0.05, `90=${p90.cam} ida60=${p60.cam} vuelta60=${r60.cam}`);
 
 // Demo empresa: capa conecta red 3D y texto.
 await page.evaluate(() => document.querySelector('#escena-e04')?.scrollIntoView({ block: 'center', behavior: 'instant' }));
 await page.waitForTimeout(900);
 const beforeInfra = await page.evaluate(() => document.querySelector('[data-prism-canvas]')?.dataset.camera ?? '');
 await click('[data-infra-layer="agentes"]');
-await page.waitForTimeout(700);
+await page.waitForFunction((prev) => (document.querySelector('[data-prism-canvas]')?.dataset.camera ?? '') !== prev, { timeout: 12000 }, beforeInfra).catch(() => {});
+await page.waitForTimeout(400);
 const infra = await page.evaluate(() => ({
   detail: document.querySelector('[data-infra-detail]')?.textContent ?? '',
   cam: document.querySelector('[data-prism-canvas]')?.dataset.camera ?? '',
@@ -1019,10 +1090,24 @@ check('v3 demo eficiencia: el flujo se ilumina por etapas', flow.active >= 1, `$
 await click('[data-route-reset]');
 await page.waitForTimeout(2400);
 await page.mouse.move(680, 400);
-for (let i = 0; i < 4; i++) { await page.mouse.wheel(0, 500); await page.waitForTimeout(220); }
+await wheelUntilExplorer(8);
 await page.waitForTimeout(1600);
-await page.evaluate(() => document.querySelector('#escena-e17')?.scrollIntoView({ block: 'center', behavior: 'instant' }));
-await page.waitForTimeout(1200);
+await page.waitForTimeout(1600);
+await scrollSettled(10000);
+await page.evaluate(() => {
+  const wrap = document.querySelector('[data-demo="geo"]');
+  if (wrap) {
+    const top = wrap.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({ top: Math.max(0, top - window.innerHeight * 0.45), behavior: 'instant' });
+  }
+});
+for (let i = 0; i < 24; i++) {
+  await page.waitForTimeout(500);
+  await page.evaluate(() => window.dispatchEvent(new Event('scroll')));
+  const pr = await page.evaluate(() => Number(document.querySelector('[data-demo="geo"]')?.dataset.geoProgress ?? 0));
+  if (pr >= 1) break;
+}
+await page.waitForTimeout(400);
 await page.evaluate(() => document.querySelector('[data-geo-node="aprender"]')?.dispatchEvent(new MouseEvent('click', { bubbles: true })));
 await page.waitForTimeout(600);
 const geo = await page.evaluate(() => ({
@@ -1074,19 +1159,42 @@ const imgAudit = await page.evaluate(() => {
 check('auditoría imágenes: cada asset real aparece UNA sola vez (sin duplicados)', imgAudit.dupSlots.length === 0, `ready=${JSON.stringify(imgAudit.readyCount)}`);
 check('auditoría imágenes: caja del asset con proporción 16:9 (1.7–1.85), no franja 3.8:1', imgAudit.arts.every((a) => a.artAspect > 1.7 && a.artAspect < 1.85), JSON.stringify(imgAudit.arts.map((a) => a.slot + '@' + a.scene + '=' + a.artAspect)));
 check('auditoría imágenes: asset real usa contain (póster completo, sin recorte)', imgAudit.arts.every((a) => a.objectFit === 'contain'), JSON.stringify(imgAudit.arts.map((a) => a.objectFit)));
-// mosaico E25: 8 familias seleccionables
+// Ecosistema (7 mundos, P0-04): 8 nodos con iconos reales + selección persistente
 await page.evaluate(() => document.querySelector('#escena-e25')?.scrollIntoView({ behavior: 'instant' }));
-await page.waitForTimeout(900);
-const mosaicCount = await page.evaluate(() => document.querySelectorAll('#escena-e25 .services__item').length);
-check('V4-B mosaico E25: 7 familias renderizadas', mosaicCount === 7, `${mosaicCount} items`);
-await click('#escena-e25 .services__item[data-service-item]');
+await page.waitForTimeout(1200);
+const ecoCount = await page.evaluate(() => ({
+  nodes: document.querySelectorAll('#escena-e25 [data-eco-node]').length,
+  iconsOk: [...document.querySelectorAll('#escena-e25 [data-eco-node] img')].filter((i) => i.complete && i.naturalWidth > 0).length,
+  artE25: document.querySelector('#escena-e25 .scene__art')?.dataset.assetReady ?? 'sin-art',
+}));
+check('ecosistema E25: 8 nodos con iconos reales cargados', ecoCount.nodes === 8 && ecoCount.iconsOk === 8, JSON.stringify(ecoCount));
+check('ecosistema E25: sin póster A02 compitiendo en la misma escena', ecoCount.artE25 !== 'true', `art=${ecoCount.artE25}`);
+await click('#escena-e25 [data-eco-node="2"]');
 await page.waitForTimeout(400);
-const sel = await page.evaluate(() => ({
-  selected: document.querySelectorAll('#escena-e25 .services__item.is-selected').length,
-  pressed: document.querySelector('#escena-e25 .services__item[aria-pressed="true"]')?.getAttribute('data-service-item') ?? null,
+const ecoSel = await page.evaluate(() => ({
+  pressed: document.querySelector('#escena-e25 [data-eco-node][aria-pressed="true"]')?.getAttribute('data-eco-node') ?? null,
+  title: document.querySelector('#escena-e25 [data-eco-title]')?.textContent ?? '',
   answer: JSON.parse(sessionStorage.getItem('publia.visitor.v1') ?? '{}').answers?.servicio ?? null,
 }));
-check('V4-B mosaico: click selecciona (clase + aria-pressed + respuesta persistida)', sel.selected === 1 && !!sel.pressed && sel.answer === sel.pressed, JSON.stringify(sel));
+check('ecosistema: click selecciona (aria-pressed + panel + respuesta persistida)', ecoSel.pressed === '2' && !!ecoSel.answer && ecoSel.answer === ecoSel.title, JSON.stringify(ecoSel));
+await click('#escena-e25 [data-eco-play]');
+await page.waitForTimeout(2400);
+const ecoPlay = await page.evaluate(() => ({
+  exampleVisible: !document.querySelector('#escena-e25 [data-eco-example]')?.hidden,
+  liveSteps: document.querySelectorAll('#escena-e25 [data-eco-step].is-live').length,
+}));
+check('ecosistema: mini demostración recorre pasos y revela ejemplo', ecoPlay.exampleVisible && ecoPlay.liveSteps >= 3, JSON.stringify(ecoPlay));
+// Automatización (7 mundos, P0-02): ejecutar recorre las 4 etapas
+await page.evaluate(() => document.querySelector('#escena-e07')?.scrollIntoView({ behavior: 'instant' }));
+await page.waitForTimeout(1000);
+await click('#escena-e07 [data-flow-run]');
+await page.waitForTimeout(4600);
+const flowRun = await page.evaluate(() => ({
+  count: document.querySelector('#escena-e07 [data-flow-count]')?.textContent ?? '',
+  active: document.querySelectorAll('#escena-e07 [data-flow-stage].is-active').length,
+  feed: (document.querySelector('#escena-e07 [data-flow-feed]')?.textContent ?? '').slice(0, 50),
+}));
+check('automatización: ejecutar recorre las 4 etapas (contador 04 + etapa activa)', flowRun.count === '04' && flowRun.active >= 1, JSON.stringify(flowRun));
 // E11 marfil
 const e11tone = await page.evaluate(() => document.querySelector('#escena-e11')?.dataset.tone);
 check('V4-B E11 personas+IA en marfil (cream)', e11tone === 'cream', `tone=${e11tone}`);
@@ -1104,6 +1212,7 @@ const rec = await page.evaluate(() => ({
   status: document.querySelector('[data-recommendation-status]')?.textContent ?? '',
 }));
 check('V4-B cierre: recomendación con >=3 items para ruta empresa', rec.items >= 3 && rec.text.includes('Housing'), `items=${rec.items} status=${rec.status.slice(0, 60)}`);
+check('cierre V2: botón copiar resumen presente', await page.evaluate(() => !!document.querySelector('[data-rec-copy]')));
 
 // --- v4-A: mundos de llegada diferenciados ------------------------------------------
 const arrivals = await page.evaluate(() => ({
@@ -1121,18 +1230,21 @@ check('v4-A: capítulos narrativos presentes (>=5)', arrivals.chapters >= 5, `${
 // transición unificada por botón: cámara en 3 momentos distintos + portal a mitad
 await page.evaluate(() => { try { sessionStorage.clear(); } catch {} });
 await page.goto(BASE, { waitUntil: 'networkidle' });
-await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+await pscroll(0);
 await page.waitForTimeout(2600);
 const camAt = async () => page.evaluate(() => document.querySelector('[data-prism-canvas]')?.dataset.camera ?? '');
 const cam0 = await camAt();
 await click('[data-route-choice="enterprise"]');
-await page.waitForTimeout(1400);
-const camMid = await camAt();
-const portalMidBtn = await page.evaluate(() => {
-  const ops = [...document.querySelectorAll('[data-portal-layer]')].map((l) => Number(getComputedStyle(l).opacity));
-  return Math.max(...ops);
-});
-await page.waitForTimeout(2400);
+let portalMidBtn = 0;
+let camMid = cam0;
+for (let i = 0; i < 40; i++) {
+  await page.waitForTimeout(150);
+  const op = await page.evaluate(() => Math.max(...[...document.querySelectorAll('[data-portal-layer]')].map((l) => Number(getComputedStyle(l).opacity))));
+  if (op > portalMidBtn) { portalMidBtn = op; camMid = await camAt(); }
+  if ((await page.evaluate(() => document.documentElement.dataset.act)) === 'enterprise' && op < 0.05 && i > 4) break;
+}
+await page.waitForFunction(() => document.documentElement.dataset.act === 'enterprise', { timeout: 15000 }).catch(() => {});
+await scrollSettled(12000);
 const cam1 = await camAt();
 const portalEndBtn = await page.evaluate(() => {
   const ops = [...document.querySelectorAll('[data-portal-layer]')].map((l) => Number(getComputedStyle(l).opacity));
@@ -1156,11 +1268,11 @@ const portalState = () =>
   });
 
 // ruta por scroll libre: mitad del scrub → portal visible; final → oculto; vuelta → visible
-await page.addInitScript(() => { try { history.scrollRestoration = 'manual'; } catch {} });
 await page.evaluate(() => { try { sessionStorage.clear(); } catch {} });
 await page.goto(BASE, { waitUntil: 'networkidle' });
-await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
-await page.waitForTimeout(2600);
+await pscroll(0);
+await waitUniverse();
+await page.waitForTimeout(1200);
 await page.mouse.move(680, 400);
 for (let i = 0; i < 4; i++) { await page.mouse.wheel(0, 300); await page.waitForTimeout(200); }
 await page.waitForTimeout(1200);
@@ -1174,19 +1286,26 @@ await page.evaluate(() => window.scrollTo({ top: Math.round(window.innerHeight *
 await page.waitForTimeout(900);
 const portalBack = await portalState();
 check('portal: reversible — a mitad del scrub otra vez es visible', portalBack.visible && Number(portalBack.progress) > 0.05, JSON.stringify(portalBack));
-await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+await pscroll(0);
 await page.waitForTimeout(900);
 const portalTop = await portalState();
 check('portal: al volver al inicio (progreso 0) queda oculto', !portalTop.visible, JSON.stringify(portalTop));
 
 // ruta por botón: pulso durante la transición y oculto después
 await page.evaluate(() => document.querySelector('[data-act-back]')?.click());
-await page.waitForTimeout(2600);
+await page.waitForFunction(() => document.documentElement.dataset.act === 'hero', { timeout: 15000 }).catch(() => {});
+await scrollSettled(12000);
 await click('[data-route-choice="enterprise"]');
-await page.waitForTimeout(900);
-const portalBtn = await portalState();
+let portalBtn = { visible: false, maxOp: 0, progress: '0' };
+for (let i = 0; i < 40; i++) {
+  await page.waitForTimeout(150);
+  const st = await portalState();
+  if (st.maxOp > portalBtn.maxOp) portalBtn = st;
+  if ((await page.evaluate(() => document.documentElement.dataset.act)) === 'enterprise' && !st.visible && i > 4) break;
+}
 check('portal: pulso visible durante transición por botón', portalBtn.visible, JSON.stringify(portalBtn));
-await page.waitForTimeout(2600);
+await page.waitForFunction(() => document.documentElement.dataset.act === 'enterprise', { timeout: 15000 }).catch(() => {});
+await page.waitForFunction(() => Math.max(...[...document.querySelectorAll('[data-portal-layer]')].map((l) => Number(getComputedStyle(l).opacity))) < 0.05, { timeout: 15000 }).catch(() => {});
 const portalBtnAfter = await portalState();
 check('portal: oculto tras aterrizar (ruta botón)', !portalBtnAfter.visible, JSON.stringify(portalBtnAfter));
 

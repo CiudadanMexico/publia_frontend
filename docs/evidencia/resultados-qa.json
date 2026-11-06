@@ -1,6 +1,6 @@
 {
   "base": "https://kitty-midi-grid-liked.trycloudflare.com",
-  "total": 136,
+  "total": 140,
   "fallos": 0,
   "resultados": [
     {
@@ -31,12 +31,12 @@
     {
       "name": "prisma: la escena 3D se renderiza y cambia (animación real)",
       "ok": true,
-      "detail": "672820 vs 683466 bytes"
+      "detail": "666216 vs 677737 bytes"
     },
     {
       "name": "prisma: pinta una fracción útil del viewport",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.20553703703703705}"
+      "detail": "{\"paintedRatio\":0.20310185185185184}"
     },
     {
       "name": "hero 3D: lienzo único presente con WebGL activo",
@@ -66,12 +66,12 @@
     {
       "name": "hero 3D: pinta la escena (mascota, prisma, tarjetas)",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.206125}"
+      "detail": "{\"paintedRatio\":0.206}"
     },
     {
       "name": "hero 3D: la animación ambiental cambia entre fotogramas",
       "ok": true,
-      "detail": "690850 vs 682574 bytes"
+      "detail": "687499 vs 691107 bytes"
     },
     {
       "name": "marca: el encabezado usa el logotipo oficial",
@@ -91,12 +91,12 @@
     {
       "name": "composición: coincide con la captura aprobada",
       "ok": true,
-      "detail": "izq 36/35 · der 41/40 · brillo 14.4/14.8 %"
+      "detail": "izq 36/35 · der 45/40 · brillo 14.4/14.8 %"
     },
     {
       "name": "transición enterprise: la cámara viaja a otro mundo del mismo universo",
       "ok": true,
-      "detail": "mundo hero→enterprise · cámara [0,2.4,11.6]→[2.425025025025025,1.8343843843843843,8.332832832832834] · tinte #050b1b→#0a0e18"
+      "detail": "mundo hero→enterprise · cámara [0,2.4,11.6]→[2.3873873873873874,1.8202702702702702,8.302252252252252] · tinte #050b1b→#0a0e18"
     },
     {
       "name": "transición enterprise: el contenido de la escena destino aparece",
@@ -111,7 +111,7 @@
     {
       "name": "transición efficiency: la cámara viaja a otro mundo del mismo universo",
       "ok": true,
-      "detail": "mundo hero→efficiency · cámara [0,2.4,11.6]→[-1.7624103299856528,1.6606886657101865,8.201721664275468] · tinte #050b1b→#0d0a05"
+      "detail": "mundo hero→efficiency · cámara [0,2.4,11.6]→[-1.8332572992700729,1.6809306569343063,8.252326642335767] · tinte #050b1b→#0d0a05"
     },
     {
       "name": "transición efficiency: el contenido de la escena destino aparece",
@@ -126,12 +126,12 @@
     {
       "name": "transición cooperative: la cámara viaja a otro mundo del mismo universo",
       "ok": true,
-      "detail": "mundo hero→cooperative · cámara [0,2.4,11.6]→[-0.016666666666666673,2.4332144618680376,9.97317836503856] · tinte #050b1b→#060d08"
+      "detail": "mundo hero→cooperative · cámara [0,2.4,11.6]→[-0.016666666666666673,2.3465745538057745,10.5434824671916] · tinte #050b1b→#060c12"
     },
     {
       "name": "transición cooperative: el contenido de la escena destino aparece",
       "ok": true,
-      "detail": "scrollY 1240 · act=cooperative"
+      "detail": "scrollY 700 · act=cooperative"
     },
     {
       "name": "transición cooperative: volver regresa al hero sin recargar",
@@ -156,7 +156,7 @@
     {
       "name": "P0: el scroll conduce la cámara (scrub) hacia el mundo cooperativo",
       "ok": true,
-      "detail": "world=cooperative · cámara=[-0.016666666666666673,2.340338474721508,9.868894601542417] · scrollY=1400"
+      "detail": "world=cooperative · cámara=[-0.016666666666666673,2.386932474721508,10.073908601542417] · scrollY=1400"
     },
     {
       "name": "P0: tras elegir empresa, el scroll NO cambia a exploración",
@@ -261,7 +261,7 @@
     {
       "name": "ruta eficiencia: escena propia visible",
       "ok": true,
-      "detail": "1595px · route=efficiency act=efficiency world=efficiency scrollY=6652"
+      "detail": "1696px · route=efficiency act=efficiency world=efficiency scrollY=1853"
     },
     {
       "name": "ruta eficiencia: mensaje propio de la escena",
@@ -446,12 +446,12 @@
     {
       "name": "rendimiento: JS + CSS inicial (con el 3D del hero) por debajo de 260 kB",
       "ok": true,
-      "detail": "248 kB (JS 238 · CSS 10)"
+      "detail": "252 kB (JS 241 · CSS 11)"
     },
     {
       "name": "rendimiento: la aplicación sin 3D por debajo de 90 kB",
       "ok": true,
-      "detail": "68 kB de JS de aplicación"
+      "detail": "71 kB de JS de aplicación"
     },
     {
       "name": "rendimiento: el escenario 3D se carga sólo bajo demanda",
@@ -481,7 +481,7 @@
     {
       "name": "v3: slots de arte A01-A05 preparados",
       "ok": true,
-      "detail": "A01,A01,A04,A04,A03,A03,A03,A03,A05,A05,A05,A04,A08,A02,A06,A09"
+      "detail": "A01,A01,A04,A04,A03,A03,A03,A03,A05,A05,A05,A02,A04,A08,A06,A09"
     },
     {
       "name": "v3: eyebrows con emoji semántico",
@@ -496,12 +496,12 @@
     {
       "name": "v3 scroll: la cámara se transforma en 30/60/90% (ida)",
       "ok": true,
-      "detail": "30=[1.9,1.8321745057941377,8.557941376959782] 60=[1.9987179487179487,1.5289377289377288,7.972344322344322] 90=[1.9,1.5808328579577866,8.268054763262978]"
+      "detail": "30=[2.638038038038038,1.9142642642642642,8.505905905905907] 60=[2.3873873873873874,1.8202702702702702,8.302252252252252] 90=[1.9,1.54541010320478,8.209016838674634]"
     },
     {
-      "name": "v3 scroll: recorrido inverso restaura transformación (reversible)",
+      "name": "v3 scroll: recorrido inverso mueve la cámara en sentido inverso (reversible)",
       "ok": true,
-      "detail": "90=[1.9,1.5808328579577866,8.268054763262978] vuelta60=[1.9987179487179487,1.5289377289377288,7.972344322344322]"
+      "detail": "90=[1.9,1.54541010320478,8.209016838674634] ida60=[2.3873873873873874,1.8202702702702702,8.302252252252252] vuelta60=[1.391025641025641,1.7025641025641025,8.406410256410258]"
     },
     {
       "name": "v3 demo empresa: la capa cambia el texto",
@@ -531,7 +531,7 @@
     {
       "name": "v3 demo eficiencia: el flujo se ilumina por etapas",
       "ok": true,
-      "detail": "3 etapas"
+      "detail": "1 etapas"
     },
     {
       "name": "v3 demo geonodos: el nodo explica qué se comparte",
@@ -576,7 +576,7 @@
     {
       "name": "auditoría imágenes: caja del asset con proporción 16:9 (1.7–1.85), no franja 3.8:1",
       "ok": true,
-      "detail": "[\"A04@escena-e03=1.78\",\"A03@escena-e07=1.78\",\"A05@escena-e15=1.78\",\"A02@escena-e25=1.78\"]"
+      "detail": "[\"A04@escena-e03=1.78\",\"A03@escena-e07=1.78\",\"A05@escena-e15=1.78\",\"A02@escena-e20=1.78\"]"
     },
     {
       "name": "auditoría imágenes: asset real usa contain (póster completo, sin recorte)",
@@ -584,14 +584,29 @@
       "detail": "[\"contain\",\"contain\",\"contain\",\"contain\"]"
     },
     {
-      "name": "V4-B mosaico E25: 7 familias renderizadas",
+      "name": "ecosistema E25: 8 nodos con iconos reales cargados",
       "ok": true,
-      "detail": "7 items"
+      "detail": "{\"nodes\":8,\"iconsOk\":8,\"artE25\":\"sin-art\"}"
     },
     {
-      "name": "V4-B mosaico: click selecciona (clase + aria-pressed + respuesta persistida)",
+      "name": "ecosistema E25: sin póster A02 compitiendo en la misma escena",
       "ok": true,
-      "detail": "{\"selected\":1,\"pressed\":\"Marketing y comunicación\",\"answer\":\"Marketing y comunicación\"}"
+      "detail": "art=sin-art"
+    },
+    {
+      "name": "ecosistema: click selecciona (aria-pressed + panel + respuesta persistida)",
+      "ok": true,
+      "detail": "{\"pressed\":\"2\",\"title\":\"Agentes de IA\",\"answer\":\"Agentes de IA\"}"
+    },
+    {
+      "name": "ecosistema: mini demostración recorre pasos y revela ejemplo",
+      "ok": true,
+      "detail": "{\"exampleVisible\":true,\"liveSteps\":3}"
+    },
+    {
+      "name": "automatización: ejecutar recorre las 4 etapas (contador 04 + etapa activa)",
+      "ok": true,
+      "detail": "{\"count\":\"04\",\"active\":1,\"feed\":\"Simulación completada: consulta atendida con revis\"}"
     },
     {
       "name": "V4-B E11 personas+IA en marfil (cream)",
@@ -601,7 +616,12 @@
     {
       "name": "V4-B cierre: recomendación con >=3 items para ruta empresa",
       "ok": true,
-      "detail": "items=4 status=Tu recorrido: ruta Empresa. Estas son las 2–3 siguientes pas"
+      "detail": "items=4 status=Tu recorrido: ruta Empresa · solución: Inteligencia artifici"
+    },
+    {
+      "name": "cierre V2: botón copiar resumen presente",
+      "ok": true,
+      "detail": ""
     },
     {
       "name": "v4-A empresa: llegada con demo infra + arte A04 + capítulo mundo",
@@ -631,12 +651,12 @@
     {
       "name": "v4-A transición botón: cámara cambia en 3 momentos (inicio/medio/fin)",
       "ok": true,
-      "detail": "0=[0,2.4,11.6] mid=[1.16964,1.96908,9.63008] fin=[2.3873873873873874,1.8202"
+      "detail": "0=[0,2.4,11.6] mid=[1.9,1.742159383033419,8.4 fin=[2.3873873873873874,1.8202"
     },
     {
       "name": "v4-A transición botón: portal visible a mitad del viaje",
       "ok": true,
-      "detail": "maxOp=0.56"
+      "detail": "maxOp=0.95"
     },
     {
       "name": "v4-A transición botón: portal disuelto al aterrizar",

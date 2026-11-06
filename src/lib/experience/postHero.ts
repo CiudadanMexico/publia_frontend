@@ -27,6 +27,7 @@ function renderRecommendation(): void {
   const route = state.primary;
   const foco = state.answers.foco;
   const escala = state.answers.escala;
+  const servicio = state.answers.servicio;
 
   const items: { tag: string; title: string; body: string }[] = [];
   if (route === 'enterprise') {
@@ -67,8 +68,28 @@ function renderRecommendation(): void {
     )
     .join('');
   const routeLabel = route === 'unclassified' ? 'sin ruta elegida aún' : route === 'enterprise' ? 'ruta Empresa' : route === 'efficiency' ? 'ruta Eficiencia' : 'exploración libre';
-  status.textContent = `Tu recorrido: ${routeLabel}${foco ? ` · foco en ${FOCO_LABEL[foco]}` : ''}${escala ? ` · escala: ${escala.replace('_', ' ')}` : ''}. Estas son las 2–3 siguientes pasos que cuadran:`;
-  track('recommendation_rendered', { route, foco: foco ?? '', escala: escala ?? '' });
+  status.textContent = `Tu recorrido: ${routeLabel}${foco ? ` · foco en ${FOCO_LABEL[foco]}` : ''}${escala ? ` · escala: ${escala.replace('_', ' ')}` : ''}${servicio ? ` · solución: ${servicio}` : ''}. Estos son los siguientes pasos que cuadran:`;
+  track('recommendation_rendered', { route, foco: foco ?? '', escala: escala ?? '', servicio: servicio ?? '' });
+
+  // Copiar resumen (acción explícita del visitante, V2)
+  const copyBtn = root.querySelector<HTMLButtonElement>('[data-rec-copy]');
+  const copied = root.querySelector<HTMLElement>('[data-rec-copied]');
+  copyBtn?.addEventListener('click', async () => {
+    const lines = [
+      `Recorrido Publia.mx — ${routeLabel}`,
+      foco ? `- Foco: ${FOCO_LABEL[foco]}` : null,
+      escala ? `- Escala: ${escala.replace('_', ' ')}` : null,
+      servicio ? `- Solución elegida: ${servicio}` : null,
+      '- Contacto: hola@publia.mx · WhatsApp 55 73 72 46 60',
+    ].filter(Boolean) as string[];
+    try {
+      await navigator.clipboard.writeText(lines.join('\n'));
+      if (copied) copied.textContent = '✓ Resumen copiado al portapapeles.';
+      track('recommendation_copied', { route });
+    } catch {
+      if (copied) copied.textContent = 'No se pudo copiar; selecciona y copia el texto de arriba.';
+    }
+  });
 }
 
 function bindSolutionsMosaic(universe: PostHeroUniverse | null): void {

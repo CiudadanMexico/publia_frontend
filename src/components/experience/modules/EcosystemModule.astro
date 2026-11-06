@@ -1,0 +1,145 @@
+---
+/**
+ * Ecosistema de soluciones (P0-04, paquete 7 mundos): órbita de 8 servicios
+ * con iconos reales + panel de lectura accesible. La selección persiste en
+ * `answers.servicio` y alimenta el cierre personalizado (V2).
+ * Arte: DOM/CSS 3D sobre el universo 3D existente — sin iframes ni pósteres.
+ */
+import type { ResolvedScene } from '../../../lib/experience/graph';
+import { accentify } from '../../../lib/experience/accent';
+import { ECOSYSTEM_SERVICES } from '../../../data/ecosystem';
+
+interface Props {
+  scene: ResolvedScene;
+}
+
+const { scene } = Astro.props;
+const services = ECOSYSTEM_SERVICES;
+const first = services[0]!;
+---
+
+<section class="eco" data-module="ecosystem" data-demo="ecosystem">
+  <div class="catalog__intro eco__intro">
+    {scene.eyebrow && <p class="catalog__eyebrow" data-role="eyebrow" data-reveal set:html={accentify(scene.eyebrow)} />}
+    <h2 class="catalog__title" data-role="title" data-reveal="lines" set:html={accentify(scene.title)} />
+    {scene.lead && <p class="catalog__lead" data-role="lead" data-reveal>{scene.lead}</p>}
+  </div>
+
+  <div class="eco__grid">
+    <div class="eco__panel" data-eco-panel aria-live="polite">
+      <div class="eco__top">
+        <span class="eco__index" data-eco-index>01 / 08</span>
+        <span class="eco__signal"><i></i> MÓDULO SELECCIONADO</span>
+      </div>
+      <div class="eco__body">
+        <div class="eco__icon" data-eco-emoji aria-hidden="true">{first.emoji}</div>
+        <div>
+          <h3 class="eco__title" data-eco-title>{first.title}</h3>
+          <p class="eco__detail" data-eco-detail>{first.detail}</p>
+        </div>
+      </div>
+      <div class="eco__flow" data-eco-flow aria-label="Pasos del módulo">
+        {first.flow.map((f, i) => (<>{i > 0 && <b aria-hidden="true">⟶</b>}<span data-eco-step={String(i)}>{f}</span></>))}
+      </div>
+      <div class="eco__actions">
+        <button type="button" class="eco__btn eco__btn--primary" data-eco-play>▶ Ver mini demostración</button>
+        <button type="button" class="eco__btn" data-eco-more aria-expanded="false">¿Qué hace? ↗</button>
+        <button type="button" class="eco__btn eco__btn--round" data-eco-next aria-label="Siguiente solución">➜</button>
+        <button type="button" class="eco__btn eco__btn--activate" data-eco-activate>⚡ Activar ecosistema</button>
+      </div>
+      <p class="eco__example" data-eco-example hidden>{first.example}</p>
+      <p class="eco__toast" data-eco-toast role="status" aria-live="polite"></p>
+    </div>
+
+    <div class="eco__orbit" data-eco-orbit>
+      <div class="eco__hub" aria-hidden="true">
+        <img src="/assets/ecosistema/publia_isotipo.png" alt="" />
+        <span class="eco__hub-star">✦</span>
+      </div>
+      <div class="eco__ring eco__ring--one" aria-hidden="true"></div>
+      <div class="eco__ring eco__ring--two" aria-hidden="true"></div>
+      <div class="eco__cloud" data-eco-cloud role="group" aria-label="Ocho soluciones interactivas">
+        {
+          services.map((s, i) => (
+            <button
+              type="button"
+              class="eco__node"
+              data-eco-node={String(i)}
+              style={`--c:${s.color}`}
+              aria-pressed={i === 0 ? 'true' : 'false'}
+            >
+              <span class="eco__num">{String(i + 1).padStart(2, '0')}</span>
+              <img src={`/assets/ecosistema/servicio_${s.file}.png`} alt="" decoding="async" />
+              <span class="eco__name">{s.name}</span>
+            </button>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+  <p class="eco__hint">↕ Desplázate para recorrer la escena · ← → cambian de solución · Todo simulado con fines ilustrativos</p>
+</section>
+
+<style>
+  .eco { display: grid; gap: 1.2rem; }
+  .eco__grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 1.4rem; align-items: center; }
+  .eco__panel {
+    border: 1px solid var(--tone-border, rgba(255, 255, 255, 0.18));
+    border-radius: 1.2rem;
+    padding: 1.1rem 1.2rem;
+    background: rgba(9, 7, 30, 0.72);
+    display: grid;
+    gap: 0.8rem;
+    transition: border-color 0.3s;
+  }
+  .eco__top { display: flex; justify-content: space-between; font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.85; }
+  .eco__signal i { display: inline-block; width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--publia-mint); margin-right: 0.35rem; }
+  .eco__body { display: flex; gap: 0.9rem; align-items: flex-start; }
+  .eco__icon { font-size: 1.9rem; line-height: 1; width: 3rem; height: 3rem; display: grid; place-items: center; border-radius: 0.9rem; background: rgba(255, 255, 255, 0.07); flex: none; }
+  .eco__title { margin: 0 0 0.3rem; font-size: 1.35rem; }
+  .eco__detail { margin: 0; font-size: 0.95rem; line-height: 1.5; opacity: 0.92; }
+  .eco__flow { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; }
+  .eco__flow span { border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 999px; padding: 0.28rem 0.6rem; transition: background 0.25s, border-color 0.25s, color 0.25s; }
+  .eco__flow span.is-live { background: #0f6f85; border-color: #ffdc54; color: #fff; }
+  .eco__flow b { color: var(--publia-yellow); }
+  .eco__actions { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+  .eco__btn { border: 1px solid rgba(255, 255, 255, 0.3); background: transparent; color: inherit; border-radius: 999px; padding: 0.45rem 0.9rem; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: transform 0.2s, background 0.2s; }
+  .eco__btn:hover { transform: translateY(-2px); }
+  .eco__btn--primary { background: var(--publia-yellow); color: #03254f; border-color: transparent; }
+  .eco__btn--activate { border-color: var(--publia-coral); color: #ffd7dc; }
+  .eco__btn--round { border-radius: 50%; padding: 0.45rem 0.65rem; }
+  .eco__example { margin: 0; font-size: 0.88rem; border-left: 3px solid var(--publia-yellow); padding-left: 0.6rem; opacity: 0.9; }
+  .eco__toast { margin: 0; min-height: 1.2em; font-size: 0.82rem; color: var(--publia-yellow); opacity: 0; transition: opacity 0.3s; }
+  .eco__toast.visible { opacity: 1; }
+  .eco__orbit { position: relative; min-height: 420px; perspective: 900px; }
+  .eco__cloud { position: absolute; inset: 0; transform-style: preserve-3d; }
+  .eco__node {
+    position: absolute; left: 50%; top: 50%; translate: -50% -50%;
+    display: grid; justify-items: center; gap: 0.3rem;
+    background: rgba(10, 8, 34, 0.82); border: 1px solid var(--c, rgba(255,255,255,.3));
+    border-radius: 1rem; padding: 0.6rem; cursor: pointer; color: inherit;
+    transition: border-color 0.25s, box-shadow 0.25s;
+  }
+  .eco__node img { width: 44px; height: 44px; object-fit: contain; }
+  .eco__num { font-size: 0.62rem; letter-spacing: 0.12em; opacity: 0.7; }
+  .eco__name { font-size: 0.68rem; font-weight: 800; letter-spacing: 0.06em; }
+  .eco__node[aria-pressed='true'] { box-shadow: 0 0 0 2px var(--c, var(--publia-yellow)), 0 14px 34px rgba(0,0,0,.5); }
+  .eco__node:hover, .eco__node:focus-visible { border-color: var(--publia-yellow); outline: none; }
+  .eco__hub { position: absolute; left: 50%; top: 50%; translate: -50% -50%; width: 96px; height: 96px; display: grid; place-items: center; }
+  .eco__hub img { width: 72px; height: 72px; object-fit: contain; filter: drop-shadow(0 0 18px rgba(255, 205, 37, 0.55)); }
+  .eco__hub-star { position: absolute; color: var(--publia-yellow); animation: ecoSpin 6s linear infinite; }
+  @keyframes ecoSpin { to { rotate: 360deg; } }
+  .eco__ring { position: absolute; left: 50%; top: 50%; translate: -50% -50%; border: 1px dashed rgba(150, 93, 255, 0.4); border-radius: 50%; }
+  .eco__ring--one { width: 62%; aspect-ratio: 1; }
+  .eco__ring--two { width: 88%; aspect-ratio: 1; border-color: rgba(98, 234, 255, 0.25); }
+  .eco__orbit.is-burst .eco__hub { animation: ecoBurst 0.7s ease-out; }
+  @keyframes ecoBurst { 0% { scale: 1; } 40% { scale: 1.35; filter: drop-shadow(0 0 30px rgba(255,205,37,.9)); } 100% { scale: 1; } }
+  .eco__hint { margin: 0; font-size: 0.78rem; opacity: 0.7; text-align: center; }
+  @media (max-width: 900px) {
+    .eco__grid { grid-template-columns: 1fr; }
+    .eco__orbit { min-height: 340px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .eco__hub-star { animation: none; }
+  }
+</style>

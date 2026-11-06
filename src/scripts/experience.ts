@@ -31,6 +31,7 @@ import { pickVariantFrom, visitorSegments } from '../lib/experience/graph';
 import { accentify } from '../lib/experience/accent';
 import { createNarrative } from '../lib/experience/narrative';
 import { bindPostHero } from '../lib/experience/postHero';
+import { bindEcosystem } from '../lib/experience/ecosystem';
 import type { NarrativeHandle } from '../lib/experience/narrative';
 import { buildMailto } from '../data/site';
 import type { PrimaryRoute, VisitorState, VisitorTrait } from '../lib/experience/state';
@@ -253,7 +254,7 @@ function bindFreeScrollIntent(narrative: NarrativeHandle | null): void {
   const tryFreeRoute = (fromRealInput: boolean): void => {
     if (!armed) return;
     const root = document.documentElement;
-    if (root.dataset['scrolling'] === 'programmatic') return;
+    if (!fromRealInput && root.dataset['scrolling'] === 'programmatic') return;
     if (!fromRealInput) {
       // Un evento scroll suelto sólo cuenta como intención si pasó tiempo
       // desde el último desplazamiento programático (evita rezagos).
@@ -274,7 +275,14 @@ function bindFreeScrollIntent(narrative: NarrativeHandle | null): void {
     const keys = ['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', ' ', 'Home', 'End'];
     if (keys.includes(event.key)) tryFreeRoute(true);
   });
-  window.addEventListener('scroll', () => tryFreeRoute(false), { passive: true });
+  let lastSeenY = window.scrollY;
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY;
+    const delta = Math.abs(y - lastSeenY);
+    lastSeenY = y;
+    if (delta < 2) return; // scroll espurio (refresh/pin) sin intención real
+    tryFreeRoute(false);
+  }, { passive: true });
 }
 
 /** Las ocho tarjetas del hero responden a hover, foco y tap (nivel 2). */
@@ -331,6 +339,56 @@ function bindDemos(universe: UniverseHandleLike | null): void {
       universe?.cardPulse(2);
       track('demo_flujo_foco', { foco: chip.dataset['flowFocus'] ?? '' });
     });
+  });
+
+  // Eficiencia — ejecutar la demostración por las 4 etapas (P0-02, paquete 7 mundos)
+  document.querySelectorAll<HTMLElement>('[data-demo="flow"]').forEach((wrap) => {
+    const runBtn = wrap.querySelector<HTMLButtonElement>('[data-flow-run]');
+    const resetBtn = wrap.querySelector<HTMLButtonElement>('[data-flow-reset]');
+    const feed = wrap.querySelector<HTMLElement>('[data-flow-feed]');
+    const count = wrap.querySelector<HTMLElement>('[data-flow-count]');
+    const stages = [...wrap.querySelectorAll<HTMLElement>('[data-flow-stage]')];
+    const chip = () => wrap.querySelector<HTMLButtonElement>('[data-flow-focus][aria-pressed="true"]');
+    let running = false;
+    let timers: number[] = [];
+    const clear = (): void => { timers.forEach(window.clearTimeout); timers = []; };
+    const stageLines = ['Llega la consulta al canal elegido.', 'El agente la clasifica y prepara una propuesta.', 'Una persona revisa y decide.', 'Queda registro y seguimiento visible.'];
+    const reset = (): void => {
+      clear();
+      running = false;
+      if (runBtn) runBtn.disabled = false;
+      stages.forEach((st) => st.classList.remove('is-active'));
+      if (count) count.textContent = '00';
+      if (feed) feed.textContent = 'Listo para otra simulación. Elige un caso y ejecuta.';
+    };
+    runBtn?.addEventListener('click', () => {
+      if (running) return;
+      running = true;
+      if (runBtn) runBtn.disabled = true;
+      clear();
+      stages.forEach((st) => st.classList.remove('is-active'));
+      const c = chip();
+      const foco = c?.dataset['flowFocus'] ?? '';
+      if (feed) feed.textContent = 'Iniciando simulación…';
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      stages.forEach((st, i) => {
+        timers.push(window.setTimeout(() => {
+          stages.forEach((x) => x.classList.remove('is-active'));
+          st.classList.add('is-active');
+          if (feed) feed.textContent = stageLines[i] ?? '';
+          if (count) count.textContent = String(i + 1).padStart(2, '0');
+          universe?.cardPulse(i);
+        }, reduced ? 0 : i * 900));
+      });
+      timers.push(window.setTimeout(() => {
+        running = false;
+        if (runBtn) runBtn.disabled = false;
+        if (feed) feed.textContent = 'Simulación completada: consulta atendida con revisión humana y seguimiento registrado.';
+        track('demo_flujo_run', { foco });
+      }, reduced ? 0 : stages.length * 900));
+      track('demo_flujo_run', { foco });
+    });
+    resetBtn?.addEventListener('click', reset);
   });
 
   // Cooperativa — GeoNodos: el scroll enciende conexiones, el clic explica
@@ -677,6 +735,7 @@ export async function startExperience(): Promise<void> {
   const reducedMotion = reduced;
   const sceneLookTriggers = bindSceneLooks(universe);
   bindDemos(universe);
+  bindEcosystem(universe);
   bindPostHero(universe);
   let lastPortalKey = '';
   const drivePortal = (state: ReturnType<typeof getState>): void => {

@@ -54,6 +54,12 @@ const stages = [
     ))}
     <span class="flow-demo__dot" data-flow-dot aria-hidden="true" />
   </ol>
+  <div class="flow-demo__runrow">
+    <button type="button" class="flow-demo__run" data-flow-run>▶ Ejecutar demostración</button>
+    <button type="button" class="flow-demo__reset" data-flow-reset>↺ Reiniciar</button>
+    <span class="flow-demo__count" data-flow-count aria-label="Eventos completados">00</span>
+  </div>
+  <p class="flow-demo__feed" data-flow-feed aria-live="polite">Elige un caso y ejecuta la demostración para recorrer las cuatro etapas.</p>
   <p class="flow-demo__result" data-flow-result aria-live="polite">{focuses[0]?.result}</p>
   <p class="flow-demo__note">Una simulación conceptual, no una promesa de ventas automáticas.</p>
 </div>
@@ -120,4 +126,10 @@ const stages = [
   }
   .flow-demo__result { margin: 0; max-width: 52ch; font-size: 1.05rem; line-height: 1.5; min-height: 3.2em; }
   .flow-demo__note { margin: 0; font-size: 0.8rem; opacity: 0.85; border-left: 3px solid var(--publia-yellow); padding-left: 0.6rem; }
+  .flow-demo__runrow { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+  .flow-demo__run { background: var(--publia-yellow); color: #03254f; border: none; border-radius: 999px; padding: 0.55rem 1.1rem; font-weight: 800; cursor: pointer; }
+  .flow-demo__run:disabled { opacity: 0.55; cursor: wait; }
+  .flow-demo__reset { background: transparent; color: inherit; border: 1px solid var(--tone-border, rgba(255,255,255,.3)); border-radius: 999px; padding: 0.55rem 0.9rem; font-weight: 700; cursor: pointer; }
+  .flow-demo__count { font-weight: 900; color: var(--publia-cyan); font-variant-numeric: tabular-nums; }
+  .flow-demo__feed { margin: 0; font-size: 0.85rem; opacity: 0.9; min-height: 1.4em; }
 </style>
