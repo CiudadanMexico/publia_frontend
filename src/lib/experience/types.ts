@@ -81,7 +81,8 @@ export type SceneModule =
   | 'cta'
   | 'recommendation'
   | 'ecosystem'
-  | 'redDemo';
+  | 'redDemo'
+  | 'personasDemo';
 
 export interface CTA {
   label: string;

@@ -106,6 +106,10 @@ const stageVariants = Object.fromEntries(
           if (module === 'recommendation') {
             return <RecommendationModule scene={scene} />;
           }
+          if (module === 'personasDemo') {
+            const { default: PersonasDemo } = await import('./modules/PersonasDemo.astro');
+            return <PersonasDemo scene={resolved} />;
+          }
           if (module === 'redDemo') {
             const { default: RedDemo } = await import('./modules/RedDemo.astro');
             return <RedDemo scene={resolved} />;

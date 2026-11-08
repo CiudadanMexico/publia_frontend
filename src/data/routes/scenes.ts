@@ -402,7 +402,7 @@ const SCENES_RAW: SceneDefinition[] = [
     lead: 'Cuando la máquina no alcanza, entra una persona con criterio y contexto.',
     body: 'Los becarios de Publia trabajan dentro de una red supervisada por mentores y especialistas. No son un recurso infinito: son capacidad organizada.',
     purpose: 'Cerrar el ciclo: la tecnología no sustituye a la red, la ordena.',
-    modules: ['escalation'],
+    modules: ['personasDemo'],
     segments: [],
     route: 'shared',
     duration: 2,

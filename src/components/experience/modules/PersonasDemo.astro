@@ -1,0 +1,195 @@
+---
+/**
+ * Personas + IA (P0-04, Bloque C 7M-B): escena marfil con solicitud entrante,
+ * núcleo de agente, especialista humana (SVG original), cola de 4 pasos y
+ * resultado supervisado. Controles: ejecutar / pausar / paso a paso / reiniciar.
+ * E11 usa tono `cream`.
+ */
+import type { ResolvedScene } from '../../../lib/experience/graph';
+import { accentify } from '../../../lib/experience/accent';
+import { PERSONAS_CASES } from '../../../data/personas';
+
+interface Props {
+  scene: ResolvedScene;
+}
+
+const { scene } = Astro.props;
+const cases = PERSONAS_CASES;
+const c0 = cases[0]!;
+---
+
+<section class="pers" data-module="personasDemo" data-demo="personas">
+  <div class="catalog__intro pers__intro">
+    {scene.eyebrow && <p class="catalog__eyebrow" data-reveal set:html={accentify(scene.eyebrow)} />}
+    <h2 class="catalog__title" data-role="title" data-reveal="lines" set:html={accentify(scene.title)} />
+    {scene.lead && <p class="catalog__lead" data-reveal>{scene.lead}</p>}
+  </div>
+
+  <div class="pers__grid">
+    <div class="pers__controls">
+      <span class="pers__label">ELIGE UN CASO PARA EXPLORAR ↘</span>
+      <div class="pers__cases" role="group" aria-label="Casos de demostración">
+        {cases.map((c, i) => (
+          <button type="button" class="pers__case" data-pers-case={c.id} aria-pressed={i === 0 ? 'true' : 'false'}>{c.kind}</button>
+        ))}
+      </div>
+      <div class="pers__buttons">
+        <button type="button" class="pers__run" data-pers-run><span data-pers-run-text>▶ Ver cómo colaboran</span> ↗</button>
+        <button type="button" class="pers__ctl" data-pers-pause disabled>⏸ Pausar</button>
+        <button type="button" class="pers__ctl" data-pers-step>Paso a paso →</button>
+        <button type="button" class="pers__ctl" data-pers-reset>↺ Reiniciar</button>
+      </div>
+      <p class="pers__foot">Demo ilustrativa. Sin mensajes reales ni conexión con servicios externos.</p>
+    </div>
+
+    <div class="pers__visual" aria-label="Diagrama: solicitud, agente de IA y persona">
+      <svg class="pers__wires" viewBox="0 0 780 580" aria-hidden="true">
+        <defs>
+          <linearGradient id="persWireA" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#ffcd28" /><stop offset=".5" stop-color="#ff6980" /><stop offset="1" stop-color="#2b9af4" />
+          </linearGradient>
+          <linearGradient id="persWireB" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#6555eb" /><stop offset="1" stop-color="#02c7c6" />
+          </linearGradient>
+        </defs>
+        <path class="pers__wire w1" d="M108 349 C218 360, 219 197, 364 246" stroke="url(#persWireA)" />
+        <path class="pers__wire w2" d="M365 246 C526 171, 518 306, 626 300" stroke="url(#persWireB)" />
+        <path class="pers__wire w3" d="M626 300 C669 464, 345 476, 365 365" stroke="url(#persWireA)" />
+        <circle class="pers__packet" data-pers-packet="0" r="7" fill="#ffce28" cx="108" cy="349" />
+        <circle class="pers__packet" data-pers-packet="1" r="6" fill="#fa6c7d" cx="365" cy="246" />
+      </svg>
+
+      <div class="pers__card pers__source" data-pers-source>
+        <span class="pers__tag">01 / NECESIDAD</span>
+        <strong data-pers-source-title>{c0.source}</strong>
+        <small data-pers-source-msg>{c0.message}</small>
+      </div>
+
+      <div class="pers__ai" data-pers-ai>
+        <img src="/assets/ecosistema/publia_isotipo.png" alt="" />
+        <div class="pers__ai-label"><strong>AGENTE PUBLIA</strong><small data-pers-agent-role>{c0.agent}</small></div>
+      </div>
+
+      <div class="pers__human" data-pers-human>
+        <svg class="pers__portrait" viewBox="0 0 205 236" aria-hidden="true">
+          <defs>
+            <linearGradient id="persPbg" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#ffd684" /><stop offset="1" stop-color="#ff9d91" />
+            </linearGradient>
+            <linearGradient id="persSkin" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#c77c59" /><stop offset="1" stop-color="#8f4a3f" />
+            </linearGradient>
+          </defs>
+          <circle cx="102" cy="118" r="96" fill="url(#persPbg)" />
+          <path d="M102 30 C60 30 48 66 50 96 C52 70 66 52 102 52 C138 52 152 70 154 96 C156 66 144 30 102 30 Z" fill="#24233f" />
+          <ellipse cx="102" cy="104" rx="34" ry="40" fill="url(#persSkin)" />
+          <circle cx="89" cy="102" r="4" fill="#24233f" /><circle cx="115" cy="102" r="4" fill="#24233f" />
+          <path d="M92 124 Q102 132 112 124" stroke="#8f4a3f" stroke-width="3" fill="none" stroke-linecap="round" />
+          <path d="M58 236 C58 178 78 158 102 158 C126 158 146 178 146 236 Z" fill="#25345c" />
+          <path d="M92 158 L102 176 L112 158 L102 166 Z" fill="#ffda49" />
+          <circle cx="102" cy="60" r="5" fill="#6275b5" />
+        </svg>
+        <div class="pers__human-desc">
+          <span class="pers__person-label">PERSONA REAL, CRITERIO REAL</span>
+          <strong data-pers-human-name>{c0.human}</strong>
+          <small data-pers-human-role>{c0.role}</small>
+          <span class="pers__indicator" data-pers-indicator><i></i> DISPONIBLE</span>
+        </div>
+      </div>
+
+      <div class="pers__work" data-pers-work>
+        <span>EN PROCESO</span>
+        <div class="pers__work-lines"><i></i><i></i><i></i></div>
+        <strong data-pers-work-status>{c0.workStatus[0]}</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="pers__flow">
+    <div class="pers__flow-head">
+      <span>UNA SOLICITUD. VARIAS CAPACIDADES.</span>
+      <b data-pers-kind>{c0.kind}</b>
+    </div>
+    <ol class="pers__steps" data-pers-steps role="list">
+      {c0.steps.map((s, i) => (
+        <li class="pers__step" data-pers-step={String(i)} data-index={i}>
+          <b>{String(i + 1).padStart(2, '0')}</b>
+          <span>{s[0].replace(/^[^\s]+\s/, '')}</span>
+        </li>
+      ))}
+    </ol>
+    <p class="pers__output" data-pers-output aria-live="polite">
+      <strong data-pers-out-title>💬 ¿Qué ocurre cuando llega una solicitud?</strong>
+      <span data-pers-out-text>Elige «Ver cómo colaboran» o «Paso a paso».</span>
+    </p>
+  </div>
+</section>
+
+<style>
+  .pers { display: grid; gap: 1.2rem; }
+  .pers__intro .catalog__title, .pers__intro .catalog__eyebrow, .pers__intro .catalog__lead { color: var(--ink, #171f39); }
+  .pers__grid { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 1.2rem; align-items: start; }
+  .pers__controls { display: grid; gap: 0.7rem; justify-items: start; }
+  .pers__label { font-size: 0.72rem; letter-spacing: .14em; font-weight: 800; color: #514c6b; }
+  .pers__cases { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+  .pers__case { border: 1px solid #efddd4; background: #fffaf5; color: #514c6b; border-radius: 999px; padding: 0.45rem 0.9rem; font-weight: 800; cursor: pointer; }
+  .pers__case[aria-pressed='true'] { background: #142c56; color: #fff; border-color: transparent; }
+  .pers__buttons { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+  .pers__run { border: none; border-radius: 999px; padding: 0.6rem 1.1rem; font-weight: 900; background: #ffcc2e; color: #11274e; cursor: pointer; box-shadow: 0 4px 0 #de984c38; }
+  .pers__run:disabled { opacity: .55; cursor: wait; }
+  .pers__ctl { border: 1px solid #d8c6b8; background: #fffaf5; color: #514c6b; border-radius: 999px; padding: 0.5rem 0.9rem; font-weight: 700; cursor: pointer; }
+  .pers__ctl:disabled { opacity: .45; cursor: default; }
+  .pers__foot { font-size: 0.75rem; color: #8a8272; margin: 0; }
+  .pers__visual { position: relative; min-height: 340px; border-radius: 1.2rem; background: linear-gradient(120deg, #fffdf3, #ffecdb); border: 1px solid #f3e2d2; }
+  .pers__wires { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .pers__wire { fill: none; stroke-width: 3; stroke-dasharray: 12 14; opacity: .8; }
+  .pers__packet { opacity: .32; transition: opacity .3s; }
+  .pers__visual.is-running .pers__packet { opacity: .95; }
+  .pers__card { position: absolute; background: rgba(255,255,255,.87); border: 1px solid #efddd4; border-radius: 0.9rem; padding: 0.6rem 0.8rem; }
+  .pers__source { left: 6%; top: 52%; max-width: 200px; }
+  .pers__source.pulse { animation: persPulse .8s ease-out; }
+  @keyframes persPulse { 0% { box-shadow: 0 0 0 4px rgba(255, 206, 40, .55); } 100% { box-shadow: 0 0 0 0 transparent; } }
+  .pers__tag { display: block; font-size: 0.6rem; letter-spacing: .14em; color: #b0622f; font-weight: 800; }
+  .pers__source strong { display: block; font-size: 0.9rem; color: #192a55; }
+  .pers__source small { font-size: 0.78rem; color: #514c6b; }
+  .pers__ai { position: absolute; left: 50%; top: 40%; translate: -50% -50%; width: 86px; height: 86px; border-radius: 50%; display: grid; place-items: center; background: linear-gradient(135deg, #a7e4ff, #3089d5 68%, #174d9a); border: 6px solid #ffcc32; box-shadow: 0 8px 30px rgba(23, 57, 105, .35); }
+  .pers__ai img { width: 46px; height: 46px; object-fit: contain; }
+  .pers__ai.is-running { box-shadow: 0 0 34px rgba(58, 200, 246, .8); }
+  .pers__ai-label { position: absolute; bottom: -2rem; white-space: nowrap; text-align: center; background: #142c58; color: #fff; border-radius: 0.5rem; padding: 0.2rem 0.5rem; }
+  .pers__ai-label strong { display: block; font-size: 0.62rem; }
+  .pers__ai-label small { font-size: 0.58rem; color: #9ef8ee; }
+  .pers__human { position: absolute; right: 5%; top: 8%; display: flex; gap: 0.5rem; align-items: flex-start; background: rgba(255,255,255,.87); border: 1px solid #efddd4; border-radius: 0.9rem; padding: 0.5rem; max-width: 240px; }
+  .pers__human.is-active { border-color: #f4ce77; box-shadow: 0 0 22px rgba(244, 206, 119, .5); }
+  .pers__portrait { width: 64px; height: 74px; flex: none; }
+  .pers__person-label { display: block; font-size: 0.56rem; letter-spacing: .1em; color: #f16d75; font-weight: 900; }
+  .pers__human-desc strong { display: block; font-size: 0.82rem; color: #192a55; }
+  .pers__human-desc small { font-size: 0.68rem; color: #514c6b; }
+  .pers__indicator { display: inline-flex; align-items: center; gap: 0.3rem; margin-top: 0.25rem; font-size: 0.6rem; font-weight: 800; color: #2b9076; }
+  .pers__indicator i { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: #36ce9c; }
+  .pers__work { position: absolute; left: 8%; bottom: 6%; background: rgba(255, 254, 251, .92); border: 1px solid #dbbfe1; border-radius: 0.8rem; padding: 0.45rem 0.7rem; font-size: 0.62rem; }
+  .pers__work span { letter-spacing: .12em; color: #7758db; font-weight: 800; }
+  .pers__work-lines { display: grid; gap: 3px; margin: 0.3rem 0; }
+  .pers__work-lines i { height: 4px; border-radius: 2px; }
+  .pers__work-lines i:nth-child(1) { background: #a5dbea; } .pers__work-lines i:nth-child(2) { background: #ffc962; } .pers__work-lines i:nth-child(3) { background: #ffa0b7; }
+  .pers__work strong { color: #192a55; }
+  .pers__flow { border-radius: 1.2rem; background: #182e58; color: #dfebff; padding: 1rem 1.2rem; display: grid; gap: 0.7rem; }
+  .pers__flow-head { display: flex; justify-content: space-between; font-size: 0.72rem; letter-spacing: .12em; color: #9ccef5; font-weight: 800; }
+  .pers__flow-head b { color: #ffcf34; }
+  .pers__steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; }
+  .pers__step { background: #213c69; border: 1px solid rgba(123, 156, 205, .31); border-radius: 0.7rem; padding: 0.5rem 0.6rem; font-size: 0.78rem; color: #c9d9f2; transition: background .3s, border-color .3s; position: relative; }
+  .pers__step b { display: inline-block; background: rgba(255, 243, 206, .13); color: #ffd658; border-radius: 0.4rem; padding: 0 0.35rem; margin-right: 0.3rem; font-size: 0.68rem; }
+  .pers__step.is-active { background: #4267aa; border-color: #f4ce77; }
+  .pers__step.is-done { background: #225c63; }
+  .pers__output { margin: 0; background: rgba(255,255,255,.05); border: 1px solid rgba(137, 176, 199, .33); border-radius: 0.7rem; padding: 0.6rem 0.8rem; display: grid; gap: 0.15rem; }
+  .pers__output strong { color: #ffdb6f; font-size: 0.9rem; }
+  .pers__output span { color: #e0e9f5; font-size: 0.84rem; }
+  @media (max-width: 900px) {
+    .pers__grid { grid-template-columns: 1fr; }
+    .pers__steps { grid-template-columns: 1fr 1fr; }
+    .pers__visual { min-height: 300px; }
+    .pers__human { max-width: 190px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pers__source.pulse { animation: none; }
+  }
+</style>
