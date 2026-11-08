@@ -37,6 +37,11 @@ const baseState: VisitorState = {
   visitedScenes: [],
   lastScene: null,
   updatedAt: 0,
+  capabilities: [],
+  membership: null,
+  infra: null,
+  red: null,
+  proposalTouched: false,
 };
 
 const state = (patch: Partial<VisitorState>): VisitorState => ({ ...baseState, ...patch });

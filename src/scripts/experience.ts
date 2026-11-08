@@ -32,6 +32,7 @@ import { accentify } from '../lib/experience/accent';
 import { createNarrative } from '../lib/experience/narrative';
 import { bindPostHero } from '../lib/experience/postHero';
 import { bindEcosystem } from '../lib/experience/ecosystem';
+import { bindRed } from '../lib/experience/red';
 import type { NarrativeHandle } from '../lib/experience/narrative';
 import { buildMailto } from '../data/site';
 import type { PrimaryRoute, VisitorState, VisitorTrait } from '../lib/experience/state';
@@ -736,6 +737,7 @@ export async function startExperience(): Promise<void> {
   const sceneLookTriggers = bindSceneLooks(universe);
   bindDemos(universe);
   bindEcosystem(universe);
+  bindRed(universe);
   bindPostHero(universe);
   let lastPortalKey = '';
   const drivePortal = (state: ReturnType<typeof getState>): void => {

@@ -80,7 +80,8 @@ export type SceneModule =
   | 'geoDemo'
   | 'cta'
   | 'recommendation'
-  | 'ecosystem';
+  | 'ecosystem'
+  | 'redDemo';
 
 export interface CTA {
   label: string;

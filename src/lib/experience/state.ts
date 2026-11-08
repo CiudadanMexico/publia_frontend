@@ -21,6 +21,44 @@ export type VisitorTrait =
 
 export type RouteOrigin = 'button' | 'scroll' | null;
 
+/** Identificadores estables de capacidades del cierre V2 (nunca cadenas libres). */
+export type CapabilityId =
+  | 'web'
+  | 'agentes'
+  | 'marketing'
+  | 'personas'
+  | 'housing'
+  | 'capacitacion';
+
+export const CAPABILITY_IDS: readonly CapabilityId[] = [
+  'web',
+  'agentes',
+  'marketing',
+  'personas',
+  'housing',
+  'capacitacion',
+];
+
+/** Preferencia de infraestructura (Bloque A). */
+export type InfraPreference = 'ia_privada' | 'housing' | 'red_distribuida';
+
+export const INFRA_PREFERENCES: readonly InfraPreference[] = [
+  'ia_privada',
+  'housing',
+  'red_distribuida',
+];
+
+/** Niveles de membresía (Bloque D). */
+export type MembershipSlug = 'base' | 'agente' | 'crecimiento' | 'operacion' | 'cobertura';
+
+export const MEMBERSHIP_SLUGS: readonly MembershipSlug[] = [
+  'base',
+  'agente',
+  'crecimiento',
+  'operacion',
+  'cobertura',
+];
+
 export interface VisitorAnswers {
   /** Ruta A2: ¿ya hay sistemas o se empieza desde cero? */
   arranque?: 'existente' | 'desde_cero';
@@ -49,6 +87,16 @@ export interface VisitorState {
   transitioning: boolean;
   /** Marca de tiempo de la última actualización. */
   updatedAt: number;
+  /** Capacidades seleccionadas para la propuesta final (cierre V2). */
+  capabilities: CapabilityId[];
+  /** Membresía orientativa elegida en E27 (null = sin elegir). */
+  membership: MembershipSlug | null;
+  /** Preferencia de infraestructura elegida en E03/E21 (null = sin elegir). */
+  infra: InfraPreference | null;
+  /** Preferencia de red colaborativa (Bloque B). */
+  red: string | null;
+  /** Cambios manuales a la propuesta hechos en el cierre. */
+  proposalTouched: boolean;
 }
 
 export const ROUTES: readonly PrimaryRoute[] = [
@@ -83,6 +131,11 @@ function emptyState(): VisitorState {
     lastScene: null,
     transitioning: false,
     updatedAt: Date.now(),
+    capabilities: [],
+    membership: null,
+    infra: null,
+    red: null,
+    proposalTouched: false,
   };
 }
 
@@ -92,6 +145,18 @@ function isRoute(value: unknown): value is PrimaryRoute {
 
 function isTrait(value: unknown): value is VisitorTrait {
   return typeof value === 'string' && (TRAITS as readonly string[]).includes(value);
+}
+
+function isCapability(value: unknown): value is CapabilityId {
+  return typeof value === 'string' && (CAPABILITY_IDS as readonly string[]).includes(value);
+}
+
+function isInfra(value: unknown): value is InfraPreference {
+  return typeof value === 'string' && (INFRA_PREFERENCES as readonly string[]).includes(value);
+}
+
+function isMembership(value: unknown): value is MembershipSlug {
+  return typeof value === 'string' && (MEMBERSHIP_SLUGS as readonly string[]).includes(value);
 }
 
 function load(): VisitorState {
@@ -130,6 +195,15 @@ function load(): VisitorState {
       lastScene: typeof candidate.lastScene === 'string' ? candidate.lastScene : null,
       transitioning: false,
       updatedAt: typeof candidate.updatedAt === 'number' ? candidate.updatedAt : Date.now(),
+      // Migración compatible: sesiones antiguas de publia.visitor.v1 obtienen
+      // los campos nuevos con defaults; nada se pierde ni se reescribe mal.
+      capabilities: Array.isArray(candidate.capabilities)
+        ? candidate.capabilities.filter(isCapability)
+        : [],
+      membership: isMembership(candidate.membership) ? candidate.membership : null,
+      infra: isInfra(candidate.infra) ? candidate.infra : null,
+      red: typeof candidate.red === 'string' && candidate.red.trim() ? candidate.red : null,
+      proposalTouched: candidate.proposalTouched === true,
     };
   } catch {
     return emptyState();
@@ -253,6 +327,48 @@ export function hasVisited(sceneId: string): boolean {
 
 export function hasTrait(trait: VisitorTrait): boolean {
   return state.traits.includes(trait);
+}
+
+/** Añade o quita una capacidad de la propuesta final (cierre V2). */
+export function toggleCapability(id: CapabilityId): boolean {
+  const has = state.capabilities.includes(id);
+  commit({
+    ...state,
+    capabilities: has
+      ? state.capabilities.filter((c) => c !== id)
+      : [...state.capabilities, id],
+    proposalTouched: true,
+    updatedAt: Date.now(),
+  });
+  return !has;
+}
+
+/** Guarda la membresía orientativa elegida (E27). */
+export function setMembership(slug: MembershipSlug | null): void {
+  if (slug !== null && !isMembership(slug)) return;
+  if (state.membership === slug) return;
+  commit({ ...state, membership: slug, updatedAt: Date.now() });
+}
+
+/** Guarda la preferencia de infraestructura (E03/E21). */
+export function setInfraPreference(pref: InfraPreference | null): void {
+  if (pref !== null && !isInfra(pref)) return;
+  if (state.infra === pref) return;
+  commit({ ...state, infra: pref, updatedAt: Date.now() });
+}
+
+/** Guarda la capacidad de red colaborativa elegida (E15–E19). */
+export function setRedCapability(value: string | null): void {
+  const clean = value ? value.trim() : null;
+  if (!clean) return;
+  if (state.red === clean) return;
+  commit({ ...state, red: clean, updatedAt: Date.now() });
+}
+
+/** Marca que el visitante editó manualmente la propuesta en el cierre. */
+export function markProposalTouched(): void {
+  if (state.proposalTouched) return;
+  commit({ ...state, proposalTouched: true, updatedAt: Date.now() });
 }
 
 /** Reinicia la experiencia (botón "empezar de nuevo"). */

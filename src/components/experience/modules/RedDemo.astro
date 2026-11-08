@@ -1,0 +1,168 @@
+---
+/**
+ * Red Colaborativa de Publia (P0-05, paquete 7 mundos): 6 capacidades en órbita
+ * alrededor del núcleo, panel de lectura, 3 demostraciones con flujo iluminado.
+ * La selección persiste en el estado compartido (state.red) y alimenta el cierre.
+ * Ciudadan aparece sólo como enlace secundario.
+ */
+import type { ResolvedScene } from '../../../lib/experience/graph';
+import { accentify } from '../../../lib/experience/accent';
+import { RED_CAPABILITIES, RED_DEMOS, CIUDADAN_LINK } from '../../../data/red';
+
+interface Props {
+  scene: ResolvedScene;
+}
+
+const { scene } = Astro.props;
+const caps = RED_CAPABILITIES;
+const first = caps[0]!;
+const demos = RED_DEMOS;
+---
+
+<section class="red" data-module="redDemo" data-demo="red">
+  <div class="catalog__intro red__intro">
+    {scene.eyebrow && <p class="catalog__eyebrow" data-role="eyebrow" data-reveal set:html={accentify(scene.eyebrow)} />}
+    <h2 class="catalog__title" data-role="title" data-reveal="lines" set:html={accentify(scene.title)} />
+    {scene.lead && <p class="catalog__lead" data-role="lead" data-reveal>{scene.lead}</p>}
+  </div>
+
+  <div class="red__grid">
+    <div class="red__info" data-red-info aria-live="polite">
+      <div class="red__top">
+        <span class="red__num" data-red-num>01 / 06</span>
+        <span class="red__on"><i></i> ● CONECTADO</span>
+      </div>
+      <div class="red__body">
+        <div class="red__icon" data-red-icon aria-hidden="true">{first.icon}</div>
+        <div>
+          <h3 data-red-title>{first.title}</h3>
+          <p data-red-desc>{first.desc}</p>
+        </div>
+      </div>
+      <div class="red__actions">
+        <button type="button" class="red__btn red__btn--ghost" data-red-example>▶ Ver cómo colabora ↗</button>
+      </div>
+      <p class="red__example" data-red-example-text hidden>{first.example}</p>
+      <p class="red__toast" data-red-toast role="status" aria-live="polite"></p>
+    </div>
+
+    <div class="red__universe" data-red-universe>
+      <svg class="red__wires" data-red-wires viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        {caps.map((c, i) => <line data-red-wire={String(i)} x1="50" y1="50" x2="50" y2="50" stroke={c.color} />)}
+      </svg>
+      <div class="red__core" aria-hidden="true">
+        <img src="/assets/ecosistema/publia_isotipo.png" alt="" />
+        <span class="red__core-label">PUBLIA · NÚCLEO</span>
+        <span class="red__flare">✦</span>
+      </div>
+      <div class="red__nodes" data-red-nodes role="group" aria-label="Seis capacidades de la red">
+        {
+          caps.map((c, i) => (
+            <button
+              type="button"
+              class="red__node"
+              data-red-node={String(i)}
+              style={`--node:${c.color}`}
+              aria-pressed={i === 0 ? 'true' : 'false'}
+            >
+              <span class="red__node-index">{String(i + 1).padStart(2, '0')}</span>
+              <span class="red__node-ico" aria-hidden="true">{c.icon}</span>
+              <span class="red__node-text">
+                <span class="red__node-title">{c.name}</span>
+                <span class="red__node-sub">{c.subtitle}</span>
+              </span>
+            </button>
+          ))
+        }
+      </div>
+      <div class="red__status">RED ACTIVA · 06 CAPACIDADES</div>
+    </div>
+  </div>
+
+  <div class="red__scenario">
+    <div class="red__scenario-left">
+      <span class="red__scenario-title" data-red-scenario-title>{demos[0]?.title}</span>
+      <div class="red__chips" role="group" aria-label="Elige una demostración">
+        {demos.map((d, i) => (
+          <button type="button" class="red__chip" data-red-case={String(i)} aria-pressed={i === 0 ? 'true' : 'false'}>{d.label}</button>
+        ))}
+      </div>
+    </div>
+    <button type="button" class="red__trigger" data-red-run>ACTIVAR FLUJO ➜</button>
+  </div>
+  <p class="red__result" data-red-result aria-live="polite"></p>
+
+  <p class="red__foot">
+    Demostración conceptual, sin servicios reales.{' '}
+    <a class="red__ciudadan" href={CIUDADAN_LINK} target="_blank" rel="noopener">¿Y Ciudadan? Conoce el ecosistema cooperativo ↗</a>
+  </p>
+</section>
+
+<style>
+  .red { display: grid; gap: 1.1rem; }
+  .red__grid { display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: 1.3rem; align-items: center; }
+  .red__info {
+    border: 1px solid rgba(99, 216, 255, 0.35); border-radius: 1.2rem; padding: 1.1rem 1.2rem;
+    background: linear-gradient(160deg, rgba(8, 22, 52, 0.93), rgba(10, 44, 85, 0.93));
+    display: grid; gap: 0.75rem; transition: border-color 0.3s;
+  }
+  .red__top { display: flex; justify-content: space-between; font-size: 0.72rem; letter-spacing: 0.14em; opacity: 0.85; }
+  .red__on i { display: inline-block; width: 0.5rem; height: 0.5rem; border-radius: 50%; background: #61edbe; margin-right: 0.3rem; }
+  .red__body { display: flex; gap: 0.9rem; align-items: flex-start; }
+  .red__icon { font-size: 1.8rem; width: 3rem; height: 3rem; display: grid; place-items: center; border-radius: 0.9rem; background: rgba(255, 255, 255, 0.08); flex: none; }
+  .red__body h3 { margin: 0 0 0.3rem; font-size: 1.3rem; }
+  .red__body p { margin: 0; font-size: 0.95rem; line-height: 1.5; opacity: 0.92; }
+  .red__btn { border: 1px solid rgba(255, 255, 255, 0.3); background: transparent; color: inherit; border-radius: 999px; padding: 0.45rem 0.9rem; font-weight: 700; font-size: 0.85rem; cursor: pointer; }
+  .red__btn:hover { transform: translateY(-2px); }
+  .red__example { margin: 0; font-size: 0.88rem; border-left: 3px solid var(--publia-yellow); padding-left: 0.6rem; opacity: 0.9; }
+  .red__toast { margin: 0; min-height: 1.2em; font-size: 0.82rem; color: var(--publia-cyan); opacity: 0; transition: opacity 0.3s; }
+  .red__toast.visible { opacity: 1; }
+  .red__universe { position: relative; min-height: 430px; }
+  .red__wires { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .red__wires line { stroke-width: 0.55; opacity: 0.35; transition: opacity 0.3s, stroke-width 0.3s; vector-effect: non-scaling-stroke; }
+  .red__wires line.is-live { opacity: 1; stroke-width: 1.1; filter: drop-shadow(0 0 4px currentColor); }
+  .red__core { position: absolute; left: 50%; top: 50%; translate: -50% -50%; width: 92px; height: 92px; display: grid; place-items: center; }
+  .red__core img { width: 64px; height: 64px; object-fit: contain; filter: drop-shadow(0 0 16px rgba(69, 223, 255, 0.5)); }
+  .red__core-label { position: absolute; bottom: -1.4rem; font-size: 0.6rem; letter-spacing: 0.18em; opacity: 0.7; white-space: nowrap; }
+  .red__flare { position: absolute; top: -0.4rem; right: -0.2rem; color: var(--publia-yellow); animation: redSpin 6s linear infinite; }
+  @keyframes redSpin { to { rotate: 360deg; } }
+  .red__nodes { position: absolute; inset: 0; }
+  .red__node {
+    position: absolute; left: 50%; top: 50%; translate: -50% -50%;
+    display: grid; justify-items: center; gap: 0.15rem; width: 118px;
+    background: linear-gradient(160deg, rgba(6, 26, 60, 0.92), rgba(9, 37, 68, 0.86));
+    border: 1px solid var(--node, rgba(255, 255, 255, 0.3)); border-radius: 0.9rem;
+    padding: 0.55rem 0.4rem; cursor: pointer; color: inherit;
+    transition: border-color 0.25s, box-shadow 0.25s, transform 0.2s;
+  }
+  .red__node:hover, .red__node:focus-visible { border-color: #fff; outline: none; }
+  .red__node[aria-pressed='true'] { box-shadow: 0 0 0 2px var(--node), 0 12px 30px rgba(0, 0, 0, 0.5); }
+  .red__node.is-running { animation: redPulse 0.85s ease-out; }
+  @keyframes redPulse { 0% { box-shadow: 0 0 0 3px var(--node), 0 0 26px var(--node); } 100% { box-shadow: 0 0 0 1px var(--node); } }
+  .red__node-index { font-size: 0.58rem; letter-spacing: 0.14em; opacity: 0.65; }
+  .red__node-ico { font-size: 1.35rem; }
+  .red__node-title { display: block; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.05em; }
+  .red__node-sub { display: block; font-size: 0.56rem; opacity: 0.7; }
+  .red__status { position: absolute; left: 50%; bottom: 0.2rem; translate: -50% 0; font-size: 0.62rem; letter-spacing: 0.16em; opacity: 0.65; }
+  .red__scenario { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.8rem; border: 1px solid rgba(255, 202, 116, 0.4); border-radius: 1rem; padding: 0.9rem 1.1rem; background: linear-gradient(150deg, rgba(39, 19, 74, 0.79), rgba(9, 36, 78, 0.89)); }
+  .red__scenario-left { display: grid; gap: 0.5rem; }
+  .red__scenario-title { font-weight: 800; font-size: 0.95rem; }
+  .red__chips { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+  .red__chip { border: 1px solid rgba(255, 255, 255, 0.25); background: transparent; color: inherit; border-radius: 999px; padding: 0.4rem 0.85rem; font-weight: 700; font-size: 0.82rem; cursor: pointer; }
+  .red__chip[aria-pressed='true'] { background: #ffcb36; color: #18234c; border-color: transparent; }
+  .red__trigger { background: #2adfff; color: #071335; border: none; border-radius: 999px; padding: 0.6rem 1.2rem; font-weight: 900; letter-spacing: 0.04em; cursor: pointer; }
+  .red__trigger:disabled { opacity: 0.55; cursor: wait; }
+  .red__result { margin: 0; min-height: 1.4em; font-size: 0.9rem; color: #9ef8ee; }
+  .red__foot { margin: 0; font-size: 0.78rem; opacity: 0.75; }
+  .red__ciudadan { color: var(--publia-cyan); }
+  @media (max-width: 900px) {
+    .red__grid { grid-template-columns: 1fr; }
+    .red__universe { min-height: 340px; }
+    .red__node { width: 96px; }
+    .red__node-sub { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .red__flare { animation: none; }
+    .red__node.is-running { animation: none; }
+  }
+</style>

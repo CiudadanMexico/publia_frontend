@@ -160,6 +160,11 @@ export function renderableScenes(): ResolvedScene[] {
       visitedScenes: [],
       lastScene: null,
       transitioning: false,
+      capabilities: [],
+      membership: null,
+      infra: null,
+      red: null,
+      proposalTouched: false,
       updatedAt: 0,
     }),
   );
