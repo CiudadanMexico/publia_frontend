@@ -765,7 +765,7 @@ const SCENES_RAW: SceneDefinition[] = [
       },
     ],
     purpose: 'Presentar el catálogo comercial sin ambigüedad.',
-    modules: ['plans'],
+    modules: ['statement', 'membershipsDemo'],
     segments: [],
     route: 'shared',
     duration: 3,

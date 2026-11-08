@@ -35,6 +35,7 @@ import { bindEcosystem } from '../lib/experience/ecosystem';
 import { bindRed } from '../lib/experience/red';
 import { bindInfra } from '../lib/experience/infra';
 import { bindPersonas } from '../lib/experience/personas';
+import { bindMemberships } from '../lib/experience/memberships';
 import type { NarrativeHandle } from '../lib/experience/narrative';
 import { buildMailto } from '../data/site';
 import type { PrimaryRoute, VisitorState, VisitorTrait } from '../lib/experience/state';
@@ -742,6 +743,7 @@ export async function startExperience(): Promise<void> {
   bindRed(universe);
   bindInfra(universe);
   bindPersonas();
+  bindMemberships();
   bindPostHero(universe);
   let lastPortalKey = '';
   const drivePortal = (state: ReturnType<typeof getState>): void => {
