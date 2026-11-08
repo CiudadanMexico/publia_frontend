@@ -1,87 +1,169 @@
 ---
 /**
- * Demo D3 — Ruta empresa: tres capas conectables de infraestructura.
- * Al elegir una capa cambia el texto, la red 3D (vía data-event) y el
- * énfasis del arte. Es conceptual: no afirma equipos físicos concretos.
+ * Infraestructura soberana (P0-01, Bloque A 7M-B): 3 modos (IA privada,
+ * Housing administrado, Red distribuida), servidores con luces animadas,
+ * conexiones, demo "activar red", comparación compartida vs privada y
+ * cambios de cámara/iluminación en el universo 3D. La preferencia persiste
+ * en state.infra y alimenta el cierre. Todo etiquetado SIMULACIÓN.
  */
 import type { ResolvedScene } from '../../../lib/experience/graph';
+import { accentify } from '../../../lib/experience/accent';
+import { INFRA_MODES, RACK_POSITIONS, MAP_NODES, MAP_LINES } from '../../../data/infra';
+import { HOUSING_PLANS } from '../../../data/memberships/housing';
 
 interface Props {
   scene: ResolvedScene;
 }
 
 const { scene } = Astro.props;
-const layers = [
-  {
-    id: 'datos',
-    icon: '🔗',
-    label: 'Datos',
-    detail:
-      'Tus sistemas actuales se conectan con acceso controlado: quién ve qué, y cuándo. No tienes que empezar de cero.',
-  },
-  {
-    id: 'agentes',
-    icon: '🤖',
-    label: 'Agentes',
-    detail:
-      'Agentes conectados a tareas concretas y supervisables: clasifican, responden borradores, registran seguimiento. Tú decides.',
-  },
-  {
-    id: 'operacion',
-    icon: '🛡️',
-    label: 'Operación',
-    detail:
-      'Tu equipo mantiene el control de las decisiones. La infraestructura registra, propone y avisa; no decide por ti.',
-  },
-];
+const modes = INFRA_MODES;
+const first = modes[0]!;
+const shared = HOUSING_PLANS.find((p) => p.id === 'compartido');
+const priv = HOUSING_PLANS.find((p) => p.id === 'privado');
 ---
 
-<div class="infra-demo" data-module="infraDemo" data-demo="infra">
-  <p class="infra-demo__hint" data-reveal>Elige una capa para ver cómo se conecta:</p>
-  <div class="infra-demo__chips" role="group" aria-label="Capas de infraestructura">
-    {
-      layers.map((layer, i) => (
-        <button
-          type="button"
-          class="infra-demo__chip"
-          data-infra-layer={layer.id}
-          aria-pressed={i === 0 ? 'true' : 'false'}
-        >
-          <span aria-hidden="true">{layer.icon}</span> {layer.label}
-        </button>
-      ))
-    }
+<section class="infra2" data-module="infraDemo" data-demo="infra2">
+  <div class="catalog__intro">
+    {scene.eyebrow && <p class="catalog__eyebrow" data-reveal set:html={accentify(scene.eyebrow)} />}
+    <h2 class="catalog__title" data-role="title" data-reveal="lines" set:html={accentify(scene.title)} />
+    {scene.lead && <p class="catalog__lead" data-reveal>{scene.lead}</p>}
   </div>
-  <p class="infra-demo__detail" data-infra-detail aria-live="polite">{layers[0]?.detail}</p>
-  <p class="infra-demo__note">Representación conceptual: los equipos y alcances dependen del plan y la configuración.</p>
-</div>
+
+  <div class="infra2__grid">
+    <div class="infra2__panel">
+      <div class="infra2__modes" role="group" aria-label="Modalidad de infraestructura">
+        {
+          modes.map((m, i) => (
+            <button type="button" class="infra2__mode" data-infra2-mode={m.id} aria-pressed={i === 0 ? 'true' : 'false'}>
+              <b>{m.num}</b>
+              <span>
+                <strong>{m.label}</strong>
+                <small>{m.subtitle}</small>
+              </span>
+            </button>
+          ))
+        }
+      </div>
+      <div class="infra2__detail" aria-live="polite">
+        <span class="infra2__status" data-infra2-status>{first.status}</span>
+        <p data-infra2-desc>{first.description}</p>
+        <div class="infra2__cols">
+          <div>
+            <h3>Beneficios</h3>
+            <ul data-infra2-benefits>{first.benefits.map((b) => <li>{b}</li>)}</ul>
+          </div>
+          <div>
+            <h3>Limitaciones</h3>
+            <ul data-infra2-limits>{first.limitations.map((l) => <li>{l}</li>)}</ul>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="infra2__launch" data-infra2-launch>✦ ACTIVAR RED →</button>
+      <p class="infra2__toast" data-infra2-toast role="status" aria-live="polite"></p>
+    </div>
+
+    <div class="infra2__stage">
+      <div class="infra2__city" data-infra2-city>
+        <svg class="infra2__map" viewBox="0 0 340 115" aria-hidden="true">
+          {MAP_LINES.map((d) => <path class="infra2__mapline" d={d} />)}
+          <path class="infra2__mapflow" data-infra2-flow d={MAP_LINES[0]} />
+          {MAP_NODES.map((n, i) => <circle class="infra2__mapnode" cx={n[0]} cy={n[1]} r={i === 3 ? 5 : 3.5} />)}
+        </svg>
+        <div class="infra2__racks" data-infra2-racks>
+          {
+            RACK_POSITIONS.map((pos, i) => (
+              <div class="infra2__rack" data-infra2-rack={String(i)} style={`--rx:${pos[0]}%;--ry:${pos[1]}%`}>
+                <span class="infra2__racknum">N-{String(i + 1).padStart(2, '0')}</span>
+                <div class="infra2__slots">
+                  {Array.from({ length: 9 }, (_, j) => <i style={`--d:${(i * 0.2 + j * 0.1).toFixed(2)}s`} />)}
+                </div>
+              </div>
+            ))
+          }
+        </div>
+        <div class="infra2__core"><span>P</span></div>
+      </div>
+      <div class="infra2__stats">
+        <span>RUTAS <b data-infra2-routes>04</b></span>
+        <span>TRÁFICO <b data-infra2-traffic>000</b></span>
+        <em>SIMULACIÓN</em>
+      </div>
+    </div>
+  </div>
+
+  <div class="infra2__compare">
+    <h3>Compartida vs privada</h3>
+    <div class="infra2__compare-grid">
+      <article>
+        <h4>{shared?.name ?? 'Modalidad compartida'}</h4>
+        <p>{shared?.summary}</p>
+        <ul>{shared?.allocation.map((a) => <li>{a.label}: {a.percent}%</li>)}</ul>
+        <p class="infra2__price">Mensualidad administrativa: <b>pendiente de confirmación</b> (no es un servicio gratuito confirmado).</p>
+      </article>
+      <article>
+        <h4>{priv?.name ?? 'Modalidad privada'}</h4>
+        <p>{priv?.summary}</p>
+        <ul>{priv?.allocation.map((a) => <li>{a.label}: {a.percent}%</li>)}</ul>
+        <p class="infra2__price">Mensualidad: <b>se define al dimensionar la capacidad contratada</b>.</p>
+      </article>
+    </div>
+    <p class="infra2__note">Representación conceptual: no son fotografías de instalaciones reales. Los equipos y alcances dependen del plan y la configuración.</p>
+  </div>
+</section>
 
 <style>
-  .infra-demo { display: grid; gap: 0.9rem; justify-items: start; }
-  .infra-demo__hint { font-weight: 700; color: var(--tone-muted, #b7c8db); margin: 0; }
-  .infra-demo__chips { display: flex; flex-wrap: wrap; gap: 0.6rem; }
-  .infra-demo__chip {
-    border: 1px solid var(--tone-border, rgba(255, 255, 255, 0.2));
-    background: var(--tone-card, rgba(255, 255, 255, 0.05));
-    color: inherit;
-    border-radius: 999px;
-    padding: 0.55rem 1rem;
-    font-weight: 800;
-    cursor: pointer;
-    transition: transform 0.2s, background-color 0.2s, border-color 0.2s;
+  .infra2 { display: grid; gap: 1.2rem; }
+  .infra2__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 1.2rem; align-items: start; }
+  .infra2__panel { display: grid; gap: 0.8rem; border: 1px solid var(--tone-border, rgba(255,255,255,.18)); border-radius: 1.1rem; padding: 1rem; background: var(--tone-card, rgba(255,255,255,.04)); }
+  .infra2__modes { display: grid; gap: 0.45rem; }
+  .infra2__mode { display: flex; gap: 0.7rem; align-items: center; text-align: left; border: 1px solid var(--tone-border, rgba(255,255,255,.2)); background: transparent; color: inherit; border-radius: 0.8rem; padding: 0.55rem 0.8rem; cursor: pointer; transition: border-color .25s, box-shadow .25s; }
+  .infra2__mode b { font-size: 0.8rem; opacity: .7; }
+  .infra2__mode strong { display: block; font-size: 0.92rem; letter-spacing: .04em; }
+  .infra2__mode small { opacity: .75; font-size: 0.78rem; }
+  .infra2__mode[aria-pressed='true'] { border-color: var(--publia-yellow, #ffd232); box-shadow: 0 0 19px rgba(255, 189, 34, .19), inset 0 0 12px rgba(255,189,34,.08); }
+  .infra2__status { font-size: 0.68rem; letter-spacing: .16em; color: var(--publia-cyan, #48e9ff); }
+  .infra2__detail p { margin: 0.2rem 0 0.5rem; line-height: 1.5; }
+  .infra2__cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; }
+  .infra2__cols h3 { margin: 0 0 0.3rem; font-size: 0.78rem; letter-spacing: .1em; text-transform: uppercase; opacity: .8; }
+  .infra2__cols ul { margin: 0; padding-left: 1.1rem; font-size: 0.85rem; line-height: 1.45; display: grid; gap: 0.25rem; }
+  .infra2__launch { justify-self: start; border: none; border-radius: 999px; padding: 0.6rem 1.2rem; font-weight: 900; background: var(--publia-cyan, #2adfff); color: #071335; cursor: pointer; }
+  .infra2__launch:disabled { opacity: .55; cursor: wait; }
+  .infra2__toast { margin: 0; min-height: 1.2em; font-size: 0.82rem; color: var(--publia-cyan, #48e9ff); opacity: 0; transition: opacity .3s; }
+  .infra2__toast.visible { opacity: 1; }
+  .infra2__stage { display: grid; gap: 0.5rem; }
+  .infra2__city { position: relative; height: 300px; border: 1px solid rgba(41, 149, 233, .35); border-radius: 1.1rem; overflow: hidden; background: radial-gradient(circle at 50% 45%, rgba(23, 72, 145, .35), rgba(3, 6, 23, .6) 75%); }
+  .infra2__racks { position: absolute; inset: 0; }
+  .infra2__rack { position: absolute; left: 50%; top: 50%; width: 34px; height: 62px; transform: translate(calc(-50% + var(--rx) * 0.55px), calc(-50% + var(--ry) * 0.42px)); border: 1px solid rgba(41,149,233,.6); border-radius: 4px; background: linear-gradient(180deg, #07152a, #143c62 55%, #061222); padding: 3px 2px; transition: filter .3s; }
+  .infra2__rack.is-on { filter: drop-shadow(0 0 23px #42f4ff); }
+  .infra2__racknum { position: absolute; top: 1px; left: 3px; font-size: 6px; color: #ffdf52; letter-spacing: .05em; }
+  .infra2__slots { display: grid; gap: 2px; margin-top: 8px; }
+  .infra2__slots i { display: block; height: 3px; border-radius: 1px; background: repeating-linear-gradient(90deg, #3af3ff 0 3px, transparent 3px 6px); animation: infra2led 1.8s steps(3) infinite; animation-delay: var(--d); }
+  .infra2__slots i::before { content: ''; display: block; width: 3px; height: 3px; border-radius: 50%; background: #ffce39; margin-bottom: 1px; }
+  @keyframes infra2led { 0% { opacity: 1; } 33% { opacity: .55; } 66% { opacity: .85; } 100% { opacity: 1; } }
+  .infra2__core { position: absolute; left: 50%; top: 50%; translate: -50% -50%; width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle at 35% 30%, #ffe9a3, #ffcf31 55%, #b8860b); box-shadow: 0 0 26px rgba(255, 207, 49, .55); }
+  .infra2__core span { font-weight: 1000; font-size: 1.6rem; color: #06132e; }
+  .infra2__map { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 34%; opacity: .9; }
+  .infra2__mapline { fill: none; stroke: #33cafa; stroke-width: 2.2; stroke-dasharray: 4 5; opacity: .45; }
+  .infra2__mapflow { fill: none; stroke: #ffe360; stroke-width: 3; stroke-dasharray: 22 60; animation: infra2flow 3s linear infinite; }
+  @keyframes infra2flow { to { stroke-dashoffset: -82; } }
+  .infra2__mapnode { fill: #ffd13c; stroke: #a9f6ff; stroke-width: 1; }
+  .infra2__stats { display: flex; gap: 1.2rem; font-size: 0.72rem; letter-spacing: .14em; opacity: .85; }
+  .infra2__stats b { color: #ffe360; }
+  .infra2__stats em { margin-left: auto; font-style: normal; opacity: .6; }
+  .infra2__compare h3 { margin: 0 0 0.5rem; font-size: 1rem; }
+  .infra2__compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+  .infra2__compare-grid article { border: 1px solid var(--tone-border, rgba(255,255,255,.18)); border-radius: 0.9rem; padding: 0.8rem 1rem; background: var(--tone-card, rgba(255,255,255,.04)); font-size: 0.86rem; }
+  .infra2__compare-grid h4 { margin: 0 0 0.3rem; }
+  .infra2__compare-grid p { margin: 0 0 0.4rem; line-height: 1.45; opacity: .9; }
+  .infra2__compare-grid ul { margin: 0 0 0.4rem; padding-left: 1.1rem; }
+  .infra2__price b { color: var(--publia-yellow, #ffd232); }
+  .infra2__note { font-size: 0.78rem; opacity: .75; margin: 0.5rem 0 0; }
+  @media (max-width: 900px) {
+    .infra2__grid, .infra2__compare-grid { grid-template-columns: 1fr; }
+    .infra2__cols { grid-template-columns: 1fr; }
+    .infra2__city { height: 240px; }
   }
-  .infra-demo__chip:hover { transform: translateY(-2px); }
-  .infra-demo__chip[aria-pressed='true'] {
-    background: var(--tone-accent);
-    color: var(--tone-accent-ink);
-    border-color: transparent;
+  @media (prefers-reduced-motion: reduce) {
+    .infra2__slots i, .infra2__mapflow { animation: none; }
   }
-  .infra-demo__detail {
-    margin: 0;
-    max-width: 46ch;
-    font-size: 1.05rem;
-    line-height: 1.5;
-    min-height: 3.2em;
-  }
-  .infra-demo__note { margin: 0; font-size: 0.8rem; color: var(--tone-muted, #b7c8db); opacity: 0.85; }
 </style>
