@@ -2,7 +2,7 @@
  * V4-B: interacciones post-hero — mosaico de soluciones seleccionable (E25)
  * y cierre personalizado con recomendación según ruta + respuestas (E29).
  */
-import { getState, setAnswer } from './state';
+import { getState, setAnswer, CAPABILITY_IDS } from './state';
 import { track } from './events';
 /** Contrato mínimo del universo 3D que usan estas interacciones. */
 export interface PostHeroUniverse {
@@ -80,6 +80,9 @@ function renderRecommendation(): void {
       foco ? `- Foco: ${FOCO_LABEL[foco]}` : null,
       escala ? `- Escala: ${escala.replace('_', ' ')}` : null,
       servicio ? `- Solución elegida: ${servicio}` : null,
+      state.infra ? `- Infraestructura: ${state.infra}` : null,
+      state.membership ? `- Membresía orientativa: ${state.membership.toUpperCase()}` : null,
+      state.capabilities.length ? `- Capacidades: ${CAPABILITY_IDS.filter((c) => state.capabilities.includes(c)).join(', ')}` : null,
       '- Contacto: hola@publia.mx · WhatsApp 55 73 72 46 60',
     ].filter(Boolean) as string[];
     try {

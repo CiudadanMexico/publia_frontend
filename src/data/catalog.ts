@@ -235,7 +235,9 @@ export const HOUSING: {
     {
       id: 'compartida',
       name: 'Modalidad compartida',
-      monthlyMxn: 0,
+      // Nunca publicar $0 como tarifa confirmada: la mensualidad administrativa
+      // es candidata pendiente de confirmación comercial (ver memberships/housing.ts).
+      monthlyMxn: null,
       summary:
         'El cliente aporta equipo, espacio, electricidad y conexión; el cómputo se reparte entre el cliente, la red de socios y becarios, y los usuarios con membresía del ecosistema.',
       allocation: [

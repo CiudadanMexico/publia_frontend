@@ -1,16 +1,20 @@
 ---
 /**
- * Cierre personalizado (V4-B): el cliente (recommendation.ts) rellena las
- * sugerencias a partir de la ruta elegida y las respuestas de la sesión.
+ * Cierre personalizado V2 (P0-07, Bloque E 7M-B): 6 tarjetas de capacidad con
+ * descripción, demo de 3 pasos y añadir/quitar; propuesta final construida del
+ * estado compartido; acciones: copiar, descargar TXT, modificar, regresar al
+ * diagnóstico, reiniciar y contactar con contexto. Nada se envía a servidor.
  */
 import type { ResolvedScene } from '../../../lib/experience/graph';
 import { accentify } from '../../../lib/experience/accent';
+import { CIERRE_CAPABILITIES, CONTACTO } from '../../../data/cierre';
 
 interface Props {
   scene: ResolvedScene;
 }
 
 const { scene } = Astro.props;
+const caps = CIERRE_CAPABILITIES;
 ---
 
 <section class="recommendation" data-module="recommendation" data-recommendation>
@@ -20,9 +24,47 @@ const { scene } = Astro.props;
     {scene.lead && <p class="catalog__lead" data-role="lead" data-reveal>{scene.lead}</p>}
   </div>
   <p class="recommendation__status" data-recommendation-status data-reveal>Preparando tu resumen…</p>
-  <ul class="recommendation__list" data-recommendation-list data-reveal-group></ul>
+
+  <div class="cierre__caps" data-cierre-caps role="group" aria-label="Seis capacidades para armar tu propuesta">
+    {
+      caps.map((c) => (
+        <article class="cierre__card" data-cierre-card={c.id}>
+          <header>
+            <span class="cierre__icon" aria-hidden="true">{c.icon}</span>
+            <div>
+              <h3>{c.name}</h3>
+              <p>{c.desc}</p>
+            </div>
+          </header>
+          <ol class="cierre__steps" data-cierre-steps hidden>
+            {c.steps.map((s) => <li>{s}</li>)}
+          </ol>
+          <p class="cierre__example" data-cierre-example hidden>{c.example}</p>
+          <div class="cierre__card-actions">
+            <button type="button" class="cierre__btn" data-cierre-demo>▶ Demo</button>
+            <button type="button" class="cierre__btn cierre__btn--ghost" data-cierre-info>ℹ Descripción</button>
+            <button type="button" class="cierre__btn cierre__btn--add" data-cierre-toggle aria-pressed="false">＋ Añadir a mi Publia</button>
+          </div>
+          <p class="cierre__run" data-cierre-run role="status" aria-live="polite"></p>
+        </article>
+      ))
+    }
+  </div>
+
+  <div class="cierre__proposal">
+    <h3>Tu propuesta (la armamos de tu recorrido y tus toques)</h3>
+    <ul class="recommendation__list" data-recommendation-list data-reveal-group></ul>
+    <p class="cierre__meta" data-cierre-meta></p>
+    <p class="cierre__caveat">* Sugerencia inicial orientativa; los precios preliminares no son una oferta vinculante. Nada de esto se envía automáticamente: tú decides cómo contactarnos.</p>
+  </div>
+
   <div class="recommendation__actions" data-reveal>
     <button type="button" class="recommendation__copy" data-rec-copy>⧉ Copiar resumen de mi recorrido</button>
+    <button type="button" class="recommendation__copy recommendation__copy--ghost" data-cierre-download>⬇ Descargar propuesta (.txt)</button>
+    <button type="button" class="recommendation__copy recommendation__copy--ghost" data-cierre-top>↖ Modificar capacidades / volver al diagnóstico</button>
+    <button type="button" class="recommendation__copy recommendation__copy--ghost" data-cierre-restart>↺ Reiniciar la experiencia</button>
+    <a class="recommendation__copy recommendation__copy--wa" data-cierre-wa target="_blank" rel="noopener">💬 WhatsApp {CONTACTO.whatsappLabel} con tu contexto</a>
+    <a class="recommendation__copy recommendation__copy--ghost" href={`mailto:${CONTACTO.email}`} data-cierre-mail>✉ {CONTACTO.email}</a>
     <span class="recommendation__copied" data-rec-copied role="status"></span>
   </div>
   <p class="recommendation__hint" data-reveal>
@@ -39,7 +81,30 @@ const { scene } = Astro.props;
   .recommendation__item span { color: #cfe3ff; font-size: .92rem; line-height: 1.45; }
   .recommendation__item em { font-style: normal; color: var(--publia-cyan); font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; }
   .recommendation__hint { font-size: .85rem; opacity: .7; }
-  .recommendation__copy { background: var(--publia-yellow); color: #061126; border: none; border-radius: 999px; padding: .55rem 1rem; font-weight: 800; cursor: pointer; }
+  .recommendation__copy { background: var(--publia-yellow); color: #061126; border: none; border-radius: 999px; padding: .55rem 1rem; font-weight: 800; cursor: pointer; text-decoration: none; display: inline-block; }
+  .recommendation__copy--ghost { background: transparent; border: 1px solid rgba(255,255,255,.35); color: inherit; }
+  .recommendation__copy--wa { background: #25d366; color: #06210f; }
+  .recommendation__actions { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; }
   .recommendation__copied { font-size: .8rem; color: var(--publia-mint); min-height: 1.2em; }
   .recommendation__hint kbd { background: rgba(255,255,255,.12); border-radius: .35rem; padding: .05rem .4rem; }
+  .cierre__caps { display: grid; gap: .8rem; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+  .cierre__card { border: 1px solid rgba(255, 255, 255, .18); background: rgba(6, 17, 38, .55); border-radius: 1rem; padding: .9rem 1rem; display: grid; gap: .55rem; transition: border-color .25s, box-shadow .25s; }
+  .cierre__card header { display: flex; gap: .7rem; align-items: flex-start; }
+  .cierre__icon { font-size: 1.5rem; }
+  .cierre__card h3 { margin: 0; font-size: 1rem; }
+  .cierre__card header p { margin: .15rem 0 0; font-size: .82rem; opacity: .85; line-height: 1.4; }
+  .cierre__card.is-on { border-color: var(--publia-yellow); box-shadow: 0 0 18px rgba(255, 209, 46, .25); }
+  .cierre__steps { margin: 0; padding-left: 1.2rem; font-size: .82rem; display: grid; gap: .2rem; counter-reset: step; }
+  .cierre__steps li::marker { color: var(--publia-cyan); font-weight: 800; }
+  .cierre__steps li.is-active { color: var(--publia-yellow); font-weight: 700; }
+  .cierre__steps li.is-done { opacity: .65; text-decoration: line-through; }
+  .cierre__example { margin: 0; font-size: .8rem; border-left: 3px solid var(--publia-cyan); padding-left: .5rem; opacity: .9; }
+  .cierre__card-actions { display: flex; flex-wrap: wrap; gap: .4rem; }
+  .cierre__btn { border: 1px solid rgba(255,255,255,.3); background: transparent; color: inherit; border-radius: 999px; padding: .35rem .8rem; font-weight: 700; font-size: .78rem; cursor: pointer; }
+  .cierre__btn--add[aria-pressed='true'] { background: var(--publia-yellow); color: #061126; border-color: transparent; }
+  .cierre__run { margin: 0; min-height: 1.1em; font-size: .78rem; color: var(--publia-cyan); }
+  .cierre__proposal { display: grid; gap: .6rem; border: 1px solid rgba(255, 209, 46, .35); border-radius: 1rem; padding: 1rem 1.1rem; background: rgba(6, 17, 38, .4); }
+  .cierre__proposal h3 { margin: 0; font-size: 1.05rem; color: var(--publia-yellow); }
+  .cierre__meta { margin: 0; font-size: .85rem; opacity: .9; }
+  .cierre__caveat { margin: 0; font-size: .75rem; opacity: .65; }
 </style>
