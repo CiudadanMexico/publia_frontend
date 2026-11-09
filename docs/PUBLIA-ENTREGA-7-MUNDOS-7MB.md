@@ -13,7 +13,8 @@ Rama: `feature/publia-6-frontend` · Base de partida: `17d8e92` (tag `recovery/7
 | `955cdc3` | E+H | Cierre V2 en E29: 6 tarjetas (web/agentes/marketing/personas/housing/capacitación) con demo de 3 pasos y añadir/quitar; acciones copiar, descargar TXT, volver al diagnóstico, reiniciar y contactar con contexto (mailto/WhatsApp). Housing compartida ya no publica `$0` como tarifa |
 | `2c8e6df` | E | Eventos del cierre en `ExperienceEvent` |
 | `b51c636` | F/perf | Binders 7M-B en chunks perezosos + sección QA 7M-B (15 checks) |
-| `c2b1138` | F/perf | LazyBind solo con IntersectionObserver; 253 kB iniciales (< 260 kB) |
+| `c2b1138` | F/perf | LazyBind con IO + scroll + visitedScenes; 253 kB iniciales (< 260 kB) |
+| `30bf764`+ | QA/docs | waitBound por binder en QA; presupuesto medido en carga; reporte 158/158 |
 
 ## Estado real de los siete mundos
 
@@ -34,7 +35,7 @@ Rama: `feature/publia-6-frontend` · Base de partida: `17d8e92` (tag `recovery/7
 ## Verificación
 
 - `tsc --noEmit` limpio · `npm test` 15/15 · `npm run build` OK.
-- QA en staging (Playwright, 158 criterios): ver bitácora de la corrida final (ver § Evidencia). Última corrida: 153/158; tras corregir lazyBind (IO puro) se reejecuta a 158/158.
+- QA en staging (Playwright): **158/158 criterios verificados** (corrida final `qa-7mb10`: presupuesto medido en carga inicial, 253 kB < 260 kB).
 - Presupuestos: 253 kB iniciales (JS 238 + CSS 15) < 260 kB; app sin 3D ≈ 69 kB < 90 kB.
 - Rutas probadas: empresa, eficiencia, exploración (adelante/atrás, recarga, estado conservado, cambio de ruta) + móvil 390×844.
 

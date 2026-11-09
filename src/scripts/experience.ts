@@ -302,7 +302,9 @@ function lazyBind(selector: string, load: () => Promise<void>): void {
   const maybe = (): void => {
     if (done) return;
     const r = el.getBoundingClientRect();
-    if (r.height > 0 && r.top < window.innerHeight * 1.8 && r.bottom > -window.innerHeight * 0.8) {
+    const secId = el.closest('section[id]')?.id.replace(/^escena-/, '').toUpperCase() ?? '';
+    const visited = secId !== '' && getState().visitedScenes.includes(secId);
+    if ((r.height > 0 && r.top < window.innerHeight * 1.8 && r.bottom > -window.innerHeight * 0.8) || visited) {
       done = true;
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('publia:state', maybe);

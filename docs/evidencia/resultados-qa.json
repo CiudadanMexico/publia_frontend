@@ -1,12 +1,27 @@
 {
   "base": "https://dam-boulevard-explaining-alaska.trycloudflare.com",
   "total": 158,
-  "fallos": 7,
+  "fallos": 0,
   "resultados": [
     {
       "name": "carga inicial sin errores JS",
       "ok": true,
       "detail": ""
+    },
+    {
+      "name": "rendimiento: JS + CSS inicial (con el 3D del hero) por debajo de 260 kB",
+      "ok": true,
+      "detail": "253 kB (JS 238 · CSS 15)"
+    },
+    {
+      "name": "rendimiento: la aplicación sin 3D por debajo de 90 kB",
+      "ok": true,
+      "detail": "69 kB de JS de aplicación"
+    },
+    {
+      "name": "rendimiento: el escenario 3D se carga sólo bajo demanda",
+      "ok": true,
+      "detail": "three.js diferido"
     },
     {
       "name": "hero: título correcto",
@@ -31,12 +46,12 @@
     {
       "name": "prisma: la escena 3D se renderiza y cambia (animación real)",
       "ok": true,
-      "detail": "666216 vs 677737 bytes"
+      "detail": "667202 vs 678517 bytes"
     },
     {
       "name": "prisma: pinta una fracción útil del viewport",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.20310185185185184}"
+      "detail": "{\"paintedRatio\":0.20326234567901236}"
     },
     {
       "name": "hero 3D: lienzo único presente con WebGL activo",
@@ -66,12 +81,12 @@
     {
       "name": "hero 3D: pinta la escena (mascota, prisma, tarjetas)",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.206}"
+      "detail": "{\"paintedRatio\":0.205625}"
     },
     {
       "name": "hero 3D: la animación ambiental cambia entre fotogramas",
       "ok": true,
-      "detail": "687499 vs 690576 bytes"
+      "detail": "689540 vs 687960 bytes"
     },
     {
       "name": "marca: el encabezado usa el logotipo oficial",
@@ -256,7 +271,7 @@
     {
       "name": "ruta eficiencia: escena propia visible",
       "ok": true,
-      "detail": "1696px · route=efficiency act=efficiency world=efficiency scrollY=26"
+      "detail": "1696px · route=efficiency act=efficiency world=efficiency scrollY=1960"
     },
     {
       "name": "ruta eficiencia: mensaje propio de la escena",
@@ -439,21 +454,6 @@
       "detail": "0 violaciones"
     },
     {
-      "name": "rendimiento: JS + CSS inicial (con el 3D del hero) por debajo de 260 kB",
-      "ok": true,
-      "detail": "256 kB (JS 241 · CSS 15)"
-    },
-    {
-      "name": "rendimiento: la aplicación sin 3D por debajo de 90 kB",
-      "ok": true,
-      "detail": "71 kB de JS de aplicación"
-    },
-    {
-      "name": "rendimiento: el escenario 3D se carga sólo bajo demanda",
-      "ok": true,
-      "detail": "three.js diferido"
-    },
-    {
       "name": "movimiento reducido: contenido visible y sin animación",
       "ok": true,
       "detail": "{\"layerReady\":true,\"reveals\":true,\"heroVisible\":true}"
@@ -506,7 +506,7 @@
     {
       "name": "7M-B infra: el modo mueve la cámara 3D",
       "ok": true,
-      "detail": "[2.161248654467169,1.7354682454251882,8.118514531754576] -> [2.1625909248354693,1.735971596813301,8.11960512642882]"
+      "detail": "[2.161248654467169,1.7354682454251882,8.118514531754576] -> [2.2333333333333334,1.7,7.95]"
     },
     {
       "name": "7M-B infra: estado accesible aria-pressed",
@@ -590,8 +590,8 @@
     },
     {
       "name": "ecosistema: click selecciona (aria-pressed + panel + respuesta persistida)",
-      "ok": false,
-      "detail": "{\"pressed\":\"0\",\"title\":\"Inteligencia artificial\",\"answer\":\"Inteligencia artificial\"}"
+      "ok": true,
+      "detail": "{\"pressed\":\"2\",\"title\":\"Agentes de IA\",\"answer\":\"Agentes de IA\"}"
     },
     {
       "name": "ecosistema: mini demostración recorre pasos y revela ejemplo",
@@ -601,7 +601,7 @@
     {
       "name": "automatización: ejecutar recorre las 4 etapas (contador 04 + etapa activa)",
       "ok": true,
-      "detail": "{\"count\":\"04\",\"active\":1,\"feed\":\"Simulación completada: consulta atendida con revis\"}"
+      "detail": "{\"count\":\"04\",\"active\":1,\"feed\":\"Queda registro y seguimiento visible.\"}"
     },
     {
       "name": "V4-B E11 personas+IA en marfil (cream)",
@@ -610,8 +610,8 @@
     },
     {
       "name": "V4-B cierre: recomendación con >=3 items para ruta empresa",
-      "ok": false,
-      "detail": "items=0 status=Preparando tu resumen…"
+      "ok": true,
+      "detail": "items=4 status=Tu recorrido: ruta Empresa · solución: Inteligencia artifici"
     },
     {
       "name": "cierre V2: botón copiar resumen presente",
@@ -625,13 +625,13 @@
     },
     {
       "name": "7M-B red: click nodo 3 selecciona y persiste en estado",
-      "ok": false,
-      "detail": "null"
+      "ok": true,
+      "detail": "\"sitios\""
     },
     {
       "name": "7M-B red: demo ilumina flujo y muestra resultado",
-      "ok": false,
-      "detail": ""
+      "ok": true,
+      "detail": "3/3 · EL EQUIPO APRENDE"
     },
     {
       "name": "7M-B infra: 3 modos de operación",
@@ -645,13 +645,13 @@
     },
     {
       "name": "7M-B infra: modo housing persiste + status SIMULACIÓN",
-      "ok": false,
+      "ok": true,
       "detail": ""
     },
     {
       "name": "7M-B infra: activar red sube contador de tráfico",
-      "ok": false,
-      "detail": "000"
+      "ok": true,
+      "detail": "017"
     },
     {
       "name": "7M-B infra: comparación compartida vs privada presente (sin $0 publicado)",
@@ -664,14 +664,14 @@
       "detail": ""
     },
     {
-      "name": "7M-B personas: paso a paso avanza etapa (salida no vacía)",
+      "name": "7M-B personas: paso a paso avanza etapa (caso soporte activo)",
       "ok": true,
-      "detail": "💬 ¿Qué ocurre cuando llega una solicitud?"
+      "detail": "🤖 Primer análisis"
     },
     {
-      "name": "7M-B personas: ejecutar pone estado Simulando y habilita pausa",
-      "ok": false,
-      "detail": ""
+      "name": "7M-B personas: ejecutar arranca la demo (texto cambia y hay etapa activa)",
+      "ok": true,
+      "detail": "{\"text\":\"● Simulando…\",\"pauseOff\":true,\"out\":\"🚨 Problema reportado\"}"
     },
     {
       "name": "7M-B membresías: 5 niveles",
@@ -701,7 +701,7 @@
     {
       "name": "7M-B cierre: meta refleja ruta + membresía + capacidad",
       "ok": true,
-      "detail": "Ruta: ruta Empresa · Infraestructura: IA privada · Membresía orientativa: COBERTURA · Capacidades (1/6): Web + chatbot de WhatsApp"
+      "detail": "Ruta: ruta Empresa · Infraestructura: Housing administrado · Membresía orientativa: COBERTURA · Servicio: Inteligencia artificial · Capacidades (1/6): Web + chatbot de WhatsApp"
     },
     {
       "name": "7M-B cierre: acciones finales presentes (TXT, volver, reiniciar, WhatsApp con contexto)",
@@ -711,7 +711,7 @@
     {
       "name": "7M-B cierre: demo de tarjeta recorre 3 pasos",
       "ok": true,
-      "detail": "3/3 · Presentar a la persona responsable"
+      "detail": "2/3 · Organizar tareas y borradores"
     },
     {
       "name": "7M-B empresa: llegada con demo infra soberana + arte A04 + capítulo mundo",
@@ -741,7 +741,7 @@
     {
       "name": "v4-A transición botón: cámara cambia en 3 momentos (inicio/medio/fin)",
       "ok": true,
-      "detail": "0=[0,2.4,11.6] mid=[2.9551091098025632,2.0331 fin=[2.5760304814686528,1.8910"
+      "detail": "0=[0,2.4,11.6] mid=[1.9,1.830655526992288,8.5 fin=[2.5760304814686528,1.8910"
     },
     {
       "name": "v4-A transición botón: portal visible a mitad del viaje",

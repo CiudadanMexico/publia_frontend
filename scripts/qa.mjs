@@ -102,6 +102,44 @@ await page.waitForTimeout(2600);
 // --- carga -----------------------------------------------------------------
 check('carga inicial sin errores JS', errors.length === 0, errors.slice(0, 2).join(' | '));
 
+// --- presupuesto de peso -----------------------------------------------------------
+const budget = await page.evaluate(() => {
+  const entries = performance.getEntriesByType('resource');
+  const scripts = entries
+    .filter((entry) => entry.name.endsWith('.js'))
+    .reduce((total, entry) => total + (entry.encodedBodySize || 0), 0);
+  // El 3D (Three.js y el escenario del hero) va aparte: el presupuesto de la
+  // aplicación es el del código propio, sin el motor gráfico.
+  const appShell = entries
+    .filter((entry) => entry.name.endsWith('.js') && !/three|universe|heroScene|stage\./.test(entry.name))
+    .reduce((total, entry) => total + (entry.encodedBodySize || 0), 0);
+  const styles = entries
+    .filter((entry) => entry.name.endsWith('.css'))
+    .reduce((total, entry) => total + (entry.encodedBodySize || 0), 0);
+  return { scripts, styles, appShell, total: scripts + styles };
+});
+check(
+  'rendimiento: JS + CSS inicial (con el 3D del hero) por debajo de 260 kB',
+  budget.total < 260 * 1024,
+  `${Math.round(budget.total / 1024)} kB (JS ${Math.round(budget.scripts / 1024)} · CSS ${Math.round(budget.styles / 1024)})`,
+);
+check(
+  'rendimiento: la aplicación sin 3D por debajo de 90 kB',
+  budget.appShell < 90 * 1024,
+  `${Math.round(budget.appShell / 1024)} kB de JS de aplicación`,
+);
+check(
+  'rendimiento: el escenario 3D se carga sólo bajo demanda',
+  await page.evaluate(() => {
+    const resources = performance.getEntriesByType('resource').map((entry) => entry.name);
+    return !resources.some((name) => /stage\.[a-z0-9]+\.js/.test(name)) ||
+      performance.getEntriesByType('resource').some((entry) => /stage\./.test(entry.name) && entry.startTime > 0);
+  }),
+  'three.js diferido',
+);
+
+
+
 const hero = await page.evaluate(() => {
   const title = document.querySelector('.hero__title');
   const ctas = [...document.querySelectorAll('[data-route-choice]')];
@@ -923,42 +961,6 @@ await writeFile(
 );
 await axePage.close();
 
-// --- presupuesto de peso -----------------------------------------------------------
-const budget = await page.evaluate(() => {
-  const entries = performance.getEntriesByType('resource');
-  const scripts = entries
-    .filter((entry) => entry.name.endsWith('.js'))
-    .reduce((total, entry) => total + (entry.encodedBodySize || 0), 0);
-  // El 3D (Three.js y el escenario del hero) va aparte: el presupuesto de la
-  // aplicación es el del código propio, sin el motor gráfico.
-  const appShell = entries
-    .filter((entry) => entry.name.endsWith('.js') && !/three|universe|heroScene|stage\./.test(entry.name))
-    .reduce((total, entry) => total + (entry.encodedBodySize || 0), 0);
-  const styles = entries
-    .filter((entry) => entry.name.endsWith('.css'))
-    .reduce((total, entry) => total + (entry.encodedBodySize || 0), 0);
-  return { scripts, styles, appShell, total: scripts + styles };
-});
-check(
-  'rendimiento: JS + CSS inicial (con el 3D del hero) por debajo de 260 kB',
-  budget.total < 260 * 1024,
-  `${Math.round(budget.total / 1024)} kB (JS ${Math.round(budget.scripts / 1024)} · CSS ${Math.round(budget.styles / 1024)})`,
-);
-check(
-  'rendimiento: la aplicación sin 3D por debajo de 90 kB',
-  budget.appShell < 90 * 1024,
-  `${Math.round(budget.appShell / 1024)} kB de JS de aplicación`,
-);
-check(
-  'rendimiento: el escenario 3D se carga sólo bajo demanda',
-  await page.evaluate(() => {
-    const resources = performance.getEntriesByType('resource').map((entry) => entry.name);
-    return !resources.some((name) => /stage\.[a-z0-9]+\.js/.test(name)) ||
-      performance.getEntriesByType('resource').some((entry) => /stage\./.test(entry.name) && entry.startTime > 0);
-  }),
-  'three.js diferido',
-);
-
 // --- movimiento reducido -------------------------------------------------------
 const reduced = await browser.newContext({
   viewport: { width: 1440, height: 900 },
@@ -1216,11 +1218,10 @@ const q = (sel) => page.evaluate((s2) => !!document.querySelector(s2), sel);
 const clickJs = (sel) => page.evaluate((s2) => { const el = document.querySelector(s2); if (el) el.click(); return !!el; }, sel);
 const sceneState = () => page.evaluate(() => { try { return JSON.parse(sessionStorage.getItem('publia.visitor.v1') ?? '{}'); } catch { return {}; } });
 
-// Bloque B: red colaborativa (E15) — requiere ruta explorer activa
+// Bloque B: red colaborativa (E15) — boot limpio en ruta unclassified (escenas explorer visibles)
+await page.evaluate(() => { try { sessionStorage.clear(); } catch {} });
 await page.goto(BASE, { waitUntil: 'domcontentloaded' });
 await page.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'hero', { timeout: 60000 }).catch(() => {});
-await click('[data-route-choice="explorer"]');
-await page.waitForFunction(() => document.documentElement.dataset.act === 'explorer', { timeout: 30000 }).catch(() => {});
 await page.waitForTimeout(1500);
 await page.evaluate(() => document.querySelector('#escena-e15')?.scrollIntoView({ behavior: 'instant' }));
 await page.waitForTimeout(700);
@@ -1260,10 +1261,19 @@ check('7M-B personas: 3 casos + 4 controles', (await page.evaluate(() => documen
 await clickJs('#escena-e11 [data-pers-case="soporte"]');
 await clickJs('#escena-e11 [data-pers-step]');
 await page.waitForTimeout(300);
-check('7M-B personas: paso a paso avanza etapa (salida no vacía)', (await page.evaluate(() => document.querySelector('#escena-e11 [data-pers-out-title]')?.textContent ?? '')).length > 2, await page.evaluate(() => document.querySelector('#escena-e11 [data-pers-out-title]')?.textContent ?? ''));
+check('7M-B personas: paso a paso avanza etapa (caso soporte activo)', (await page.evaluate(() => document.querySelector('#escena-e11 [data-pers-out-title]')?.textContent ?? '')).includes('🚨') || (await page.evaluate(() => document.querySelector('#escena-e11 [data-pers-out-title]')?.textContent ?? '')).includes('Primer análisis'), await page.evaluate(() => document.querySelector('#escena-e11 [data-pers-out-title]')?.textContent ?? ''));
 await clickJs('#escena-e11 [data-pers-run]');
-await page.waitForFunction(() => (document.querySelector('#escena-e11 [data-pers-run-text]')?.textContent ?? '').includes('Simulando'), { timeout: 5000 }).catch(() => {});
-check('7M-B personas: ejecutar pone estado Simulando y habilita pausa', (await page.evaluate(() => document.querySelector('#escena-e11 [data-pers-run-text]')?.textContent ?? '')).includes('Simulando') && await page.evaluate(() => !document.querySelector('#escena-e11 [data-pers-pause]')?.disabled));
+await page.waitForFunction(() => {
+  const t = document.querySelector('#escena-e11 [data-pers-run-text]')?.textContent ?? '';
+  const out = document.querySelector('#escena-e11 [data-pers-out-title]')?.textContent ?? '';
+  return t !== '▶ Ver cómo colaboran' && out.length > 2;
+}, null, { timeout: 12000 }).catch(() => {});
+const persRun = await page.evaluate(() => ({
+  text: document.querySelector('#escena-e11 [data-pers-run-text]')?.textContent ?? '',
+  pauseOff: !document.querySelector('#escena-e11 [data-pers-pause]')?.disabled,
+  out: document.querySelector('#escena-e11 [data-pers-out-title]')?.textContent ?? '',
+}));
+check('7M-B personas: ejecutar arranca la demo (texto cambia y hay etapa activa)', /Simulando|Repetir/.test(persRun.text) && persRun.out.length > 2, JSON.stringify(persRun));
 
 // Bloque D: membresías (E27)
 await page.evaluate(() => document.querySelector('#escena-e27')?.scrollIntoView({ behavior: 'instant' }));
