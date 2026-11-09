@@ -1,7 +1,7 @@
 {
   "base": "https://dam-boulevard-explaining-alaska.trycloudflare.com",
   "total": 158,
-  "fallos": 5,
+  "fallos": 7,
   "resultados": [
     {
       "name": "carga inicial sin errores JS",
@@ -31,7 +31,7 @@
     {
       "name": "prisma: la escena 3D se renderiza y cambia (animación real)",
       "ok": true,
-      "detail": "666215 vs 677737 bytes"
+      "detail": "666216 vs 677737 bytes"
     },
     {
       "name": "prisma: pinta una fracción útil del viewport",
@@ -71,7 +71,7 @@
     {
       "name": "hero 3D: la animación ambiental cambia entre fotogramas",
       "ok": true,
-      "detail": "687498 vs 690575 bytes"
+      "detail": "687499 vs 690576 bytes"
     },
     {
       "name": "marca: el encabezado usa el logotipo oficial",
@@ -96,12 +96,12 @@
     {
       "name": "transición enterprise: la cámara viaja a otro mundo del mismo universo",
       "ok": true,
-      "detail": "mundo hero→enterprise · cámara [0,2.4,11.6]→[2.587668860408729,1.8953758226532733,8.464980949082092] · tinte #050b1b→#0a0e18"
+      "detail": "mundo hero→enterprise · cámara [0,2.4,11.6]→[2.5760304814686528,1.8910114305507446,8.45552476619328] · tinte #050b1b→#0a0e18"
     },
     {
       "name": "transición enterprise: el contenido de la escena destino aparece",
       "ok": true,
-      "detail": "scrollY 3011 · act=enterprise"
+      "detail": "scrollY 3022 · act=enterprise"
     },
     {
       "name": "transición enterprise: volver regresa al hero sin recargar",
@@ -256,7 +256,7 @@
     {
       "name": "ruta eficiencia: escena propia visible",
       "ok": true,
-      "detail": "1696px · route=efficiency act=efficiency world=efficiency scrollY=2618"
+      "detail": "1696px · route=efficiency act=efficiency world=efficiency scrollY=26"
     },
     {
       "name": "ruta eficiencia: mensaje propio de la escena",
@@ -371,12 +371,12 @@
     {
       "name": "contacto: WhatsApp visible en la página",
       "ok": true,
-      "detail": "3 enlace(s)"
+      "detail": "2 enlace(s)"
     },
     {
       "name": "contacto: número público verificado",
       "ok": true,
-      "detail": "https://wa.me/525573724660?text=Hola%20Publia%2C%20vengo%20del%20recorrido%20web.%0A%0APropuesta%20Publia.mx%20%E2%80%94%20exploraci%C3%B3n%20libre%0A-%20Elegiste%20la%20ruta%20por%3A%20scroll%20libre%0A-%20Servicio%20ex"
+      "detail": "https://wa.me/525573724660"
     },
     {
       "name": "formulario: existe con sus campos",
@@ -440,13 +440,13 @@
     },
     {
       "name": "rendimiento: JS + CSS inicial (con el 3D del hero) por debajo de 260 kB",
-      "ok": false,
-      "detail": "268 kB (JS 253 · CSS 15)"
+      "ok": true,
+      "detail": "256 kB (JS 241 · CSS 15)"
     },
     {
       "name": "rendimiento: la aplicación sin 3D por debajo de 90 kB",
       "ok": true,
-      "detail": "83 kB de JS de aplicación"
+      "detail": "71 kB de JS de aplicación"
     },
     {
       "name": "rendimiento: el escenario 3D se carga sólo bajo demanda",
@@ -471,7 +471,7 @@
     {
       "name": "v3: acentos amarillos en titulares (em)",
       "ok": true,
-      "detail": "17 em"
+      "detail": "13 em"
     },
     {
       "name": "v3: slots de arte A01-A05 preparados",
@@ -491,12 +491,12 @@
     {
       "name": "v3 scroll: la cámara se transforma en 30/60/90% (ida)",
       "ok": true,
-      "detail": "30=[2.9551091098025632,2.033165916175961,8.763526151714583] 60=[2.5760304814686528,1.8910114305507446,8.45552476619328] 90=[1.9,1.778019504876219,8.596699174793699]"
+      "detail": "30=[2.893591963976446,2.0100969864911673,8.713543470730864] 60=[2.5760304814686528,1.8910114305507446,8.45552476619328] 90=[1.9,1.8221628289473684,8.670271381578948]"
     },
     {
       "name": "v3 scroll: recorrido inverso mueve la cámara en sentido inverso (reversible)",
       "ok": true,
-      "detail": "90=[1.9,1.778019504876219,8.596699174793699] ida60=[2.5760304814686528,1.8910114305507446,8.45552476619328] vuelta60=[1.2635983263598325,1.4119246861924686,7.655648535564854]"
+      "detail": "90=[1.9,1.8221628289473684,8.670271381578948] ida60=[2.5760304814686528,1.8910114305507446,8.45552476619328] vuelta60=[1.4343096234309622,1.4439330543933053,7.805020920502092]"
     },
     {
       "name": "7M-B infra: el modo cambia el texto",
@@ -506,7 +506,7 @@
     {
       "name": "7M-B infra: el modo mueve la cámara 3D",
       "ok": true,
-      "detail": "[2.161248654467169,1.7354682454251882,8.118514531754576] -> [2.2333333333333334,1.7,7.95]"
+      "detail": "[2.161248654467169,1.7354682454251882,8.118514531754576] -> [2.1625909248354693,1.735971596813301,8.11960512642882]"
     },
     {
       "name": "7M-B infra: estado accesible aria-pressed",
@@ -535,8 +535,8 @@
     },
     {
       "name": "v3 demo geonodos: scroll enciende conexiones (progreso)",
-      "ok": false,
-      "detail": "progreso=0"
+      "ok": true,
+      "detail": "progreso=3"
     },
     {
       "name": "v3 demo geonodos: nodo activo marcado",
@@ -590,8 +590,8 @@
     },
     {
       "name": "ecosistema: click selecciona (aria-pressed + panel + respuesta persistida)",
-      "ok": true,
-      "detail": "{\"pressed\":\"2\",\"title\":\"Agentes de IA\",\"answer\":\"Agentes de IA\"}"
+      "ok": false,
+      "detail": "{\"pressed\":\"0\",\"title\":\"Inteligencia artificial\",\"answer\":\"Inteligencia artificial\"}"
     },
     {
       "name": "ecosistema: mini demostración recorre pasos y revela ejemplo",
@@ -610,8 +610,8 @@
     },
     {
       "name": "V4-B cierre: recomendación con >=3 items para ruta empresa",
-      "ok": true,
-      "detail": "items=4 status=Tu recorrido: ruta Empresa · solución: Inteligencia artifici"
+      "ok": false,
+      "detail": "items=0 status=Preparando tu resumen…"
     },
     {
       "name": "cierre V2: botón copiar resumen presente",
@@ -626,7 +626,7 @@
     {
       "name": "7M-B red: click nodo 3 selecciona y persiste en estado",
       "ok": false,
-      "detail": "\"profesionales\""
+      "detail": "null"
     },
     {
       "name": "7M-B red: demo ilumina flujo y muestra resultado",
@@ -645,13 +645,13 @@
     },
     {
       "name": "7M-B infra: modo housing persiste + status SIMULACIÓN",
-      "ok": true,
+      "ok": false,
       "detail": ""
     },
     {
       "name": "7M-B infra: activar red sube contador de tráfico",
-      "ok": true,
-      "detail": "017"
+      "ok": false,
+      "detail": "000"
     },
     {
       "name": "7M-B infra: comparación compartida vs privada presente (sin $0 publicado)",
@@ -666,7 +666,7 @@
     {
       "name": "7M-B personas: paso a paso avanza etapa (salida no vacía)",
       "ok": true,
-      "detail": "🤖 Primer análisis"
+      "detail": "💬 ¿Qué ocurre cuando llega una solicitud?"
     },
     {
       "name": "7M-B personas: ejecutar pone estado Simulando y habilita pausa",
@@ -701,7 +701,7 @@
     {
       "name": "7M-B cierre: meta refleja ruta + membresía + capacidad",
       "ok": true,
-      "detail": "Ruta: ruta Empresa · Infraestructura: Housing administrado · Membresía orientativa: COBERTURA · Servicio: Inteligencia artificial · Capacidades (1/6): Web + chatbot de WhatsApp"
+      "detail": "Ruta: ruta Empresa · Infraestructura: IA privada · Membresía orientativa: COBERTURA · Capacidades (1/6): Web + chatbot de WhatsApp"
     },
     {
       "name": "7M-B cierre: acciones finales presentes (TXT, volver, reiniciar, WhatsApp con contexto)",
@@ -711,7 +711,7 @@
     {
       "name": "7M-B cierre: demo de tarjeta recorre 3 pasos",
       "ok": true,
-      "detail": "2/3 · Organizar tareas y borradores"
+      "detail": "3/3 · Presentar a la persona responsable"
     },
     {
       "name": "7M-B empresa: llegada con demo infra soberana + arte A04 + capítulo mundo",
@@ -761,7 +761,7 @@
     {
       "name": "portal: visible a mitad del recorrido por scroll",
       "ok": true,
-      "detail": "{\"progress\":\"0.667\",\"maxOp\":1,\"visible\":true}"
+      "detail": "{\"progress\":\"0.889\",\"maxOp\":0.9,\"visible\":true}"
     },
     {
       "name": "portal: se disuelve al aterrizar en el mundo",
@@ -771,7 +771,7 @@
     {
       "name": "portal: reversible — a mitad del scrub otra vez es visible",
       "ok": true,
-      "detail": "{\"progress\":\"0.944\",\"maxOp\":0.5,\"visible\":true}"
+      "detail": "{\"progress\":\"0.500\",\"maxOp\":1,\"visible\":true}"
     },
     {
       "name": "portal: al volver al inicio (progreso 0) queda oculto",

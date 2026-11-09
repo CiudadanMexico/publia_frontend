@@ -295,25 +295,44 @@ function lazyBind(selector: string, load: () => Promise<void>): void {
     void load();
     return;
   }
-  // IO puro: dispara al entrar al viewport; al cambiar de ruta (display:none
-  // -> block) el IO recalcula y dispara cuando la escena sea visible.
+  // Dispara cuando la escena tiene caja y entra en el viewport ampliado.
+  // Fallback de scroll/estado por si IntersectionObserver no_recalcula con
+  // ancestros display:none (escenas de ruta inactiva).
   let done = false;
-  if (!('IntersectionObserver' in window)) {
-    void load();
-    return;
+  const maybe = (): void => {
+    if (done) return;
+    const r = el.getBoundingClientRect();
+    if (r.height > 0 && r.top < window.innerHeight * 1.8 && r.bottom > -window.innerHeight * 0.8) {
+      done = true;
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('publia:state', maybe);
+      void load();
+    }
+  };
+  const onScroll = (): void => {
+    if (scrollTick) return;
+    scrollTick = requestAnimationFrame(() => { scrollTick = 0; maybe(); });
+  };
+  let scrollTick = 0;
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('publia:state', maybe);
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (done) return;
+        if (entries.some((e) => e.isIntersecting)) {
+          done = true;
+          io.disconnect();
+          window.removeEventListener('scroll', onScroll);
+          window.removeEventListener('publia:state', maybe);
+          void load();
+        }
+      },
+      { rootMargin: '80% 0px' },
+    );
+    io.observe(el);
   }
-  const io = new IntersectionObserver(
-    (entries) => {
-      if (done) return;
-      if (entries.some((e) => e.isIntersecting)) {
-        done = true;
-        io.disconnect();
-        void load();
-      }
-    },
-    { rootMargin: '80% 0px' },
-  );
-  io.observe(el);
+  maybe();
 }
 
 function bindDemos(universe: UniverseHandleLike | null): void {

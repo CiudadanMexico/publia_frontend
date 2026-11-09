@@ -565,6 +565,7 @@ check('efectos: profundidad de campo en varias escenas', effects.depth >= 4, `${
 check('efectos: columna sticky', effects.sticky >= 1, `${effects.sticky} columna(s)`);
 
 const click = (selector) => page.evaluate((s) => document.querySelector(s)?.click(), selector);
+const waitBound = (sel) => page.waitForFunction((s2) => document.querySelector(s2)?.dataset.bound === '1', sel, { timeout: 30000 }).catch(() => {});
 // Espera a que el universo 3D haya inicializado (evita flakes de arranque lento)
 
 // --- variante compartida: texto neutral antes de elegir ruta -----------------
@@ -1170,6 +1171,7 @@ const ecoSel = await page.evaluate(() => ({
   title: document.querySelector('#escena-e25 [data-eco-title]')?.textContent ?? '',
   answer: JSON.parse(sessionStorage.getItem('publia.visitor.v1') ?? '{}').answers?.servicio ?? null,
 }));
+await waitBound('[data-demo="ecosystem"]');
 check('ecosistema: click selecciona (aria-pressed + panel + respuesta persistida)', ecoSel.pressed === '2' && !!ecoSel.answer && ecoSel.answer === ecoSel.title, JSON.stringify(ecoSel));
 await click('#escena-e25 [data-eco-play]');
 await page.waitForTimeout(2400);
@@ -1200,6 +1202,7 @@ await click('[data-route-choice="enterprise"]');
 await page.waitForTimeout(3400);
 await page.evaluate(() => document.querySelector('#escena-e29')?.scrollIntoView({ behavior: 'instant' }));
 await page.waitForTimeout(900);
+await waitBound('[data-recommendation]');
 const rec = await page.evaluate(() => ({
   items: document.querySelectorAll('[data-recommendation-list] .recommendation__item').length,
   text: document.querySelector('[data-recommendation-list]')?.textContent ?? '',
@@ -1212,7 +1215,6 @@ check('cierre V2: botón copiar resumen presente', await page.evaluate(() => !!d
 const q = (sel) => page.evaluate((s2) => !!document.querySelector(s2), sel);
 const clickJs = (sel) => page.evaluate((s2) => { const el = document.querySelector(s2); if (el) el.click(); return !!el; }, sel);
 const sceneState = () => page.evaluate(() => { try { return JSON.parse(sessionStorage.getItem('publia.visitor.v1') ?? '{}'); } catch { return {}; } });
-const waitBound = (sel) => page.waitForFunction((s2) => document.querySelector(s2)?.dataset.bound === '1', sel, { timeout: 15000 }).catch(() => {});
 
 // Bloque B: red colaborativa (E15) — requiere ruta explorer activa
 await page.goto(BASE, { waitUntil: 'domcontentloaded' });
