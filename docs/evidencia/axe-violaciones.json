@@ -1,5 +1,43 @@
 {
   "base": "https://dam-boulevard-explaining-alaska.trycloudflare.com",
-  "violaciones": [],
-  "rutaEmpresa": []
+  "violaciones": [
+    {
+      "id": "aria-prohibited-attr",
+      "impact": "serious",
+      "nodes": 1,
+      "help": "Elements must only use permitted ARIA attributes",
+      "targets": [
+        ".housing__segments"
+      ]
+    },
+    {
+      "id": "nested-interactive",
+      "impact": "serious",
+      "nodes": 1,
+      "help": "Interactive controls must not be nested",
+      "targets": [
+        ".housing__stage"
+      ]
+    }
+  ],
+  "rutaEmpresa": [
+    {
+      "id": "aria-prohibited-attr",
+      "impact": "serious",
+      "nodes": 1,
+      "help": "Elements must only use permitted ARIA attributes",
+      "targets": [
+        ".housing__segments"
+      ]
+    },
+    {
+      "id": "nested-interactive",
+      "impact": "serious",
+      "nodes": 1,
+      "help": "Interactive controls must not be nested",
+      "targets": [
+        ".housing__stage"
+      ]
+    }
+  ]
 }

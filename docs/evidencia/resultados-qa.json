@@ -1,7 +1,7 @@
 {
   "base": "https://dam-boulevard-explaining-alaska.trycloudflare.com",
-  "total": 158,
-  "fallos": 0,
+  "total": 178,
+  "fallos": 8,
   "resultados": [
     {
       "name": "carga inicial sin errores JS",
@@ -11,7 +11,7 @@
     {
       "name": "rendimiento: JS + CSS inicial (con el 3D del hero) por debajo de 260 kB",
       "ok": true,
-      "detail": "253 kB (JS 238 · CSS 15)"
+      "detail": "256 kB (JS 238 · CSS 18)"
     },
     {
       "name": "rendimiento: la aplicación sin 3D por debajo de 90 kB",
@@ -46,12 +46,12 @@
     {
       "name": "prisma: la escena 3D se renderiza y cambia (animación real)",
       "ok": true,
-      "detail": "667202 vs 678517 bytes"
+      "detail": "667202 vs 683310 bytes"
     },
     {
       "name": "prisma: pinta una fracción útil del viewport",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.20326234567901236}"
+      "detail": "{\"paintedRatio\":0.20960802469135803}"
     },
     {
       "name": "hero 3D: lienzo único presente con WebGL activo",
@@ -81,12 +81,12 @@
     {
       "name": "hero 3D: pinta la escena (mascota, prisma, tarjetas)",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.205625}"
+      "detail": "{\"paintedRatio\":0.21225}"
     },
     {
       "name": "hero 3D: la animación ambiental cambia entre fotogramas",
       "ok": true,
-      "detail": "689540 vs 687960 bytes"
+      "detail": "690631 vs 687960 bytes"
     },
     {
       "name": "marca: el encabezado usa el logotipo oficial",
@@ -271,7 +271,7 @@
     {
       "name": "ruta eficiencia: escena propia visible",
       "ok": true,
-      "detail": "1696px · route=efficiency act=efficiency world=efficiency scrollY=1960"
+      "detail": "1696px · route=efficiency act=efficiency world=efficiency scrollY=598"
     },
     {
       "name": "ruta eficiencia: mensaje propio de la escena",
@@ -440,18 +440,18 @@
     },
     {
       "name": "accesibilidad: sin violaciones graves (axe wcag2aa)",
-      "ok": true,
-      "detail": "0 graves"
+      "ok": false,
+      "detail": "aria-prohibited-attr×1, label-content-name-mismatch×3"
     },
     {
       "name": "accesibilidad: sin violaciones moderadas o menores",
-      "ok": true,
-      "detail": "0 violaciones"
+      "ok": false,
+      "detail": "aria-prohibited-attr×1, heading-order×1, label-content-name-mismatch×3"
     },
     {
       "name": "accesibilidad: ruta empresa sin violaciones",
-      "ok": true,
-      "detail": "0 violaciones"
+      "ok": false,
+      "detail": "aria-prohibited-attr×1, heading-order×1, label-content-name-mismatch×3"
     },
     {
       "name": "movimiento reducido: contenido visible y sin animación",
@@ -491,12 +491,12 @@
     {
       "name": "v3 scroll: la cámara se transforma en 30/60/90% (ida)",
       "ok": true,
-      "detail": "30=[2.893591963976446,2.0100969864911673,8.713543470730864] 60=[2.5760304814686528,1.8910114305507446,8.45552476619328] 90=[1.9,1.8221628289473684,8.670271381578948]"
+      "detail": "30=[1.9,2.0923228346456693,8.8248031496063] 60=[2.6829927260131625,1.931122272254936,8.542431589885695] 90=[2.5760304814686528,1.8910114305507446,8.45552476619328]"
     },
     {
       "name": "v3 scroll: recorrido inverso mueve la cámara en sentido inverso (reversible)",
       "ok": true,
-      "detail": "90=[1.9,1.8221628289473684,8.670271381578948] ida60=[2.5760304814686528,1.8910114305507446,8.45552476619328] vuelta60=[1.4343096234309622,1.4439330543933053,7.805020920502092]"
+      "detail": "90=[2.5760304814686528,1.8910114305507446,8.45552476619328] ida60=[2.6829927260131625,1.931122272254936,8.542431589885695] vuelta60=[1.1592547342700061,1.768784361637141,8.571960904092853]"
     },
     {
       "name": "7M-B infra: el modo cambia el texto",
@@ -506,7 +506,7 @@
     {
       "name": "7M-B infra: el modo mueve la cámara 3D",
       "ok": true,
-      "detail": "[2.161248654467169,1.7354682454251882,8.118514531754576] -> [2.2333333333333334,1.7,7.95]"
+      "detail": "[1.1592547342700061,1.768784361637141,8.571960904092853] -> [2.1625909248354693,1.735971596813301,8.11960512642882]"
     },
     {
       "name": "7M-B infra: estado accesible aria-pressed",
@@ -631,7 +631,7 @@
     {
       "name": "7M-B red: demo ilumina flujo y muestra resultado",
       "ok": true,
-      "detail": "3/3 · EL EQUIPO APRENDE"
+      "detail": "Una consulta entra, un agente propone una respuesta y una persona decide qué enviar."
     },
     {
       "name": "7M-B infra: 3 modos de operación",
@@ -685,8 +685,8 @@
     },
     {
       "name": "7M-B membresías: diagnóstico recomienda y persiste",
-      "ok": true,
-      "detail": "\"cobertura\""
+      "ok": false,
+      "detail": "null"
     },
     {
       "name": "7M-B cierre: 6 tarjetas de capacidad",
@@ -700,8 +700,8 @@
     },
     {
       "name": "7M-B cierre: meta refleja ruta + membresía + capacidad",
-      "ok": true,
-      "detail": "Ruta: ruta Empresa · Infraestructura: Housing administrado · Membresía orientativa: COBERTURA · Servicio: Inteligencia artificial · Capacidades (1/6): Web + chatbot de WhatsApp"
+      "ok": false,
+      "detail": "Ruta: ruta Empresa · Infraestructura: Housing administrado · Red: aprendizaje · Servicio: Inteligencia artificial · Capacidades (1/6): Web + chatbot de WhatsApp"
     },
     {
       "name": "7M-B cierre: acciones finales presentes (TXT, volver, reiniciar, WhatsApp con contexto)",
@@ -711,7 +711,7 @@
     {
       "name": "7M-B cierre: demo de tarjeta recorre 3 pasos",
       "ok": true,
-      "detail": "2/3 · Organizar tareas y borradores"
+      "detail": "1/3 · Identificar la necesidad"
     },
     {
       "name": "7M-B empresa: llegada con demo infra soberana + arte A04 + capítulo mundo",
@@ -741,7 +741,7 @@
     {
       "name": "v4-A transición botón: cámara cambia en 3 momentos (inicio/medio/fin)",
       "ok": true,
-      "detail": "0=[0,2.4,11.6] mid=[1.9,1.830655526992288,8.5 fin=[2.5760304814686528,1.8910"
+      "detail": "0=[0,2.4,11.6] mid=[1.9,1.6617609254498715,8. fin=[2.5760304814686528,1.8910"
     },
     {
       "name": "v4-A transición botón: portal visible a mitad del viaje",
@@ -789,9 +789,109 @@
       "detail": "{\"progress\":\"0\",\"maxOp\":0,\"visible\":false}"
     },
     {
-      "name": "sin errores JS al final del recorrido",
+      "name": "7M-C infra: 10 racks con transform computado válido (no none)",
+      "ok": false,
+      "detail": "{\"n\":10,\"distinct\":1,\"transform\":\"none\"}"
+    },
+    {
+      "name": "7M-C infra: los 10 racks ocupan posiciones distintas",
+      "ok": false,
+      "detail": "distinct=1"
+    },
+    {
+      "name": "7M-C infra: sin auto-selección persistida (null hasta que el visitante elige)",
+      "ok": true,
+      "detail": "null"
+    },
+    {
+      "name": "7M-C membresías: BASE es solo visual; estado queda en null",
       "ok": true,
       "detail": ""
+    },
+    {
+      "name": "7M-C red: clic en nodo persiste en estado",
+      "ok": true,
+      "detail": "\"sitios\""
+    },
+    {
+      "name": "7M-C red: tras recarga se restaura la selección previa (sin sobrescribir)",
+      "ok": true,
+      "detail": "pressed=true"
+    },
+    {
+      "name": "7M-C housing: default compartido 50/25/25",
+      "ok": true,
+      "detail": "[\"50%\",\"25%\",\"25%\"]"
+    },
+    {
+      "name": "7M-C housing: privado = 100% y persiste en state.housingMode",
+      "ok": true,
+      "detail": "[\"100%\"]"
+    },
+    {
+      "name": "7M-C housing: stage transforma los racks (data-mode=privado, escudo visible)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-C housing: demo ilumina el stage (data-demo-state=on)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-C housing: recarga restaura privado (botón + estado)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-C cierre: la meta incluye la modalidad Housing elegida",
+      "ok": true,
+      "detail": "Ruta: exploración sin ruta fija · Housing: privado 100% · Red: sitios · Servicio: Inteligencia artificial · Aún no añade"
+    },
+    {
+      "name": "7M-C A06: 5 áreas + 3 demos seleccionables presentes",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-C A06: ejecutar demo muestra resultado",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-C matriz 390×844: sin overflow horizontal en E03/E15/E22/E26/E29",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-C matriz 1366×768: sin overflow horizontal en E03/E15/E22/E26/E29",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-C matriz 1440×900: sin overflow horizontal en E03/E15/E22/E26/E29",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-C matriz 1920×1080: sin overflow horizontal en E03/E15/E22/E26/E29",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-C matriz 3440×1440: sin overflow horizontal en E03/E15/E22/E26/E29",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-C reduced-motion: housing enlazado y anillos sin animación",
+      "ok": true,
+      "detail": "bound=1 anim=none"
+    },
+    {
+      "name": "sin errores JS al final del recorrido",
+      "ok": false,
+      "detail": "console: Failed to load resource: the server responded with a status of 404 () | console: Failed to load resource: the server responded with a status of 404 ()"
     }
   ]
 }

@@ -73,6 +73,8 @@ export function bindCierre(universe: CierreUniverse | null): void {
     meta.textContent =
       `Ruta: ${ROUTE_LABEL[s.primary] ?? s.primary}` +
       (s.infra ? ` · Infraestructura: ${INFRA_LABEL[s.infra]}` : '') +
+      (s.housingMode ? ` · Housing: ${s.housingMode === 'privado' ? 'privado 100%' : 'compartido 50/25/25'}` : '') +
+      (s.red ? ` · Red: ${s.red}` : '') +
       (s.membership ? ` · Membresía orientativa: ${s.membership.toUpperCase()}` : '') +
       (s.answers.servicio ? ` · Servicio: ${s.answers.servicio}` : '') +
       (caps.length ? ` · Capacidades (${caps.length}/6): ${caps.join(', ')}` : ' · Aún no añades capacidades: toca «＋ Añadir a mi Publia» en las tarjetas');

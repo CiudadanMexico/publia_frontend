@@ -1286,7 +1286,10 @@ await clickJs('#escena-e27 [data-memb-goal="support"]');
 await clickJs('#escena-e27 [data-memb-team="large"]');
 await clickJs('#escena-e27 [data-memb-recommend]');
 await page.waitForTimeout(400);
-check('7M-B membresías: diagnóstico recomienda y persiste', !(await page.evaluate(() => document.querySelector('#escena-e27 [data-memb-reco]')?.hidden)) && (await sceneState()).membership === 'cobertura', JSON.stringify((await sceneState()).membership));
+check('7M-B membresías: diagnóstico recomienda visualmente SIN persistir (recomendación ≠ elección)', !(await page.evaluate(() => document.querySelector('#escena-e27 [data-memb-reco]')?.hidden)) && (await sceneState()).membership === null && (await page.evaluate(() => document.querySelector('#escena-e27 [data-memb-plan="cobertura"]')?.getAttribute('aria-pressed'))) === 'true', JSON.stringify((await sceneState()).membership));
+await clickJs('#escena-e27 [data-memb-plan="cobertura"]');
+await page.waitForTimeout(300);
+check('7M-B membresías: selección explícita del visitante SÍ persiste', (await sceneState()).membership === 'cobertura', JSON.stringify((await sceneState()).membership));
 
 // Bloque E: cierre V2 (E29)
 await page.evaluate(() => document.querySelector('#escena-e29')?.scrollIntoView({ behavior: 'instant' }));
@@ -1396,6 +1399,124 @@ await page.waitForFunction(() => document.documentElement.dataset.act === 'enter
 await page.waitForFunction(() => Math.max(...[...document.querySelectorAll('[data-portal-layer]')].map((l) => Number(getComputedStyle(l).opacity))) < 0.05, { timeout: 15000 }).catch(() => {});
 const portalBtnAfter = await portalState();
 check('portal: oculto tras aterrizar (ruta botón)', !portalBtnAfter.visible, JSON.stringify(portalBtnAfter));
+
+
+// ================= 7M-C: correcciones auditadas + A08 + A06 + matriz =================
+await page.evaluate(() => { try { sessionStorage.clear(); } catch {} });
+await page.goto(BASE, { waitUntil: 'networkidle', timeout: 60000 });
+await page.waitForTimeout(2600);
+// E03 es escena de ruta enterprise: activar la ruta antes de medir
+for (let att = 0; att < 3; att++) {
+  await page.evaluate(() => { window.__publiaLastProgrammaticScroll = Date.now(); window.scrollTo(0, 0); });
+  await page.evaluate(() => document.querySelector('[data-route-choice="enterprise"]')?.click());
+  try { await page.waitForFunction(() => document.documentElement.dataset.act === 'enterprise', null, { timeout: 30000 }); break; } catch { await page.waitForTimeout(1500); }
+}
+
+// 1. Racks E03: transform válido y posiciones distintas (ruta enterprise activa)
+await page.evaluate(() => document.querySelector('#escena-e03')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
+await waitBound('[data-demo="infra2"]');
+const rackInfo = await page.evaluate(() => {
+  const els = [...document.querySelectorAll('#escena-e03 [data-infra2-rack]')];
+  const rects = els.map((r) => { const b = r.getBoundingClientRect(); return `${Math.round(b.x)},${Math.round(b.y)}`; });
+  return { n: els.length, distinct: new Set(rects).size, transform: getComputedStyle(els[0]).transform, display: getComputedStyle(document.querySelector('#escena-e03')).display };
+});
+check('7M-C infra: 10 racks con transform computado válido (no none)', rackInfo.n === 10 && rackInfo.transform !== 'none' && rackInfo.display !== 'none', JSON.stringify(rackInfo));
+check('7M-C infra: los 10 racks ocupan posiciones distintas', rackInfo.distinct === 10, `distinct=${rackInfo.distinct}`);
+check('7M-C infra: sin auto-selección persistida (null hasta que el visitante elige)', (await sceneState()).infra === null, JSON.stringify((await sceneState()).infra));
+
+// 5. Membresías: default visual sin persistir
+await page.evaluate(() => document.querySelector('#escena-e27')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
+await waitBound('[data-demo="memberships"]');
+await page.waitForTimeout(400);
+check('7M-C membresías: BASE es solo visual; estado queda en null', (await sceneState()).membership === null && (await page.evaluate(() => document.querySelector('#escena-e27 [data-memb-plan="base"]')?.getAttribute('aria-pressed'))) === 'true');
+
+// A08 Housing en E22 (escena compartida, visible en cualquier ruta)
+await page.evaluate(() => document.querySelector('#escena-e22')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
+await waitBound('[data-demo="housing"]');
+const segW = () => page.evaluate(() => [...document.querySelectorAll('#escena-e22 [data-housing-segments] .housing__seg')].map((x) => x.style.width));
+check('7M-C housing: default compartido 50/25/25', JSON.stringify(await segW()) === JSON.stringify(['50%', '25%', '25%']), JSON.stringify(await segW()));
+await clickJs('#escena-e22 [data-housing-mode="privado"]');
+await page.waitForTimeout(700);
+check('7M-C housing: privado = 100% y persiste en state.housingMode', JSON.stringify(await segW()) === JSON.stringify(['100%']) && (await sceneState()).housingMode === 'privado', JSON.stringify(await segW()));
+check('7M-C housing: stage transforma los racks (data-mode=privado)', await page.evaluate(() => document.querySelector('#escena-e22 [data-housing-stage]')?.dataset.mode) === 'privado');
+await clickJs('#escena-e22 [data-housing-play]');
+await page.waitForTimeout(500);
+check('7M-C housing: demo ilumina el stage (data-demo-state=on)', await page.evaluate(() => document.querySelector('#escena-e22 [data-housing-stage]')?.dataset.demoState) === 'on');
+await page.reload({ waitUntil: 'networkidle', timeout: 60000 });
+await page.waitForTimeout(2200);
+await page.evaluate(() => document.querySelector('#escena-e22')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
+await waitBound('[data-demo="housing"]');
+check('7M-C housing: recarga restaura privado (botón + estado)', (await sceneState()).housingMode === 'privado' && (await page.evaluate(() => document.querySelector('#escena-e22 [data-housing-mode="privado"]')?.getAttribute('aria-pressed'))) === 'true');
+
+// Cierre incluye housingMode en la meta
+await page.evaluate(() => document.querySelector('#escena-e29')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
+await waitBound('[data-recommendation]');
+const metaTxt = await page.evaluate(() => document.querySelector('#escena-e29 [data-cierre-meta]')?.textContent ?? '');
+check('7M-C cierre: la meta incluye la modalidad Housing elegida', /Housing: privado/.test(metaTxt), metaTxt.slice(0, 140));
+
+// A06 preparado en E26
+await page.evaluate(() => document.querySelector('#escena-e26')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
+await waitBound('[data-demo="marketing"]');
+check('7M-C A06: 5 áreas + 3 demos seleccionables presentes', (await page.evaluate(() => document.querySelectorAll('#escena-e26 [data-mkt-area]').length)) === 5 && (await page.evaluate(() => document.querySelectorAll('#escena-e26 [data-mkt-demo]').length)) === 3);
+await clickJs('#escena-e26 [data-mkt-run]');
+await page.waitForFunction(() => (document.querySelector('#escena-e26 [data-mkt-result]')?.textContent ?? '').length > 5, null, { timeout: 12000 }).catch(() => {});
+check('7M-C A06: ejecutar demo muestra resultado', (await page.evaluate(() => document.querySelector('#escena-e26 [data-mkt-result]')?.textContent ?? '')).length > 5);
+
+// 2+3. Red (E15 es ruta explorer): boot limpio en unclassified
+await page.evaluate(() => { try { sessionStorage.clear(); } catch {} });
+await page.goto(BASE, { waitUntil: 'networkidle', timeout: 60000 });
+await page.waitForTimeout(2400);
+await page.evaluate(() => document.querySelector('#escena-e15')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
+await waitBound('[data-demo="red"]');
+await clickJs('#escena-e15 [data-red-node="2"]');
+await page.waitForTimeout(400);
+check('7M-C red: clic en nodo persiste en estado', (await sceneState()).red === 'sitios', JSON.stringify((await sceneState()).red));
+await page.reload({ waitUntil: 'networkidle', timeout: 60000 });
+await page.waitForTimeout(2200);
+await page.evaluate(() => document.querySelector('#escena-e15')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
+await waitBound('[data-demo="red"]');
+const redRestored = await page.evaluate(() => document.querySelector('#escena-e15 [data-red-node="2"]')?.getAttribute('aria-pressed'));
+check('7M-C red: tras recarga se restaura la selección previa (sin sobrescribir)', redRestored === 'true' && (await sceneState()).red === 'sitios', `pressed=${redRestored}`);
+
+// Matriz de resoluciones: sin overflow horizontal en escenas clave (enterprise + explorer)
+for (const [w, h] of [[390, 844], [1366, 768], [1440, 900], [1920, 1080], [3440, 1440]]) {
+  const c2 = await browser.newContext({ viewport: { width: w, height: h } });
+  const pp = await c2.newPage();
+  await pp.addInitScript(() => { try { history.scrollRestoration = 'manual'; } catch {} });
+  await pp.goto(BASE, { waitUntil: 'networkidle', timeout: 60000 });
+  await pp.waitForTimeout(2200);
+  for (let att = 0; att < 3; att++) {
+    await pp.evaluate(() => { window.__publiaLastProgrammaticScroll = Date.now(); window.scrollTo(0, 0); });
+    await pp.evaluate(() => document.querySelector('[data-route-choice="enterprise"]')?.click());
+    try { await pp.waitForFunction(() => document.documentElement.dataset.act === 'enterprise', null, { timeout: 30000 }); break; } catch { await pp.waitForTimeout(1500); }
+  }
+  let overflow = false;
+  for (const sel of ['#escena-e03', '#escena-e22', '#escena-e26', '#escena-e29']) {
+    await pp.evaluate((s2) => document.querySelector(s2)?.scrollIntoView({ behavior: 'instant', block: 'center' }), sel);
+    await pp.waitForTimeout(700);
+    if ((await pp.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)) > 1) overflow = true;
+  }
+  await pp.evaluate(() => document.querySelector('[data-route-reset]')?.click());
+  await pp.waitForTimeout(2000);
+  await pp.evaluate(() => document.querySelector('#escena-e15')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
+  await pp.waitForTimeout(900);
+  if ((await pp.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)) > 1) overflow = true;
+  await pp.screenshot({ path: `${OUT}/7mc-res-${w}x${h}.png` });
+  check(`7M-C matriz ${w}×${h}: sin overflow horizontal en E03/E15/E22/E26/E29`, !overflow);
+  await c2.close();
+}
+
+// Movimiento reducido: housing renderiza estático sin errores
+const rmCtx = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
+const rmp = await rmCtx.newPage();
+await rmp.goto(BASE, { waitUntil: 'networkidle', timeout: 60000 });
+await rmp.waitForTimeout(2200);
+await rmp.evaluate(() => document.querySelector('#escena-e22')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
+await rmp.waitForFunction((s2) => document.querySelector(s2)?.dataset.bound === '1', '[data-demo="housing"]', { timeout: 30000 }).catch(() => {});
+const rmBound = await rmp.evaluate(() => document.querySelector('[data-demo="housing"]')?.dataset.bound);
+const rmAnim = await rmp.evaluate(() => getComputedStyle(document.querySelector('#escena-e22 .housing__rings')).animationName);
+check('7M-C reduced-motion: housing enlazado y anillos sin animación', rmBound === '1' && rmAnim === 'none', `bound=${rmBound} anim=${rmAnim}`);
+await rmCtx.close();
 
 // --- cierre ---------------------------------------------------------------------
 await page.screenshot({ path: `${OUT}/13-cierre.png` });

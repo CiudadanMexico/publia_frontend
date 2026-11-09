@@ -55,7 +55,7 @@ const racks = [rack(0, 'NODE / 01', 'PUBLIA · RTX / AI'), rack(1, 'NODE / 02', 
     </div>
   </div>
 
-  <div class="housing__stage" data-housing-stage data-mode="compartido" data-demo-state="off" aria-label="Escena de servidores transformables: compartido agrupa tres nodos; privado concentra uno">
+  <div class="housing__stage" data-housing-stage data-mode="compartido" data-demo-state="off" role="img" aria-label="Escena de servidores transformables: compartido agrupa tres nodos; privado concentra uno">
     <span class="housing__service-light">SISTEMA ILUSTRATIVO</span>
     <img class="housing__rings" src="/assets/a08/A08_anillos.svg" alt="" aria-hidden="true" />
     <div class="housing__platform" aria-hidden="true" />
@@ -67,7 +67,7 @@ const racks = [rack(0, 'NODE / 01', 'PUBLIA · RTX / AI'), rack(1, 'NODE / 02', 
     </svg>
     <div class="housing__hardware" data-housing-hardware>
       {racks.map((r) => (
-        <button class="housing__rack" data-housing-rack={String(r.i)} type="button" aria-label={`Inspeccionar nodo ${r.i + 1}`}>
+        <button class="housing__rack" data-housing-rack={String(r.i)} type="button">
           <span class="housing__rack-title">{r.title}</span>
           {Array.from({ length: 10 }).map(() => <span class="housing__slot" />)}
           <span class="housing__rack-foot">{r.foot}</span>
