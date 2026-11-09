@@ -12,3 +12,4 @@ dist/
 .tmp/
 _entrega/analisis/
 docs/audit/video/
+.tmp-vids/

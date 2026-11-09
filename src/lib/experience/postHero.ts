@@ -54,12 +54,13 @@ function renderRecommendation(): void {
   if (state.answers.servicio) {
     items.push({ tag: 'Servicio explorado', title: state.answers.servicio, body: 'Elegido en el ecosistema (E25).' });
   }
-  if (!items.length) {
-    // Sin decisiones previas: la ruta orienta (GeoNodos ya no tiene protagonismo en exploración)
+  if (items.length < 3) {
+    // La ruta orienta siempre que haya menos de 3 puntos (GeoNodos ya no tiene protagonismo en exploración)
     if (route === 'enterprise') {
       items.push(
         { tag: 'Infraestructura', title: 'Housing: tu propio nodo administrado', body: 'Modalidad compartida o privada según lo que necesites; sin elegirla no se asume.' },
         { tag: 'Agentes', title: 'Agentes de IA con aprobación humana', body: 'Cada acción de un agente espera tu visto bueno. Nada se ejecuta solo.' },
+        { tag: 'Operación', title: 'Cobertura humana en horario definido', body: 'Ventana de atención real, no un bot que simula responder.' },
       );
     } else if (route === 'efficiency') {
       const focoTxt = foco ? FOCO_LABEL[foco] ?? 'tu área de foco' : 'lo que más te quita tiempo';

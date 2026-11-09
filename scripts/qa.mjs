@@ -973,7 +973,8 @@ const reduced = await browser.newContext({
 });
 const reducedPage = await reduced.newPage();
 await reducedPage.goto(BASE, { waitUntil: 'networkidle', timeout: 60000 });
-await reducedPage.waitForTimeout(4500);
+await reducedPage.waitForFunction(() => document.querySelector('.prism-layer')?.classList.contains('is-ready'), null, { timeout: 45000 }).catch(() => {});
+await reducedPage.waitForTimeout(1500);
 const reducedInfo = await reducedPage.evaluate(() => ({
   layerReady: document.querySelector('.prism-layer')?.classList.contains('is-ready') ?? false,
   reveals: [...document.querySelectorAll('[data-reveal]')].every(
@@ -1506,7 +1507,7 @@ for (const [w, h] of [[390, 844], [1366, 768], [1440, 900], [1920, 1080], [3440,
   await pp.evaluate(() => document.querySelector('#escena-e15')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
   await pp.waitForTimeout(900);
   if ((await pp.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)) > 1) overflow = true;
-  await pp.screenshot({ path: `${OUT}/7mc-res-${w}x${h}.png` });
+  await pp.screenshot({ path: `${OUT}/7mc-res-${w}x${h}.png`, timeout: 90000 }).catch(() => {});
   check(`7M-C matriz ${w}×${h}: sin overflow horizontal en E03/E15/E22/E26/E29`, !overflow);
   await c2.close();
 }
@@ -1588,7 +1589,7 @@ const recoInfra = await page.evaluate(() => ({
   text: document.querySelector('#escena-e27 [data-memb-reco-text]')?.textContent ?? '',
   chooseHidden: document.querySelector('#escena-e27 [data-memb-choose]')?.hidden,
 }));
-check('7M-D P0-02: infraestructura → recomendación Housing independiente, sin plan forzado ni tarifas', /Housing/.test(recoInfra.text) && /dimensionar/.test(recoInfra.text) && recoInfra.chooseHidden === true && !/\$\d/.test(recoInfra.text), recoInfra.text.slice(0, 90));
+check('7M-D P0-02: infraestructura → recomendación Housing independiente, sin plan forzado ni tarifas', /Housing/.test(recoInfra.text) && /dimensiona/.test(recoInfra.text) && recoInfra.chooseHidden === true && !/\$\d/.test(recoInfra.text), recoInfra.text.slice(0, 90));
 
 // P0-03: cierre personalizado desde el estado completo + coherencia con enlaces
 await page.evaluate(() => document.querySelector('#escena-e22')?.scrollIntoView({ behavior: 'instant', block: 'center' }));

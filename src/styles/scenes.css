@@ -627,7 +627,11 @@ html[data-segments~='advanced'] .scene__inner[data-scene-segments~='advanced'] {
   gap: 0;
 }
 
+/* 7M-D: los botones de catálogo toman fondo sólido del tone (evita el gris
+   por defecto del UA en color-scheme: dark) y texto del tone-ink → contraste AA */
 .services__item {
+  background: var(--tone-card, rgba(127, 127, 127, 0.08));
+  border-radius: 0.6rem;
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
@@ -643,11 +647,11 @@ html[data-segments~='advanced'] .scene__inner[data-scene-segments~='advanced'] {
 }
 
 .services__name {
-  color: color-mix(in oklab, var(--paper) 94%, transparent);
+  color: var(--tone-ink, var(--scene-ink, var(--paper)));
 }
 
 .services__detail {
-  color: var(--ink-300);
+  color: color-mix(in oklab, var(--tone-ink, var(--scene-ink, var(--paper))) 74%, transparent);
   font-size: var(--step--1);
 }
 
@@ -657,7 +661,7 @@ html[data-segments~='advanced'] .scene__inner[data-scene-segments~='advanced'] {
 }
 
 .services__price--pending {
-  color: var(--ink-300);
+  color: color-mix(in oklab, var(--tone-ink, var(--scene-ink, var(--paper))) 74%, transparent);
 }
 
 .coverage {
