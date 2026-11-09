@@ -15,14 +15,20 @@ const fmtPrice = (p: Membership['price']): string =>
 const bySlug = (slug: string): Membership | undefined => MEMBERSHIPS.find((m) => m.slug === slug);
 
 /** Lógica del prototipo 06, mapeada a los slugs canónicos. */
-function recommend(goal: string | null, team: string | null): Membership | null {
+export interface Recommendation {
+  plan: Membership | null;
+  /** true cuando la recomendación es de Housing (independiente del plan) */
+  housing: boolean;
+}
+export function recommend(goal: string | null, team: string | null): Recommendation | null {
   if (!goal || !team) return null;
-  if (goal === 'agent') return bySlug('agente') ?? null;
-  if (goal === 'growth') return bySlug('crecimiento') ?? null;
-  if (goal === 'support') return team === 'large' ? bySlug('cobertura') ?? null : bySlug('operacion') ?? null;
-  if (goal === 'infrastructure') return bySlug('cobertura') ?? null; // Housing + asesoría: precio por cotizar
-  if (goal === 'start') return team === 'large' ? bySlug('crecimiento') ?? null : bySlug('base') ?? null;
-  return bySlug('base') ?? null;
+  if (goal === 'agent') return { plan: bySlug('agente') ?? null, housing: false };
+  if (goal === 'growth') return { plan: bySlug('crecimiento') ?? null, housing: false };
+  if (goal === 'support') return { plan: team === 'large' ? bySlug('cobertura') ?? null : bySlug('operacion') ?? null, housing: false };
+  if (goal === 'start') return { plan: team === 'large' ? bySlug('crecimiento') ?? null : bySlug('base') ?? null, housing: false };
+  // P0-02: infraestructura/Housing NO recomienda COBERTURA por defecto.
+  // Genera una recomendación independiente de Housing + invitación a dimensionar el equipo.
+  return { plan: null, housing: true };
 }
 
 export function bindMemberships(): void {
@@ -42,6 +48,10 @@ export function bindMemberships(): void {
   const teamBtns = [...wrap.querySelectorAll<HTMLButtonElement>('[data-memb-team]')];
   const recoBtn = wrap.querySelector<HTMLButtonElement>('[data-memb-recommend]');
   const elReco = wrap.querySelector<HTMLElement>('[data-memb-reco]');
+  const elRecoText = wrap.querySelector<HTMLElement>('[data-memb-reco-text]');
+  const elChoose = wrap.querySelector<HTMLButtonElement>('[data-memb-choose]');
+  const elChosen = wrap.querySelector<HTMLElement>('[data-memb-chosen]');
+  const badges = [...wrap.querySelectorAll<HTMLElement>('[data-memb-badge]')];
 
   let goal: string | null = null;
   let team: string | null = null;
@@ -71,13 +81,16 @@ export function bindMemberships(): void {
     }
     if (core) core.style.boxShadow = `0 10px 34px rgba(7,26,49,.25), 0 0 ${18 + upto.length * 8}px rgba(255, 209, 46, .55)`;
   };
-  // Selección explícita del visitante: renderiza Y persiste.
+  // Selección explícita del visitante: renderiza Y persiste (única vía que toca state.membership).
   const select = (slug: string): void => {
     render(slug);
     const plan = bySlug(slug);
     if (!plan) return;
     setMembership(plan.slug as never);
     track('membership_selected', { membresia: plan.slug });
+    if (elChosen) elChosen.textContent = `Tu selección: ${plan.name}`;
+    badges.forEach((b) => (b.hidden = true));
+    planBtns.forEach((b) => b.classList.remove('is-suggested'));
   };
 
   planBtns.forEach((b) => b.addEventListener('click', () => select(b.dataset.membPlan ?? 'base')));
@@ -89,24 +102,41 @@ export function bindMemberships(): void {
     team = b.dataset.membTeam ?? null;
     teamBtns.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
   }));
+  let suggested: string | null = null;
   recoBtn?.addEventListener('click', () => {
-    if (!elReco) return;
+    if (!elReco || !elRecoText) return;
     if (!goal || !team) {
       elReco.hidden = false;
-      elReco.textContent = '⚠ Selecciona ambas respuestas para obtener una recomendación.';
+      elRecoText.textContent = '⚠ Selecciona ambas respuestas para obtener una recomendación.';
+      if (elChoose) elChoose.hidden = true;
       return;
     }
     const rec = recommend(goal, team);
     if (!rec) return;
     elReco.hidden = false;
-    elReco.textContent = goal === 'infrastructure'
-      ? `💡 Recomendación orientativa: ${rec.name} como base, con Housing + asesoría (infraestructura: precio por cotizar).`
-      : `💡 Recomendación orientativa: ${rec.name} · ${fmtPrice(rec.price)} · referencia, no es una oferta vinculante.`;
-    render(rec.slug); // recomendación automática: solo visual, no persiste
-    track('membership_diagnosis', { goal, team, recomendacion: rec.slug });
+    suggested = rec.plan?.slug ?? null;
+    // La sugerencia se marca visualmente pero NO reemplaza la selección confirmada
+    badges.forEach((b) => (b.hidden = b.dataset.membBadge !== suggested));
+    planBtns.forEach((b) => b.classList.toggle('is-suggested', b.dataset.membPlan === suggested));
+    if (rec.housing) {
+      elRecoText.textContent = '💡 Recomendación orientativa: Housing con modalidad compartida o privada a definir contigo (E22). El plan de membresía se dimensiona con tu equipo y tu operación — no hay tarifa predeterminada.';
+      if (elChoose) elChoose.hidden = true;
+      track('membership_diagnosis', { goal, team, recomendacion: 'housing' });
+    } else if (rec.plan) {
+      elRecoText.textContent = `💡 Nuestra sugerencia: ${rec.plan.name} · ${fmtPrice(rec.plan.price)} · referencia orientativa, no es una oferta vinculante.`;
+      if (elChoose) elChoose.hidden = false;
+      track('membership_diagnosis', { goal, team, recomendacion: rec.plan.slug });
+    }
+    // no se llama a render(): el detalle sigue mostrando la selección confirmada (o BASE visual)
+  });
+  // «Elegir este plan»: ÚNICO botón que persiste la recomendación como selección
+  elChoose?.addEventListener('click', () => {
+    if (suggested) select(suggested);
   });
 
   // Default visual BASE sin persistir; si el visitante ya eligió, se restaura sin reescribir.
-  render(getState().membership ?? 'base');
+  const savedMemb = getState().membership ?? 'base';
+  render(savedMemb);
+  if (elChosen) elChosen.textContent = getState().membership ? `Tu selección: ${bySlug(savedMemb)?.name ?? savedMemb}` : 'Tu selección: aún no confirmas un plan (BASE es sólo la vista inicial)';
   wrap.dataset.bound = '1';
 }

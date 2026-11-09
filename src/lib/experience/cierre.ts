@@ -18,7 +18,7 @@ const ROUTE_LABEL: Record<string, string> = {
   efficiency: 'ruta Eficiencia',
   explorer: 'exploración libre',
 };
-const INFRA_LABEL: Record<string, string> = {
+export const INFRA_LABEL: Record<string, string> = {
   ia_privada: 'IA privada',
   housing: 'Housing administrado',
   red_distribuida: 'Red distribuida',

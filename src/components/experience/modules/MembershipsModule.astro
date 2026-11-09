@@ -54,10 +54,12 @@ const first = plans[0]!;
 
     <div class="memb__panel">
       <div class="memb__plans" role="group" aria-label="Niveles de membresía">
+        <p class="memb__chosen" data-memb-chosen aria-live="polite">Tu selección: BASE (aún no confirmas un plan)</p>
         {plans.map((p, i) => (
           <button type="button" class="memb__plan" data-memb-plan={p.slug} aria-pressed={i === 0 ? 'true' : 'false'}>
             <strong>{p.name}</strong>
             <b>{fmtPrice(p.price)}</b>
+            <span class="memb__badge" data-memb-badge={p.slug} hidden>Nuestra sugerencia</span>
           </button>
         ))}
       </div>
@@ -104,12 +106,22 @@ const first = plans[0]!;
       </div>
     </div>
     <button type="button" class="memb__reco-btn" data-memb-recommend>✨ Ver mi punto de partida ↗</button>
-    <p class="memb__reco" data-memb-reco hidden aria-live="polite"></p>
+    <div class="memb__reco" data-memb-reco hidden aria-live="polite">
+      <p data-memb-reco-text></p>
+      <button type="button" class="memb__reco-choose" data-memb-choose hidden>✓ Elegir este plan</button>
+    </div>
   </div>
 </section>
 
 <style>
   .memb { display: grid; gap: 1.2rem; }
+  .memb__chosen { margin: 0 0 8px; font-size: 12px; font-weight: 800; color: #7a5b00; letter-spacing: 0.04em; }
+  .memb__plan { position: relative; }
+  .memb__plan.is-suggested { outline: 2px dashed #b8860b; outline-offset: 2px; }
+  .memb__badge { position: absolute; top: -9px; right: 8px; background: #ffe9a8; color: #7a5b00; border-radius: 100px; padding: 2px 8px; font-size: 9px; font-weight: 900; letter-spacing: 0.08em; }
+  .memb__reco { margin-top: 10px; }
+  .memb__reco p { margin: 0 0 8px; }
+  .memb__reco-choose { border: 1px solid #7a5b00; background: #ffd64d; color: #3a2c00; border-radius: 100px; padding: 8px 14px; font-size: 11px; font-weight: 900; cursor: pointer; }
   .memb__grid { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 1.2rem; align-items: center; }
   .memb__core-wrap { display: grid; justify-items: center; gap: 1rem; }
   .memb__core { width: 120px; height: 120px; border-radius: 50%; display: grid; place-items: center; align-content: center; gap: 0.3rem; background: linear-gradient(135deg, #3ac8f6, #1061a8 55%, #0b3457); border: 6px solid #ffd12e; box-shadow: 0 10px 34px rgba(7, 26, 49, .25); }

@@ -38,6 +38,7 @@ export type ExperienceEvent =
   | 'red_demo_start'
   | 'housing_mode_selected'
   | 'housing_demo'
+  | 'marketing_area_toggled'
   | 'marketing_demo_selected'
   | 'marketing_demo_start'
   | 'marketing_demo_run'

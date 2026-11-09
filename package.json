@@ -10,7 +10,7 @@
     "preview": "astro preview --host 127.0.0.1 --port 4322",
     "serve": "node scripts/serve-dist.mjs",
     "check": "tsc --noEmit",
-    "test": "esbuild scripts/graph.test.ts --bundle --format=esm --platform=node --outfile=.tmp/graph.test.mjs && node --test .tmp/graph.test.mjs",
+    "test": "esbuild scripts/graph.test.ts --bundle --format=esm --platform=node --outfile=.tmp/graph.test.mjs && esbuild scripts/commerce.test.ts --bundle --format=esm --platform=node --outfile=.tmp/commerce.test.mjs && node --test .tmp/graph.test.mjs .tmp/commerce.test.mjs",
     "sync:content": "node scripts/sync-wordpress-content.mjs",
     "astro": "astro"
   },

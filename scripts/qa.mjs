@@ -1291,10 +1291,10 @@ await clickJs('#escena-e27 [data-memb-goal="support"]');
 await clickJs('#escena-e27 [data-memb-team="large"]');
 await clickJs('#escena-e27 [data-memb-recommend]');
 await page.waitForTimeout(400);
-check('7M-B membresías: diagnóstico recomienda visualmente SIN persistir (recomendación ≠ elección)', !(await page.evaluate(() => document.querySelector('#escena-e27 [data-memb-reco]')?.hidden)) && (await sceneState()).membership === null && (await page.evaluate(() => document.querySelector('#escena-e27 [data-memb-plan="cobertura"]')?.getAttribute('aria-pressed'))) === 'true', JSON.stringify((await sceneState()).membership));
-await clickJs('#escena-e27 [data-memb-plan="cobertura"]');
+check('7M-B membresías: diagnóstico marca sugerencia SIN persistir ni pisar la selección (badge, no aria-pressed)', !(await page.evaluate(() => document.querySelector('#escena-e27 [data-memb-reco]')?.hidden)) && (await sceneState()).membership === null && (await page.evaluate(() => !document.querySelector('#escena-e27 [data-memb-badge="cobertura"]')?.hidden)) && (await page.evaluate(() => document.querySelector('#escena-e27 [data-memb-plan="cobertura"]')?.getAttribute('aria-pressed'))) === 'false', JSON.stringify((await sceneState()).membership));
+await clickJs('#escena-e27 [data-memb-choose]');
 await page.waitForTimeout(300);
-check('7M-B membresías: selección explícita del visitante SÍ persiste', (await sceneState()).membership === 'cobertura', JSON.stringify((await sceneState()).membership));
+check('7M-B membresías: «Elegir este plan» SÍ persiste la selección', (await sceneState()).membership === 'cobertura', JSON.stringify((await sceneState()).membership));
 
 // Bloque E: cierre V2 (E29)
 await page.evaluate(() => document.querySelector('#escena-e29')?.scrollIntoView({ behavior: 'instant' }));
@@ -1522,6 +1522,139 @@ const rmBound = await rmp.evaluate(() => document.querySelector('[data-demo="hou
 const rmAnim = await rmp.evaluate(() => getComputedStyle(document.querySelector('#escena-e22 .housing__rings')).animationName);
 check('7M-C reduced-motion: housing enlazado y anillos sin animación', rmBound === '1' && rmAnim === 'none', `bound=${rmBound} anim=${rmAnim}`);
 await rmCtx.close();
+
+
+// ================= 7M-D: P0-01 red, P0-02 membresías, P0-03 cierre, P0-04 A06 =================
+await page.evaluate(() => { try { sessionStorage.clear(); } catch {} });
+await page.goto(BASE, { waitUntil: 'networkidle', timeout: 60000 });
+await page.waitForTimeout(2400);
+
+// P0-01: la demo de Red NO modifica state.red y restaura el foco
+await page.evaluate(() => document.querySelector('#escena-e15')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
+await waitBound('[data-demo="red"]');
+await clickJs('#escena-e15 [data-red-node="2"]');
+await page.waitForTimeout(400);
+check('7M-D P0-01: nodo 3 elegido persiste', (await sceneState()).red === 'sitios', JSON.stringify((await sceneState()).red));
+await clickJs('#escena-e15 [data-red-run]');
+await page.waitForFunction(() => {
+  const r = document.querySelector('#escena-e15 [data-red-result]')?.textContent ?? '';
+  const btn = document.querySelector('#escena-e15 [data-red-run]');
+  return r.length > 10 && btn && !btn.disabled;
+}, null, { timeout: 15000 }).catch(() => {});
+const afterDemo = await page.evaluate(() => ({
+  red: JSON.parse(sessionStorage.getItem('publia.visitor.v1') ?? '{}').red,
+  pressed: document.querySelector('#escena-e15 [data-red-node="2"]')?.getAttribute('aria-pressed'),
+  result: document.querySelector('#escena-e15 [data-red-result]')?.textContent ?? '',
+}));
+check('7M-D P0-01: tras completar la demo, state.red conserva el nodo 3', afterDemo.red === 'sitios', JSON.stringify(afterDemo));
+check('7M-D P0-01: al terminar la demo el foco visual vuelve a la capacidad elegida', afterDemo.pressed === 'true', `pressed=${afterDemo.pressed}`);
+await page.reload({ waitUntil: 'networkidle', timeout: 60000 });
+await page.waitForTimeout(2200);
+await page.evaluate(() => document.querySelector('#escena-e15')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
+await waitBound('[data-demo="red"]');
+check('7M-D P0-01: tras recarga se restaura la selección (regresión completa)', (await sceneState()).red === 'sitios' && (await page.evaluate(() => document.querySelector('#escena-e15 [data-red-node="2"]')?.getAttribute('aria-pressed'))) === 'true');
+
+// P0-02: membresías — sugerencia ≠ selección
+await page.evaluate(() => document.querySelector('#escena-e27')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
+await waitBound('[data-demo="memberships"]');
+await clickJs('#escena-e27 [data-memb-goal="support"]');
+await clickJs('#escena-e27 [data-memb-team="large"]');
+await clickJs('#escena-e27 [data-memb-recommend]');
+await page.waitForTimeout(400);
+const reco1 = await page.evaluate(() => ({
+  badge: !document.querySelector('#escena-e27 [data-memb-badge="cobertura"]')?.hidden,
+  pressedCobertura: document.querySelector('#escena-e27 [data-memb-plan="cobertura"]')?.getAttribute('aria-pressed'),
+  chosen: document.querySelector('#escena-e27 [data-memb-chosen]')?.textContent ?? '',
+}));
+check('7M-D P0-02: la sugerencia se marca con badge, sin pisar la selección (aria-pressed sigue en BASE, estado null)', reco1.badge && reco1.pressedCobertura === 'false' && (await sceneState()).membership === null, JSON.stringify(reco1));
+await clickJs('#escena-e27 [data-memb-choose]');
+await page.waitForTimeout(300);
+check('7M-D P0-02: «Elegir este plan» persiste COBERTURA', (await sceneState()).membership === 'cobertura' && (await page.evaluate(() => document.querySelector('#escena-e27 [data-memb-plan="cobertura"]')?.getAttribute('aria-pressed'))) === 'true');
+await clickJs('#escena-e27 [data-memb-goal="start"]');
+await clickJs('#escena-e27 [data-memb-team="small"]');
+await clickJs('#escena-e27 [data-memb-recommend]');
+await page.waitForTimeout(400);
+const reco2 = await page.evaluate(() => ({
+  badgeBase: !document.querySelector('#escena-e27 [data-memb-badge="base"]')?.hidden,
+  pressedCobertura: document.querySelector('#escena-e27 [data-memb-plan="cobertura"]')?.getAttribute('aria-pressed'),
+  chosen: document.querySelector('#escena-e27 [data-memb-chosen]')?.textContent ?? '',
+}));
+check('7M-D P0-02: nueva sugerencia (BASE) no reemplaza la selección confirmada (COBERTURA)', reco2.badgeBase && reco2.pressedCobertura === 'true' && (await sceneState()).membership === 'cobertura' && /COBERTURA/.test(reco2.chosen), JSON.stringify(reco2));
+// infraestructura: recomendación independiente de Housing, sin plan predeterminado
+await clickJs('#escena-e27 [data-memb-goal="infrastructure"]');
+await clickJs('#escena-e27 [data-memb-recommend]');
+await page.waitForTimeout(300);
+const recoInfra = await page.evaluate(() => ({
+  text: document.querySelector('#escena-e27 [data-memb-reco-text]')?.textContent ?? '',
+  chooseHidden: document.querySelector('#escena-e27 [data-memb-choose]')?.hidden,
+}));
+check('7M-D P0-02: infraestructura → recomendación Housing independiente, sin plan forzado ni tarifas', /Housing/.test(recoInfra.text) && /dimensionar/.test(recoInfra.text) && recoInfra.chooseHidden === true && !/\$\d/.test(recoInfra.text), recoInfra.text.slice(0, 90));
+
+// P0-03: cierre personalizado desde el estado completo + coherencia con enlaces
+await page.evaluate(() => document.querySelector('#escena-e22')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
+await waitBound('[data-demo="housing"]');
+await clickJs('#escena-e22 [data-housing-mode="privado"]');
+await page.waitForTimeout(400);
+await page.evaluate(() => document.querySelector('#escena-e29')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
+await waitBound('[data-recommendation]');
+await clickJs('#escena-e29 [data-cierre-card="web"] [data-cierre-toggle]');
+await page.waitForTimeout(500);
+const cierreView = await page.evaluate(() => {
+  const list = document.querySelector('#escena-e29 [data-recommendation-list]')?.textContent ?? '';
+  const meta = document.querySelector('#escena-e29 [data-cierre-meta]')?.textContent ?? '';
+  const wa = decodeURIComponent(document.querySelector('#escena-e29 [data-cierre-wa]')?.getAttribute('href') ?? '');
+  return { list, meta, wa };
+});
+check('7M-D P0-03: lista visible refleja membresía + housing + capacidad elegidas', /COBERTURA/.test(cierreView.list) && /privad/i.test(cierreView.list) && /WEB/i.test(cierreView.list), cierreView.list.slice(0, 120));
+check('7M-D P0-03: meta y enlace WhatsApp coherentes con la lista (mismo estado)', /COBERTURA/.test(cierreView.meta) && /Housing/.test(cierreView.meta) && /Housing: modalidad privada/.test(cierreView.wa) && /COBERTURA/.test(cierreView.wa) && /web/i.test(cierreView.wa), cierreView.wa.slice(0, 100));
+// teclado: enfocar toggle de tarjeta y activar con Enter
+await page.evaluate(() => document.querySelector('#escena-e29 [data-cierre-card="marketing"] [data-cierre-toggle]')?.focus());
+await page.keyboard.press('Enter');
+await page.waitForTimeout(400);
+check('7M-D teclado: Enter sobre el botón enfocado añade la capacidad', (await sceneState()).capabilities?.includes('marketing') === true);
+
+// P0-04: A06 sin promesas + áreas como controles
+await page.evaluate(() => document.querySelector('#escena-e26')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
+await waitBound('[data-demo="marketing"]');
+const e26text = await page.evaluate(() => document.querySelector('#escena-e26')?.textContent ?? '');
+check('7M-D P0-04: A06 sin promesas de plazos/volúmenes (48 h / 30 piezas)', !/48\s*h|30\s*piezas/i.test(e26text));
+await clickJs('#escena-e26 [data-mkt-area="campanas"]');
+await page.waitForTimeout(300);
+const areaState = await page.evaluate(() => ({
+  expanded: document.querySelector('#escena-e26 [data-mkt-area="campanas"]')?.getAttribute('aria-expanded'),
+  panelVisible: !document.querySelector('#escena-e26 [data-mkt-panel="campanas"]')?.hidden,
+  chip: document.querySelector('#escena-e26 [data-mkt-demo="campana-local"]')?.getAttribute('aria-pressed'),
+}));
+check('7M-D P0-04: el área abre información y selecciona su caso (cambio visual)', areaState.expanded === 'true' && areaState.panelVisible && areaState.chip === 'true', JSON.stringify(areaState));
+await clickJs('#escena-e26 [data-mkt-run]');
+await page.waitForFunction(() => (document.querySelector('#escena-e26 [data-mkt-result]')?.textContent ?? '').length > 5, null, { timeout: 12000 }).catch(() => {});
+check('7M-D P0-04: los escenarios siguen ejecutables', (await page.evaluate(() => document.querySelector('#escena-e26 [data-mkt-result]')?.textContent ?? '')).length > 5);
+
+// axe en rutas eficiencia y exploración + tras abrir controles interactivos
+for (const r of ['efficiency', 'explorer']) {
+  const ap = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  await ap.goto(BASE, { waitUntil: 'networkidle', timeout: 60000 });
+  await ap.waitForTimeout(2200);
+  for (let att = 0; att < 3; att++) {
+    await ap.evaluate((rr) => { window.__publiaLastProgrammaticScroll = Date.now(); window.scrollTo(0, 0); }, r);
+    await ap.evaluate((rr) => document.querySelector(`[data-route-choice="${rr}"]`)?.click(), r);
+    try { await ap.waitForFunction((rr) => document.documentElement.dataset.act === rr, r, { timeout: 30000 }); break; } catch { await ap.waitForTimeout(1500); }
+  }
+  await ap.evaluate(() => document.querySelector('#escena-e22')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
+  await ap.waitForFunction((s2) => document.querySelector(s2)?.dataset.bound === '1', '[data-demo="housing"]', { timeout: 30000 }).catch(() => {});
+  await ap.evaluate(() => document.querySelector('#escena-e22 [data-housing-mode="privado"]')?.click());
+  await ap.evaluate(() => document.querySelector('#escena-e26')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
+  await ap.waitForFunction((s2) => document.querySelector(s2)?.dataset.bound === '1', '[data-demo="marketing"]', { timeout: 30000 }).catch(() => {});
+  await ap.evaluate(() => document.querySelector('#escena-e26 [data-mkt-area="redes"]')?.click());
+  await ap.waitForTimeout(600);
+  await ap.addScriptTag({ content: axeSource });
+  const axeR = await ap.evaluate(async () => {
+    const run = await window.axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'best-practice'] } });
+    return run.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical' || v.impact === 'moderate').map((v) => `${v.id}×${v.nodes.length}`);
+  });
+  check(`7M-D axe ruta ${r} tras abrir controles: sin violaciones graves/moderadas`, axeR.length === 0, axeR.join(', ') || '0');
+  await ap.close();
+}
 
 // --- cierre ---------------------------------------------------------------------
 await page.screenshot({ path: `${OUT}/13-cierre.png` });

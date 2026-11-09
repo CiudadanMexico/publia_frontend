@@ -47,6 +47,7 @@ const racks = [rack(0, 'NODE / 01', 'PUBLIA · RTX / AI'), rack(1, 'NODE / 02', 
       </div>
       <div class="housing__actions">
         <button class="housing__btn housing__btn--primary" type="button" data-housing-play>▶ Simular tráfico</button>
+        <span class="housing__scope">Animación ilustrativa: no simula cargas, solicitudes ni rendimiento real</span>
         <button class="housing__btn" type="button" data-housing-pause disabled>Ⅱ Pausar</button>
         <button class="housing__btn" type="button" data-housing-reset>↺ Restablecer</button>
         <button class="housing__btn" type="button" data-housing-copy>⧉ Copiar resumen</button>
@@ -78,7 +79,8 @@ const racks = [rack(0, 'NODE / 01', 'PUBLIA · RTX / AI'), rack(1, 'NODE / 02', 
     <img src="/assets/a08/A08_nucleo.svg" alt="" class="housing__centerbrand" aria-hidden="true" />
     <span class="housing__caption">ARRASTRA PARA ORBITAR · HAZ CLIC EN UN NODO</span>
   </div>
-  <p class="housing__disclaimer">{HOUSING_DISCLAIMER} {scene.id === 'E22' ? '' : ''}</p>
+  <div class="housing__metrics" data-housing-metrics hidden aria-label="Panel de métricas (pendiente)"></div>
+  <p class="housing__disclaimer">{HOUSING_DISCLAIMER} Panel de métricas (solicitudes, capacidad disponible, utilización, cola): interfaz preparada en <code>data-housing-metrics</code>, sin backend ni datos reales por ahora.</p>
 </div>
 
 <style>
@@ -219,6 +221,8 @@ const racks = [rack(0, 'NODE / 01', 'PUBLIA · RTX / AI'), rack(1, 'NODE / 02', 
   .housing__service-light { position: absolute; right: 3%; top: 12%; font-size: 11px; color: #6df2df; letter-spacing: 0.14em; font-weight: 800; }
   .housing__service-light::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 7px; background: #6df2df; box-shadow: 0 0 13px #6df2df; }
   .housing__disclaimer { grid-column: 1 / -1; color: #a3bdd7; font-size: 11px; margin: 6px 0 0; }
+  .housing__scope { font-size: 10px; color: #8fb8d8; align-self: center; }
+  .housing__metrics { grid-column: 1 / -1; }
 
   @keyframes housing-led { to { opacity: 0.2; } }
   @keyframes housing-dash { to { stroke-dashoffset: -105; } }

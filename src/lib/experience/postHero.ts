@@ -2,7 +2,8 @@
  * V4-B: interacciones post-hero — mosaico de soluciones seleccionable (E25)
  * y cierre personalizado con recomendación según ruta + respuestas (E29).
  */
-import { getState, setAnswer } from './state';
+import { getState, setAnswer, CAPABILITY_IDS } from './state';
+import { INFRA_LABEL } from './cierre';
 import { buildSummary } from './cierre'; // única fuente del resumen compartido
 import { track } from './events';
 /** Contrato mínimo del universo 3D que usan estas interacciones. */
@@ -30,35 +31,53 @@ function renderRecommendation(): void {
   const escala = state.answers.escala;
   const servicio = state.answers.servicio;
 
+  // P0-03: la lista visible se construye desde el ESTADO completo, no sólo la ruta.
+  // Prioridad: lo que el visitante eligió/modificó explícitamente; la ruta sólo orienta
+  // cuando aún no hay decisiones.
   const items: { tag: string; title: string; body: string }[] = [];
-  if (route === 'enterprise') {
-    items.push(
-      { tag: 'Infraestructura', title: 'Housing: tu propio nodo administrado', body: 'Servidores propios con administración incluida; decide privado o compartido al platicarlo.' },
-      { tag: 'Agentes', title: 'Agentes de IA con aprobación humana', body: 'Cada acción de un agente espera tu visto bueno. Nada se ejecuta solo.' },
-      { tag: 'Operación', title: 'Cobertura humana en horario definido', body: 'Ventana de atención real, no un bot que simula responder.' },
-    );
-  } else if (route === 'efficiency') {
-    const focoTxt = foco ? FOCO_LABEL[foco] ?? 'tu área de foco' : 'lo que más te quita tiempo';
-    items.push(
-      { tag: 'Automatización', title: `Empieza por ${focoTxt}`, body: 'Un flujo de atención real: mensaje → clasificación → persona → seguimiento.' },
-      { tag: 'Personas + IA', title: 'La IA ayuda, las personas deciden', body: 'Asistencia automatizada con escalación a humanos con criterio.' },
-    );
-    if (escala === 'solo' || escala === 'equipo_pequeno') {
-      items.push({ tag: 'Membresía', title: 'Empieza con BASE', body: 'Capacidad compartida para arrancar sin contratarlo todo.' });
+  const capNames = CAPABILITY_IDS.filter((c) => state.capabilities.includes(c)).map((c) => c.toUpperCase());
+  if (capNames.length) {
+    items.push({ tag: 'Elegiste', title: `Tus ${capNames.length} capacidad(es)`, body: `Añadiste: ${capNames.join(', ')}. Puedes quitarlas o sumar otras en las tarjetas de arriba.` });
+  }
+  if (state.membership) {
+    items.push({ tag: 'Tu selección', title: `Membresía ${state.membership.toUpperCase()}`, body: 'La elegiste tú en E27; la recomendación del diagnóstico no la reemplaza.' });
+  }
+  if (state.infra) {
+    items.push({ tag: 'Infraestructura', title: INFRA_LABEL[state.infra] ?? state.infra, body: state.infra === 'housing' ? 'Explora la modalidad compartida o privada en E22.' : 'Preferencia guardada de tu recorrido.' });
+  }
+  if (state.housingMode) {
+    items.push({ tag: 'Housing', title: state.housingMode === 'privado' ? 'Modalidad privada (100% dedicada)' : 'Modalidad compartida (50/25/25)', body: 'Elegida en E22; sin elegirla no se asume contratación.' });
+  }
+  if (state.red) {
+    items.push({ tag: 'Red colaborativa', title: `Capacidad de red: ${state.red}`, body: 'Seleccionada en E15; sobrevive a las demostraciones.' });
+  }
+  if (state.answers.servicio) {
+    items.push({ tag: 'Servicio explorado', title: state.answers.servicio, body: 'Elegido en el ecosistema (E25).' });
+  }
+  if (!items.length) {
+    // Sin decisiones previas: la ruta orienta (GeoNodos ya no tiene protagonismo en exploración)
+    if (route === 'enterprise') {
+      items.push(
+        { tag: 'Infraestructura', title: 'Housing: tu propio nodo administrado', body: 'Modalidad compartida o privada según lo que necesites; sin elegirla no se asume.' },
+        { tag: 'Agentes', title: 'Agentes de IA con aprobación humana', body: 'Cada acción de un agente espera tu visto bueno. Nada se ejecuta solo.' },
+      );
+    } else if (route === 'efficiency') {
+      const focoTxt = foco ? FOCO_LABEL[foco] ?? 'tu área de foco' : 'lo que más te quita tiempo';
+      items.push(
+        { tag: 'Automatización', title: `Empieza por ${focoTxt}`, body: 'Un flujo de atención real: mensaje → clasificación → persona → seguimiento.' },
+        { tag: 'Personas + IA', title: 'La IA ayuda, las personas deciden', body: 'Asistencia automatizada con escalación a humanos con criterio.' },
+      );
+    } else if (route === 'explorer') {
+      items.push(
+        { tag: 'Comunidad', title: 'Red colaborativa: ideas que crecen en red', body: 'Comparte herramientas y conocimiento con tu comunidad (E15).' },
+        { tag: 'Plataforma', title: 'Tecnología con tus datos bajo tu control', body: 'Explora Ciudadan como contexto abierto del cooperativismo.' },
+      );
     } else {
-      items.push({ tag: 'Membresía', title: 'Crece según tu operación', body: 'CRECIMIENTO u OPERACIÓN cuando la ventana de atención lo pida.' });
+      items.push(
+        { tag: 'Conversación', title: 'Hablemos de tu negocio', body: 'Sin cuestionario obligatorio: escríbenos y armamos el siguiente paso contigo.' },
+        { tag: 'Explora', title: 'Recorre las tres rutas', body: 'Empresa, eficiencia o exploración libre: elige por dónde entrar.' },
+      );
     }
-  } else if (route === 'explorer') {
-    items.push(
-      { tag: 'Comunidad', title: 'GeoNodos: una idea crece en red', body: 'Comunidades que comparten herramientas, conocimiento y capacidad de producción.' },
-      { tag: 'Plataforma', title: 'Ciudadan da contexto al cooperativismo', body: 'Tecnología abierta con datos bajo control de quien la usa.' },
-      { tag: 'Economía', title: 'Consumo y producción en común', body: 'Servicios compartidos sin intermediarios que encarecen.' },
-    );
-  } else {
-    items.push(
-      { tag: 'Conversación', title: 'Hablemos de tu negocio', body: 'Sin cuestionario obligatorio: escríbenos y armamos el siguiente paso contigo.' },
-      { tag: 'Explora', title: 'Recorre las tres rutas', body: 'Empresa, eficiencia o exploración libre: elige por dónde entrar.' },
-    );
   }
   items.push({ tag: 'Contacto', title: 'hola@publia.mx · WhatsApp 55 73 72 46 60', body: 'Respuesta humana, sin formularios que nadie lee.' });
 

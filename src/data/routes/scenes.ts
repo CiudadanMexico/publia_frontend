@@ -725,7 +725,7 @@ const SCENES_RAW: SceneDefinition[] = [
     lead: 'También hay un mundo fuera de la pantalla.',
     body: 'Eventos y activaciones, producción audiovisual, casting, influencers, imprenta y maquila, publicidad tradicional y el programa experimental de Ciudadan.',
     purpose: 'Mostrar la amplitud real del oferta sin mezclarlo con las membresías.',
-    modules: ['catalog', 'marketingDemo'],
+    modules: ['marketingDemo'],
     segments: [],
     route: 'shared',
     duration: 2,

@@ -89,6 +89,9 @@ export function bindRed(universe: RedUniverse | null): void {
     const d = RED_DEMOS[caseIndex];
     if (!d || !elResult) return;
     if (runBtn) runBtn.disabled = true;
+    // P0-01: la demo enfoca nodos sólo visualmente (persist=false);
+    // state.red conserva la capacidad elegida por el visitante.
+    const restore = selected;
     toast(`⚡ Simulación visual: ${d.title}`);
     const delay = reduced ? 75 : 850;
     d.path.forEach((nodeIdx, step) => {
@@ -100,7 +103,7 @@ export function bindRed(universe: RedUniverse | null): void {
           const wire = wires[nodeIdx];
           node?.classList.add('is-running');
           wire?.classList.add('is-live');
-          choose(nodeIdx);
+          choose(nodeIdx, false);
           if (elResult) elResult.textContent = `${step + 1}/3 · ${d.labels[step] ?? ''}`;
           universe?.cardPulse(nodeIdx);
         }, step * delay),
@@ -110,6 +113,7 @@ export function bindRed(universe: RedUniverse | null): void {
       window.setTimeout(() => {
         if (elResult) elResult.textContent = d.text;
         stopRun();
+        choose(restore, false); // restaurar el foco visual a la capacidad elegida
         if (elResult) elResult.textContent = d.text;
         track('red_demo_run', { demo: d.id }); // fin de la demo: un evento por acción completada
       }, d.path.length * delay + (reduced ? 80 : 900)),

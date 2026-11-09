@@ -18,15 +18,21 @@ void scene;
 
 <div class="mkt" data-demo="marketing">
   <div class="mkt__areas" role="group" aria-label="Áreas del estudio multimedia">
-    {MARKETING_AREAS.map((a) => (
-      <article class="mkt__area" data-mkt-area={a.id}>
-        <span class="mkt__area-icon" aria-hidden="true">{a.icon}</span>
-        <h3 class="mkt__area-title">{a.name}</h3>
-        <p>{a.desc}</p>
-        <div class="mkt__art" data-mkt-art={a.id}>
-          <img src={a.art} alt="" loading="lazy" aria-hidden="true" onerror="this.closest('[data-mkt-art]')?.classList.add('is-missing')" />
+    {MARKETING_AREAS.map((a, i) => (
+      <div class="mkt__area-wrap">
+        <button type="button" class="mkt__area" data-mkt-area={a.id} aria-expanded="false" aria-controls={`mkt-panel-${a.id}`}>
+          <span class="mkt__area-icon" aria-hidden="true">{a.icon}</span>
+          <span class="mkt__area-title">{a.name}</span>
+          <span class="mkt__area-caret" aria-hidden="true">▾</span>
+        </button>
+        <div class="mkt__panel" id={`mkt-panel-${a.id}`} data-mkt-panel={a.id} hidden>
+          <p>{a.desc}</p>
+          <div class="mkt__art" data-mkt-art={a.id}>
+            <img src={a.art} alt="" loading="lazy" aria-hidden="true" onerror="this.closest('[data-mkt-art]')?.classList.add('is-missing')" />
+          </div>
+          <p class="mkt__panel-note">Recurso A06: <code>{a.art}</code> (pendiente del paquete; el bloque se mantiene sin él)</p>
         </div>
-      </article>
+      </div>
     ))}
   </div>
   <div class="mkt__demos">
@@ -49,10 +55,17 @@ void scene;
 <style>
   .mkt { display: grid; gap: 22px; }
   .mkt__areas { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
-  .mkt__area { border: 1px solid rgba(167, 139, 250, 0.35); border-radius: 16px; padding: 14px; background: rgba(30, 20, 60, 0.35); }
+  .mkt__area-wrap { border: 1px solid rgba(167, 139, 250, 0.35); border-radius: 16px; background: rgba(30, 20, 60, 0.35); overflow: hidden; }
+  .mkt__area { display: flex; align-items: center; gap: 10px; width: 100%; border: 0; background: transparent; color: #e6defc; padding: 14px; cursor: pointer; text-align: left; font: inherit; }
+  .mkt__area[aria-expanded='true'], .mkt__area.is-active { background: rgba(167, 139, 250, 0.18); }
   .mkt__area-icon { font-size: 22px; }
-  .mkt__area-title { margin: 8px 0 4px; font-size: 13px; letter-spacing: 0.02em; }
-  .mkt__area p { margin: 0; font-size: 11px; color: #c9bdf0; line-height: 1.45; }
+  .mkt__area-title { flex: 1; font-size: 13px; font-weight: 800; letter-spacing: 0.02em; }
+  .mkt__area-caret { transition: transform 0.2s; }
+  .mkt__area[aria-expanded='true'] .mkt__area-caret { transform: rotate(180deg); }
+  .mkt__panel { padding: 0 14px 14px; }
+  .mkt__panel p { margin: 0 0 8px; font-size: 11px; color: #c9bdf0; line-height: 1.45; }
+  .mkt__panel-note { font-size: 10px; color: #8f83c0; }
+  .mkt__panel-note code { color: #b9a8f5; }
   .mkt__art { margin-top: 10px; border-radius: 10px; overflow: hidden; background: rgba(10, 6, 26, 0.6); min-height: 54px; display: grid; place-items: center; }
   .mkt__art img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .mkt__art.is-missing img { display: none; }
