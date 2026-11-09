@@ -4,6 +4,7 @@
  * pulsos, y persistencia de la preferencia en state.infra.
  */
 import { INFRA_MODES } from '../../data/infra';
+import type { InfraPreference } from './state';
 import { setInfraPreference, getState } from './state';
 import { track } from './events';
 
@@ -45,7 +46,7 @@ function bindOne(wrap: HTMLElement, universe: InfraUniverse | null): void {
     toastTimer = window.setTimeout(() => elToast.classList.remove('visible'), 2200);
   };
 
-  const select = (id: string): void => {
+  const render = (id: string): void => {
     const mode = INFRA_MODES.find((m) => m.id === id);
     if (!mode) return;
     modeBtns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.infra2Mode === id)));
@@ -53,7 +54,6 @@ function bindOne(wrap: HTMLElement, universe: InfraUniverse | null): void {
     if (elDesc) elDesc.textContent = mode.description;
     if (elBenefits) elBenefits.innerHTML = mode.benefits.map((b) => `<li>${b}</li>`).join('');
     if (elLimits) elLimits.innerHTML = mode.limitations.map((l) => `<li>${l}</li>`).join('');
-    setInfraPreference(mode.id);
     universe?.setSceneLook({
       tintHex: mode.tintHex,
       tintMix: 0.55,
@@ -63,7 +63,12 @@ function bindOne(wrap: HTMLElement, universe: InfraUniverse | null): void {
       ...mode.cam,
     });
     universe?.cardPulse(INFRA_MODES.indexOf(mode));
-    track('infra_selected', { modo: mode.id });
+  };
+  // Selección explícita: renderiza Y persiste la preferencia.
+  const select = (id: string): void => {
+    render(id);
+    setInfraPreference(id as InfraPreference);
+    track('infra_selected', { modo: id });
   };
 
   modeBtns.forEach((b) => b.addEventListener('click', () => select(b.dataset.infra2Mode ?? 'ia_privada')));
@@ -90,5 +95,6 @@ function bindOne(wrap: HTMLElement, universe: InfraUniverse | null): void {
     track('infra_red_activated', {});
   });
 
-  select(getState().infra ?? 'ia_privada');
+  // Default visual sin persistir; preferencia previa se restaura sin reescribir.
+  render(getState().infra ?? 'ia_privada');
 }

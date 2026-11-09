@@ -1,0 +1,250 @@
+---
+/**
+ * A08 Housing (E22): comparación interactiva compartido vs privado.
+ * Portado nativo desde PUBLIA_A08_HOUSING..._V1 (sin iframe): 3 racks
+ * transformables por CSS 3D, segmentos 50/25/25 vs 100%, demo de tráfico,
+ * persistencia en state.housingMode (campo nuevo, distinto de `infra`).
+ * Sin precios confirmados ni textos dentro de los SVG.
+ */
+import type { ResolvedScene } from '../../../lib/experience/graph';
+import { HOUSING_PLANS, HOUSING_DISCLAIMER } from '../../../data/housing';
+
+interface Props {
+  scene: ResolvedScene;
+}
+
+const { scene } = Astro.props;
+const compartido = HOUSING_PLANS.compartido;
+const privado = HOUSING_PLANS.privado;
+
+const rack = (i: number, title: string, foot: string) => ({ i, title, foot });
+const racks = [rack(0, 'NODE / 01', 'PUBLIA · RTX / AI'), rack(1, 'NODE / 02', 'PUBLIA · RED'), rack(2, 'NODE / 03', 'PUBLIA · MEMBERS')];
+---
+
+<div class="housing" data-demo="housing" data-a08>
+  <div class="housing__panel">
+    <div class="housing__glass">
+      <div class="housing__glass-top">
+        <h3 data-housing-title>{compartido.title}</h3>
+        <span class="housing__pill">COMPARACIÓN</span>
+      </div>
+      <p data-housing-desc>{compartido.text}</p>
+      <div class="housing__segments" data-housing-segments aria-label="Distribución porcentual de la capacidad">
+        {compartido.distribution.map((d) => <span class={`housing__seg housing__seg--${d.tone}`} style={`width:${d.porcentaje}%`} />)}
+      </div>
+      <div class="housing__legend" data-housing-legend>
+        {compartido.distribution.map((d) => (
+          <div class="housing__legend-row">
+            <span><i class={`housing__dot housing__dot--${d.tone}`} />{d.actor}</span>
+            <b>{d.porcentaje}%</b>
+          </div>
+        ))}
+      </div>
+      <p class="housing__note" data-housing-note>{compartido.note}</p>
+      <div class="housing__selector" role="group" aria-label="Elegir modalidad de Housing">
+        <button class="housing__mode" type="button" data-housing-mode="compartido" aria-pressed="true">{compartido.label}</button>
+        <button class="housing__mode" type="button" data-housing-mode="privado" aria-pressed="false">{privado.label}</button>
+      </div>
+      <div class="housing__actions">
+        <button class="housing__btn housing__btn--primary" type="button" data-housing-play>▶ Simular tráfico</button>
+        <button class="housing__btn" type="button" data-housing-pause disabled>Ⅱ Pausar</button>
+        <button class="housing__btn" type="button" data-housing-reset>↺ Restablecer</button>
+        <button class="housing__btn" type="button" data-housing-copy>⧉ Copiar resumen</button>
+      </div>
+      <p class="housing__status" data-housing-status role="status" aria-live="polite">Selecciona una modalidad para explorarla.</p>
+    </div>
+  </div>
+
+  <div class="housing__stage" data-housing-stage data-mode="compartido" data-demo-state="off" aria-label="Escena de servidores transformables: compartido agrupa tres nodos; privado concentra uno">
+    <span class="housing__service-light">SISTEMA ILUSTRATIVO</span>
+    <img class="housing__rings" src="/assets/a08/A08_anillos.svg" alt="" aria-hidden="true" />
+    <div class="housing__platform" aria-hidden="true" />
+    <div class="housing__shield" aria-hidden="true" />
+    <svg class="housing__links" viewBox="0 0 800 590" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M350 410 C 355 320, 375 285, 465 250" />
+      <path class="housing__links-yellow" d="M335 415 Q 470 410, 515 460" />
+      <path d="M468 250 Q 540 270, 515 460" />
+    </svg>
+    <div class="housing__hardware" data-housing-hardware>
+      {racks.map((r) => (
+        <button class="housing__rack" data-housing-rack={String(r.i)} type="button" aria-label={`Inspeccionar nodo ${r.i + 1}`}>
+          <span class="housing__rack-title">{r.title}</span>
+          {Array.from({ length: 10 }).map(() => <span class="housing__slot" />)}
+          <span class="housing__rack-foot">{r.foot}</span>
+        </button>
+      ))}
+    </div>
+    <img src="/assets/a08/A08_nucleo.svg" alt="" class="housing__centerbrand" aria-hidden="true" />
+    <span class="housing__caption">ARRASTRA PARA ORBITAR · HAZ CLIC EN UN NODO</span>
+  </div>
+  <p class="housing__disclaimer">{HOUSING_DISCLAIMER} {scene.id === 'E22' ? '' : ''}</p>
+</div>
+
+<style>
+  .housing {
+    --h-navy: #030d21;
+    --h-cyan: #5ce7fa;
+    --h-yellow: #ffd64d;
+    --h-paper: #eff8ff;
+    display: grid;
+    grid-template-columns: minmax(320px, 0.9fr) minmax(420px, 1.1fr);
+    gap: 28px;
+    align-items: center;
+    position: relative;
+    isolation: isolate;
+    border-radius: 24px;
+    padding: clamp(18px, 3vw, 40px);
+    color: var(--h-paper);
+    background:
+      radial-gradient(ellipse 75% 80% at 78% 47%, #0d3d67 0%, transparent 67%),
+      #020919;
+  }
+  .housing::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    border-radius: 24px;
+    background-image: url('/assets/a08/A08_fondo_blueprint.svg');
+    background-size: cover;
+    opacity: 0.9;
+  }
+  .housing::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    border-radius: 24px;
+    background: linear-gradient(100deg, rgba(2, 9, 24, 0.63), transparent 70%);
+  }
+  .housing__glass {
+    max-width: 590px;
+    border: 1px solid #70e9ef43;
+    border-radius: 20px;
+    padding: 22px 24px;
+    background: linear-gradient(130deg, #0c284bbf, #07162dd4);
+    box-shadow: 0 20px 48px #0005;
+  }
+  .housing__glass-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .housing__glass h3 { font-size: 24px; letter-spacing: -0.04em; margin: 0; }
+  .housing__pill { font-size: 10px; color: #8ff6d9; border: 1px solid #78ecbb70; border-radius: 100px; padding: 5px 8px; white-space: nowrap; }
+  .housing__glass p { color: #c3d8ee; line-height: 1.5; font-size: 13px; }
+  .housing__segments { display: flex; gap: 8px; margin: 17px 0 12px; }
+  .housing__seg { height: 12px; border-radius: 5px; min-width: 0; box-shadow: 0 0 14px currentColor; transition: width 0.6s ease; }
+  .housing__seg--c { background: #ffd34a; color: #ffd34a; }
+  .housing__seg--s { background: #61e4f4; color: #61e4f4; }
+  .housing__seg--m { background: #fd7a95; color: #fd7a95; }
+  .housing__legend { display: grid; gap: 7px; }
+  .housing__legend-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #cedfec; }
+  .housing__legend-row b { font-variant-numeric: tabular-nums; color: #fff; }
+  .housing__legend-row span { display: flex; align-items: center; gap: 8px; }
+  .housing__dot { display: inline-block; border-radius: 50%; width: 8px; height: 8px; }
+  .housing__dot--c { background: #ffd34a; }
+  .housing__dot--s { background: #61e4f4; }
+  .housing__dot--m { background: #fd7a95; }
+  .housing__note { color: #a3bdd7; font-size: 10px; margin-top: 12px; }
+  .housing__selector { margin-top: 18px; display: flex; gap: 10px; flex-wrap: wrap; }
+  .housing__mode {
+    border: 1px solid #70d6f26f; background: #0724489e; color: #e1f5ff;
+    padding: 14px 19px; border-radius: 14px; font-size: 12px; letter-spacing: 0.06em;
+    cursor: pointer; font-weight: 900; transition: 0.24s;
+  }
+  .housing__mode[aria-pressed='true'] { border-color: #ffe282; background: var(--h-yellow); color: #071830; box-shadow: 0 0 24px #ffc74d36; }
+  .housing__mode:hover { transform: translateY(-2px); }
+  .housing__actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 22px; }
+  .housing__btn {
+    border-radius: 100px; padding: 12px 17px; font-size: 11px; letter-spacing: 0.055em;
+    font-weight: 900; cursor: pointer; background: transparent; border: 1px solid #8cdbf66b; color: #cceeff;
+  }
+  .housing__btn--primary { border-color: var(--h-yellow); background: var(--h-yellow); color: #072248; }
+  .housing__btn:disabled { opacity: 0.45; cursor: default; }
+  .housing__status { min-height: 22px; color: #9ffbe0; font-size: 12px; margin-top: 11px; font-weight: 700; }
+
+  .housing__stage { position: relative; height: 590px; perspective: 1050px; isolation: isolate; }
+  .housing__stage::before {
+    content: ''; position: absolute; inset: 10% 2% 0; pointer-events: none;
+    background: radial-gradient(ellipse 58% 39% at 48% 65%, #19affb38, transparent 85%);
+  }
+  .housing__rings { position: absolute; inset: 0; margin: auto; width: 96%; height: 96%; object-fit: contain; opacity: 0.75; animation: housing-spin 48s linear infinite; pointer-events: none; }
+  .housing__platform {
+    position: absolute; left: 11%; right: 11%; bottom: 8%; height: 170px;
+    border: 1px solid #43cfff76; border-radius: 50%; transform: rotateX(65deg);
+    background: radial-gradient(ellipse, #1ac7e04c 0%, #07152ad0 69%, transparent);
+    box-shadow: 0 0 60px #0780eb70, inset 0 0 35px #66edfa44;
+  }
+  .housing__platform::before { content: ''; position: absolute; inset: 13px; border: 3px dotted #55d3fd99; border-radius: 50%; }
+  .housing__hardware { position: absolute; inset: 14% 0 3%; transform-style: preserve-3d; transform: rotateY(var(--orbit, 0deg)) rotateX(-2deg); transition: transform 0.6s; }
+  .housing__rack {
+    display: block; text-align: left; position: absolute; width: 166px; height: 310px;
+    left: 50%; top: 41%; border: 1px solid #5cceefad; border-radius: 11px; cursor: pointer; overflow: hidden;
+    background: linear-gradient(130deg, #24557c, #071a32 35%, #051124 72%, #143a5d);
+    box-shadow: 19px 20px 4px #0006, 0 0 30px #008bfb46, inset -12px 0 19px #20baff21;
+    transform: translate(-50%, -50%) var(--placement);
+    transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s, opacity 0.5s;
+    padding: 20px 12px 14px; color: inherit; font: inherit;
+  }
+  .housing__rack::before { content: ''; position: absolute; inset: 0 auto 0 0; width: 9px; background: linear-gradient(#4bfaff, #123047, #4bfaff); opacity: 0.55; }
+  .housing__rack::after { content: ''; position: absolute; inset: 0 0 auto; height: 5px; background: linear-gradient(90deg, transparent, #ffdb4d, #45ddff, transparent); }
+  .housing__rack-title { display: block; font-size: 10px; letter-spacing: 0.2em; font-weight: 900; color: #ffc94d; margin-bottom: 16px; }
+  .housing__slot { display: block; height: 17px; border: 1px solid #3697ba88; background: linear-gradient(90deg, #07182c 0%, #133757 75%, #07182c); border-radius: 3px; margin-bottom: 7px; position: relative; }
+  .housing__slot::before { content: ''; position: absolute; left: 8px; top: 5px; background: #5cfde2; width: 6px; height: 6px; border-radius: 50%; box-shadow: 0 0 8px #55eafa; animation: housing-led 2.6s infinite alternate; }
+  .housing__slot::after { content: ''; position: absolute; right: 12px; top: 6px; width: 52%; height: 4px; background: repeating-linear-gradient(90deg, #4bc3ed 0 4px, transparent 4px 9px); opacity: 0.75; }
+  .housing__rack-foot { display: block; color: #beeefa; opacity: 0.7; font-size: 8px; letter-spacing: 0.11em; }
+  .housing__rack:hover, .housing__rack:focus-visible { box-shadow: 0 0 36px #5dfff9a6; outline: 2px solid #ffd34a; outline-offset: 3px; }
+  .housing__rack[data-housing-rack='0'] { z-index: 3; }
+  .housing__rack[data-housing-rack='1'], .housing__rack[data-housing-rack='2'] { z-index: 2; }
+  .housing__rack:focus-visible { z-index: 9; }
+  .housing__stage[data-mode='compartido'] .housing__rack[data-housing-rack='0'] { --placement: translate3d(-136px, -2px, 110px) rotateY(-11deg); }
+  .housing__stage[data-mode='compartido'] .housing__rack[data-housing-rack='1'] { --placement: translate3d(31px, -58px, -60px) rotateY(13deg) scale(0.83); }
+  .housing__stage[data-mode='compartido'] .housing__rack[data-housing-rack='2'] { --placement: translate3d(120px, 38px, -110px) rotateY(22deg) scale(0.73); }
+  .housing__stage[data-mode='privado'] .housing__rack[data-housing-rack='0'] { --placement: translate3d(0px, -26px, 135px) rotateY(-3deg) scale(1.18); }
+  .housing__stage[data-mode='privado'] .housing__rack[data-housing-rack='1'] { --placement: translate3d(-265px, 60px, -150px) scale(0.52); opacity: 0.16; pointer-events: none; }
+  .housing__stage[data-mode='privado'] .housing__rack[data-housing-rack='2'] { --placement: translate3d(265px, 60px, -150px) scale(0.52); opacity: 0.16; pointer-events: none; }
+  .housing__centerbrand { position: absolute; top: 13%; left: 50%; width: 106px; transform: translateX(-50%); filter: drop-shadow(0 0 28px #ffc34f96); pointer-events: none; }
+  .housing__links { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .housing__links path { fill: none; stroke-width: 2; stroke-dasharray: 7 12; stroke: #62edfa; opacity: 0.6; animation: housing-dash 9s linear infinite; }
+  .housing__links-yellow { stroke: #ffd44b; }
+  .housing__stage[data-mode='privado'] .housing__links { opacity: 0.06; }
+  .housing__shield {
+    position: absolute; inset: 10% 13% 4%; border: 2px solid #ffe8a370; border-radius: 48%;
+    box-shadow: 0 0 50px #ffd44b2a, inset 0 0 50px #ffd44b18; opacity: 0; transform: scale(0.7); transition: 0.65s; pointer-events: none;
+  }
+  .housing__stage[data-mode='privado'] .housing__shield { opacity: 1; transform: scale(0.95); }
+  .housing__stage[data-demo-state='on'] .housing__links path { stroke-width: 4; opacity: 1; animation-duration: 1s; }
+  .housing__stage[data-demo-state='on'] .housing__platform { box-shadow: 0 0 100px #44edfa, inset 0 0 55px #51e6ff; }
+  .housing__stage[data-demo-state='on'] .housing__slot::before { animation-duration: 0.35s; }
+  .housing__caption { position: absolute; bottom: 0; left: 0; right: 0; text-align: center; letter-spacing: 0.16em; font-size: 10px; color: #90e2ff; font-weight: 900; }
+  .housing__service-light { position: absolute; right: 3%; top: 12%; font-size: 11px; color: #6df2df; letter-spacing: 0.14em; font-weight: 800; }
+  .housing__service-light::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 7px; background: #6df2df; box-shadow: 0 0 13px #6df2df; }
+  .housing__disclaimer { grid-column: 1 / -1; color: #a3bdd7; font-size: 11px; margin: 6px 0 0; }
+
+  @keyframes housing-led { to { opacity: 0.2; } }
+  @keyframes housing-dash { to { stroke-dashoffset: -105; } }
+  @keyframes housing-spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 1100px) {
+    .housing { grid-template-columns: 1fr; gap: 4px; }
+    .housing__stage { height: 490px; max-width: 790px; width: 100%; margin: auto; }
+  }
+  @media (max-width: 640px) {
+    .housing__glass { padding: 16px; }
+    .housing__glass h3 { font-size: 19px; }
+    .housing__stage { height: 400px; }
+    .housing__hardware { transform: scale(0.78) rotateY(var(--orbit, 0deg)); }
+    .housing__stage[data-mode='compartido'] .housing__rack[data-housing-rack='0'] { --placement: translate3d(-112px, 9px, 110px) rotateY(-11deg) scale(0.86); }
+    .housing__stage[data-mode='compartido'] .housing__rack[data-housing-rack='1'] { --placement: translate3d(32px, -40px, -60px) rotateY(13deg) scale(0.73); }
+    .housing__stage[data-mode='compartido'] .housing__rack[data-housing-rack='2'] { --placement: translate3d(110px, 42px, -110px) rotateY(22deg) scale(0.64); }
+    .housing__stage[data-mode='privado'] .housing__rack[data-housing-rack='0'] { --placement: translate3d(0px, -22px, 135px) scale(0.9); }
+    .housing__rack { height: 275px; width: 142px; }
+    .housing__slot { height: 15px; margin-bottom: 5px; }
+    .housing__centerbrand { width: 72px; top: 12%; }
+    .housing__service-light { top: 6%; font-size: 9px; }
+    .housing__mode { flex: 1 1 130px; }
+    .housing__caption { font-size: 8px; }
+    .housing__rings { opacity: 0.5; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .housing *, .housing *::before, .housing *::after { animation: none !important; transition: none !important; }
+  }
+</style>

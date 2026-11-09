@@ -37,6 +37,7 @@ export function buildSummary(): string {
     s.answers.servicio ? `- Servicio explorado: ${s.answers.servicio}` : null,
     s.red ? `- Red colaborativa: ${s.red}` : null,
     s.infra ? `- Infraestructura preferida: ${INFRA_LABEL[s.infra]}` : null,
+    s.housingMode ? `- Housing: modalidad ${s.housingMode === 'privado' ? 'privada (100% dedicada)' : 'compartida (50/25/25)'}` : null,
     s.membership ? `- Membresía orientativa: ${s.membership.toUpperCase()}` : null,
     capNames.length ? `- Capacidades elegidas: ${capNames.join(', ')}` : null,
     s.proposalTouched ? '- Propuesta modificada manualmente por el visitante' : null,

@@ -133,7 +133,7 @@ const priv = HOUSING_PLANS.find((p) => p.id === 'privado');
   .infra2__stage { display: grid; gap: 0.5rem; }
   .infra2__city { position: relative; height: 300px; border: 1px solid rgba(41, 149, 233, .35); border-radius: 1.1rem; overflow: hidden; background: radial-gradient(circle at 50% 45%, rgba(23, 72, 145, .35), rgba(3, 6, 23, .6) 75%); }
   .infra2__racks { position: absolute; inset: 0; }
-  .infra2__rack { position: absolute; left: 50%; top: 50%; width: 34px; height: 62px; transform: translate(calc(-50% + var(--rx) * 0.55px), calc(-50% + var(--ry) * 0.42px)); border: 1px solid rgba(41,149,233,.6); border-radius: 4px; background: linear-gradient(180deg, #07152a, #143c62 55%, #061222); padding: 3px 2px; transition: filter .3s; }
+  .infra2__rack { position: absolute; left: calc(50% + var(--rx) * 0.1); top: calc(50% + var(--ry) * 0.085); width: 34px; height: 62px; transform: translate(-50%, -50%); border: 1px solid rgba(41,149,233,.6); border-radius: 4px; background: linear-gradient(180deg, #07152a, #143c62 55%, #061222); padding: 3px 2px; transition: filter .3s; }
   .infra2__rack.is-on { filter: drop-shadow(0 0 23px #42f4ff); }
   .infra2__racknum { position: absolute; top: 1px; left: 3px; font-size: 6px; color: #ffdf52; letter-spacing: .05em; }
   .infra2__slots { display: grid; gap: 2px; margin-top: 8px; }

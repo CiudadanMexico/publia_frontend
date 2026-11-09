@@ -42,6 +42,14 @@ export const CAPABILITY_IDS: readonly CapabilityId[] = [
 /** Preferencia de infraestructura (Bloque A). */
 export type InfraPreference = 'ia_privada' | 'housing' | 'red_distribuida';
 
+export type HousingMode = 'compartido' | 'privado';
+
+export const HOUSING_MODES: readonly HousingMode[] = ['compartido', 'privado'];
+
+function isHousingMode(value: unknown): value is HousingMode {
+  return value === 'compartido' || value === 'privado';
+}
+
 export const INFRA_PREFERENCES: readonly InfraPreference[] = [
   'ia_privada',
   'housing',
@@ -97,6 +105,8 @@ export interface VisitorState {
   red: string | null;
   /** Cambios manuales a la propuesta hechos en el cierre. */
   proposalTouched: boolean;
+  /** Modalidad de Housing elegida en E22 (A08); null = sin elegir. Distinto de `infra`. */
+  housingMode: HousingMode | null;
 }
 
 export const ROUTES: readonly PrimaryRoute[] = [
@@ -136,6 +146,7 @@ function emptyState(): VisitorState {
     infra: null,
     red: null,
     proposalTouched: false,
+    housingMode: null,
   };
 }
 
@@ -204,6 +215,7 @@ function load(): VisitorState {
       infra: isInfra(candidate.infra) ? candidate.infra : null,
       red: typeof candidate.red === 'string' && candidate.red.trim() ? candidate.red : null,
       proposalTouched: candidate.proposalTouched === true,
+      housingMode: isHousingMode(candidate.housingMode) ? candidate.housingMode : null,
     };
   } catch {
     return emptyState();
@@ -363,6 +375,13 @@ export function setRedCapability(value: string | null): void {
   if (!clean) return;
   if (state.red === clean) return;
   commit({ ...state, red: clean, updatedAt: Date.now() });
+}
+
+/** Guarda la modalidad de Housing elegida en E22 (A08). */
+export function setHousingMode(mode: HousingMode | null): void {
+  if (mode !== null && !isHousingMode(mode)) return;
+  if (state.housingMode === mode) return;
+  commit({ ...state, housingMode: mode, updatedAt: Date.now() });
 }
 
 /** Marca que el visitante editó manualmente la propuesta en el cierre. */

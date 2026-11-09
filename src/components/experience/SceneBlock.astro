@@ -24,6 +24,7 @@ import GeoDemo from './modules/GeoDemo.astro';
 import RedDemo from './modules/RedDemo.astro';
 import PersonasDemo from './modules/PersonasDemo.astro';
 import MembershipsModule from './modules/MembershipsModule.astro';
+import HousingCompare from './modules/HousingCompare.astro';
 
 interface Props {
   scene: ResolvedScene;
@@ -96,6 +97,9 @@ const stageVariants = Object.fromEntries(
           }
           if (module === 'geoDemo') {
             return <GeoDemo scene={scene} />;
+          }
+          if (module === 'housingCompare') {
+            return <HousingCompare scene={scene} />;
           }
           if (module === 'plans' || module === 'catalog' || module === 'coverage') {
             return <CatalogModule scene={scene} />;

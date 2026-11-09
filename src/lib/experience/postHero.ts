@@ -2,7 +2,8 @@
  * V4-B: interacciones post-hero — mosaico de soluciones seleccionable (E25)
  * y cierre personalizado con recomendación según ruta + respuestas (E29).
  */
-import { getState, setAnswer, CAPABILITY_IDS } from './state';
+import { getState, setAnswer } from './state';
+import { buildSummary } from './cierre'; // única fuente del resumen compartido
 import { track } from './events';
 /** Contrato mínimo del universo 3D que usan estas interacciones. */
 export interface PostHeroUniverse {
@@ -70,29 +71,6 @@ function renderRecommendation(): void {
   const routeLabel = route === 'unclassified' ? 'sin ruta elegida aún' : route === 'enterprise' ? 'ruta Empresa' : route === 'efficiency' ? 'ruta Eficiencia' : 'exploración libre';
   status.textContent = `Tu recorrido: ${routeLabel}${foco ? ` · foco en ${FOCO_LABEL[foco]}` : ''}${escala ? ` · escala: ${escala.replace('_', ' ')}` : ''}${servicio ? ` · solución: ${servicio}` : ''}. Estos son los siguientes pasos que cuadran:`;
   track('recommendation_rendered', { route, foco: foco ?? '', escala: escala ?? '', servicio: servicio ?? '' });
-
-  // Copiar resumen (acción explícita del visitante, V2)
-  const copyBtn = root.querySelector<HTMLButtonElement>('[data-rec-copy]');
-  const copied = root.querySelector<HTMLElement>('[data-rec-copied]');
-  copyBtn?.addEventListener('click', async () => {
-    const lines = [
-      `Recorrido Publia.mx — ${routeLabel}`,
-      foco ? `- Foco: ${FOCO_LABEL[foco]}` : null,
-      escala ? `- Escala: ${escala.replace('_', ' ')}` : null,
-      servicio ? `- Solución elegida: ${servicio}` : null,
-      state.infra ? `- Infraestructura: ${state.infra}` : null,
-      state.membership ? `- Membresía orientativa: ${state.membership.toUpperCase()}` : null,
-      state.capabilities.length ? `- Capacidades: ${CAPABILITY_IDS.filter((c) => state.capabilities.includes(c)).join(', ')}` : null,
-      '- Contacto: hola@publia.mx · WhatsApp 55 73 72 46 60',
-    ].filter(Boolean) as string[];
-    try {
-      await navigator.clipboard.writeText(lines.join('\n'));
-      if (copied) copied.textContent = '✓ Resumen copiado al portapapeles.';
-      track('recommendation_copied', { route });
-    } catch {
-      if (copied) copied.textContent = 'No se pudo copiar; selecciona y copia el texto de arriba.';
-    }
-  });
 }
 
 function bindSolutionsMosaic(universe: PostHeroUniverse | null): void {
@@ -118,9 +96,26 @@ function bindSolutionsMosaic(universe: PostHeroUniverse | null): void {
   });
 }
 
+let postHeroBound = false;
 export function bindPostHero(universe: PostHeroUniverse | null): void {
+  if (postHeroBound) return; // lazyBind puede llamarlo por dos selectores: una sola vez
+  postHeroBound = true;
   bindSolutionsMosaic(universe);
+  // Copiar (V2): listener único, y usa el MISMO buildSummary() del cierre V2,
+  // así copiar/TXT/WhatsApp/correo comparten exactamente el mismo resumen.
+  const root = document.querySelector('[data-recommendation]');
+  const copyBtn = root?.querySelector<HTMLButtonElement>('[data-rec-copy]');
+  const copied = root?.querySelector<HTMLElement>('[data-rec-copied]');
+  copyBtn?.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(buildSummary());
+      if (copied) copied.textContent = '✓ Resumen copiado al portapapeles.';
+      track('recommendation_copied', {});
+    } catch {
+      if (copied) copied.textContent = 'No se pudo copiar; usa el botón de descargar TXT.';
+    }
+  });
   renderRecommendation();
-  // re-render al cambiar de ruta (ej. volver y elegir otra)
+  // re-render al cambiar de ruta (ej. volver y elegir otra); el listener de copiar NO se re-adjunta
   window.addEventListener('publia:state', () => renderRecommendation());
 }

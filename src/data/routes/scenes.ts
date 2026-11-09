@@ -646,7 +646,7 @@ const SCENES_RAW: SceneDefinition[] = [
     lead: 'Infraestructura computacional administrada por Publia, con equipo que puede ser tuyo.',
     body: 'En la modalidad compartida, una parte de la capacidad es tuya y el resto circula entre la red. En la privada, la capacidad es exclusiva.',
     purpose: 'Explicar Housing con el reparto real, sin inventar cifras financieras.',
-    modules: ['distribution'],
+    modules: ['distribution', 'housingCompare'],
     segments: [],
     route: 'shared',
     duration: 2,

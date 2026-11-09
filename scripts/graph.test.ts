@@ -42,6 +42,7 @@ const baseState: VisitorState = {
   infra: null,
   red: null,
   proposalTouched: false,
+  housingMode: null,
 };
 
 const state = (patch: Partial<VisitorState>): VisitorState => ({ ...baseState, ...patch });

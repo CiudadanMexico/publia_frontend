@@ -48,7 +48,7 @@ export function bindMemberships(): void {
 
   const ORDER = ['base', 'agente', 'crecimiento', 'operacion', 'cobertura'];
 
-  const select = (slug: string): void => {
+  const render = (slug: string): void => {
     const plan = bySlug(slug);
     if (!plan) return;
     planBtns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.membPlan === slug)));
@@ -70,6 +70,12 @@ export function bindMemberships(): void {
       elWindow.style.display = plan.serviceWindow ? '' : 'none';
     }
     if (core) core.style.boxShadow = `0 10px 34px rgba(7,26,49,.25), 0 0 ${18 + upto.length * 8}px rgba(255, 209, 46, .55)`;
+  };
+  // Selección explícita del visitante: renderiza Y persiste.
+  const select = (slug: string): void => {
+    render(slug);
+    const plan = bySlug(slug);
+    if (!plan) return;
     setMembership(plan.slug as never);
     track('membership_selected', { membresia: plan.slug });
   };
@@ -96,10 +102,11 @@ export function bindMemberships(): void {
     elReco.textContent = goal === 'infrastructure'
       ? `💡 Recomendación orientativa: ${rec.name} como base, con Housing + asesoría (infraestructura: precio por cotizar).`
       : `💡 Recomendación orientativa: ${rec.name} · ${fmtPrice(rec.price)} · referencia, no es una oferta vinculante.`;
-    select(rec.slug);
+    render(rec.slug); // recomendación automática: solo visual, no persiste
     track('membership_diagnosis', { goal, team, recomendacion: rec.slug });
   });
 
-  select(getState().membership ?? 'base');
+  // Default visual BASE sin persistir; si el visitante ya eligió, se restaura sin reescribir.
+  render(getState().membership ?? 'base');
   wrap.dataset.bound = '1';
 }

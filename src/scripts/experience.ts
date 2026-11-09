@@ -792,6 +792,7 @@ export async function startExperience(): Promise<void> {
   lazyBind('[data-recommendation]', () => import('../lib/experience/cierre').then((m) => m.bindCierre(universe)));
   lazyBind('[data-demo="ecosystem"]', () => import('../lib/experience/postHero').then((m) => m.bindPostHero(universe)));
   lazyBind('[data-recommendation]', () => import('../lib/experience/postHero').then((m) => m.bindPostHero(universe)));
+  lazyBind('[data-demo="housing"]', () => import('../lib/experience/housing').then((m) => m.bindHousing()));
   let lastPortalKey = '';
   const drivePortal = (state: ReturnType<typeof getState>): void => {
     const heroElement = document.querySelector<HTMLElement>('[data-hero-scene]');

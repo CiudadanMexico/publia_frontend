@@ -3,7 +3,7 @@
  * flujo iluminado. Selección persiste en state.red; corre el demo con timers.
  */
 import { RED_CAPABILITIES, RED_DEMOS } from '../../data/red';
-import { setRedCapability } from './state';
+import { setRedCapability, getState } from './state';
 import { track } from './events';
 
 export interface RedUniverse {
@@ -49,7 +49,9 @@ export function bindRed(universe: RedUniverse | null): void {
     toastTimer = window.setTimeout(() => elToast.classList.remove('visible'), 2600);
   };
 
-  const choose = (i: number): void => {
+  // persist=false solo para el renderizado inicial (restaurar o default visual);
+  // las selecciones del visitante siempre persisten.
+  const choose = (i: number, persist = true): void => {
     selected = ((i % nodes.length) + nodes.length) % nodes.length;
     const c = RED_CAPABILITIES[selected];
     if (!c) return;
@@ -60,9 +62,11 @@ export function bindRed(universe: RedUniverse | null): void {
     if (elDesc) elDesc.textContent = c.desc;
     if (elInfo) elInfo.style.borderColor = c.color;
     if (elExample) elExample.hidden = true;
-    setRedCapability(c.id);
+    if (persist) {
+      setRedCapability(c.id);
+      track('red_capability_selected', { capacidad: c.id });
+    }
     universe?.cardPulse(selected);
-    track('red_capability_selected', { capacidad: c.id });
   };
 
   const setCase = (i: number): void => {
@@ -107,10 +111,10 @@ export function bindRed(universe: RedUniverse | null): void {
         if (elResult) elResult.textContent = d.text;
         stopRun();
         if (elResult) elResult.textContent = d.text;
-        track('red_demo_run', { demo: d.id });
+        track('red_demo_run', { demo: d.id }); // fin de la demo: un evento por acción completada
       }, d.path.length * delay + (reduced ? 80 : 900)),
     );
-    track('red_demo_run', { demo: d.id });
+    track('red_demo_start', { demo: d.id }); // inicio: evento separado
   };
 
   nodes.forEach((node, i) => node.addEventListener('click', () => choose(i)));
@@ -124,7 +128,10 @@ export function bindRed(universe: RedUniverse | null): void {
     toast(`Ejemplo de ${c.name.toLowerCase()}`);
   });
 
-  choose(0);
+  // Restaurar selección previa del estado; si no hay, default visual sin persistir.
+  const saved = getState().red;
+  const savedIdx = RED_CAPABILITIES.findIndex((c) => c.id === saved);
+  choose(savedIdx >= 0 ? savedIdx : 0, false);
   setCase(0);
   wrap.dataset.bound = '1';
 
