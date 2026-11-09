@@ -1,0 +1,72 @@
+---
+/**
+ * A06 Marketing y Multimedia (E26) — preparado para recibir recursos.
+ * No es tabla estática: áreas con demostraciones seleccionables; cada demo
+ * corre sus pasos y muestra resultado. Los recursos del paquete A06 entran
+ * por `art` (public/assets/a06/) sin reconstruir la escena.
+ */
+import type { ResolvedScene } from '../../../lib/experience/graph';
+import { MARKETING_AREAS, MARKETING_DEMOS } from '../../../data/marketing';
+
+interface Props {
+  scene: ResolvedScene;
+}
+
+const { scene } = Astro.props;
+void scene;
+---
+
+<div class="mkt" data-demo="marketing">
+  <div class="mkt__areas" role="group" aria-label="Áreas del estudio multimedia">
+    {MARKETING_AREAS.map((a) => (
+      <article class="mkt__area" data-mkt-area={a.id}>
+        <span class="mkt__area-icon" aria-hidden="true">{a.icon}</span>
+        <h4>{a.name}</h4>
+        <p>{a.desc}</p>
+        <div class="mkt__art" data-mkt-art={a.id}>
+          <img src={a.art} alt="" loading="lazy" aria-hidden="true" onerror="this.closest('[data-mkt-art]')?.classList.add('is-missing')" />
+        </div>
+      </article>
+    ))}
+  </div>
+  <div class="mkt__demos">
+    <div class="mkt__chips" role="group" aria-label="Demostraciones seleccionables">
+      {MARKETING_DEMOS.map((d, i) => (
+        <button type="button" class="mkt__chip" data-mkt-demo={d.id} aria-pressed={i === 0 ? 'true' : 'false'}>{d.title}</button>
+      ))}
+    </div>
+    <div class="mkt__player">
+      <ol class="mkt__steps" data-mkt-steps></ol>
+      <p class="mkt__result" data-mkt-result role="status" aria-live="polite"></p>
+      <div class="mkt__actions">
+        <button type="button" class="mkt__btn mkt__btn--primary" data-mkt-run>▶ Ejecutar demo</button>
+        <button type="button" class="mkt__btn" data-mkt-reset>↺ Reiniciar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .mkt { display: grid; gap: 22px; }
+  .mkt__areas { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+  .mkt__area { border: 1px solid rgba(167, 139, 250, 0.35); border-radius: 16px; padding: 14px; background: rgba(30, 20, 60, 0.35); }
+  .mkt__area-icon { font-size: 22px; }
+  .mkt__area h4 { margin: 8px 0 4px; font-size: 13px; letter-spacing: 0.02em; }
+  .mkt__area p { margin: 0; font-size: 11px; color: #c9bdf0; line-height: 1.45; }
+  .mkt__art { margin-top: 10px; border-radius: 10px; overflow: hidden; background: rgba(10, 6, 26, 0.6); min-height: 54px; display: grid; place-items: center; }
+  .mkt__art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .mkt__art.is-missing img { display: none; }
+  .mkt__art.is-missing::after { content: 'Recurso A06 pendiente'; font-size: 10px; color: #8f83c0; letter-spacing: 0.12em; }
+  .mkt__chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .mkt__chip { border: 1px solid rgba(167, 139, 250, 0.5); background: transparent; color: #e6defc; border-radius: 100px; padding: 9px 14px; font-size: 11px; font-weight: 700; cursor: pointer; }
+  .mkt__chip[aria-pressed='true'] { background: #a78bfa; color: #1b1038; border-color: #a78bfa; }
+  .mkt__player { border: 1px solid rgba(167, 139, 250, 0.3); border-radius: 16px; padding: 16px; background: rgba(24, 15, 50, 0.4); margin-top: 14px; }
+  .mkt__steps { margin: 0 0 10px; padding-left: 20px; display: grid; gap: 5px; font-size: 12px; color: #d9cff7; }
+  .mkt__steps li.is-on { color: #fff; font-weight: 700; }
+  .mkt__result { min-height: 20px; font-size: 12px; color: #b9f5d8; font-weight: 700; margin: 0 0 12px; }
+  .mkt__actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .mkt__btn { border-radius: 100px; padding: 10px 15px; font-size: 11px; font-weight: 800; cursor: pointer; background: transparent; border: 1px solid rgba(167, 139, 250, 0.5); color: #e6defc; }
+  .mkt__btn--primary { background: #a78bfa; border-color: #a78bfa; color: #1b1038; }
+  .mkt__btn:disabled { opacity: 0.45; cursor: default; }
+  @media (prefers-reduced-motion: reduce) { .mkt * { transition: none !important; animation: none !important; } }
+</style>
