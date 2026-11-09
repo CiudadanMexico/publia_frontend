@@ -5,7 +5,7 @@
  * cuando hay prefers-reduced-motion.
  */
 import { ECOSYSTEM_SERVICES } from '../../data/ecosystem';
-import { setAnswer } from './state';
+import { getState, setAnswer } from './state';
 import { track } from './events';
 
 export interface EcosystemUniverse {
@@ -49,7 +49,7 @@ export function bindEcosystem(universe: EcosystemUniverse | null): void {
     toastTimer = window.setTimeout(() => elToast.classList.remove('visible'), 2400);
   };
 
-  const select = (i: number): void => {
+  const select = (i: number, persist = true): void => {
     selected = ((i % nodes.length) + nodes.length) % nodes.length;
     const s = ECOSYSTEM_SERVICES[selected];
     if (!s) return;
@@ -69,7 +69,7 @@ export function bindEcosystem(universe: EcosystemUniverse | null): void {
     if (elExample) elExample.hidden = true;
     if (btnMore) btnMore.setAttribute('aria-expanded', 'false');
     if (elPanel) elPanel.style.borderColor = s.color;
-    setAnswer('servicio', s.title);
+    if (persist) setAnswer('servicio', s.title);
     universe?.cardPulse(selected);
     track('ecosystem_selected', { servicio: s.title });
   };
@@ -132,7 +132,11 @@ export function bindEcosystem(universe: EcosystemUniverse | null): void {
     if (ev.key === 'ArrowLeft' && !['BUTTON', 'INPUT', 'TEXTAREA'].includes(tag)) select(selected - 1);
   });
 
-  select(0);
+  // P0-01 7M-E: al iniciar se restaura la selección previa SIN persistir;
+  // sólo los clics del visitante (o next/play) escriben answers.servicio.
+  const prevServicio = getState().answers.servicio;
+  const initialIdx = Math.max(0, ECOSYSTEM_SERVICES.findIndex((sv) => sv.title === prevServicio));
+  select(initialIdx, false);
 
   // Órbita continua ligada al progreso de scroll de la escena (reversible).
   //Sólo corre mientras la órbita está cerca del viewport (sin costo en el hero).

@@ -484,7 +484,7 @@ const SCENES_RAW: SceneDefinition[] = [
     body: 'Explora las seis capacidades de la red, elige una y observa cómo colaboran entre sí.',
     purpose: 'Presentar la Red Colaborativa de Publia como ruta central de exploración.',
     modules: ['statement', 'redDemo'],
-    segments: ['cooperative', 'values'],
+    segments: ['cooperative', 'values', 'explorer'],
     route: 'explorer',
     duration: 2,
     transition: 'rise',
