@@ -692,8 +692,13 @@ if (resetRoute !== 'unclassified') {
   resetRoute = await page.evaluate(() => document.documentElement.dataset.route);
 }
 await pscroll(0);
-await page.waitForFunction(() => window.scrollY < 120, { timeout: 20000 }).catch(() => {});
-await scrollSettled();
+// a 2 FPS (swiftshader) el scroll al hero tarda; esperar por estado, no por sleep
+for (let att = 0; att < 3; att++) {
+  await page.waitForFunction(() => window.scrollY < 120, null, { timeout: 25000 }).catch(() => {});
+  if ((await page.evaluate(() => window.scrollY)) < 120) break;
+  await page.evaluate(() => window.scrollTo(0, 0));
+}
+await scrollSettled(30000);
 const reset = await page.evaluate((r) => ({
   route: r,
   scroll: window.scrollY,

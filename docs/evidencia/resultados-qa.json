@@ -1,7 +1,7 @@
 {
   "base": "https://dam-boulevard-explaining-alaska.trycloudflare.com",
-  "total": 178,
-  "fallos": 8,
+  "total": 179,
+  "fallos": 0,
   "resultados": [
     {
       "name": "carga inicial sin errores JS",
@@ -46,12 +46,12 @@
     {
       "name": "prisma: la escena 3D se renderiza y cambia (animación real)",
       "ok": true,
-      "detail": "667202 vs 683310 bytes"
+      "detail": "667202 vs 683065 bytes"
     },
     {
       "name": "prisma: pinta una fracción útil del viewport",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.20960802469135803}"
+      "detail": "{\"paintedRatio\":0.20937345679012345}"
     },
     {
       "name": "hero 3D: lienzo único presente con WebGL activo",
@@ -81,12 +81,12 @@
     {
       "name": "hero 3D: pinta la escena (mascota, prisma, tarjetas)",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.21225}"
+      "detail": "{\"paintedRatio\":0.2120625}"
     },
     {
       "name": "hero 3D: la animación ambiental cambia entre fotogramas",
       "ok": true,
-      "detail": "690631 vs 687960 bytes"
+      "detail": "689540 vs 690518 bytes"
     },
     {
       "name": "marca: el encabezado usa el logotipo oficial",
@@ -171,7 +171,7 @@
     {
       "name": "P0: el scroll conduce la cámara (scrub) hacia el mundo cooperativo",
       "ok": true,
-      "detail": "world=cooperative · cámara=[-0.016666666666666673,2.386932474721508,10.073908601542417] · scrollY=1400"
+      "detail": "world=cooperative · cámara=[-0.016666666666666673,2.340338474721508,9.868894601542417] · scrollY=1400"
     },
     {
       "name": "P0: tras elegir empresa, el scroll NO cambia a exploración",
@@ -271,7 +271,7 @@
     {
       "name": "ruta eficiencia: escena propia visible",
       "ok": true,
-      "detail": "1696px · route=efficiency act=efficiency world=efficiency scrollY=598"
+      "detail": "1696px · route=efficiency act=efficiency world=efficiency scrollY=582"
     },
     {
       "name": "ruta eficiencia: mensaje propio de la escena",
@@ -440,18 +440,18 @@
     },
     {
       "name": "accesibilidad: sin violaciones graves (axe wcag2aa)",
-      "ok": false,
-      "detail": "aria-prohibited-attr×1, label-content-name-mismatch×3"
+      "ok": true,
+      "detail": "0 graves"
     },
     {
       "name": "accesibilidad: sin violaciones moderadas o menores",
-      "ok": false,
-      "detail": "aria-prohibited-attr×1, heading-order×1, label-content-name-mismatch×3"
+      "ok": true,
+      "detail": "0 violaciones"
     },
     {
       "name": "accesibilidad: ruta empresa sin violaciones",
-      "ok": false,
-      "detail": "aria-prohibited-attr×1, heading-order×1, label-content-name-mismatch×3"
+      "ok": true,
+      "detail": "0 violaciones"
     },
     {
       "name": "movimiento reducido: contenido visible y sin animación",
@@ -491,12 +491,12 @@
     {
       "name": "v3 scroll: la cámara se transforma en 30/60/90% (ida)",
       "ok": true,
-      "detail": "30=[1.9,2.0923228346456693,8.8248031496063] 60=[2.6829927260131625,1.931122272254936,8.542431589885695] 90=[2.5760304814686528,1.8910114305507446,8.45552476619328]"
+      "detail": "30=[2.9551091098025632,2.033165916175961,8.763526151714583] 60=[2.5760304814686528,1.8910114305507446,8.45552476619328] 90=[1.9,1.8513980263157894,8.718996710526316]"
     },
     {
       "name": "v3 scroll: recorrido inverso mueve la cámara en sentido inverso (reversible)",
       "ok": true,
-      "detail": "90=[2.5760304814686528,1.8910114305507446,8.45552476619328] ida60=[2.6829927260131625,1.931122272254936,8.542431589885695] vuelta60=[1.1592547342700061,1.768784361637141,8.571960904092853]"
+      "detail": "90=[1.9,1.8513980263157894,8.718996710526316] ida60=[2.5760304814686528,1.8910114305507446,8.45552476619328] vuelta60=[1.3194550408719343,1.4223978201634877,7.704523160762943]"
     },
     {
       "name": "7M-B infra: el modo cambia el texto",
@@ -506,7 +506,7 @@
     {
       "name": "7M-B infra: el modo mueve la cámara 3D",
       "ok": true,
-      "detail": "[1.1592547342700061,1.768784361637141,8.571960904092853] -> [2.1625909248354693,1.735971596813301,8.11960512642882]"
+      "detail": "[1.3194550408719343,1.4223978201634877,7.704523160762943] -> [2.1625909248354693,1.735971596813301,8.11960512642882]"
     },
     {
       "name": "7M-B infra: estado accesible aria-pressed",
@@ -601,7 +601,7 @@
     {
       "name": "automatización: ejecutar recorre las 4 etapas (contador 04 + etapa activa)",
       "ok": true,
-      "detail": "{\"count\":\"04\",\"active\":1,\"feed\":\"Queda registro y seguimiento visible.\"}"
+      "detail": "{\"count\":\"04\",\"active\":1,\"feed\":\"Simulación completada: consulta atendida con revis\"}"
     },
     {
       "name": "V4-B E11 personas+IA en marfil (cream)",
@@ -631,7 +631,7 @@
     {
       "name": "7M-B red: demo ilumina flujo y muestra resultado",
       "ok": true,
-      "detail": "Una consulta entra, un agente propone una respuesta y una persona decide qué enviar."
+      "detail": "3/3 · EL EQUIPO APRENDE"
     },
     {
       "name": "7M-B infra: 3 modos de operación",
@@ -671,7 +671,7 @@
     {
       "name": "7M-B personas: ejecutar arranca la demo (texto cambia y hay etapa activa)",
       "ok": true,
-      "detail": "{\"text\":\"● Simulando…\",\"pauseOff\":true,\"out\":\"🚨 Problema reportado\"}"
+      "detail": "{\"text\":\"● Simulando…\",\"pauseOff\":true,\"out\":\"🤖 Primer análisis\"}"
     },
     {
       "name": "7M-B membresías: 5 niveles",
@@ -684,9 +684,14 @@
       "detail": " AGENTE pendiente de confirmar (objetivo $500–$600 MXN/mes) "
     },
     {
-      "name": "7M-B membresías: diagnóstico recomienda y persiste",
-      "ok": false,
+      "name": "7M-B membresías: diagnóstico recomienda visualmente SIN persistir (recomendación ≠ elección)",
+      "ok": true,
       "detail": "null"
+    },
+    {
+      "name": "7M-B membresías: selección explícita del visitante SÍ persiste",
+      "ok": true,
+      "detail": "\"cobertura\""
     },
     {
       "name": "7M-B cierre: 6 tarjetas de capacidad",
@@ -700,8 +705,8 @@
     },
     {
       "name": "7M-B cierre: meta refleja ruta + membresía + capacidad",
-      "ok": false,
-      "detail": "Ruta: ruta Empresa · Infraestructura: Housing administrado · Red: aprendizaje · Servicio: Inteligencia artificial · Capacidades (1/6): Web + chatbot de WhatsApp"
+      "ok": true,
+      "detail": "Ruta: ruta Empresa · Infraestructura: Housing administrado · Red: aprendizaje · Membresía orientativa: COBERTURA · Servicio: Inteligencia artificial · Capacidades (1/6): Web + chatbot de WhatsApp"
     },
     {
       "name": "7M-B cierre: acciones finales presentes (TXT, volver, reiniciar, WhatsApp con contexto)",
@@ -711,7 +716,7 @@
     {
       "name": "7M-B cierre: demo de tarjeta recorre 3 pasos",
       "ok": true,
-      "detail": "1/3 · Identificar la necesidad"
+      "detail": "2/3 · Organizar tareas y borradores"
     },
     {
       "name": "7M-B empresa: llegada con demo infra soberana + arte A04 + capítulo mundo",
@@ -741,7 +746,7 @@
     {
       "name": "v4-A transición botón: cámara cambia en 3 momentos (inicio/medio/fin)",
       "ok": true,
-      "detail": "0=[0,2.4,11.6] mid=[1.9,1.6617609254498715,8. fin=[2.5760304814686528,1.8910"
+      "detail": "0=[0,2.4,11.6] mid=[1.9,1.742159383033419,8.4 fin=[2.5760304814686528,1.8910"
     },
     {
       "name": "v4-A transición botón: portal visible a mitad del viaje",
@@ -790,13 +795,13 @@
     },
     {
       "name": "7M-C infra: 10 racks con transform computado válido (no none)",
-      "ok": false,
-      "detail": "{\"n\":10,\"distinct\":1,\"transform\":\"none\"}"
+      "ok": true,
+      "detail": "{\"n\":10,\"distinct\":10,\"transform\":\"matrix(1, 0, 0, 1, -17, -31)\",\"display\":\"block\"}"
     },
     {
       "name": "7M-C infra: los 10 racks ocupan posiciones distintas",
-      "ok": false,
-      "detail": "distinct=1"
+      "ok": true,
+      "detail": "distinct=10"
     },
     {
       "name": "7M-C infra: sin auto-selección persistida (null hasta que el visitante elige)",
@@ -809,16 +814,6 @@
       "detail": ""
     },
     {
-      "name": "7M-C red: clic en nodo persiste en estado",
-      "ok": true,
-      "detail": "\"sitios\""
-    },
-    {
-      "name": "7M-C red: tras recarga se restaura la selección previa (sin sobrescribir)",
-      "ok": true,
-      "detail": "pressed=true"
-    },
-    {
       "name": "7M-C housing: default compartido 50/25/25",
       "ok": true,
       "detail": "[\"50%\",\"25%\",\"25%\"]"
@@ -829,7 +824,7 @@
       "detail": "[\"100%\"]"
     },
     {
-      "name": "7M-C housing: stage transforma los racks (data-mode=privado, escudo visible)",
+      "name": "7M-C housing: stage transforma los racks (data-mode=privado)",
       "ok": true,
       "detail": ""
     },
@@ -846,7 +841,7 @@
     {
       "name": "7M-C cierre: la meta incluye la modalidad Housing elegida",
       "ok": true,
-      "detail": "Ruta: exploración sin ruta fija · Housing: privado 100% · Red: sitios · Servicio: Inteligencia artificial · Aún no añade"
+      "detail": "Ruta: ruta Empresa · Housing: privado 100% · Servicio: Inteligencia artificial · Aún no añades capacidades: toca «＋ Añadir a mi Publia» en l"
     },
     {
       "name": "7M-C A06: 5 áreas + 3 demos seleccionables presentes",
@@ -857,6 +852,16 @@
       "name": "7M-C A06: ejecutar demo muestra resultado",
       "ok": true,
       "detail": ""
+    },
+    {
+      "name": "7M-C red: clic en nodo persiste en estado",
+      "ok": true,
+      "detail": "\"sitios\""
+    },
+    {
+      "name": "7M-C red: tras recarga se restaura la selección previa (sin sobrescribir)",
+      "ok": true,
+      "detail": "pressed=true"
     },
     {
       "name": "7M-C matriz 390×844: sin overflow horizontal en E03/E15/E22/E26/E29",
@@ -890,8 +895,8 @@
     },
     {
       "name": "sin errores JS al final del recorrido",
-      "ok": false,
-      "detail": "console: Failed to load resource: the server responded with a status of 404 () | console: Failed to load resource: the server responded with a status of 404 ()"
+      "ok": true,
+      "detail": ""
     }
   ]
 }

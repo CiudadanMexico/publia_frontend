@@ -29,7 +29,7 @@ const racks = [rack(0, 'NODE / 01', 'PUBLIA · RTX / AI'), rack(1, 'NODE / 02', 
         <span class="housing__pill">COMPARACIÓN</span>
       </div>
       <p data-housing-desc>{compartido.text}</p>
-      <div class="housing__segments" data-housing-segments aria-label="Distribución porcentual de la capacidad">
+      <div class="housing__segments" data-housing-segments role="img" aria-label="Distribución porcentual de la capacidad">
         {compartido.distribution.map((d) => <span class={`housing__seg housing__seg--${d.tone}`} style={`width:${d.porcentaje}%`} />)}
       </div>
       <div class="housing__legend" data-housing-legend>
@@ -55,7 +55,8 @@ const racks = [rack(0, 'NODE / 01', 'PUBLIA · RTX / AI'), rack(1, 'NODE / 02', 
     </div>
   </div>
 
-  <div class="housing__stage" data-housing-stage data-mode="compartido" data-demo-state="off" role="img" aria-label="Escena de servidores transformables: compartido agrupa tres nodos; privado concentra uno">
+  <p class="visually-hidden" id="housing-stage-desc">Escena de servidores transformables: en modalidad compartida hay tres nodos conectados; en privada, uno solo al 100%.</p>
+  <div class="housing__stage" data-housing-stage data-mode="compartido" data-demo-state="off" aria-describedby="housing-stage-desc">
     <span class="housing__service-light">SISTEMA ILUSTRATIVO</span>
     <img class="housing__rings" src="/assets/a08/A08_anillos.svg" alt="" aria-hidden="true" />
     <div class="housing__platform" aria-hidden="true" />
