@@ -5,8 +5,10 @@
  * Fuente canónica de condiciones preliminares: src/data/memberships/housing.ts
  */
 
-export type HousingMode = 'compartido' | 'privado';
+import type { HousingMode as CanonicalHousingMode } from './memberships/housing';
 
+/** Fuente canónica del modo: src/data/memberships/housing.ts */
+export type HousingMode = CanonicalHousingMode;
 export const HOUSING_MODES: readonly HousingMode[] = ['compartido', 'privado'];
 
 export interface HousingShare {
