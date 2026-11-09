@@ -21,6 +21,9 @@ import ArtPlaceholder from './ArtPlaceholder.astro';
 import InfraDemo from './modules/InfraDemo.astro';
 import FlowDemo from './modules/FlowDemo.astro';
 import GeoDemo from './modules/GeoDemo.astro';
+import RedDemo from './modules/RedDemo.astro';
+import PersonasDemo from './modules/PersonasDemo.astro';
+import MembershipsModule from './modules/MembershipsModule.astro';
 
 interface Props {
   scene: ResolvedScene;
@@ -107,16 +110,13 @@ const stageVariants = Object.fromEntries(
             return <RecommendationModule scene={scene} />;
           }
           if (module === 'membershipsDemo') {
-            const { default: MembershipsModule } = await import('./modules/MembershipsModule.astro');
-            return <MembershipsModule scene={resolved} />;
+            return <MembershipsModule scene={scene} />;
           }
           if (module === 'personasDemo') {
-            const { default: PersonasDemo } = await import('./modules/PersonasDemo.astro');
-            return <PersonasDemo scene={resolved} />;
+            return <PersonasDemo scene={scene} />;
           }
           if (module === 'redDemo') {
-            const { default: RedDemo } = await import('./modules/RedDemo.astro');
-            return <RedDemo scene={resolved} />;
+            return <RedDemo scene={scene} />;
           }
           if (module === 'ecosystem') {
             return <EcosystemModule scene={scene} />;

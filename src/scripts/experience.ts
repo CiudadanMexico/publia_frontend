@@ -32,11 +32,7 @@ import { accentify } from '../lib/experience/accent';
 import { createNarrative } from '../lib/experience/narrative';
 import { bindPostHero } from '../lib/experience/postHero';
 import { bindEcosystem } from '../lib/experience/ecosystem';
-import { bindRed } from '../lib/experience/red';
-import { bindInfra } from '../lib/experience/infra';
-import { bindPersonas } from '../lib/experience/personas';
-import { bindMemberships } from '../lib/experience/memberships';
-import { bindCierre } from '../lib/experience/cierre';
+
 import type { NarrativeHandle } from '../lib/experience/narrative';
 import { buildMailto } from '../data/site';
 import type { PrimaryRoute, VisitorState, VisitorTrait } from '../lib/experience/state';
@@ -294,6 +290,25 @@ function bindFreeScrollIntent(narrative: NarrativeHandle | null): void {
 /**
  * Demos interactivas D3: cada decisión cambia el contenido Y el entorno 3D.
  */
+/** Carga diferida de un binder cuando su escena entra al viewport. */
+function lazyBind(selector: string, load: () => Promise<void>): void {
+  const el = document.querySelector(selector);
+  if (!el || !('IntersectionObserver' in window)) {
+    void load();
+    return;
+  }
+  const io = new IntersectionObserver(
+    (entries) => {
+      if (entries.some((e) => e.isIntersecting)) {
+        io.disconnect();
+        void load();
+      }
+    },
+    { rootMargin: '80% 0px' },
+  );
+  io.observe(el);
+}
+
 function bindDemos(universe: UniverseHandleLike | null): void {
   // Empresa — capas de infraestructura
   document.querySelectorAll<HTMLButtonElement>('[data-infra-layer]').forEach((chip) => {
@@ -741,11 +756,12 @@ export async function startExperience(): Promise<void> {
   const sceneLookTriggers = bindSceneLooks(universe);
   bindDemos(universe);
   bindEcosystem(universe);
-  bindRed(universe);
-  bindInfra(universe);
-  bindPersonas();
-  bindMemberships();
-  bindCierre(universe);
+  // Bloques 7M-B: binders en chunks propios, cargados sólo al acercarse a su escena
+  lazyBind('[data-demo="red"]', () => import('../lib/experience/red').then((m) => m.bindRed(universe)));
+  lazyBind('[data-demo="infra2"]', () => import('../lib/experience/infra').then((m) => m.bindInfra(universe)));
+  lazyBind('[data-demo="personas"]', () => import('../lib/experience/personas').then((m) => m.bindPersonas()));
+  lazyBind('[data-demo="memberships"]', () => import('../lib/experience/memberships').then((m) => m.bindMemberships()));
+  lazyBind('[data-recommendation]', () => import('../lib/experience/cierre').then((m) => m.bindCierre(universe)));
   bindPostHero(universe);
   let lastPortalKey = '';
   const drivePortal = (state: ReturnType<typeof getState>): void => {

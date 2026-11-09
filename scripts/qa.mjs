@@ -538,29 +538,28 @@ const structure = await page.evaluate(() => ({
   scenes: document.querySelectorAll('[data-scene-id]').length,
   network: document.querySelectorAll('.network__link').length,
   demos: document.querySelectorAll('[data-simulated="true"]').length,
-  plans: document.querySelectorAll('.plan').length,
-  shares: document.querySelectorAll('.shares__row').length,
+  plans: document.querySelectorAll('#escena-e27 [data-memb-plan]').length,
+  shares: document.querySelectorAll('#escena-e03 .infra2__compare-grid article').length,
 }));
 check('grafo: 31 escenas montadas (E00-E30)', structure.scenes >= 31, `${structure.scenes} escenas`);
 check('red humana: enlaces dibujados', structure.network >= 8, `${structure.network} enlaces`);
 check('demostraciones marcadas como simulación', structure.demos >= 4, `${structure.demos} bloques`);
 check('catálogo: cinco niveles de membresía', structure.plans === 5, `${structure.plans} planes`);
-check('housing: reparto en tres bandas', structure.shares === 3, `${structure.shares} bandas`);
+check('housing: comparación compartida vs privada (2 modalidades)', structure.shares === 2, `${structure.shares} modalidades`);
 
 const effects = await page.evaluate(() => {
-  const plans = document.querySelector('#escena-e27 .plans');
   return {
     pin: document.querySelectorAll('[data-pin]').length,
     horizontal: document.querySelectorAll('[data-horizontal]').length,
     morph: document.querySelectorAll('[data-morph]').length,
     depth: document.querySelectorAll('[data-depth]').length,
     sticky: document.querySelectorAll('[data-sticky]').length,
-    planWidth: plans?.scrollWidth ?? 0,
-    planClient: plans?.parentElement?.clientWidth ?? 0,
+    planWidth: 0,
+    planClient: 0,
   };
 });
 check('efectos: anclaje asignado', effects.pin >= 1, `${effects.pin} escena(s) anclada(s)`);
-check('efectos: sección horizontal de planes', effects.horizontal >= 1, `${effects.horizontal} pista(s)`);
+check('efectos: pin/horizontal/morph presentes en la página', effects.pin >= 1 && effects.horizontal >= 1 && effects.morph >= 1, `pin=${effects.pin} h=${effects.horizontal} morph=${effects.morph}`);
 check(
   'efectos: los planes se recorren en horizontal (escritorio)',
   effects.planWidth > effects.planClient + 50,
@@ -722,13 +721,11 @@ check(
 
 // --- catálogo y conversión ---------------------------------------------------
 const catalog = await page.evaluate(() => {
-  const plans = [...document.querySelectorAll('.plan')].map((plan) => ({
-    name: plan.querySelector('.plan__name')?.textContent?.trim() ?? '',
-    price: plan.querySelector('.plan__price')?.textContent?.trim() ?? '',
+  const plans = [...document.querySelectorAll('#escena-e27 [data-memb-plan]')].map((plan) => ({
+    name: plan.querySelector('strong')?.textContent?.trim() ?? '',
+    price: plan.querySelector('b')?.textContent?.trim() ?? '',
   }));
-  const shares = [...document.querySelectorAll('.shares__fill')].map((fill) =>
-    getComputedStyle(fill).getPropertyValue('--value').trim(),
-  );
+  const shares = [...document.querySelectorAll('#escena-e03 .infra2__compare-grid article')].map((a) => (a.textContent ?? '').match(/(\d+)%/g)?.join('/') ?? '');
   return { plans, shares };
 });
 const prices = Object.fromEntries(catalog.plans.map((plan) => [plan.name, plan.price]));
@@ -736,8 +733,8 @@ check('catálogo: BASE $300', prices['BASE']?.includes('300'), prices['BASE']);
 check('catálogo: CRECIMIENTO $2,000', prices['CRECIMIENTO']?.includes('2,000'), prices['CRECIMIENTO']);
 check('catálogo: OPERACIÓN $3,000', prices['OPERACIÓN']?.includes('3,000'), prices['OPERACIÓN']);
 check('catálogo: COBERTURA $4,000', prices['COBERTURA']?.includes('4,000'), prices['COBERTURA']);
-check('catálogo: AGENTE como rango pendiente', (prices['AGENTE'] ?? '').includes('500'), prices['AGENTE']);
-check('housing: reparto 50/25/25', catalog.shares.join('/') === '50/25/25', catalog.shares.join('/'));
+check('catálogo: AGENTE como rango pendiente (nunca tarifa confirmada)', (prices['AGENTE'] ?? '').includes('pendiente') && (prices['AGENTE'] ?? '').includes('500'), prices['AGENTE']);
+check('housing: reparto 50/25/25 en modalidad compartida', catalog.shares.some((x) => x.replace(/\s/g, '') === '50%/25%/25%'), catalog.shares.join(' | '));
 
 const services = await page.evaluate(() => {
   const items = [...document.querySelectorAll('#escena-e28 .services__item')].map((item) => ({
@@ -786,7 +783,7 @@ const contactLinks = await page.evaluate(() => {
 check('contacto: WhatsApp visible en la página', contactLinks.visible >= 1, `${contactLinks.visible} enlace(s)`);
 check(
   'contacto: número público verificado',
-  contactLinks.number === 'https://wa.me/525573724660',
+  contactLinks.number.startsWith('https://wa.me/525573724660'),
   contactLinks.number,
 );
 
@@ -1056,17 +1053,19 @@ check('v3 scroll: recorrido inverso mueve la cámara en sentido inverso (reversi
 await page.evaluate(() => document.querySelector('#escena-e04')?.scrollIntoView({ block: 'center', behavior: 'instant' }));
 await page.waitForTimeout(900);
 const beforeInfra = await page.evaluate(() => document.querySelector('[data-prism-canvas]')?.dataset.camera ?? '');
-await click('[data-infra-layer="agentes"]');
+await page.evaluate(() => document.querySelector('#escena-e03')?.scrollIntoView({ block: 'center', behavior: 'instant' }));
+await page.waitForTimeout(1200);
+await click('#escena-e03 [data-infra2-mode="housing"]');
 await page.waitForFunction((prev) => (document.querySelector('[data-prism-canvas]')?.dataset.camera ?? '') !== prev, { timeout: 12000 }, beforeInfra).catch(() => {});
 await page.waitForTimeout(400);
 const infra = await page.evaluate(() => ({
-  detail: document.querySelector('[data-infra-detail]')?.textContent ?? '',
+  detail: document.querySelector('#escena-e03 [data-infra2-desc]')?.textContent ?? '',
   cam: document.querySelector('[data-prism-canvas]')?.dataset.camera ?? '',
-  pressed: document.querySelector('[data-infra-layer="agentes"]')?.getAttribute('aria-pressed'),
+  pressed: document.querySelector('#escena-e03 [data-infra2-mode="housing"]')?.getAttribute('aria-pressed'),
 }));
-check('v3 demo empresa: la capa cambia el texto', infra.detail.includes('supervisables'), infra.detail.slice(0, 60));
-check('v3 demo empresa: la capa mueve la cámara 3D', infra.cam !== beforeInfra, `${beforeInfra} -> ${infra.cam}`);
-check('v3 demo empresa: estado accesible aria-pressed', infra.pressed === 'true', infra.pressed);
+check('7M-B infra: el modo cambia el texto', infra.detail.includes('módulos independientes'), infra.detail.slice(0, 60));
+check('7M-B infra: el modo mueve la cámara 3D', infra.cam !== beforeInfra, `${beforeInfra} -> ${infra.cam}`);
+check('7M-B infra: estado accesible aria-pressed', infra.pressed === 'true', infra.pressed);
 
 // Demo eficiencia: foco responde y guarda respuesta.
 await click('[data-route-reset]');
@@ -1214,16 +1213,82 @@ const rec = await page.evaluate(() => ({
 check('V4-B cierre: recomendación con >=3 items para ruta empresa', rec.items >= 3 && rec.text.includes('Housing'), `items=${rec.items} status=${rec.status.slice(0, 60)}`);
 check('cierre V2: botón copiar resumen presente', await page.evaluate(() => !!document.querySelector('[data-rec-copy]')));
 
+// --- 7M-B: bloques A/B/C/D/E ------------------------------------------------------
+const q = (sel) => page.evaluate((s2) => !!document.querySelector(s2), sel);
+const clickJs = (sel) => page.evaluate((s2) => { const el = document.querySelector(s2); if (el) el.click(); return !!el; }, sel);
+const sceneState = () => page.evaluate(() => { try { return JSON.parse(sessionStorage.getItem('publia.visitor.v1') ?? '{}'); } catch { return {}; } });
+
+// Bloque B: red colaborativa (E15)
+await page.evaluate(() => document.querySelector('#escena-e15')?.scrollIntoView({ behavior: 'instant' }));
+await page.waitForTimeout(700);
+check('7M-B red: 6 nodos de capacidad', await page.evaluate(() => document.querySelectorAll('#escena-e15 [data-red-node]').length) === 6);
+await clickJs('#escena-e15 [data-red-node="2"]');
+await page.waitForTimeout(300);
+check('7M-B red: click nodo 3 selecciona y persiste en estado', await page.evaluate(() => document.querySelector('#escena-e15 [data-red-node="2"]')?.getAttribute('aria-pressed') === 'true') && (await sceneState()).red === 'sitios', JSON.stringify((await sceneState()).red));
+await clickJs('#escena-e15 [data-red-run]');
+await page.waitForFunction(() => (document.querySelector('#escena-e15 [data-red-result]')?.textContent ?? '').length > 3, { timeout: 8000 }).catch(() => {});
+check('7M-B red: demo ilumina flujo y muestra resultado', (await page.evaluate(() => document.querySelector('#escena-e15 [data-red-result]')?.textContent ?? '')).length > 3, await page.evaluate(() => document.querySelector('#escena-e15 [data-red-result]')?.textContent ?? ''));
+
+// Bloque A: infraestructura soberana (E03)
+await page.evaluate(() => document.querySelector('#escena-e03')?.scrollIntoView({ behavior: 'instant' }));
+await page.waitForTimeout(700);
+check('7M-B infra: 3 modos de operación', await page.evaluate(() => document.querySelectorAll('#escena-e03 [data-infra2-mode]').length) === 3);
+check('7M-B infra: 10 racks con LEDs', await page.evaluate(() => document.querySelectorAll('#escena-e03 [data-infra2-rack]').length) === 10);
+await clickJs('#escena-e03 [data-infra2-mode="housing"]');
+await page.waitForTimeout(400);
+check('7M-B infra: modo housing persiste + status SIMULACIÓN', (await sceneState()).infra === 'housing' && (await page.evaluate(() => document.querySelector('#escena-e03 [data-infra2-status]')?.textContent ?? '')).includes('HOUSING'));
+await clickJs('#escena-e03 [data-infra2-launch]');
+await page.waitForTimeout(1600);
+check('7M-B infra: activar red sube contador de tráfico', (await page.evaluate(() => document.querySelector('#escena-e03 [data-infra2-traffic]')?.textContent ?? '')) !== '000', await page.evaluate(() => document.querySelector('#escena-e03 [data-infra2-traffic]')?.textContent ?? ''));
+check('7M-B infra: comparación compartida vs privada presente (sin $0 publicado)', await page.evaluate(() => { const t = document.querySelector('#escena-e03 .infra2__compare')?.textContent ?? ''; return t.includes('compartida') && t.includes('privada') && !t.includes('$0'); }));
+
+// Bloque C: personas + IA (E11)
+await page.evaluate(() => document.querySelector('#escena-e11')?.scrollIntoView({ behavior: 'instant' }));
+await page.waitForTimeout(700);
+check('7M-B personas: 3 casos + 4 controles', (await page.evaluate(() => document.querySelectorAll('#escena-e11 [data-pers-case]').length)) === 3 && (await page.evaluate(() => ['[data-pers-run]','[data-pers-pause]','[data-pers-step]','[data-pers-reset]'].filter((x) => document.querySelector('#escena-e11 ' + x)).length)) === 4);
+await clickJs('#escena-e11 [data-pers-case="soporte"]');
+await clickJs('#escena-e11 [data-pers-step]');
+await page.waitForTimeout(300);
+check('7M-B personas: paso a paso avanza etapa (salida no vacía)', (await page.evaluate(() => document.querySelector('#escena-e11 [data-pers-out-title]')?.textContent ?? '')).length > 2, await page.evaluate(() => document.querySelector('#escena-e11 [data-pers-out-title]')?.textContent ?? ''));
+await clickJs('#escena-e11 [data-pers-run]');
+await page.waitForFunction(() => (document.querySelector('#escena-e11 [data-pers-run-text]')?.textContent ?? '').includes('Simulando'), { timeout: 5000 }).catch(() => {});
+check('7M-B personas: ejecutar pone estado Simulando y habilita pausa', (await page.evaluate(() => document.querySelector('#escena-e11 [data-pers-run-text]')?.textContent ?? '')).includes('Simulando') && await page.evaluate(() => !document.querySelector('#escena-e11 [data-pers-pause]')?.disabled));
+
+// Bloque D: membresías (E27)
+await page.evaluate(() => document.querySelector('#escena-e27')?.scrollIntoView({ behavior: 'instant' }));
+await page.waitForTimeout(700);
+check('7M-B membresías: 5 niveles', (await page.evaluate(() => document.querySelectorAll('#escena-e27 [data-memb-plan]').length)) === 5);
+const agenteTxt = await page.evaluate(() => document.querySelector('#escena-e27 [data-memb-plan="agente"]')?.textContent ?? '');
+check('7M-B membresías: AGENTE nunca publica tarifa confirmada (etiqueta pendiente)', agenteTxt.includes('pendiente') && !/\$\d/.test(agenteTxt.replace('objetivo', '')), agenteTxt);
+await clickJs('#escena-e27 [data-memb-goal="support"]');
+await clickJs('#escena-e27 [data-memb-team="large"]');
+await clickJs('#escena-e27 [data-memb-recommend]');
+await page.waitForTimeout(400);
+check('7M-B membresías: diagnóstico recomienda y persiste', !(await page.evaluate(() => document.querySelector('#escena-e27 [data-memb-reco]')?.hidden)) && (await sceneState()).membership === 'cobertura', JSON.stringify((await sceneState()).membership));
+
+// Bloque E: cierre V2 (E29)
+await page.evaluate(() => document.querySelector('#escena-e29')?.scrollIntoView({ behavior: 'instant' }));
+await page.waitForTimeout(700);
+check('7M-B cierre: 6 tarjetas de capacidad', (await page.evaluate(() => document.querySelectorAll('#escena-e29 [data-cierre-card]').length)) === 6);
+await clickJs('#escena-e29 [data-cierre-card="web"] [data-cierre-toggle]');
+await page.waitForTimeout(300);
+check('7M-B cierre: añadir capacidad persiste en estado.capabilities', (await sceneState()).capabilities?.includes('web') === true && await page.evaluate(() => document.querySelector('#escena-e29 [data-cierre-card="web"] [data-cierre-toggle]')?.getAttribute('aria-pressed') === 'true'));
+check('7M-B cierre: meta refleja ruta + membresía + capacidad', await page.evaluate(() => { const t = document.querySelector('#escena-e29 [data-cierre-meta]')?.textContent ?? ''; return t.includes('ruta') && t.includes('COBERTURA') && t.includes('Web'); }), await page.evaluate(() => document.querySelector('#escena-e29 [data-cierre-meta]')?.textContent ?? ''));
+check('7M-B cierre: acciones finales presentes (TXT, volver, reiniciar, WhatsApp con contexto)', await page.evaluate(() => !!document.querySelector('#escena-e29 [data-cierre-download]') && !!document.querySelector('#escena-e29 [data-cierre-top]') && !!document.querySelector('#escena-e29 [data-cierre-restart]') && (document.querySelector('#escena-e29 [data-cierre-wa]')?.href ?? '').includes('wa.me')));
+await clickJs('#escena-e29 [data-cierre-card="agentes"] [data-cierre-demo]');
+await page.waitForFunction(() => (document.querySelector('#escena-e29 [data-cierre-card="agentes"] [data-cierre-run]')?.textContent ?? '').length > 3, { timeout: 6000 }).catch(() => {});
+check('7M-B cierre: demo de tarjeta recorre 3 pasos', (await page.evaluate(() => document.querySelector('#escena-e29 [data-cierre-card="agentes"] [data-cierre-run]')?.textContent ?? '')).includes('/3') || (await page.evaluate(() => document.querySelector('#escena-e29 [data-cierre-card="agentes"] [data-cierre-run]')?.textContent ?? '')).includes('✓'), await page.evaluate(() => document.querySelector('#escena-e29 [data-cierre-card="agentes"] [data-cierre-run]')?.textContent ?? ''));
+
 // --- v4-A: mundos de llegada diferenciados ------------------------------------------
 const arrivals = await page.evaluate(() => ({
-  e03: { demo: !!document.querySelector('#escena-e03 [data-demo="infra"]'), art: document.querySelector('#escena-e03 .scene__art')?.dataset.artSlot ?? null, chapter: document.querySelector('#escena-e03')?.dataset.chapter ?? null, tone: document.querySelector('#escena-e03')?.dataset.tone ?? null, title: document.querySelector('#escena-e03 [data-role="title"]')?.textContent ?? '' },
+  e03: { demo: !!document.querySelector('#escena-e03 [data-demo="infra2"]'), art: document.querySelector('#escena-e03 .scene__art')?.dataset.artSlot ?? null, chapter: document.querySelector('#escena-e03')?.dataset.chapter ?? null, tone: document.querySelector('#escena-e03')?.dataset.tone ?? null, title: document.querySelector('#escena-e03 [data-role="title"]')?.textContent ?? '' },
   e07: { demo: !!document.querySelector('#escena-e07 [data-demo="flow"]'), art: document.querySelector('#escena-e07 .scene__art')?.dataset.artSlot ?? null, chapter: document.querySelector('#escena-e07')?.dataset.chapter ?? null, tone: document.querySelector('#escena-e07')?.dataset.tone ?? null },
-  e15: { demo: !!document.querySelector('#escena-e15 [data-demo="geo"]'), art: document.querySelector('#escena-e15 .scene__art')?.dataset.artSlot ?? null, chapter: document.querySelector('#escena-e15')?.dataset.chapter ?? null, tone: document.querySelector('#escena-e15')?.dataset.tone ?? null },
+  e15: { demo: !!document.querySelector('#escena-e15 [data-demo="red"]'), art: document.querySelector('#escena-e15 .scene__art')?.dataset.artSlot ?? null, chapter: document.querySelector('#escena-e15')?.dataset.chapter ?? null, tone: document.querySelector('#escena-e15')?.dataset.tone ?? null },
   chapters: new Set([...document.querySelectorAll('[data-chapter]')].map((el) => el.dataset.chapter)).size,
 }));
-check('v4-A empresa: llegada con demo infra + arte A04 + capítulo mundo', arrivals.e03.demo && arrivals.e03.art === 'A04' && arrivals.e03.chapter === 'mundo', JSON.stringify(arrivals.e03));
+check('7M-B empresa: llegada con demo infra soberana + arte A04 + capítulo mundo', arrivals.e03.demo && arrivals.e03.art === 'A04' && arrivals.e03.chapter === 'mundo', JSON.stringify(arrivals.e03));
 check('v4-A eficiencia: llegada con demo flujo + arte A03', arrivals.e07.demo && arrivals.e07.art === 'A03' && arrivals.e07.chapter === 'mundo', JSON.stringify(arrivals.e07));
-check('v4-A exploración: llegada con demo geonodos + arte A05', arrivals.e15.demo && arrivals.e15.art === 'A05' && arrivals.e15.chapter === 'mundo', JSON.stringify(arrivals.e15));
+check('7M-B exploración: llegada con demo red colaborativa + arte A05', arrivals.e15.demo && arrivals.e15.art === 'A05' && arrivals.e15.chapter === 'mundo', JSON.stringify(arrivals.e15));
 check('v4-A: los 3 mundos usan tonos distintos (petrol/electric/emerald)', arrivals.e03.tone === 'petrol' && arrivals.e07.tone === 'electric' && arrivals.e15.tone === 'emerald', `${arrivals.e03.tone}/${arrivals.e07.tone}/${arrivals.e15.tone}`);
 check('v4-A: capítulos narrativos presentes (>=5)', arrivals.chapters >= 5, `${arrivals.chapters} capítulos`);
 

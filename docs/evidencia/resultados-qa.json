@@ -1,7 +1,7 @@
 {
-  "base": "https://kitty-midi-grid-liked.trycloudflare.com",
+  "base": "https://dam-boulevard-explaining-alaska.trycloudflare.com",
   "total": 140,
-  "fallos": 0,
+  "fallos": 15,
   "resultados": [
     {
       "name": "carga inicial sin errores JS",
@@ -31,7 +31,7 @@
     {
       "name": "prisma: la escena 3D se renderiza y cambia (animación real)",
       "ok": true,
-      "detail": "666216 vs 677737 bytes"
+      "detail": "666215 vs 677737 bytes"
     },
     {
       "name": "prisma: pinta una fracción útil del viewport",
@@ -71,7 +71,7 @@
     {
       "name": "hero 3D: la animación ambiental cambia entre fotogramas",
       "ok": true,
-      "detail": "687499 vs 691107 bytes"
+      "detail": "687498 vs 690575 bytes"
     },
     {
       "name": "marca: el encabezado usa el logotipo oficial",
@@ -96,7 +96,7 @@
     {
       "name": "transición enterprise: la cámara viaja a otro mundo del mismo universo",
       "ok": true,
-      "detail": "mundo hero→enterprise · cámara [0,2.4,11.6]→[2.3873873873873874,1.8202702702702702,8.302252252252252] · tinte #050b1b→#0a0e18"
+      "detail": "mundo hero→enterprise · cámara [0,2.4,11.6]→[2.5760304814686528,1.8910114305507446,8.45552476619328] · tinte #050b1b→#0a0e18"
     },
     {
       "name": "transición enterprise: el contenido de la escena destino aparece",
@@ -191,12 +191,12 @@
     {
       "name": "demostraciones marcadas como simulación",
       "ok": true,
-      "detail": "5 bloques"
+      "detail": "4 bloques"
     },
     {
       "name": "catálogo: cinco niveles de membresía",
-      "ok": true,
-      "detail": "5 planes"
+      "ok": false,
+      "detail": "0 planes"
     },
     {
       "name": "housing: reparto en tres bandas",
@@ -210,13 +210,13 @@
     },
     {
       "name": "efectos: sección horizontal de planes",
-      "ok": true,
-      "detail": "1 pista(s)"
+      "ok": false,
+      "detail": "0 pista(s)"
     },
     {
       "name": "efectos: los planes se recorren en horizontal (escritorio)",
-      "ok": true,
-      "detail": "1864px > 1216px"
+      "ok": false,
+      "detail": "0px > 0px"
     },
     {
       "name": "efectos: morphing de la entidad",
@@ -246,7 +246,7 @@
     {
       "name": "ruta empresa: escena propia visible",
       "ok": true,
-      "detail": "1503px"
+      "detail": "2392px"
     },
     {
       "name": "ruta empresa: contenido de la escena",
@@ -261,7 +261,7 @@
     {
       "name": "ruta eficiencia: escena propia visible",
       "ok": true,
-      "detail": "1696px · route=efficiency act=efficiency world=efficiency scrollY=1853"
+      "detail": "1696px · route=efficiency act=efficiency world=efficiency scrollY=546"
     },
     {
       "name": "ruta eficiencia: mensaje propio de la escena",
@@ -311,7 +311,7 @@
     {
       "name": "bifurcación: abre la escena cooperativa",
       "ok": true,
-      "detail": "1765px"
+      "detail": "2179px"
     },
     {
       "name": "variante por rasgo: el rasgo reescribe la escena compartida",
@@ -320,28 +320,28 @@
     },
     {
       "name": "catálogo: BASE $300",
-      "ok": true,
-      "detail": "$300 MXN/mes"
+      "ok": false,
+      "detail": ""
     },
     {
       "name": "catálogo: CRECIMIENTO $2,000",
-      "ok": true,
-      "detail": "$2,000 MXN/mes"
+      "ok": false,
+      "detail": ""
     },
     {
       "name": "catálogo: OPERACIÓN $3,000",
-      "ok": true,
-      "detail": "$3,000 MXN/mes"
+      "ok": false,
+      "detail": ""
     },
     {
       "name": "catálogo: COBERTURA $4,000",
-      "ok": true,
-      "detail": "$4,000 MXN/mes"
+      "ok": false,
+      "detail": ""
     },
     {
       "name": "catálogo: AGENTE como rango pendiente",
-      "ok": true,
-      "detail": "$500 MXN–$600 MXN/mes"
+      "ok": false,
+      "detail": ""
     },
     {
       "name": "housing: reparto 50/25/25",
@@ -376,12 +376,12 @@
     {
       "name": "contacto: WhatsApp visible en la página",
       "ok": true,
-      "detail": "2 enlace(s)"
+      "detail": "3 enlace(s)"
     },
     {
       "name": "contacto: número público verificado",
-      "ok": true,
-      "detail": "https://wa.me/525573724660"
+      "ok": false,
+      "detail": "https://wa.me/525573724660?text=Hola%20Publia%2C%20vengo%20del%20recorrido%20web.%0A%0APropuesta%20Publia.mx%20%E2%80%94%20exploraci%C3%B3n%20libre%0A-%20Elegiste%20la%20ruta%20por%3A%20scroll%20libre%0A-%20Servicio%20ex"
     },
     {
       "name": "formulario: existe con sus campos",
@@ -445,13 +445,13 @@
     },
     {
       "name": "rendimiento: JS + CSS inicial (con el 3D del hero) por debajo de 260 kB",
-      "ok": true,
-      "detail": "252 kB (JS 241 · CSS 11)"
+      "ok": false,
+      "detail": "264 kB (JS 249 · CSS 15)"
     },
     {
       "name": "rendimiento: la aplicación sin 3D por debajo de 90 kB",
       "ok": true,
-      "detail": "71 kB de JS de aplicación"
+      "detail": "79 kB de JS de aplicación"
     },
     {
       "name": "rendimiento: el escenario 3D se carga sólo bajo demanda",
@@ -476,7 +476,7 @@
     {
       "name": "v3: acentos amarillos en titulares (em)",
       "ok": true,
-      "detail": "12 em"
+      "detail": "17 em"
     },
     {
       "name": "v3: slots de arte A01-A05 preparados",
@@ -496,27 +496,27 @@
     {
       "name": "v3 scroll: la cámara se transforma en 30/60/90% (ida)",
       "ok": true,
-      "detail": "30=[2.638038038038038,1.9142642642642642,8.505905905905907] 60=[2.3873873873873874,1.8202702702702702,8.302252252252252] 90=[1.9,1.54541010320478,8.209016838674634]"
+      "detail": "30=[2.893591963976446,2.0100969864911673,8.713543470730864] 60=[2.5760304814686528,1.8910114305507446,8.45552476619328] 90=[1.9,1.7814732142857141,8.602455357142858]"
     },
     {
       "name": "v3 scroll: recorrido inverso mueve la cámara en sentido inverso (reversible)",
       "ok": true,
-      "detail": "90=[1.9,1.54541010320478,8.209016838674634] ida60=[2.3873873873873874,1.8202702702702702,8.302252252252252] vuelta60=[1.391025641025641,1.7025641025641025,8.406410256410258]"
+      "detail": "90=[1.9,1.7814732142857141,8.602455357142858] ida60=[2.5760304814686528,1.8910114305507446,8.45552476619328] vuelta60=[1.2635983263598325,1.4119246861924686,7.655648535564854]"
     },
     {
       "name": "v3 demo empresa: la capa cambia el texto",
-      "ok": true,
-      "detail": "Agentes conectados a tareas concretas y supervisables: clasi"
+      "ok": false,
+      "detail": ""
     },
     {
       "name": "v3 demo empresa: la capa mueve la cámara 3D",
-      "ok": true,
-      "detail": "[2.143519494204426,1.7288198103266597,8.104109589041096] -> [2.1249736564805057,1.7218651211801896,8.089041095890412]"
+      "ok": false,
+      "detail": "[2.161248654467169,1.7354682454251882,8.118514531754576] -> [2.161248654467169,1.7354682454251882,8.118514531754576]"
     },
     {
       "name": "v3 demo empresa: estado accesible aria-pressed",
-      "ok": true,
-      "detail": "true"
+      "ok": false,
+      "detail": ""
     },
     {
       "name": "v3 demo eficiencia: resultado según foco",
@@ -625,8 +625,8 @@
     },
     {
       "name": "v4-A empresa: llegada con demo infra + arte A04 + capítulo mundo",
-      "ok": true,
-      "detail": "{\"demo\":true,\"art\":\"A04\",\"chapter\":\"mundo\",\"tone\":\"petrol\",\"title\":\"TU INFRAESTRUCTURA. TUS REGLAS.\"}"
+      "ok": false,
+      "detail": "{\"demo\":false,\"art\":\"A04\",\"chapter\":\"mundo\",\"tone\":\"petrol\",\"title\":\"TU INFRAESTRUCTURA. TUS REGLAS.\"}"
     },
     {
       "name": "v4-A eficiencia: llegada con demo flujo + arte A03",
@@ -635,8 +635,8 @@
     },
     {
       "name": "v4-A exploración: llegada con demo geonodos + arte A05",
-      "ok": true,
-      "detail": "{\"demo\":true,\"art\":\"A05\",\"chapter\":\"mundo\",\"tone\":\"emerald\"}"
+      "ok": false,
+      "detail": "{\"demo\":false,\"art\":\"A05\",\"chapter\":\"mundo\",\"tone\":\"emerald\"}"
     },
     {
       "name": "v4-A: los 3 mundos usan tonos distintos (petrol/electric/emerald)",
@@ -651,7 +651,7 @@
     {
       "name": "v4-A transición botón: cámara cambia en 3 momentos (inicio/medio/fin)",
       "ok": true,
-      "detail": "0=[0,2.4,11.6] mid=[1.9,1.742159383033419,8.4 fin=[2.3873873873873874,1.8202"
+      "detail": "0=[0,2.4,11.6] mid=[1.9,1.6617609254498715,8. fin=[2.5760304814686528,1.8910"
     },
     {
       "name": "v4-A transición botón: portal visible a mitad del viaje",

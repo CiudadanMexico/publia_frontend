@@ -13,8 +13,14 @@ export interface InfraUniverse {
 }
 
 export function bindInfra(universe: InfraUniverse | null): void {
-  const wrap = document.querySelector<HTMLElement>('[data-demo="infra2"]');
-  if (!wrap) return;
+  document.querySelectorAll<HTMLElement>('[data-demo="infra2"]').forEach((w) => {
+    if (w.dataset.bound === '1') return;
+    w.dataset.bound = '1';
+    bindOne(w, universe);
+  });
+}
+
+function bindOne(wrap: HTMLElement, universe: InfraUniverse | null): void {
   const modeBtns = [...wrap.querySelectorAll<HTMLButtonElement>('[data-infra2-mode]')];
   const elStatus = wrap.querySelector('[data-infra2-status]');
   const elDesc = wrap.querySelector('[data-infra2-desc]');
