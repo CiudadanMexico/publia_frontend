@@ -166,6 +166,7 @@ export function renderableScenes(): ResolvedScene[] {
       red: null,
       proposalTouched: false,
       housingMode: null,
+      exploreAll: false,
       updatedAt: 0,
     }),
   );

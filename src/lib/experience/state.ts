@@ -107,6 +107,8 @@ export interface VisitorState {
   proposalTouched: boolean;
   /** Modalidad de Housing elegida en E22 (A08); null = sin elegir. Distinto de `infra`. */
   housingMode: HousingMode | null;
+  /** 7M-E: true = mostrar también las escenas opcionales (recorrido completo). */
+  exploreAll: boolean;
 }
 
 export const ROUTES: readonly PrimaryRoute[] = [
@@ -147,6 +149,7 @@ function emptyState(): VisitorState {
     red: null,
     proposalTouched: false,
     housingMode: null,
+    exploreAll: false,
   };
 }
 
@@ -216,6 +219,7 @@ function load(): VisitorState {
       red: typeof candidate.red === 'string' && candidate.red.trim() ? candidate.red : null,
       proposalTouched: candidate.proposalTouched === true,
       housingMode: isHousingMode(candidate.housingMode) ? candidate.housingMode : null,
+      exploreAll: candidate.exploreAll === true,
     };
   } catch {
     return emptyState();
@@ -252,6 +256,7 @@ export function applyDocumentState(current: VisitorState): void {
   const root = document.documentElement;
   root.dataset['route'] = current.primary;
   root.dataset['traits'] = current.traits.join(' ');
+  root.dataset['explore'] = current.exploreAll ? 'all' : 'essential';
 }
 
 export function getState(): VisitorState {
@@ -382,6 +387,12 @@ export function setHousingMode(mode: HousingMode | null): void {
   if (mode !== null && !isHousingMode(mode)) return;
   if (state.housingMode === mode) return;
   commit({ ...state, housingMode: mode, updatedAt: Date.now() });
+}
+
+/** 7M-E: alterna entre recorrido esencial y completo (escenas opcionales). */
+export function setExploreAll(value: boolean): void {
+  if (state.exploreAll === value) return;
+  commit({ ...state, exploreAll: value, updatedAt: Date.now() });
 }
 
 /** Marca que el visitante editó manualmente la propuesta en el cierre. */

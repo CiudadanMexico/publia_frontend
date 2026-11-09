@@ -186,6 +186,8 @@ export interface SceneDefinition {
   segments: Segment[];
   /** Ruta principal que la dispara (`shared` = todas). */
   route: PrimaryRoute | 'shared';
+  /** 7M-E: fuera del recorrido esencial; visible sólo con "explorar todo". */
+  optional?: boolean;
   /** Estado que la escena requiere para mostrarse. */
   requires?: { route?: PrimaryRoute[]; traits?: VisitorTrait[] };
   /** Estado que la escena produce al entrar. */

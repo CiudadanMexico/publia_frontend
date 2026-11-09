@@ -196,12 +196,13 @@ const SCENES_RAW: SceneDefinition[] = [
   },
   {
     id: 'E04',
+    optional: true,
     eyebrow: 'Ruta empresa',
     title: 'El control es tuyo.',
     lead: 'Soberanía tecnológica: el código, los datos y la infraestructura pueden quedar de tu lado.',
     body: 'Trabajamos con software libre, modelos locales y redes de personas que puedes conocer. Un proveedor que se va no se lleva tu negocio con él.',
     purpose: 'Marcar el diferenciador de Publia frente a una agencia clásica.',
-    modules: ['features', 'infraDemo'],
+    modules: ['features'],
     segments: ['enterprise', 'established', 'advanced'],
     route: 'enterprise',
     duration: 2,
@@ -219,6 +220,7 @@ const SCENES_RAW: SceneDefinition[] = [
   },
   {
     id: 'E05',
+    optional: true,
     eyebrow: 'Red humana',
     title: 'Una red de talento, no una plantilla de consultores.',
     lead: 'Cada proyecto combina personas con distinto nivel, supervisadas por mentores y Specialists.',
@@ -275,6 +277,7 @@ const SCENES_RAW: SceneDefinition[] = [
   
   {
     id: 'E06',
+    optional: true,
     eyebrow: 'Ruta empresa · Ruta eficiencia',
     title: 'Inteligencia en tus procesos, no en un chat aparte.',
     lead: 'La IA vale cuando entra donde el trabajo ya ocurre.',
@@ -320,6 +323,7 @@ const SCENES_RAW: SceneDefinition[] = [
   },
   {
     id: 'E08',
+    optional: true,
     eyebrow: 'Ruta eficiencia · Demostración',
     title: 'Tu negocio responde mientras tú atiendes lo importante.',
     lead: 'Simulación de una conversación real con nuestro chatbot de WhatsApp.',
@@ -345,12 +349,13 @@ const SCENES_RAW: SceneDefinition[] = [
   },
   {
     id: 'E09',
+    optional: true,
     eyebrow: 'Ruta eficiencia · Demostración',
     title: 'Un chatbot responde. Un asistente avanza.',
     lead: 'Simulación de una sesión de trabajo con un agente personal.',
     body: 'El agente no finge ser persona: es software con contexto, herramientas y límites. Lo que autorizas, lo hace; lo demás, lo propone.',
     purpose: 'Separar con claridad chatbot de agente.',
-    modules: ['tasks', 'flowDemo'],
+    modules: ['tasks'],
     segments: ['efficiency', 'practical', 'growing', 'advanced'],
     route: 'efficiency',
     duration: 2,
@@ -374,6 +379,7 @@ const SCENES_RAW: SceneDefinition[] = [
   },
   {
     id: 'E10',
+    optional: true,
     eyebrow: 'Ruta eficiencia · Demostración',
     title: 'Tu negocio se mantiene activo sin que estés pegado al celularr.',
     lead: 'Simulación del flujo de contenido: una idea entra, salen piezas revisadas y publicadas.',
@@ -404,7 +410,7 @@ const SCENES_RAW: SceneDefinition[] = [
     purpose: 'Cerrar el ciclo: la tecnología no sustituye a la red, la ordena.',
     modules: ['personasDemo'],
     segments: [],
-    route: 'shared',
+    route: 'efficiency',
     duration: 2,
     transition: 'scale',
     stage: 'cooperative',
@@ -421,6 +427,7 @@ const SCENES_RAW: SceneDefinition[] = [
   },
   {
     id: 'E12',
+    optional: true,
     eyebrow: 'Ruta eficiencia',
     title: 'La cobertura importa: no es más contenido, es más ventana.',
     lead: 'Operación y Cobertura se diferencian por disponibilidad humana, no por volumen de piezas.',
@@ -457,6 +464,7 @@ const SCENES_RAW: SceneDefinition[] = [
   },
   {
     id: 'E14',
+    optional: true,
     eyebrow: 'Exploración',
     title: 'Nosotros queremos conocerte.',
     lead: 'Dos caminos distintos y ninguno es el correcto por defecto.',
@@ -499,6 +507,7 @@ const SCENES_RAW: SceneDefinition[] = [
   },
   {
     id: 'E16',
+    optional: true,
     eyebrow: '🌐 CONOCIMIENTO QUE CIRCULA',
     title: 'Ciudadan: la plataforma que da contexto al cooperativismo.',
     lead: 'Organización, economía e intercambios: las piezas que un negocio cooperativo necesita para funcionar.',
@@ -520,6 +529,7 @@ const SCENES_RAW: SceneDefinition[] = [
   },
   {
     id: 'E17',
+    optional: true,
     eyebrow: 'Ecosistema · Cooperativas 6.0',
     title: 'Cooperativas 6.0: herramientas para el consumo en común.',
     lead: 'No hace falta cambiar de figura jurídica para explorar el modelo.',
@@ -546,6 +556,7 @@ const SCENES_RAW: SceneDefinition[] = [
   
   {
     id: 'E18',
+    optional: true,
     eyebrow: 'Ecosistema · Economía',
     title: 'Una economía conectada, no una promesa de rendimiento.',
     lead: 'Laborys sirve para medir intercambios y trabajo compartido dentro del ecosistema.',
@@ -569,6 +580,7 @@ const SCENES_RAW: SceneDefinition[] = [
   
   {
     id: 'E19',
+    optional: true,
     eyebrow: 'Ecosistema · Publicidad',
     title: 'Publicidad por elección, no por interrupción.',
     lead: 'La diferencia no es el formato del anuncio: es quién decide que lo vea.',
@@ -591,6 +603,7 @@ const SCENES_RAW: SceneDefinition[] = [
   
   {
     id: 'E20',
+    optional: true,
     eyebrow: 'Ecosistema · Impacto',
     title: 'El cómputo también tiene una huella.',
     lead: 'La tecnología puede crecer sin que todo el cómputo termine concentrado en enormes centros de datos.',
@@ -608,6 +621,7 @@ const SCENES_RAW: SceneDefinition[] = [
   
   {
     id: 'E21',
+    optional: true,
     eyebrow: '🖥️ INFRAESTRUCTURA A TU MANERA',
     title: 'TUS DATOS, **CON MÁS CONTROL.**',
     lead: 'Una estructura centralizada, masiva y pesada. Después: nodos locales que se conectan y producen.',
@@ -663,6 +677,7 @@ const SCENES_RAW: SceneDefinition[] = [
   },
   {
     id: 'E23',
+    optional: true,
     eyebrow: 'Productos · Capacitación',
     title: 'Aprende a usar lo que contrataste.',
     lead: 'Módulos breves, prácticos y replicables para operar tus propias herramientas.',
@@ -679,6 +694,7 @@ const SCENES_RAW: SceneDefinition[] = [
   },
   {
     id: 'E24',
+    optional: true,
     eyebrow: 'Productos · Asesoría',
     title: 'Antes de construir.',
     lead: 'Cuatro escalones, del diagnóstico a la ruta tecnológica.',
@@ -720,6 +736,7 @@ const SCENES_RAW: SceneDefinition[] = [
   },
   {
     id: 'E26',
+    optional: true,
     eyebrow: 'Productos · Más allá de lo digital',
     title: 'Eventos, activaciones y producción con manos.',
     lead: 'También hay un mundo fuera de la pantalla.',
@@ -778,6 +795,7 @@ const SCENES_RAW: SceneDefinition[] = [
   
   {
     id: 'E28',
+    optional: true,
     eyebrow: 'Productos · Servicios',
     title: 'Completa tu operación.',
     lead: 'Servicios puntuales y complementos que se cotizan aparte de las membresías.',

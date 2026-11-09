@@ -38,6 +38,10 @@ import { HERO, HERO_CARDS } from '../../data/copy';
       }
     </div>
 
+    <button type="button" class="hero__explore-toggle" data-explore-toggle aria-pressed="false">
+      Explorar todo el recorrido
+    </button>
+
     <p class="hero__hint">¿Prefieres explorar a tu manera? <span>Desplázate</span> <span aria-hidden="true">↓</span></p>
 
     <ul class="hero__cards" aria-label="Ocho soluciones de Publia">
@@ -536,4 +540,15 @@ import { HERO, HERO_CARDS } from '../../data/copy';
       background: linear-gradient(180deg, #030914f0 0%, #030914c9 53%, #03091455 100%);
     }
   }
+  .hero__explore-toggle {
+    margin-top: 0.9rem;
+    border: 1px solid var(--border-subtle, rgba(255,255,255,.2));
+    background: transparent;
+    color: inherit;
+    border-radius: 999px;
+    padding: 0.45rem 1rem;
+    font-size: 0.78rem;
+    cursor: pointer;
+  }
+  .hero__explore-toggle[aria-pressed='true'] { background: rgba(255,255,255,.12); }
 </style>

@@ -24,6 +24,11 @@ html[data-route='unclassified'] .scene[data-scene-route='explorer'] {
   display: block;
 }
 
+/* 7M-E: las escenas opcionales sólo aparecen con "explorar todo el recorrido" */
+html[data-explore='essential'] .scene[data-scene-optional='1'] {
+  display: none;
+}
+
 .scene__inner[data-scene-segments] {
   display: none;
 }

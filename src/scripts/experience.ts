@@ -22,6 +22,7 @@ import {
   markSceneVisited,
   resetExperience,
   setAnswer,
+  setExploreAll,
   setPrimaryRoute,
   subscribe,
 } from '../lib/experience/state';
@@ -752,6 +753,24 @@ export async function startExperience(): Promise<void> {
 
   initAnalytics();
   applyDocumentContext(getState());
+
+  // 7M-E: alternar recorrido esencial / completo (escenas opcionales)
+  const syncExploreToggle = (): void => {
+    const all = getState().exploreAll;
+    document.querySelectorAll<HTMLButtonElement>('[data-explore-toggle]').forEach((b) => {
+      b.setAttribute('aria-pressed', String(all));
+      b.textContent = all ? 'Ver recorrido esencial' : 'Explorar todo el recorrido';
+    });
+  };
+  document.querySelectorAll<HTMLButtonElement>('[data-explore-toggle]').forEach((b) =>
+    b.addEventListener('click', () => {
+      const next = !getState().exploreAll;
+      setExploreAll(next);
+      track('explore_all_toggled', { value: String(next) });
+    }),
+  );
+  syncExploreToggle();
+  window.addEventListener('publia:state', syncExploreToggle);
 
   const reduced = prefersReducedMotion();
   const universe = await initUniverse();
