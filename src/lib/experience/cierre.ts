@@ -50,7 +50,7 @@ export function buildSummary(): string {
 
 export function bindCierre(universe: CierreUniverse | null): void {
   const root = document.querySelector<HTMLElement>('[data-recommendation]');
-  if (!root) return;
+  if (!root || root.dataset.bound === '1') return;
   const meta = root.querySelector<HTMLElement>('[data-cierre-meta]');
   const cards = [...root.querySelectorAll<HTMLElement>('[data-cierre-card]')];
   const downloadBtn = root.querySelector<HTMLButtonElement>('[data-cierre-download]');
@@ -173,6 +173,7 @@ export function bindCierre(universe: CierreUniverse | null): void {
 
   renderCards();
   contextLinks();
+  root.dataset.bound = '1';
   window.addEventListener('publia:state', () => {
     renderCards();
     contextLinks();

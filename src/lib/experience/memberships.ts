@@ -27,7 +27,7 @@ function recommend(goal: string | null, team: string | null): Membership | null 
 
 export function bindMemberships(): void {
   const wrap = document.querySelector<HTMLElement>('[data-demo="memberships"]');
-  if (!wrap) return;
+  if (!wrap || wrap.dataset.bound === '1') return;
   const planBtns = [...wrap.querySelectorAll<HTMLButtonElement>('[data-memb-plan]')];
   const chips = [...wrap.querySelectorAll<HTMLElement>('[data-memb-chip]')];
   const elName = wrap.querySelector('[data-memb-name]');
@@ -101,4 +101,5 @@ export function bindMemberships(): void {
   });
 
   select(getState().membership ?? 'base');
+  wrap.dataset.bound = '1';
 }

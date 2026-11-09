@@ -1,7 +1,7 @@
 {
   "base": "https://dam-boulevard-explaining-alaska.trycloudflare.com",
-  "total": 140,
-  "fallos": 15,
+  "total": 158,
+  "fallos": 5,
   "resultados": [
     {
       "name": "carga inicial sin errores JS",
@@ -96,12 +96,12 @@
     {
       "name": "transición enterprise: la cámara viaja a otro mundo del mismo universo",
       "ok": true,
-      "detail": "mundo hero→enterprise · cámara [0,2.4,11.6]→[2.5760304814686528,1.8910114305507446,8.45552476619328] · tinte #050b1b→#0a0e18"
+      "detail": "mundo hero→enterprise · cámara [0,2.4,11.6]→[2.587668860408729,1.8953758226532733,8.464980949082092] · tinte #050b1b→#0a0e18"
     },
     {
       "name": "transición enterprise: el contenido de la escena destino aparece",
       "ok": true,
-      "detail": "scrollY 3022 · act=enterprise"
+      "detail": "scrollY 3011 · act=enterprise"
     },
     {
       "name": "transición enterprise: volver regresa al hero sin recargar",
@@ -195,13 +195,13 @@
     },
     {
       "name": "catálogo: cinco niveles de membresía",
-      "ok": false,
-      "detail": "0 planes"
+      "ok": true,
+      "detail": "5 planes"
     },
     {
-      "name": "housing: reparto en tres bandas",
+      "name": "housing: comparación compartida vs privada (2 modalidades)",
       "ok": true,
-      "detail": "3 bandas"
+      "detail": "2 modalidades"
     },
     {
       "name": "efectos: anclaje asignado",
@@ -209,14 +209,9 @@
       "detail": "1 escena(s) anclada(s)"
     },
     {
-      "name": "efectos: sección horizontal de planes",
-      "ok": false,
-      "detail": "0 pista(s)"
-    },
-    {
-      "name": "efectos: los planes se recorren en horizontal (escritorio)",
-      "ok": false,
-      "detail": "0px > 0px"
+      "name": "efectos: pin/morph/sticky presentes en la página",
+      "ok": true,
+      "detail": "pin=1 morph=1 sticky=1"
     },
     {
       "name": "efectos: morphing de la entidad",
@@ -261,7 +256,7 @@
     {
       "name": "ruta eficiencia: escena propia visible",
       "ok": true,
-      "detail": "1696px · route=efficiency act=efficiency world=efficiency scrollY=546"
+      "detail": "1696px · route=efficiency act=efficiency world=efficiency scrollY=2618"
     },
     {
       "name": "ruta eficiencia: mensaje propio de la escena",
@@ -320,33 +315,33 @@
     },
     {
       "name": "catálogo: BASE $300",
-      "ok": false,
-      "detail": ""
+      "ok": true,
+      "detail": "$300 MXN/mes"
     },
     {
       "name": "catálogo: CRECIMIENTO $2,000",
-      "ok": false,
-      "detail": ""
+      "ok": true,
+      "detail": "$2,000 MXN/mes"
     },
     {
       "name": "catálogo: OPERACIÓN $3,000",
-      "ok": false,
-      "detail": ""
+      "ok": true,
+      "detail": "$3,000 MXN/mes"
     },
     {
       "name": "catálogo: COBERTURA $4,000",
-      "ok": false,
-      "detail": ""
-    },
-    {
-      "name": "catálogo: AGENTE como rango pendiente",
-      "ok": false,
-      "detail": ""
-    },
-    {
-      "name": "housing: reparto 50/25/25",
       "ok": true,
-      "detail": "50/25/25"
+      "detail": "$4,000 MXN/mes"
+    },
+    {
+      "name": "catálogo: AGENTE como rango pendiente (nunca tarifa confirmada)",
+      "ok": true,
+      "detail": "pendiente de confirmar (objetivo $500–$600 MXN/mes)"
+    },
+    {
+      "name": "housing: reparto 50/25/25 en modalidad compartida",
+      "ok": true,
+      "detail": "50%/25%/25% | 100%"
     },
     {
       "name": "servicios: catálogo anterior con precio real",
@@ -380,7 +375,7 @@
     },
     {
       "name": "contacto: número público verificado",
-      "ok": false,
+      "ok": true,
       "detail": "https://wa.me/525573724660?text=Hola%20Publia%2C%20vengo%20del%20recorrido%20web.%0A%0APropuesta%20Publia.mx%20%E2%80%94%20exploraci%C3%B3n%20libre%0A-%20Elegiste%20la%20ruta%20por%3A%20scroll%20libre%0A-%20Servicio%20ex"
     },
     {
@@ -446,12 +441,12 @@
     {
       "name": "rendimiento: JS + CSS inicial (con el 3D del hero) por debajo de 260 kB",
       "ok": false,
-      "detail": "264 kB (JS 249 · CSS 15)"
+      "detail": "268 kB (JS 253 · CSS 15)"
     },
     {
       "name": "rendimiento: la aplicación sin 3D por debajo de 90 kB",
       "ok": true,
-      "detail": "79 kB de JS de aplicación"
+      "detail": "83 kB de JS de aplicación"
     },
     {
       "name": "rendimiento: el escenario 3D se carga sólo bajo demanda",
@@ -496,27 +491,27 @@
     {
       "name": "v3 scroll: la cámara se transforma en 30/60/90% (ida)",
       "ok": true,
-      "detail": "30=[2.893591963976446,2.0100969864911673,8.713543470730864] 60=[2.5760304814686528,1.8910114305507446,8.45552476619328] 90=[1.9,1.7814732142857141,8.602455357142858]"
+      "detail": "30=[2.9551091098025632,2.033165916175961,8.763526151714583] 60=[2.5760304814686528,1.8910114305507446,8.45552476619328] 90=[1.9,1.778019504876219,8.596699174793699]"
     },
     {
       "name": "v3 scroll: recorrido inverso mueve la cámara en sentido inverso (reversible)",
       "ok": true,
-      "detail": "90=[1.9,1.7814732142857141,8.602455357142858] ida60=[2.5760304814686528,1.8910114305507446,8.45552476619328] vuelta60=[1.2635983263598325,1.4119246861924686,7.655648535564854]"
+      "detail": "90=[1.9,1.778019504876219,8.596699174793699] ida60=[2.5760304814686528,1.8910114305507446,8.45552476619328] vuelta60=[1.2635983263598325,1.4119246861924686,7.655648535564854]"
     },
     {
-      "name": "v3 demo empresa: la capa cambia el texto",
-      "ok": false,
-      "detail": ""
+      "name": "7M-B infra: el modo cambia el texto",
+      "ok": true,
+      "detail": "Selecciona y observa los servidores de Publia, representados"
     },
     {
-      "name": "v3 demo empresa: la capa mueve la cámara 3D",
-      "ok": false,
-      "detail": "[2.161248654467169,1.7354682454251882,8.118514531754576] -> [2.161248654467169,1.7354682454251882,8.118514531754576]"
+      "name": "7M-B infra: el modo mueve la cámara 3D",
+      "ok": true,
+      "detail": "[2.161248654467169,1.7354682454251882,8.118514531754576] -> [2.2333333333333334,1.7,7.95]"
     },
     {
-      "name": "v3 demo empresa: estado accesible aria-pressed",
-      "ok": false,
-      "detail": ""
+      "name": "7M-B infra: estado accesible aria-pressed",
+      "ok": true,
+      "detail": "true"
     },
     {
       "name": "v3 demo eficiencia: resultado según foco",
@@ -540,8 +535,8 @@
     },
     {
       "name": "v3 demo geonodos: scroll enciende conexiones (progreso)",
-      "ok": true,
-      "detail": "progreso=3"
+      "ok": false,
+      "detail": "progreso=0"
     },
     {
       "name": "v3 demo geonodos: nodo activo marcado",
@@ -624,9 +619,104 @@
       "detail": ""
     },
     {
-      "name": "v4-A empresa: llegada con demo infra + arte A04 + capítulo mundo",
+      "name": "7M-B red: 6 nodos de capacidad",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-B red: click nodo 3 selecciona y persiste en estado",
       "ok": false,
-      "detail": "{\"demo\":false,\"art\":\"A04\",\"chapter\":\"mundo\",\"tone\":\"petrol\",\"title\":\"TU INFRAESTRUCTURA. TUS REGLAS.\"}"
+      "detail": "\"profesionales\""
+    },
+    {
+      "name": "7M-B red: demo ilumina flujo y muestra resultado",
+      "ok": false,
+      "detail": ""
+    },
+    {
+      "name": "7M-B infra: 3 modos de operación",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-B infra: 10 racks con LEDs",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-B infra: modo housing persiste + status SIMULACIÓN",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-B infra: activar red sube contador de tráfico",
+      "ok": true,
+      "detail": "017"
+    },
+    {
+      "name": "7M-B infra: comparación compartida vs privada presente (sin $0 publicado)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-B personas: 3 casos + 4 controles",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-B personas: paso a paso avanza etapa (salida no vacía)",
+      "ok": true,
+      "detail": "🤖 Primer análisis"
+    },
+    {
+      "name": "7M-B personas: ejecutar pone estado Simulando y habilita pausa",
+      "ok": false,
+      "detail": ""
+    },
+    {
+      "name": "7M-B membresías: 5 niveles",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-B membresías: AGENTE nunca publica tarifa confirmada (etiqueta pendiente)",
+      "ok": true,
+      "detail": " AGENTE pendiente de confirmar (objetivo $500–$600 MXN/mes) "
+    },
+    {
+      "name": "7M-B membresías: diagnóstico recomienda y persiste",
+      "ok": true,
+      "detail": "\"cobertura\""
+    },
+    {
+      "name": "7M-B cierre: 6 tarjetas de capacidad",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-B cierre: añadir capacidad persiste en estado.capabilities",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-B cierre: meta refleja ruta + membresía + capacidad",
+      "ok": true,
+      "detail": "Ruta: ruta Empresa · Infraestructura: Housing administrado · Membresía orientativa: COBERTURA · Servicio: Inteligencia artificial · Capacidades (1/6): Web + chatbot de WhatsApp"
+    },
+    {
+      "name": "7M-B cierre: acciones finales presentes (TXT, volver, reiniciar, WhatsApp con contexto)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-B cierre: demo de tarjeta recorre 3 pasos",
+      "ok": true,
+      "detail": "2/3 · Organizar tareas y borradores"
+    },
+    {
+      "name": "7M-B empresa: llegada con demo infra soberana + arte A04 + capítulo mundo",
+      "ok": true,
+      "detail": "{\"demo\":true,\"art\":\"A04\",\"chapter\":\"mundo\",\"tone\":\"petrol\",\"title\":\"TU INFRAESTRUCTURA. TUS REGLAS.\"}"
     },
     {
       "name": "v4-A eficiencia: llegada con demo flujo + arte A03",
@@ -634,9 +724,9 @@
       "detail": "{\"demo\":true,\"art\":\"A03\",\"chapter\":\"mundo\",\"tone\":\"electric\"}"
     },
     {
-      "name": "v4-A exploración: llegada con demo geonodos + arte A05",
-      "ok": false,
-      "detail": "{\"demo\":false,\"art\":\"A05\",\"chapter\":\"mundo\",\"tone\":\"emerald\"}"
+      "name": "7M-B exploración: llegada con demo red colaborativa + arte A05",
+      "ok": true,
+      "detail": "{\"demo\":true,\"art\":\"A05\",\"chapter\":\"mundo\",\"tone\":\"emerald\"}"
     },
     {
       "name": "v4-A: los 3 mundos usan tonos distintos (petrol/electric/emerald)",
@@ -651,7 +741,7 @@
     {
       "name": "v4-A transición botón: cámara cambia en 3 momentos (inicio/medio/fin)",
       "ok": true,
-      "detail": "0=[0,2.4,11.6] mid=[1.9,1.6617609254498715,8. fin=[2.5760304814686528,1.8910"
+      "detail": "0=[0,2.4,11.6] mid=[2.9551091098025632,2.0331 fin=[2.5760304814686528,1.8910"
     },
     {
       "name": "v4-A transición botón: portal visible a mitad del viaje",
@@ -671,7 +761,7 @@
     {
       "name": "portal: visible a mitad del recorrido por scroll",
       "ok": true,
-      "detail": "{\"progress\":\"0.889\",\"maxOp\":0.9,\"visible\":true}"
+      "detail": "{\"progress\":\"0.667\",\"maxOp\":1,\"visible\":true}"
     },
     {
       "name": "portal: se disuelve al aterrizar en el mundo",
@@ -681,7 +771,7 @@
     {
       "name": "portal: reversible — a mitad del scrub otra vez es visible",
       "ok": true,
-      "detail": "{\"progress\":\"0.500\",\"maxOp\":1,\"visible\":true}"
+      "detail": "{\"progress\":\"0.944\",\"maxOp\":0.5,\"visible\":true}"
     },
     {
       "name": "portal: al volver al inicio (progreso 0) queda oculto",

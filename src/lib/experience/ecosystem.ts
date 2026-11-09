@@ -17,7 +17,7 @@ const pad = (n: number): string => String(n).padStart(2, '0');
 
 export function bindEcosystem(universe: EcosystemUniverse | null): void {
   const wrap = document.querySelector<HTMLElement>('[data-demo="ecosystem"]');
-  if (!wrap) return;
+  if (!wrap || wrap.dataset.bound === '1') return;
   const cloud = wrap.querySelector<HTMLElement>('[data-eco-cloud]');
   const orbit = wrap.querySelector<HTMLElement>('[data-eco-orbit]');
   const scene = wrap.closest<HTMLElement>('section[id]');
@@ -191,4 +191,5 @@ export function bindEcosystem(universe: EcosystemUniverse | null): void {
       el.style.transform = `translate3d(calc(-50% + ${Math.cos(angle) * rx}px), calc(-50% + ${Math.sin(angle) * ry}px), 0)`;
     });
   }
+  wrap.dataset.bound = '1';
 }

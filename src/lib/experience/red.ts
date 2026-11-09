@@ -16,7 +16,7 @@ const pad = (n: number): string => String(n).padStart(2, '0');
 
 export function bindRed(universe: RedUniverse | null): void {
   const wrap = document.querySelector<HTMLElement>('[data-demo="red"]');
-  if (!wrap) return;
+  if (!wrap || wrap.dataset.bound === '1') return;
   const universeEl = wrap.querySelector<HTMLElement>('[data-red-universe]');
   const nodesWrap = wrap.querySelector<HTMLElement>('[data-red-nodes]');
   const wires = [...wrap.querySelectorAll<SVGLineElement>('[data-red-wire]')];
@@ -126,6 +126,7 @@ export function bindRed(universe: RedUniverse | null): void {
 
   choose(0);
   setCase(0);
+  wrap.dataset.bound = '1';
 
   // Órbita ligada al scroll de la escena (reversible); rAF sólo cerca del viewport
   const scene = wrap.closest<HTMLElement>('section[id]');

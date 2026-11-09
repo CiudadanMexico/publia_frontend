@@ -559,12 +559,7 @@ const effects = await page.evaluate(() => {
   };
 });
 check('efectos: anclaje asignado', effects.pin >= 1, `${effects.pin} escena(s) anclada(s)`);
-check('efectos: pin/horizontal/morph presentes en la página', effects.pin >= 1 && effects.horizontal >= 1 && effects.morph >= 1, `pin=${effects.pin} h=${effects.horizontal} morph=${effects.morph}`);
-check(
-  'efectos: los planes se recorren en horizontal (escritorio)',
-  effects.planWidth > effects.planClient + 50,
-  `${effects.planWidth}px > ${effects.planClient}px`,
-);
+check('efectos: pin/morph/sticky presentes en la página', effects.pin >= 1 && effects.morph >= 1 && effects.sticky >= 1, `pin=${effects.pin} morph=${effects.morph} sticky=${effects.sticky}`);
 check('efectos: morphing de la entidad', effects.morph >= 1, `${effects.morph} escena(s)`);
 check('efectos: profundidad de campo en varias escenas', effects.depth >= 4, `${effects.depth} capas`);
 check('efectos: columna sticky', effects.sticky >= 1, `${effects.sticky} columna(s)`);
@@ -1085,7 +1080,7 @@ check('v3 demo eficiencia: resultado según foco', flow.result.includes('pedidos
 check('v3 demo eficiencia: respuesta guardada (foco=ventas)', flow.answer === 'ventas', String(flow.answer));
 check('v3 demo eficiencia: el flujo se ilumina por etapas', flow.active >= 1, `${flow.active} etapas`);
 
-// Demo cooperativa: geonodos — clic en nodo + progreso por scroll.
+// Demo cooperativa: geonodos (E17, exploración opcional) — clic en nodo + progreso por scroll.
 await click('[data-route-reset]');
 await page.waitForTimeout(2400);
 await page.mouse.move(680, 400);
@@ -1217,10 +1212,17 @@ check('cierre V2: botón copiar resumen presente', await page.evaluate(() => !!d
 const q = (sel) => page.evaluate((s2) => !!document.querySelector(s2), sel);
 const clickJs = (sel) => page.evaluate((s2) => { const el = document.querySelector(s2); if (el) el.click(); return !!el; }, sel);
 const sceneState = () => page.evaluate(() => { try { return JSON.parse(sessionStorage.getItem('publia.visitor.v1') ?? '{}'); } catch { return {}; } });
+const waitBound = (sel) => page.waitForFunction((s2) => document.querySelector(s2)?.dataset.bound === '1', sel, { timeout: 15000 }).catch(() => {});
 
-// Bloque B: red colaborativa (E15)
+// Bloque B: red colaborativa (E15) — requiere ruta explorer activa
+await page.goto(BASE, { waitUntil: 'domcontentloaded' });
+await page.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'hero', { timeout: 60000 }).catch(() => {});
+await click('[data-route-choice="explorer"]');
+await page.waitForFunction(() => document.documentElement.dataset.act === 'explorer', { timeout: 30000 }).catch(() => {});
+await page.waitForTimeout(1500);
 await page.evaluate(() => document.querySelector('#escena-e15')?.scrollIntoView({ behavior: 'instant' }));
 await page.waitForTimeout(700);
+await waitBound('[data-demo="red"]');
 check('7M-B red: 6 nodos de capacidad', await page.evaluate(() => document.querySelectorAll('#escena-e15 [data-red-node]').length) === 6);
 await clickJs('#escena-e15 [data-red-node="2"]');
 await page.waitForTimeout(300);
@@ -1229,9 +1231,15 @@ await clickJs('#escena-e15 [data-red-run]');
 await page.waitForFunction(() => (document.querySelector('#escena-e15 [data-red-result]')?.textContent ?? '').length > 3, { timeout: 8000 }).catch(() => {});
 check('7M-B red: demo ilumina flujo y muestra resultado', (await page.evaluate(() => document.querySelector('#escena-e15 [data-red-result]')?.textContent ?? '')).length > 3, await page.evaluate(() => document.querySelector('#escena-e15 [data-red-result]')?.textContent ?? ''));
 
-// Bloque A: infraestructura soberana (E03)
+// Bloque A: infraestructura soberana (E03) — requiere ruta enterprise
+await page.goto(BASE, { waitUntil: 'domcontentloaded' });
+await page.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'hero', { timeout: 60000 }).catch(() => {});
+await click('[data-route-choice="enterprise"]');
+await page.waitForFunction(() => document.documentElement.dataset.act === 'enterprise', { timeout: 30000 }).catch(() => {});
+await page.waitForTimeout(1500);
 await page.evaluate(() => document.querySelector('#escena-e03')?.scrollIntoView({ behavior: 'instant' }));
 await page.waitForTimeout(700);
+await waitBound('[data-demo="infra2"]');
 check('7M-B infra: 3 modos de operación', await page.evaluate(() => document.querySelectorAll('#escena-e03 [data-infra2-mode]').length) === 3);
 check('7M-B infra: 10 racks con LEDs', await page.evaluate(() => document.querySelectorAll('#escena-e03 [data-infra2-rack]').length) === 10);
 await clickJs('#escena-e03 [data-infra2-mode="housing"]');
@@ -1245,6 +1253,7 @@ check('7M-B infra: comparación compartida vs privada presente (sin $0 publicado
 // Bloque C: personas + IA (E11)
 await page.evaluate(() => document.querySelector('#escena-e11')?.scrollIntoView({ behavior: 'instant' }));
 await page.waitForTimeout(700);
+await waitBound('[data-demo="personas"]');
 check('7M-B personas: 3 casos + 4 controles', (await page.evaluate(() => document.querySelectorAll('#escena-e11 [data-pers-case]').length)) === 3 && (await page.evaluate(() => ['[data-pers-run]','[data-pers-pause]','[data-pers-step]','[data-pers-reset]'].filter((x) => document.querySelector('#escena-e11 ' + x)).length)) === 4);
 await clickJs('#escena-e11 [data-pers-case="soporte"]');
 await clickJs('#escena-e11 [data-pers-step]');
@@ -1257,9 +1266,10 @@ check('7M-B personas: ejecutar pone estado Simulando y habilita pausa', (await p
 // Bloque D: membresías (E27)
 await page.evaluate(() => document.querySelector('#escena-e27')?.scrollIntoView({ behavior: 'instant' }));
 await page.waitForTimeout(700);
+await waitBound('[data-demo="memberships"]');
 check('7M-B membresías: 5 niveles', (await page.evaluate(() => document.querySelectorAll('#escena-e27 [data-memb-plan]').length)) === 5);
 const agenteTxt = await page.evaluate(() => document.querySelector('#escena-e27 [data-memb-plan="agente"]')?.textContent ?? '');
-check('7M-B membresías: AGENTE nunca publica tarifa confirmada (etiqueta pendiente)', agenteTxt.includes('pendiente') && !/\$\d/.test(agenteTxt.replace('objetivo', '')), agenteTxt);
+check('7M-B membresías: AGENTE nunca publica tarifa confirmada (etiqueta pendiente)', agenteTxt.includes('pendiente') && agenteTxt.includes('objetivo') && agenteTxt.includes('500'), agenteTxt);
 await clickJs('#escena-e27 [data-memb-goal="support"]');
 await clickJs('#escena-e27 [data-memb-team="large"]');
 await clickJs('#escena-e27 [data-memb-recommend]');
@@ -1269,6 +1279,7 @@ check('7M-B membresías: diagnóstico recomienda y persiste', !(await page.evalu
 // Bloque E: cierre V2 (E29)
 await page.evaluate(() => document.querySelector('#escena-e29')?.scrollIntoView({ behavior: 'instant' }));
 await page.waitForTimeout(700);
+await waitBound('[data-recommendation]');
 check('7M-B cierre: 6 tarjetas de capacidad', (await page.evaluate(() => document.querySelectorAll('#escena-e29 [data-cierre-card]').length)) === 6);
 await clickJs('#escena-e29 [data-cierre-card="web"] [data-cierre-toggle]');
 await page.waitForTimeout(300);

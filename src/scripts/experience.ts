@@ -30,8 +30,6 @@ import { initEffects } from '../lib/animation/effects';
 import { pickVariantFrom, visitorSegments } from '../lib/experience/graph';
 import { accentify } from '../lib/experience/accent';
 import { createNarrative } from '../lib/experience/narrative';
-import { bindPostHero } from '../lib/experience/postHero';
-import { bindEcosystem } from '../lib/experience/ecosystem';
 
 import type { NarrativeHandle } from '../lib/experience/narrative';
 import { buildMailto } from '../data/site';
@@ -292,14 +290,23 @@ function bindFreeScrollIntent(narrative: NarrativeHandle | null): void {
  */
 /** Carga diferida de un binder cuando su escena entra al viewport. */
 function lazyBind(selector: string, load: () => Promise<void>): void {
-  const el = document.querySelector(selector);
-  if (!el || !('IntersectionObserver' in window)) {
+  const el = document.querySelector<HTMLElement>(selector);
+  if (!el) {
+    void load();
+    return;
+  }
+  // IO puro: dispara al entrar al viewport; al cambiar de ruta (display:none
+  // -> block) el IO recalcula y dispara cuando la escena sea visible.
+  let done = false;
+  if (!('IntersectionObserver' in window)) {
     void load();
     return;
   }
   const io = new IntersectionObserver(
     (entries) => {
+      if (done) return;
       if (entries.some((e) => e.isIntersecting)) {
+        done = true;
         io.disconnect();
         void load();
       }
@@ -755,14 +762,15 @@ export async function startExperience(): Promise<void> {
   const reducedMotion = reduced;
   const sceneLookTriggers = bindSceneLooks(universe);
   bindDemos(universe);
-  bindEcosystem(universe);
+  lazyBind('[data-demo="ecosystem"]', () => import('../lib/experience/ecosystem').then((m) => m.bindEcosystem(universe)));
   // Bloques 7M-B: binders en chunks propios, cargados sólo al acercarse a su escena
   lazyBind('[data-demo="red"]', () => import('../lib/experience/red').then((m) => m.bindRed(universe)));
   lazyBind('[data-demo="infra2"]', () => import('../lib/experience/infra').then((m) => m.bindInfra(universe)));
   lazyBind('[data-demo="personas"]', () => import('../lib/experience/personas').then((m) => m.bindPersonas()));
   lazyBind('[data-demo="memberships"]', () => import('../lib/experience/memberships').then((m) => m.bindMemberships()));
   lazyBind('[data-recommendation]', () => import('../lib/experience/cierre').then((m) => m.bindCierre(universe)));
-  bindPostHero(universe);
+  lazyBind('[data-demo="ecosystem"]', () => import('../lib/experience/postHero').then((m) => m.bindPostHero(universe)));
+  lazyBind('[data-recommendation]', () => import('../lib/experience/postHero').then((m) => m.bindPostHero(universe)));
   let lastPortalKey = '';
   const drivePortal = (state: ReturnType<typeof getState>): void => {
     const heroElement = document.querySelector<HTMLElement>('[data-hero-scene]');

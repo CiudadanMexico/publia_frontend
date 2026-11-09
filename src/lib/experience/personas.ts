@@ -7,7 +7,7 @@ import { track } from './events';
 
 export function bindPersonas(): void {
   const wrap = document.querySelector<HTMLElement>('[data-demo="personas"]');
-  if (!wrap) return;
+  if (!wrap || wrap.dataset.bound === '1') return;
   const caseBtns = [...wrap.querySelectorAll<HTMLButtonElement>('[data-pers-case]')];
   const runBtn = wrap.querySelector<HTMLButtonElement>('[data-pers-run]');
   const runText = wrap.querySelector('[data-pers-run-text]');
@@ -146,4 +146,5 @@ export function bindPersonas(): void {
   });
   resetBtn?.addEventListener('click', () => updateCase(current.id));
   updateCase('cliente');
+  wrap.dataset.bound = '1';
 }
