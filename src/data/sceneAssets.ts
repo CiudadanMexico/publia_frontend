@@ -63,7 +63,7 @@ export const SCENE_ASSETS: readonly AssetSlot[] = [
   },
   {
     id: 'A05',
-    scenes: ['E15', 'E16', 'E17'],
+    scenes: ['E16', 'E17'],  // 7M-E: E15 ya no usa A05 (redDemo es el visual)
     desktop: '/assets/scenes/A05-geonodos-2560x1440.webp',
     mobile: '/assets/scenes/A05-geonodos-1080x1350.webp',
     layers: ['/assets/scenes/A05-nodo-1.png', '/assets/scenes/A05-nodo-2.png', '/assets/scenes/A05-nodo-3.png'],

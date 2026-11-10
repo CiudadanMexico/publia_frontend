@@ -1,207 +1,1087 @@
 {
- "bloque": "7M-D",
- "ok": 195,
- "falla": 0,
- "total": [
-  "195",
-  "195"
- ],
- "fallas": [],
- "detalle_ok": [
-  "  carga inicial sin errores JS",
-  "  rendimiento: JS + CSS inicial (con el 3D del hero) por debajo de 260 kB — 257 kB (JS 238 · CSS 18)",
-  "  rendimiento: la aplicación sin 3D por debajo de 90 kB — 69 kB de JS de aplicación",
-  "  rendimiento: el escenario 3D se carga sólo bajo demanda — three.js diferido",
-  "  hero: título correcto — EL MUNDO ESTÁ CAMBIANDO.",
-  "  hero: dos CTA visibles — 2 CTA",
-  "  hero: jerarquía tipográfica y CTA táctil — título 73.44px · CTA 69px",
-  "  prisma: canvas presente y WebGL activo — {\"present\":true,\"webgl\":true,\"size\":[1440,900]}",
-  "  prisma: la escena 3D se renderiza y cambia (animación real) — 667202 vs 678517 bytes",
-  "  prisma: pinta una fracción útil del viewport — {\"paintedRatio\":0.20326234567901236}",
-  "  hero 3D: lienzo único presente con WebGL activo — [1440,900]",
-  "  hero 3D: el universo arranca en el mundo hero — world=hero · cámara [0,2.4,11.6]",
-  "  hero 3D: la escena carga sin errores de recursos — sin errores",
-  "  hero 3D: las ocho tarjetas holográficas están en el encuadre — 8/8 tarjetas",
-  "  hero 3D: los dos modelos GLB y los ocho iconos se descargan — 18/10 recursos",
-  "  hero 3D: pinta la escena (mascota, prisma, tarjetas) — {\"paintedRatio\":0.205625}",
-  "  hero 3D: la animación ambiental cambia entre fotogramas — 689540 vs 687258 bytes",
-  "  marca: el encabezado usa el logotipo oficial — oficial=true provisional=0",
-  "  hero: la ruta cooperativa se descubre por scroll/bifurcación, sin tercer botón — {\"heroThirdButton\":false,\"branchE14\":2,\"escenaE15\":true}",
-  "  hero: viñeta activa sólo en el acto hero — act=hero · viñeta 1",
-  "  composición: coincide con la captura aprobada — izq 36/35 · der 45/40 · brillo 14.4/14.8 %",
-  "  transición enterprise: la cámara viaja a otro mundo del mismo universo — mundo hero→enterprise · cámara [0,2.4,11.6]→[2.5760304814686528,1.8910114305507446,8.45552476619328] · tinte #050b1b→#0a0e18",
-  "  transición enterprise: el contenido de la escena destino aparece — scrollY 3022 · act=enterprise",
-  "  transición enterprise: volver regresa al hero sin recargar — world=hero · act=hero · scrollY 0",
-  "  transición efficiency: la cámara viaja a otro mundo del mismo universo — mundo hero→efficiency · cámara [0,2.4,11.6]→[-1.8332572992700729,1.6809306569343063,8.252326642335767] · tinte #050b1b→#0d0a05",
-  "  transición efficiency: el contenido de la escena destino aparece — scrollY 6652 · act=efficiency",
-  "  transición efficiency: volver regresa al hero sin recargar — world=hero · act=hero · scrollY 0",
-  "  transición cooperative: la cámara viaja a otro mundo del mismo universo — mundo hero→cooperative · cámara [0,2.4,11.6]→[-0.016666666666666673,2.3465745538057745,10.5434824671916] · tinte #050b1b→#060c12",
-  "  transición cooperative: el contenido de la escena destino aparece — scrollY 700 · act=cooperative",
-  "  transición cooperative: volver regresa al hero sin recargar — world=hero · act=hero · scrollY 0",
-  "  P0: sólo dos botones principales en el hero (la tercera ruta es por scroll) — routeChoices=2 · tercer botón=0 · pista=\"¿Prefieres explorar a tu manera? Despláz…\"",
-  "  P0: la pista de scroll invita a explorar sin botón — ¿Prefieres explorar a tu manera? Desplázate ↓",
-  "  P0: scroll manual sin clic entra inequívocamente en la ruta exploración — tras rueda: route=explorer · act=cooperative · world=cooperative",
-  "  P0: el scroll conduce la cámara (scrub) hacia el mundo cooperativo — world=cooperative · cámara=[-0.016666666666666673,2.386932474721508,10.073908601542417] · scrollY=1400",
-  "  P0: tras elegir empresa, el scroll NO cambia a exploración — route=enterprise · act=enterprise · world=enterprise",
-  "  P0: las ocho tarjetas tienen control DOM accesible — chips=8",
-  "  P0: foco de teclado en tarjeta muestra información y resalta la tarjeta 3D — {\"tooltip\":true,\"focusedCard\":\"0\",\"expanded\":\"true\"}",
-  "  P0: Enter sobre tarjeta abre/cierra la información contextual — aria-expanded=false",
-  "  grafo: 31 escenas montadas (E00-E30) — 31 escenas",
-  "  red humana: enlaces dibujados — 8 enlaces",
-  "  demostraciones marcadas como simulación — 4 bloques",
-  "  catálogo: cinco niveles de membresía — 5 planes",
-  "  housing: comparación compartida vs privada (2 modalidades) — 2 modalidades",
-  "  efectos: anclaje asignado — 1 escena(s) anclada(s)",
-  "  efectos: pin/morph/sticky presentes en la página — pin=1 morph=1 sticky=1",
-  "  efectos: morphing de la entidad — 1 escena(s)",
-  "  efectos: profundidad de campo en varias escenas — 6 capas",
-  "  efectos: columna sticky — 1 columna(s)",
-  "  ruta empresa: estado aplicado — enterprise",
-  "  ruta empresa: segmentos aplicados — enterprise",
-  "  ruta empresa: escena propia visible — 2392px",
-  "  ruta empresa: contenido de la escena — TU INFRAESTRUCTURA. TUS REGLAS.",
-  "  variante compartida: la ruta empresa reescribe la escena común — Ya tienes una empresa. La pregunta es qué hace su tecnología.",
-  "  ruta eficiencia: escena propia visible — 1696px · route=efficiency act=efficiency world=efficiency scrollY=34",
-  "  ruta eficiencia: mensaje propio de la escena — EL TIEMPO NO VUELVE. RECUPÉRALO.",
-  "  variante compartida: la ruta eficiencia reescribe la escena común — El tiempo es el cuello de botella. La pregunta es qué se elimina.",
-  "  cambio de ruta: vuelve al estado neutral — unclassified",
-  "  cambio de ruta: regresa al hero — scrollY 0",
-  "  ruta exploración: se activa por scroll natural — explorer",
-  "  ruta exploración: escena visible — 599px",
-  "  ruta exploración: dos bifurcaciones — 2 opciones",
-  "  bifurcaciones: apuntan a escenas reales — #escena-e15, #escena-e24",
-  "  bifurcación: el rasgo queda registrado — value_driven",
-  "  bifurcación: abre la escena cooperativa — 2179px",
-  "  variante por rasgo: el rasgo reescribe la escena compartida — Una red que se comparte, no que se subcontrata.",
-  "  catálogo: BASE $300 — $300 MXN/mes",
-  "  catálogo: CRECIMIENTO $2,000 — $2,000 MXN/mes",
-  "  catálogo: OPERACIÓN $3,000 — $3,000 MXN/mes",
-  "  catálogo: COBERTURA $4,000 — $4,000 MXN/mes",
-  "  catálogo: AGENTE como rango pendiente (nunca tarifa confirmada) — pendiente de confirmar (objetivo $500–$600 MXN/mes)",
-  "  housing: reparto 50/25/25 en modalidad compartida — 50%/25%/25% | 100%",
-  "  servicios: catálogo anterior con precio real — $150 MXN",
-  "  servicios: el producto de prueba no se publica — Sucri excluido",
-  "  servicios: se aclara que es venta puntual — Venta puntual del catálogo anterior, con precio de referenci",
-  "  conversión: CTA de contacto visible — 52px",
-  "  conversión: correo con contexto de navegación — mailto:hola@publia.mx?subject=Diagn%C3%B3stico%20empresarial%20%E2%80%94%20Publi",
-  "  contacto: WhatsApp visible en la página — 2 enlace(s)",
-  "  contacto: número público verificado — https://wa.me/525573724660",
-  "  formulario: existe con sus campos — 4 campos",
-  "  formulario: todos los campos tienen etiqueta — 4/4",
-  "  formulario: no envía datos a ningún servidor — action=null method=get",
-  "  formulario: declara que no guarda la información",
-  "  formulario: rechaza un correo inválido",
-  "  formulario: no genera enlace con datos inválidos",
-  "  formulario: el mensaje incluye el contexto de navegación — mailto:hola@publia.mx?subject=Diagn%C3%B3stico%20empresarial%20%E2%80%",
-  "  móvil: sin desbordamiento horizontal — 0px",
-  "  móvil: los CTA funcionan — efficiency",
-  "  accesibilidad: sin violaciones graves (axe wcag2aa) — 0 graves",
-  "  accesibilidad: sin violaciones moderadas o menores — 0 violaciones",
-  "  accesibilidad: ruta empresa sin violaciones — 0 violaciones",
-  "  movimiento reducido: contenido visible y sin animación — {\"layerReady\":true,\"reveals\":true,\"heroVisible\":true}",
-  "  v3: >=5 composiciones distintas — 7",
-  "  v3: >=4 atmósferas de fondo distintas — 8",
-  "  v3: acentos amarillos en titulares (em) — 13 em",
-  "  v3: slots de arte A01-A05 preparados — A01,A01,A04,A04,A03,A03,A03,A03,A05,A05,A05,A02,A04,A08,A06,A09",
-  "  v3: eyebrows con emoji semántico — 9 eyebrows",
-  "  v3: escena clara con tinta oscura (contraste real) — {\"color\":\"rgb(9, 25, 51)\",\"bg\":\"rgba(0, 0, 0, 0)\"}",
-  "  v3 scroll: la cámara se transforma en 30/60/90% (ida) — 30=[2.893591963976446,2.0100969864911673,8.713543470730864] 60=[2.5760304814686528,1.8910114305507446,8.45552476619328] 90=[1.9,1.8189889025893957,8.66498150431566]",
-  "  v3 scroll: recorrido inverso mueve la cámara en sentido inverso (reversible) — 90=[1.9,1.8189889025893957,8.66498150431566] ida60=[2.5760304814686528,1.8910114305507446,8.45552476619328] vuelta60=[1.8229199372056515,1.5167974882260595,8.145054945054945]",
-  "  7M-B infra: el modo cambia el texto — Selecciona y observa los servidores de Publia, representados",
-  "  7M-B infra: el modo mueve la cámara 3D — [2.161248654467169,1.7354682454251882,8.118514531754576] -> [2.2333333333333334,1.7,7.95]",
-  "  7M-B infra: estado accesible aria-pressed — true",
-  "  v3 demo eficiencia: resultado según foco — Los pedidos se registran solos y llegan a tu bandeja con pri",
-  "  v3 demo eficiencia: respuesta guardada (foco=ventas) — ventas",
-  "  v3 demo eficiencia: el flujo se ilumina por etapas — 1 etapas",
-  "  v3 demo geonodos: el nodo explica qué se comparte — Manuales y cursos abiertos: cada comunidad adapta lo que nec",
-  "  v3 demo geonodos: scroll enciende conexiones (progreso) — progreso=3",
-  "  v3 demo geonodos: nodo activo marcado — 1",
-  "  V4-B asset A02: data-asset-ready=true y servido como image/avif — {\"ready\":\"true\",\"src\":\"/assets/scenes/A02-galaxia-soluciones-2560x1440.avif\",\"head\":\"image/avif 200\",\"hasMobile\":true}",
-  "  V4-B asset A03: data-asset-ready=true y servido como image/avif — {\"ready\":\"true\",\"src\":\"/assets/scenes/A03-flujo-automatizacion-1920x1080.avif\",\"head\":\"image/avif 200\",\"hasMobile\":true}",
-  "  V4-B asset A04: data-asset-ready=true y servido como image/avif — {\"ready\":\"true\",\"src\":\"/assets/scenes/A04-infraestructura-2560x1440.avif\",\"head\":\"image/avif 200\",\"hasMobile\":true}",
-  "  V4-B asset A05: data-asset-ready=true y servido como image/avif — {\"ready\":\"true\",\"src\":\"/assets/scenes/A05-geonodos-2560x1440.avif\",\"head\":\"image/avif 200\",\"hasMobile\":true}",
-  "  auditoría imágenes: cada asset real aparece UNA sola vez (sin duplicados) — ready={\"A04\":1,\"A03\":1,\"A05\":1,\"A02\":1}",
-  "  auditoría imágenes: caja del asset con proporción 16:9 (1.7–1.85), no franja 3.8:1 — [\"A04@escena-e03=1.78\",\"A03@escena-e07=1.78\",\"A05@escena-e15=1.78\",\"A02@escena-e20=1.78\"]",
-  "  auditoría imágenes: asset real usa contain (póster completo, sin recorte) — [\"contain\",\"contain\",\"contain\",\"contain\"]",
-  "  ecosistema E25: 8 nodos con iconos reales cargados — {\"nodes\":8,\"iconsOk\":8,\"artE25\":\"sin-art\"}",
-  "  ecosistema E25: sin póster A02 compitiendo en la misma escena — art=sin-art",
-  "  ecosistema: click selecciona (aria-pressed + panel + respuesta persistida) — {\"pressed\":\"2\",\"title\":\"Agentes de IA\",\"answer\":\"Agentes de IA\"}",
-  "  ecosistema: mini demostración recorre pasos y revela ejemplo — {\"exampleVisible\":true,\"liveSteps\":3}",
-  "  automatización: ejecutar recorre las 4 etapas (contador 04 + etapa activa) — {\"count\":\"04\",\"active\":1,\"feed\":\"Simulación completada: consulta atendida con revis\"}",
-  "  V4-B E11 personas+IA en marfil (cream) — tone=cream",
-  "  V4-B cierre: recomendación con >=3 items para ruta empresa — items=5 status=Tu recorrido: ruta Empresa · solución: Inteligencia artifici",
-  "  cierre V2: botón copiar resumen presente",
-  "  7M-B red: 6 nodos de capacidad",
-  "  7M-B red: click nodo 3 selecciona y persiste en estado — \"sitios\"",
-  "  7M-B red: demo ilumina flujo y muestra resultado — 3/3 · EL EQUIPO APRENDE",
-  "  7M-B infra: 3 modos de operación",
-  "  7M-B infra: 10 racks con LEDs",
-  "  7M-B infra: modo housing persiste + status SIMULACIÓN",
-  "  7M-B infra: activar red sube contador de tráfico — 017",
-  "  7M-B infra: comparación compartida vs privada presente (sin $0 publicado)",
-  "  7M-B personas: 3 casos + 4 controles",
-  "  7M-B personas: paso a paso avanza etapa (caso soporte activo) — 🤖 Primer análisis",
-  "  7M-B personas: ejecutar arranca la demo (texto cambia y hay etapa activa) — {\"text\":\"● Simulando…\",\"pauseOff\":true,\"out\":\"🤖 Primer análisis\"}",
-  "  7M-B membresías: 5 niveles",
-  "  7M-B membresías: AGENTE nunca publica tarifa confirmada (etiqueta pendiente) —  AGENTE pendiente de confirmar (objetivo $500–$600 MXN/mes) Nuestra sugerencia ",
-  "  7M-B membresías: diagnóstico marca sugerencia SIN persistir ni pisar la selección (badge, no aria-pressed) — null",
-  "  7M-B membresías: «Elegir este plan» SÍ persiste la selección — \"cobertura\"",
-  "  7M-B cierre: 6 tarjetas de capacidad",
-  "  7M-B cierre: añadir capacidad persiste en estado.capabilities",
-  "  7M-B cierre: meta refleja ruta + membresía + capacidad — Ruta: ruta Empresa · Infraestructura: Housing administrado · Red: sitios · Membresía orientativa: COBERTURA · Servicio: Inteligencia artificial · Capacidades (1/6): Web + chatbot d",
-  "  7M-B cierre: acciones finales presentes (TXT, volver, reiniciar, WhatsApp con contexto)",
-  "  7M-B cierre: demo de tarjeta recorre 3 pasos — 3/3 · Presentar a la persona responsable",
-  "  7M-B empresa: llegada con demo infra soberana + arte A04 + capítulo mundo — {\"demo\":true,\"art\":\"A04\",\"chapter\":\"mundo\",\"tone\":\"petrol\",\"title\":\"TU INFRAESTRUCTURA. TUS REGLAS.\"}",
-  "  v4-A eficiencia: llegada con demo flujo + arte A03 — {\"demo\":true,\"art\":\"A03\",\"chapter\":\"mundo\",\"tone\":\"electric\"}",
-  "  7M-B exploración: llegada con demo red colaborativa + arte A05 — {\"demo\":true,\"art\":\"A05\",\"chapter\":\"mundo\",\"tone\":\"emerald\"}",
-  "  v4-A: los 3 mundos usan tonos distintos (petrol/electric/emerald) — petrol/electric/emerald",
-  "  v4-A: capítulos narrativos presentes (>=5) — 5 capítulos",
-  "  v4-A transición botón: cámara cambia en 3 momentos (inicio/medio/fin) — 0=[0,2.4,11.6] mid=[1.9,1.830655526992288,8.5 fin=[2.5760304814686528,1.8910",
-  "  v4-A transición botón: portal visible a mitad del viaje — maxOp=0.95",
-  "  v4-A transición botón: portal disuelto al aterrizar — maxOp=0.00",
-  "  portal: 4 capas SVG presentes — /assets/portal/01_umbral.svg,/assets/portal/02_marco_cristalino.svg,/assets/portal/03_fragmentos.svg,/assets/portal/04_energia_destellos.svg",
-  "  portal: visible a mitad del recorrido por scroll — {\"progress\":\"0.889\",\"maxOp\":0.9,\"visible\":true}",
-  "  portal: se disuelve al aterrizar en el mundo — {\"progress\":\"1.000\",\"maxOp\":0,\"visible\":false}",
-  "  portal: reversible — a mitad del scrub otra vez es visible — {\"progress\":\"0.500\",\"maxOp\":1,\"visible\":true}",
-  "  portal: al volver al inicio (progreso 0) queda oculto — {\"progress\":\"0.000\",\"maxOp\":0,\"visible\":false}",
-  "  portal: pulso visible durante transición por botón — {\"progress\":\"0\",\"maxOp\":0.95,\"visible\":true}",
-  "  portal: oculto tras aterrizar (ruta botón) — {\"progress\":\"0\",\"maxOp\":0,\"visible\":false}",
-  "  7M-C infra: 10 racks con transform computado válido (no none) — {\"n\":10,\"distinct\":10,\"transform\":\"matrix(1, 0, 0, 1, -17, -31)\",\"display\":\"block\"}",
-  "  7M-C infra: los 10 racks ocupan posiciones distintas — distinct=10",
-  "  7M-C infra: sin auto-selección persistida (null hasta que el visitante elige) — null",
-  "  7M-C membresías: BASE es solo visual; estado queda en null",
-  "  7M-C housing: default compartido 50/25/25 — [\"50%\",\"25%\",\"25%\"]",
-  "  7M-C housing: privado = 100% y persiste en state.housingMode — [\"100%\"]",
-  "  7M-C housing: stage transforma los racks (data-mode=privado)",
-  "  7M-C housing: demo ilumina el stage (data-demo-state=on)",
-  "  7M-C housing: recarga restaura privado (botón + estado)",
-  "  7M-C cierre: la meta incluye la modalidad Housing elegida — Ruta: ruta Empresa · Housing: privado 100% · Servicio: Inteligencia artificial · Aún no añades capacidades: toca «＋ Añadir a mi Publia» en l",
-  "  7M-C A06: 5 áreas + 3 demos seleccionables presentes",
-  "  7M-C A06: ejecutar demo muestra resultado",
-  "  7M-C red: clic en nodo persiste en estado — \"sitios\"",
-  "  7M-C red: tras recarga se restaura la selección previa (sin sobrescribir) — pressed=true",
-  "  7M-C matriz 390×844: sin overflow horizontal en E03/E15/E22/E26/E29",
-  "  7M-C matriz 1366×768: sin overflow horizontal en E03/E15/E22/E26/E29",
-  "  7M-C matriz 1440×900: sin overflow horizontal en E03/E15/E22/E26/E29",
-  "  7M-C matriz 1920×1080: sin overflow horizontal en E03/E15/E22/E26/E29",
-  "  7M-C matriz 3440×1440: sin overflow horizontal en E03/E15/E22/E26/E29",
-  "  7M-C reduced-motion: housing enlazado y anillos sin animación — bound=1 anim=none",
-  "  7M-D P0-01: nodo 3 elegido persiste — \"sitios\"",
-  "  7M-D P0-01: tras completar la demo, state.red conserva el nodo 3 — {\"red\":\"sitios\",\"pressed\":\"true\",\"result\":\"Una consulta entra, un agente propone una respuesta y una persona decide qué enviar.\"}",
-  "  7M-D P0-01: al terminar la demo el foco visual vuelve a la capacidad elegida — pressed=true",
-  "  7M-D P0-01: tras recarga se restaura la selección (regresión completa)",
-  "  7M-D P0-02: la sugerencia se marca con badge, sin pisar la selección (aria-pressed sigue en BASE, estado null) — {\"badge\":true,\"pressedCobertura\":\"false\",\"chosen\":\"Tu selección: aún no confirmas un plan (BASE es sólo la vista inicial)\"}",
-  "  7M-D P0-02: «Elegir este plan» persiste COBERTURA",
-  "  7M-D P0-02: nueva sugerencia (BASE) no reemplaza la selección confirmada (COBERTURA) — {\"badgeBase\":true,\"pressedCobertura\":\"true\",\"chosen\":\"Tu selección: COBERTURA\"}",
-  "  7M-D P0-02: infraestructura → recomendación Housing independiente, sin plan forzado ni tarifas — 💡 Recomendación orientativa: Housing con modalidad compartida o privada a definir contigo",
-  "  7M-D P0-03: lista visible refleja membresía + housing + capacidad elegidas — ElegisteTus 1 capacidad(es)Añadiste: WEB. Puedes quitarlas o sumar otras en las tarjetas de arriba.Tu selecciónMembresía",
-  "  7M-D P0-03: meta y enlace WhatsApp coherentes con la lista (mismo estado) — https://wa.me/525573724660?text=Hola Publia, vengo del recorrido web.",
-  "  7M-D teclado: Enter sobre el botón enfocado añade la capacidad",
-  "  7M-D P0-04: A06 sin promesas de plazos/volúmenes (48 h / 30 piezas)",
-  "  7M-D P0-04: el área abre información y selecciona su caso (cambio visual) — {\"expanded\":\"true\",\"panelVisible\":true,\"chip\":\"true\"}",
-  "  7M-D P0-04: los escenarios siguen ejecutables",
-  "  7M-D axe ruta efficiency tras abrir controles: sin violaciones graves/moderadas — 0",
-  "  7M-D axe ruta explorer tras abrir controles: sin violaciones graves/moderadas — 0",
-  "  sin errores JS al final del recorrido"
- ]
+  "base": "https://dam-boulevard-explaining-alaska.trycloudflare.com",
+  "total": 216,
+  "fallos": 1,
+  "resultados": [
+    {
+      "name": "carga inicial sin errores JS",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "rendimiento: JS + CSS inicial (con el 3D del hero) por debajo de 260 kB",
+      "ok": true,
+      "detail": "257 kB (JS 238 · CSS 19)"
+    },
+    {
+      "name": "rendimiento: la aplicación sin 3D por debajo de 90 kB",
+      "ok": true,
+      "detail": "69 kB de JS de aplicación"
+    },
+    {
+      "name": "rendimiento: el escenario 3D se carga sólo bajo demanda",
+      "ok": true,
+      "detail": "three.js diferido"
+    },
+    {
+      "name": "hero: título correcto",
+      "ok": true,
+      "detail": "EL MUNDO ESTÁ CAMBIANDO."
+    },
+    {
+      "name": "hero: dos CTA visibles",
+      "ok": true,
+      "detail": "2 CTA"
+    },
+    {
+      "name": "hero: jerarquía tipográfica y CTA táctil",
+      "ok": true,
+      "detail": "título 73.44px · CTA 69px"
+    },
+    {
+      "name": "prisma: canvas presente y WebGL activo",
+      "ok": true,
+      "detail": "{\"present\":true,\"webgl\":true,\"size\":[1440,900]}"
+    },
+    {
+      "name": "prisma: la escena 3D se renderiza y cambia (animación real)",
+      "ok": true,
+      "detail": "679387 vs 691026 bytes"
+    },
+    {
+      "name": "prisma: pinta una fracción útil del viewport",
+      "ok": true,
+      "detail": "{\"paintedRatio\":0.20326234567901236}"
+    },
+    {
+      "name": "hero 3D: lienzo único presente con WebGL activo",
+      "ok": true,
+      "detail": "[1440,900]"
+    },
+    {
+      "name": "hero 3D: el universo arranca en el mundo hero",
+      "ok": true,
+      "detail": "world=hero · cámara [0,2.4,11.6]"
+    },
+    {
+      "name": "hero 3D: la escena carga sin errores de recursos",
+      "ok": true,
+      "detail": "sin errores"
+    },
+    {
+      "name": "hero 3D: las ocho tarjetas holográficas están en el encuadre",
+      "ok": true,
+      "detail": "8/8 tarjetas"
+    },
+    {
+      "name": "hero 3D: los dos modelos GLB y los ocho iconos se descargan",
+      "ok": true,
+      "detail": "18/10 recursos"
+    },
+    {
+      "name": "hero 3D: pinta la escena (mascota, prisma, tarjetas)",
+      "ok": true,
+      "detail": "{\"paintedRatio\":0.205625}"
+    },
+    {
+      "name": "hero 3D: la animación ambiental cambia entre fotogramas",
+      "ok": true,
+      "detail": "702764 vs 701644 bytes"
+    },
+    {
+      "name": "marca: el encabezado usa el logotipo oficial",
+      "ok": true,
+      "detail": "oficial=true provisional=0"
+    },
+    {
+      "name": "hero: la ruta cooperativa se descubre por scroll/bifurcación, sin tercer botón",
+      "ok": true,
+      "detail": "{\"heroThirdButton\":false,\"branchE14\":2,\"escenaE15\":true}"
+    },
+    {
+      "name": "hero: viñeta activa sólo en el acto hero",
+      "ok": true,
+      "detail": "act=hero · viñeta 1"
+    },
+    {
+      "name": "composición: coincide con la captura aprobada",
+      "ok": true,
+      "detail": "izq 36/35 · der 45/40 · brillo 14.4/14.8 %"
+    },
+    {
+      "name": "transición enterprise: la cámara viaja a otro mundo del mismo universo",
+      "ok": true,
+      "detail": "mundo hero→enterprise · cámara [0,2.4,11.6]→[2.5760304814686528,1.8910114305507446,8.45552476619328] · tinte #050b1b→#0a0e18"
+    },
+    {
+      "name": "transición enterprise: el contenido de la escena destino aparece",
+      "ok": true,
+      "detail": "scrollY 3073 · act=enterprise"
+    },
+    {
+      "name": "transición enterprise: volver regresa al hero sin recargar",
+      "ok": true,
+      "detail": "world=hero · act=hero · scrollY 0"
+    },
+    {
+      "name": "transición efficiency: la cámara viaja a otro mundo del mismo universo",
+      "ok": true,
+      "detail": "mundo hero→efficiency · cámara [0,2.4,11.6]→[-2.571565495207668,1.8918758557736193,8.77968963943405] · tinte #050b1b→#0d0a05"
+    },
+    {
+      "name": "transición efficiency: el contenido de la escena destino aparece",
+      "ok": true,
+      "detail": "scrollY 3073 · act=efficiency"
+    },
+    {
+      "name": "transición efficiency: volver regresa al hero sin recargar",
+      "ok": true,
+      "detail": "world=hero · act=hero · scrollY 0"
+    },
+    {
+      "name": "transición cooperative: la cámara viaja a otro mundo del mismo universo",
+      "ok": true,
+      "detail": "mundo hero→cooperative · cámara [0,2.4,11.6]→[-0.016666666666666673,2.3762891530054646,10.57649868852459] · tinte #050b1b→#060c12"
+    },
+    {
+      "name": "transición cooperative: el contenido de la escena destino aparece",
+      "ok": true,
+      "detail": "scrollY 700 · act=cooperative"
+    },
+    {
+      "name": "transición cooperative: volver regresa al hero sin recargar",
+      "ok": true,
+      "detail": "world=hero · act=hero · scrollY 0"
+    },
+    {
+      "name": "P0: sólo dos botones principales en el hero (la tercera ruta es por scroll)",
+      "ok": true,
+      "detail": "routeChoices=2 · tercer botón=0 · pista=\"¿Prefieres explorar a tu manera? Despláz…\""
+    },
+    {
+      "name": "P0: la pista de scroll invita a explorar sin botón",
+      "ok": true,
+      "detail": "¿Prefieres explorar a tu manera? Desplázate ↓"
+    },
+    {
+      "name": "P0: scroll manual sin clic entra inequívocamente en la ruta exploración",
+      "ok": true,
+      "detail": "tras rueda: route=explorer · act=cooperative · world=cooperative"
+    },
+    {
+      "name": "P0: el scroll conduce la cámara (scrub) hacia el mundo cooperativo",
+      "ok": true,
+      "detail": "world=cooperative · cámara=[-0.016666666666666673,2.3917281893744646,9.997991951156813] · scrollY=1400"
+    },
+    {
+      "name": "P0: tras elegir empresa, el scroll NO cambia a exploración",
+      "ok": true,
+      "detail": "route=enterprise · act=enterprise · world=enterprise"
+    },
+    {
+      "name": "P0: las ocho tarjetas tienen control DOM accesible",
+      "ok": true,
+      "detail": "chips=8"
+    },
+    {
+      "name": "P0: foco de teclado en tarjeta muestra información y resalta la tarjeta 3D",
+      "ok": true,
+      "detail": "{\"tooltip\":true,\"focusedCard\":\"0\",\"expanded\":\"true\"}"
+    },
+    {
+      "name": "P0: Enter sobre tarjeta abre/cierra la información contextual",
+      "ok": true,
+      "detail": "aria-expanded=false"
+    },
+    {
+      "name": "grafo: 31 escenas montadas (E00-E30)",
+      "ok": true,
+      "detail": "31 escenas"
+    },
+    {
+      "name": "red humana: enlaces dibujados",
+      "ok": true,
+      "detail": "8 enlaces"
+    },
+    {
+      "name": "demostraciones marcadas como simulación",
+      "ok": true,
+      "detail": "4 bloques"
+    },
+    {
+      "name": "catálogo: cinco niveles de membresía",
+      "ok": true,
+      "detail": "5 planes"
+    },
+    {
+      "name": "housing: comparación compartida vs privada (2 modalidades)",
+      "ok": true,
+      "detail": "2 modalidades"
+    },
+    {
+      "name": "efectos: anclaje asignado",
+      "ok": true,
+      "detail": "1 escena(s) anclada(s)"
+    },
+    {
+      "name": "efectos: pin/morph/sticky presentes en la página",
+      "ok": true,
+      "detail": "pin=1 morph=1 sticky=1"
+    },
+    {
+      "name": "efectos: morphing de la entidad",
+      "ok": true,
+      "detail": "1 escena(s)"
+    },
+    {
+      "name": "efectos: profundidad de campo en varias escenas",
+      "ok": true,
+      "detail": "6 capas"
+    },
+    {
+      "name": "efectos: columna sticky",
+      "ok": true,
+      "detail": "1 columna(s)"
+    },
+    {
+      "name": "ruta empresa: estado aplicado",
+      "ok": true,
+      "detail": "enterprise"
+    },
+    {
+      "name": "ruta empresa: segmentos aplicados",
+      "ok": true,
+      "detail": "enterprise"
+    },
+    {
+      "name": "ruta empresa: escena propia visible",
+      "ok": true,
+      "detail": "2392px"
+    },
+    {
+      "name": "ruta empresa: contenido de la escena",
+      "ok": true,
+      "detail": "TU INFRAESTRUCTURA. TUS REGLAS."
+    },
+    {
+      "name": "variante compartida: la ruta empresa reescribe la escena común",
+      "ok": true,
+      "detail": "Ya tienes una empresa. La pregunta es qué hace su tecnología."
+    },
+    {
+      "name": "ruta eficiencia: escena propia visible",
+      "ok": true,
+      "detail": "1696px · route=efficiency act=efficiency world=efficiency scrollY=3067"
+    },
+    {
+      "name": "ruta eficiencia: mensaje propio de la escena",
+      "ok": true,
+      "detail": "EL TIEMPO NO VUELVE. RECUPÉRALO."
+    },
+    {
+      "name": "variante compartida: la ruta eficiencia reescribe la escena común",
+      "ok": true,
+      "detail": "El tiempo es el cuello de botella. La pregunta es qué se elimina."
+    },
+    {
+      "name": "cambio de ruta: vuelve al estado neutral",
+      "ok": true,
+      "detail": "unclassified"
+    },
+    {
+      "name": "cambio de ruta: regresa al hero",
+      "ok": true,
+      "detail": "scrollY 0"
+    },
+    {
+      "name": "ruta exploración: se activa por scroll natural",
+      "ok": true,
+      "detail": "explorer"
+    },
+    {
+      "name": "ruta exploración: escena visible",
+      "ok": true,
+      "detail": "599px"
+    },
+    {
+      "name": "ruta exploración: dos bifurcaciones",
+      "ok": true,
+      "detail": "2 opciones"
+    },
+    {
+      "name": "bifurcaciones: apuntan a escenas reales",
+      "ok": true,
+      "detail": "#escena-e15, #escena-e24"
+    },
+    {
+      "name": "bifurcación: el rasgo queda registrado",
+      "ok": true,
+      "detail": "value_driven"
+    },
+    {
+      "name": "bifurcación: abre la escena cooperativa",
+      "ok": true,
+      "detail": "1603px"
+    },
+    {
+      "name": "variante por rasgo: el rasgo reescribe la escena compartida",
+      "ok": true,
+      "detail": "Una red que se comparte, no que se subcontrata."
+    },
+    {
+      "name": "catálogo: BASE $300",
+      "ok": true,
+      "detail": "$300 MXN/mes"
+    },
+    {
+      "name": "catálogo: CRECIMIENTO $2,000",
+      "ok": true,
+      "detail": "$2,000 MXN/mes"
+    },
+    {
+      "name": "catálogo: OPERACIÓN $3,000",
+      "ok": true,
+      "detail": "$3,000 MXN/mes"
+    },
+    {
+      "name": "catálogo: COBERTURA $4,000",
+      "ok": true,
+      "detail": "$4,000 MXN/mes"
+    },
+    {
+      "name": "catálogo: AGENTE como rango pendiente (nunca tarifa confirmada)",
+      "ok": true,
+      "detail": "pendiente de confirmar (objetivo $500–$600 MXN/mes)"
+    },
+    {
+      "name": "housing: reparto 50/25/25 en modalidad compartida",
+      "ok": true,
+      "detail": "50%/25%/25% | 100%"
+    },
+    {
+      "name": "servicios: catálogo anterior con precio real",
+      "ok": true,
+      "detail": "$150 MXN"
+    },
+    {
+      "name": "servicios: el producto de prueba no se publica",
+      "ok": true,
+      "detail": "Sucri excluido"
+    },
+    {
+      "name": "servicios: se aclara que es venta puntual",
+      "ok": true,
+      "detail": "Venta puntual del catálogo anterior, con precio de referenci"
+    },
+    {
+      "name": "conversión: CTA de contacto visible",
+      "ok": true,
+      "detail": "52px"
+    },
+    {
+      "name": "conversión: correo con contexto de navegación",
+      "ok": true,
+      "detail": "mailto:hola@publia.mx?subject=Diagn%C3%B3stico%20empresarial%20%E2%80%94%20Publi"
+    },
+    {
+      "name": "contacto: WhatsApp visible en la página",
+      "ok": true,
+      "detail": "2 enlace(s)"
+    },
+    {
+      "name": "contacto: número público verificado",
+      "ok": true,
+      "detail": "https://wa.me/525573724660"
+    },
+    {
+      "name": "formulario: existe con sus campos",
+      "ok": true,
+      "detail": "4 campos"
+    },
+    {
+      "name": "formulario: todos los campos tienen etiqueta",
+      "ok": true,
+      "detail": "4/4"
+    },
+    {
+      "name": "formulario: no envía datos a ningún servidor",
+      "ok": true,
+      "detail": "action=null method=get"
+    },
+    {
+      "name": "formulario: declara que no guarda la información",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "formulario: rechaza un correo inválido",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "formulario: no genera enlace con datos inválidos",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "formulario: el mensaje incluye el contexto de navegación",
+      "ok": true,
+      "detail": "mailto:hola@publia.mx?subject=Diagn%C3%B3stico%20empresarial%20%E2%80%"
+    },
+    {
+      "name": "móvil: sin desbordamiento horizontal",
+      "ok": true,
+      "detail": "0px"
+    },
+    {
+      "name": "móvil: los CTA funcionan",
+      "ok": true,
+      "detail": "efficiency"
+    },
+    {
+      "name": "accesibilidad: sin violaciones graves (axe wcag2aa)",
+      "ok": true,
+      "detail": "0 graves"
+    },
+    {
+      "name": "accesibilidad: sin violaciones moderadas o menores",
+      "ok": true,
+      "detail": "0 violaciones"
+    },
+    {
+      "name": "accesibilidad: ruta empresa sin violaciones",
+      "ok": true,
+      "detail": "0 violaciones"
+    },
+    {
+      "name": "movimiento reducido: contenido visible y sin animación",
+      "ok": true,
+      "detail": "{\"layerReady\":true,\"reveals\":true,\"heroVisible\":true}"
+    },
+    {
+      "name": "v3: >=5 composiciones distintas",
+      "ok": true,
+      "detail": "7"
+    },
+    {
+      "name": "v3: >=4 atmósferas de fondo distintas",
+      "ok": true,
+      "detail": "8"
+    },
+    {
+      "name": "v3: acentos amarillos en titulares (em)",
+      "ok": true,
+      "detail": "12 em"
+    },
+    {
+      "name": "v3/7M-E: slots de arte en uso (A01,A03,A04,A05; A02 retirado con E20)",
+      "ok": true,
+      "detail": "A01,A01,A04,A04,A03,A03,A03,A03,A05,A05,A04"
+    },
+    {
+      "name": "v3: eyebrows con emoji semántico",
+      "ok": true,
+      "detail": "9 eyebrows"
+    },
+    {
+      "name": "v3: escena clara con tinta oscura (contraste real)",
+      "ok": true,
+      "detail": "{\"color\":\"rgb(9, 25, 51)\",\"bg\":\"rgba(0, 0, 0, 0)\"}"
+    },
+    {
+      "name": "v3 scroll: la cámara se transforma en 30/60/90% (ida)",
+      "ok": true,
+      "detail": "30=[2.716245237270523,1.943591963976446,8.5694492552823] 60=[2.5760304814686528,1.8910114305507446,8.45552476619328] 90=[1.9,2.1025201072386057,9.137533512064344]"
+    },
+    {
+      "name": "v3 scroll: recorrido inverso mueve la cámara en sentido inverso (reversible)",
+      "ok": true,
+      "detail": "90=[1.9,2.1025201072386057,9.137533512064344] ida60=[2.5760304814686528,1.8910114305507446,8.45552476619328] vuelta60=[2.330769230769231,1.4340659340659339,7.735164835164835]"
+    },
+    {
+      "name": "7M-B infra: el modo cambia el texto",
+      "ok": true,
+      "detail": "Selecciona y observa los servidores de Publia, representados"
+    },
+    {
+      "name": "7M-B infra: el modo mueve la cámara 3D",
+      "ok": true,
+      "detail": "[2.330769230769231,1.4340659340659339,7.735164835164835] -> [2.2333333333333334,1.7,7.95]"
+    },
+    {
+      "name": "7M-B infra: estado accesible aria-pressed",
+      "ok": true,
+      "detail": "true"
+    },
+    {
+      "name": "v3 demo eficiencia: resultado según foco",
+      "ok": true,
+      "detail": "Los pedidos se registran solos y llegan a tu bandeja con pri"
+    },
+    {
+      "name": "v3 demo eficiencia: respuesta guardada (foco=ventas)",
+      "ok": true,
+      "detail": "ventas"
+    },
+    {
+      "name": "v3 demo eficiencia: el flujo se ilumina por etapas",
+      "ok": true,
+      "detail": "1 etapas"
+    },
+    {
+      "name": "v3 demo geonodos: el nodo explica qué se comparte",
+      "ok": true,
+      "detail": "Manuales y cursos abiertos: cada comunidad adapta lo que nec"
+    },
+    {
+      "name": "v3 demo geonodos: scroll enciende conexiones (progreso)",
+      "ok": true,
+      "detail": "progreso=3"
+    },
+    {
+      "name": "v3 demo geonodos: nodo activo marcado",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "name": "V4-B asset A03: data-asset-ready=true y servido como image/webp (7M-E: avif→webp)",
+      "ok": true,
+      "detail": "{\"ready\":\"true\",\"src\":\"/assets/scenes/A03-flujo-automatizacion-1920x1080.webp\",\"head\":\"image/webp 200\",\"hasMobile\":true}"
+    },
+    {
+      "name": "V4-B asset A04: data-asset-ready=true y servido como image/webp (7M-E: avif→webp)",
+      "ok": true,
+      "detail": "{\"ready\":\"true\",\"src\":\"/assets/scenes/A04-infraestructura-2560x1440.webp\",\"head\":\"image/webp 200\",\"hasMobile\":true}"
+    },
+    {
+      "name": "V4-B asset A05: data-asset-ready=true y servido como image/webp (7M-E: avif→webp)",
+      "ok": true,
+      "detail": "{\"ready\":\"true\",\"src\":\"/assets/scenes/A05-geonodos-2560x1440.webp\",\"head\":\"image/webp 200\",\"hasMobile\":true}"
+    },
+    {
+      "name": "7M-E: A02 ya no aparece como arte de escena (E20 sin ilustración prestada)",
+      "ok": true,
+      "detail": "A01,A01,A04,A04,A03,A03,A03,A03,A05,A05,A04"
+    },
+    {
+      "name": "auditoría imágenes: cada asset real aparece UNA sola vez (sin duplicados)",
+      "ok": true,
+      "detail": "ready={\"A04\":1,\"A03\":1,\"A05\":1}"
+    },
+    {
+      "name": "auditoría imágenes: caja del asset con proporción 16:9 (1.7–1.85), no franja 3.8:1",
+      "ok": true,
+      "detail": "[\"A04@escena-e03=1.78\",\"A03@escena-e07=1.78\",\"A05@escena-e16=1.78\"]"
+    },
+    {
+      "name": "auditoría imágenes: asset real usa contain (póster completo, sin recorte)",
+      "ok": true,
+      "detail": "[\"contain\",\"contain\",\"contain\"]"
+    },
+    {
+      "name": "ecosistema E25: 8 nodos con iconos reales cargados",
+      "ok": true,
+      "detail": "{\"nodes\":8,\"iconsOk\":8,\"artE25\":\"sin-art\"}"
+    },
+    {
+      "name": "ecosistema E25: sin póster A02 compitiendo en la misma escena",
+      "ok": true,
+      "detail": "art=sin-art"
+    },
+    {
+      "name": "ecosistema: click selecciona (aria-pressed + panel + respuesta persistida)",
+      "ok": true,
+      "detail": "{\"pressed\":\"2\",\"title\":\"Agentes de IA\",\"answer\":\"Agentes de IA\"}"
+    },
+    {
+      "name": "ecosistema: mini demostración recorre pasos y revela ejemplo",
+      "ok": true,
+      "detail": "{\"exampleVisible\":true,\"liveSteps\":3}"
+    },
+    {
+      "name": "automatización: ejecutar recorre las 4 etapas (contador 04 + etapa activa)",
+      "ok": true,
+      "detail": "{\"count\":\"04\",\"active\":1,\"feed\":\"Queda registro y seguimiento visible.\"}"
+    },
+    {
+      "name": "V4-B E11 personas+IA en marfil (cream)",
+      "ok": true,
+      "detail": "tone=cream"
+    },
+    {
+      "name": "V4-B cierre: recomendación con >=3 items para ruta empresa",
+      "ok": true,
+      "detail": "items=4 status=Tu recorrido: ruta Empresa. Estos son los siguientes pasos q"
+    },
+    {
+      "name": "cierre V2: botón copiar resumen presente",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-B red: 6 nodos de capacidad",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-B red: click nodo 3 selecciona y persiste en estado",
+      "ok": true,
+      "detail": "\"sitios\""
+    },
+    {
+      "name": "7M-B red: demo ilumina flujo y muestra resultado",
+      "ok": true,
+      "detail": "3/3 · EL EQUIPO APRENDE"
+    },
+    {
+      "name": "7M-B infra: 3 modos de operación",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-B infra: 10 racks con LEDs",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-B infra: modo housing persiste + status SIMULACIÓN",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-B infra: activar red sube contador de tráfico",
+      "ok": true,
+      "detail": "017"
+    },
+    {
+      "name": "7M-B infra: comparación compartida vs privada presente (sin $0 publicado)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-B personas: 3 casos + 4 controles",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-B personas: paso a paso avanza etapa (caso soporte activo)",
+      "ok": true,
+      "detail": "🤖 Primer análisis"
+    },
+    {
+      "name": "7M-B personas: ejecutar arranca la demo (texto cambia y hay etapa activa)",
+      "ok": true,
+      "detail": "{\"text\":\"● Simulando…\",\"pauseOff\":true,\"out\":\"🤖 Primer análisis\"}"
+    },
+    {
+      "name": "7M-B membresías: 5 niveles",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-B membresías: AGENTE nunca publica tarifa confirmada (etiqueta pendiente)",
+      "ok": true,
+      "detail": " AGENTE pendiente de confirmar (objetivo $500–$600 MXN/mes) Nuestra sugerencia "
+    },
+    {
+      "name": "7M-B membresías: diagnóstico marca sugerencia SIN persistir ni pisar la selección (badge, no aria-pressed)",
+      "ok": true,
+      "detail": "null"
+    },
+    {
+      "name": "7M-B membresías: «Elegir este plan» SÍ persiste la selección",
+      "ok": true,
+      "detail": "\"cobertura\""
+    },
+    {
+      "name": "7M-B cierre: 6 tarjetas de capacidad",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-B cierre: añadir capacidad persiste en estado.capabilities",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-B cierre: meta refleja ruta + membresía + capacidad",
+      "ok": true,
+      "detail": "Ruta: ruta Empresa · Infraestructura: Housing administrado · Red: sitios · Membresía orientativa: COBERTURA · Capacidades (1/6): Web + chatbot de WhatsApp"
+    },
+    {
+      "name": "7M-B cierre: acciones finales presentes (TXT, volver, reiniciar, WhatsApp con contexto)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-B cierre: demo de tarjeta recorre 3 pasos",
+      "ok": true,
+      "detail": "3/3 · Presentar a la persona responsable"
+    },
+    {
+      "name": "7M-B empresa: llegada con demo infra soberana + arte A04 + capítulo mundo",
+      "ok": true,
+      "detail": "{\"demo\":true,\"art\":\"A04\",\"chapter\":\"mundo\",\"tone\":\"petrol\",\"title\":\"TU INFRAESTRUCTURA. TUS REGLAS.\"}"
+    },
+    {
+      "name": "v4-A eficiencia: llegada con demo flujo + arte A03",
+      "ok": true,
+      "detail": "{\"demo\":true,\"art\":\"A03\",\"chapter\":\"mundo\",\"tone\":\"electric\"}"
+    },
+    {
+      "name": "7M-E exploración: llegada con demo red colaborativa (sin arte A05 prestado; redDemo es el visual)",
+      "ok": true,
+      "detail": "{\"demo\":true,\"art\":null,\"chapter\":\"mundo\",\"tone\":\"emerald\"}"
+    },
+    {
+      "name": "v4-A: los 3 mundos usan tonos distintos (petrol/electric/emerald)",
+      "ok": true,
+      "detail": "petrol/electric/emerald"
+    },
+    {
+      "name": "v4-A: capítulos narrativos presentes (>=5)",
+      "ok": true,
+      "detail": "5 capítulos"
+    },
+    {
+      "name": "v4-A transición botón: cámara cambia en 3 momentos (inicio/medio/fin)",
+      "ok": true,
+      "detail": "0=[0,2.4,11.6] mid=[1.9,1.6698586118251928,8. fin=[2.5760304814686528,1.8910"
+    },
+    {
+      "name": "v4-A transición botón: portal visible a mitad del viaje",
+      "ok": true,
+      "detail": "maxOp=0.95"
+    },
+    {
+      "name": "v4-A transición botón: portal disuelto al aterrizar",
+      "ok": true,
+      "detail": "maxOp=0.00"
+    },
+    {
+      "name": "portal: 4 capas SVG presentes",
+      "ok": true,
+      "detail": "/assets/portal/01_umbral.svg,/assets/portal/02_marco_cristalino.svg,/assets/portal/03_fragmentos.svg,/assets/portal/04_energia_destellos.svg"
+    },
+    {
+      "name": "portal: visible a mitad del recorrido por scroll",
+      "ok": true,
+      "detail": "{\"progress\":\"0.889\",\"maxOp\":0.9,\"visible\":true}"
+    },
+    {
+      "name": "portal: se disuelve al aterrizar en el mundo",
+      "ok": true,
+      "detail": "{\"progress\":\"1.000\",\"maxOp\":0,\"visible\":false}"
+    },
+    {
+      "name": "portal: reversible — a mitad del scrub otra vez es visible",
+      "ok": true,
+      "detail": "{\"progress\":\"0.500\",\"maxOp\":1,\"visible\":true}"
+    },
+    {
+      "name": "portal: al volver al inicio (progreso 0) queda oculto",
+      "ok": true,
+      "detail": "{\"progress\":\"0.000\",\"maxOp\":0,\"visible\":false}"
+    },
+    {
+      "name": "portal: pulso visible durante transición por botón",
+      "ok": true,
+      "detail": "{\"progress\":\"0\",\"maxOp\":0.95,\"visible\":true}"
+    },
+    {
+      "name": "portal: oculto tras aterrizar (ruta botón)",
+      "ok": true,
+      "detail": "{\"progress\":\"0\",\"maxOp\":0.0009,\"visible\":false}"
+    },
+    {
+      "name": "7M-C infra: 10 racks con transform computado válido (no none)",
+      "ok": true,
+      "detail": "{\"n\":10,\"distinct\":10,\"transform\":\"matrix(1, 0, 0, 1, -17, -31)\",\"display\":\"block\"}"
+    },
+    {
+      "name": "7M-C infra: los 10 racks ocupan posiciones distintas",
+      "ok": true,
+      "detail": "distinct=10"
+    },
+    {
+      "name": "7M-C infra: sin auto-selección persistida (null hasta que el visitante elige)",
+      "ok": true,
+      "detail": "null"
+    },
+    {
+      "name": "7M-C membresías: BASE es solo visual; estado queda en null",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-C housing: default compartido 50/25/25",
+      "ok": true,
+      "detail": "[\"50%\",\"25%\",\"25%\"]"
+    },
+    {
+      "name": "7M-C housing: privado = 100% y persiste en state.housingMode",
+      "ok": true,
+      "detail": "[\"100%\"]"
+    },
+    {
+      "name": "7M-C housing: stage transforma los racks (data-mode=privado)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-C housing: demo ilumina el stage (data-demo-state=on)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-C housing: recarga restaura privado (botón + estado)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-C cierre: la meta incluye la modalidad Housing elegida",
+      "ok": true,
+      "detail": "Ruta: ruta Empresa · Housing: privado 100% · Aún no añades capacidades: toca «＋ Añadir a mi Publia» en las tarjetas"
+    },
+    {
+      "name": "7M-C A06: 5 áreas + 3 demos seleccionables presentes",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-C A06: ejecutar demo muestra resultado",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-C red: clic en nodo persiste en estado",
+      "ok": true,
+      "detail": "\"sitios\""
+    },
+    {
+      "name": "7M-C red: tras recarga se restaura la selección previa (sin sobrescribir)",
+      "ok": true,
+      "detail": "pressed=true"
+    },
+    {
+      "name": "7M-C matriz 390×844: sin overflow horizontal en E03/E15/E22/E26/E29",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-C matriz 1366×768: sin overflow horizontal en E03/E15/E22/E26/E29",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-C matriz 1440×900: sin overflow horizontal en E03/E15/E22/E26/E29",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-C matriz 1920×1080: sin overflow horizontal en E03/E15/E22/E26/E29",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-C matriz 3440×1440: sin overflow horizontal en E03/E15/E22/E26/E29",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-C reduced-motion: housing enlazado y anillos sin animación",
+      "ok": true,
+      "detail": "bound=1 anim=none"
+    },
+    {
+      "name": "7M-D P0-01: nodo 3 elegido persiste",
+      "ok": true,
+      "detail": "\"sitios\""
+    },
+    {
+      "name": "7M-D P0-01: tras completar la demo, state.red conserva el nodo 3",
+      "ok": true,
+      "detail": "{\"red\":\"sitios\",\"pressed\":\"true\",\"result\":\"Una consulta entra, un agente propone una respuesta y una persona decide qué enviar.\"}"
+    },
+    {
+      "name": "7M-D P0-01: al terminar la demo el foco visual vuelve a la capacidad elegida",
+      "ok": true,
+      "detail": "pressed=true"
+    },
+    {
+      "name": "7M-D P0-01: tras recarga se restaura la selección (regresión completa)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-D P0-02: la sugerencia se marca con badge, sin pisar la selección (aria-pressed sigue en BASE, estado null)",
+      "ok": true,
+      "detail": "{\"badge\":true,\"pressedCobertura\":\"false\",\"chosen\":\"Tu selección: aún no confirmas un plan (BASE es sólo la vista inicial)\"}"
+    },
+    {
+      "name": "7M-D P0-02: «Elegir este plan» persiste COBERTURA",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-D P0-02: nueva sugerencia (BASE) no reemplaza la selección confirmada (COBERTURA)",
+      "ok": true,
+      "detail": "{\"badgeBase\":true,\"pressedCobertura\":\"true\",\"chosen\":\"Tu selección: COBERTURA\"}"
+    },
+    {
+      "name": "7M-D P0-02: infraestructura → recomendación Housing independiente, sin plan forzado ni tarifas",
+      "ok": true,
+      "detail": "💡 Recomendación orientativa: Housing con modalidad compartida o privada a definir contigo"
+    },
+    {
+      "name": "7M-D P0-03: lista visible refleja membresía + housing + capacidad elegidas",
+      "ok": true,
+      "detail": "ElegisteTus 1 capacidad(es)Añadiste: WEB. Puedes quitarlas o sumar otras en las tarjetas de arriba.Tu selecciónMembresía"
+    },
+    {
+      "name": "7M-D P0-03: meta y enlace WhatsApp coherentes con la lista (mismo estado)",
+      "ok": true,
+      "detail": "https://wa.me/525573724660?text=Hola Publia, vengo del recorrido web.\n\nPropuesta Publia.mx — explora"
+    },
+    {
+      "name": "7M-D teclado: Enter sobre el botón enfocado añade la capacidad",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-D P0-04: A06 sin promesas de plazos/volúmenes (48 h / 30 piezas)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-D P0-04: el área abre información y selecciona su caso (cambio visual)",
+      "ok": true,
+      "detail": "{\"expanded\":\"true\",\"panelVisible\":true,\"chip\":\"true\"}"
+    },
+    {
+      "name": "7M-D P0-04: los escenarios siguen ejecutables",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-D axe ruta efficiency tras abrir controles: sin violaciones graves/moderadas",
+      "ok": true,
+      "detail": "0"
+    },
+    {
+      "name": "7M-D axe ruta explorer tras abrir controles: sin violaciones graves/moderadas",
+      "ok": true,
+      "detail": "0"
+    },
+    {
+      "name": "7M-E recorrido esencial ruta enterprise: 6-9 capítulos (8)",
+      "ok": true,
+      "detail": "E00,E02,E03,E22,E25,E27,E29,E30"
+    },
+    {
+      "name": "7M-E «Explorar todo» ruta enterprise: muestra todas las escenas de la ruta (21/21)",
+      "ok": true,
+      "detail": "21/21"
+    },
+    {
+      "name": "7M-E exploreAll persiste en estado (ruta enterprise)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-E recorrido esencial ruta efficiency: 6-9 capítulos (9)",
+      "ok": true,
+      "detail": "E00,E02,E07,E11,E22,E25,E27,E29,E30"
+    },
+    {
+      "name": "7M-E «Explorar todo» ruta efficiency: muestra todas las escenas de la ruta (25/25)",
+      "ok": true,
+      "detail": "25/25"
+    },
+    {
+      "name": "7M-E exploreAll persiste en estado (ruta efficiency)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-E recorrido esencial ruta explorer: 6-9 capítulos (9)",
+      "ok": true,
+      "detail": "E00,E02,E07,E11,E22,E25,E27,E29,E30"
+    },
+    {
+      "name": "7M-E «Explorar todo» ruta explorer: muestra todas las escenas de la ruta (25/22)",
+      "ok": false,
+      "detail": "25/22"
+    },
+    {
+      "name": "7M-E exploreAll persiste en estado (ruta explorer)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-E exploreAll sobrevive a la recarga (html[data-explore=all])",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-E P0-01: al cargar, answers.servicio sigue vacío (select(0) no persiste)",
+      "ok": true,
+      "detail": "{}"
+    },
+    {
+      "name": "7M-E P0-01: clic en nodo persiste servicio",
+      "ok": true,
+      "detail": "Cooperación y comunidad"
+    },
+    {
+      "name": "7M-E P0-01: la demo no sobrescribe el servicio elegido",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-E P0-01: recarga restaura servicio elegido (estado + aria-pressed + panel)",
+      "ok": true,
+      "detail": "{\"state\":\"Cooperación y comunidad\",\"pressed\":\"true\",\"title\":\"Cooperación y comunidad\"}"
+    },
+    {
+      "name": "7M-E P0-02: scroll libre sin botones llega a E15 visible y enlazada",
+      "ok": true,
+      "detail": "{\"route\":\"unclassified\",\"visible\":true,\"bound\":true}"
+    },
+    {
+      "name": "7M-E A06: los 5 SVG definitivos servidos (image/svg+xml 200)",
+      "ok": true,
+      "detail": "[{\"src\":\"estudio.svg\",\"ok\":true},{\"src\":\"pantallas.svg\",\"ok\":true},{\"src\":\"campanas.svg\",\"ok\":true},{\"src\":\"audiovisual.svg\",\"ok\":true},{\"src\":\"redes.svg\",\"ok\":true}]"
+    },
+    {
+      "name": "7M-E A06: elegir área mueve el foco visual del stage",
+      "ok": true,
+      "detail": "/assets/a06/audiovisual.svg"
+    },
+    {
+      "name": "7M-E A06: demo «campana-local» ejecuta y produce resultado",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-E A06: demo «contenido-mes» ejecuta y produce resultado",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-E A06: demo «redes» ejecuta y produce resultado",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "7M-E: sin etiquetas de placeholder/rutas internas visibles",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "sin errores JS al final del recorrido",
+      "ok": true,
+      "detail": ""
+    }
+  ]
 }

@@ -1003,7 +1003,7 @@ const art = await page.evaluate(() => {
 check('v3: >=5 composiciones distintas', art.layouts >= 5, JSON.stringify(art.layouts));
 check('v3: >=4 atmósferas de fondo distintas', art.tones >= 4, JSON.stringify(art.tones));
 check('v3: acentos amarillos en titulares (em)', art.accentEm >= 5, `${art.accentEm} em`);
-check('v3: slots de arte A01-A05 preparados', ['A01', 'A02', 'A03', 'A04', 'A05'].every((id) => art.artSlots.includes(id)), art.artSlots.join(','));
+check('v3/7M-E: slots de arte en uso (A01,A03,A04,A05; A02 retirado con E20)', ['A01', 'A03', 'A04', 'A05'].every((id) => art.artSlots.includes(id)), art.artSlots.join(','));
 check('v3: eyebrows con emoji semántico', art.emojiEyebrows >= 5, `${art.emojiEyebrows} eyebrows`);
 
 // Contraste en escena clara (cream): tinta oscura sobre fondo claro.
@@ -1122,7 +1122,12 @@ check('v3 demo geonodos: el nodo explica qué se comparte', geo.detail.includes(
 check('v3 demo geonodos: scroll enciende conexiones (progreso)', Number(geo.progress) >= 1, `progreso=${geo.progress}`);
 check('v3 demo geonodos: nodo activo marcado', geo.active === 1, `${geo.active}`);
 
-// --- V4-B: assets AVIF reales + mosaico + recomendación --------------------------------
+// --- V4-B: assets reales (webp en 7M-E) + mosaico + recomendación -----------------------
+// 7M-E: A05 vive en escenas opcionales (E16/E17) → activar "explorar todo" para medir
+await click('[data-explore-toggle]');
+await page.waitForTimeout(1200);
+await page.evaluate(() => document.querySelector('#escena-e16')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
+await page.waitForTimeout(2500);
 const assetsInfo = await page.evaluate(async () => {
   const slots = ['A02', 'A03', 'A04', 'A05'];
   const out = {};
@@ -1135,9 +1140,12 @@ const assetsInfo = await page.evaluate(async () => {
   }
   return out;
 });
-for (const id of ['A02', 'A03', 'A04', 'A05']) {
-  check(`V4-B asset ${id}: data-asset-ready=true y servido como image/avif`, assetsInfo[id].ready === 'true' && assetsInfo[id].head.startsWith('image/avif'), JSON.stringify(assetsInfo[id]));
+for (const id of ['A03', 'A04', 'A05']) {
+  check(`V4-B asset ${id}: data-asset-ready=true y servido como image/webp (7M-E: avif→webp)`, assetsInfo[id].ready === 'true' && assetsInfo[id].head.startsWith('image/webp'), JSON.stringify(assetsInfo[id]));
 }
+check('7M-E: A02 ya no aparece como arte de escena (E20 sin ilustración prestada)', !art.artSlots.includes('A02'), art.artSlots.join(','));
+await click('[data-explore-toggle]');
+await page.waitForTimeout(800);
 // Auditoría de imágenes (desktop): el asset real aparece UNA sola vez (escena primaria) y sin recortes agresivos
 const imgAudit = await page.evaluate(() => {
   const res = [];
@@ -1320,7 +1328,7 @@ const arrivals = await page.evaluate(() => ({
 }));
 check('7M-B empresa: llegada con demo infra soberana + arte A04 + capítulo mundo', arrivals.e03.demo && arrivals.e03.art === 'A04' && arrivals.e03.chapter === 'mundo', JSON.stringify(arrivals.e03));
 check('v4-A eficiencia: llegada con demo flujo + arte A03', arrivals.e07.demo && arrivals.e07.art === 'A03' && arrivals.e07.chapter === 'mundo', JSON.stringify(arrivals.e07));
-check('7M-B exploración: llegada con demo red colaborativa + arte A05', arrivals.e15.demo && arrivals.e15.art === 'A05' && arrivals.e15.chapter === 'mundo', JSON.stringify(arrivals.e15));
+check('7M-E exploración: llegada con demo red colaborativa (sin arte A05 prestado; redDemo es el visual)', arrivals.e15.demo && arrivals.e15.art === null && arrivals.e15.chapter === 'mundo', JSON.stringify(arrivals.e15));
 check('v4-A: los 3 mundos usan tonos distintos (petrol/electric/emerald)', arrivals.e03.tone === 'petrol' && arrivals.e07.tone === 'electric' && arrivals.e15.tone === 'emerald', `${arrivals.e03.tone}/${arrivals.e07.tone}/${arrivals.e15.tone}`);
 check('v4-A: capítulos narrativos presentes (>=5)', arrivals.chapters >= 5, `${arrivals.chapters} capítulos`);
 
@@ -1656,6 +1664,108 @@ for (const r of ['efficiency', 'explorer']) {
   check(`7M-D axe ruta ${r} tras abrir controles: sin violaciones graves/moderadas`, axeR.length === 0, axeR.join(', ') || '0');
   await ap.close();
 }
+
+
+// ================= 7M-E: recorrido esencial, exploración libre, A06 =================
+await page.evaluate(() => { try { sessionStorage.clear(); } catch {} });
+await page.goto(BASE, { waitUntil: 'networkidle', timeout: 60000 });
+await page.waitForTimeout(2400);
+
+// recorrido esencial: <=9 escenas visibles por ruta; completo: 30
+const visibleScenes = () => page.evaluate(() => [...document.querySelectorAll('.scene')].filter((el) => getComputedStyle(el).display !== 'none').map((el) => el.dataset.sceneId));
+for (const r of ['enterprise', 'efficiency', 'explorer']) {
+  for (let att = 0; att < 3; att++) {
+    await page.evaluate((rr) => { window.__publiaLastProgrammaticScroll = Date.now(); window.scrollTo(0, 0); document.querySelector(`[data-route-choice="${rr}"]`)?.click(); }, r);
+    try { await page.waitForFunction((rr) => document.documentElement.dataset.act === rr && document.documentElement.dataset.route === rr, r, { timeout: 30000 }); break; } catch { await page.waitForTimeout(1500); }
+  }
+  const ids = await visibleScenes();
+  check(`7M-E recorrido esencial ruta ${r}: 6-9 capítulos (${ids.length})`, ids.length >= 6 && ids.length <= 9, ids.join(','));
+  await page.evaluate(() => document.querySelector('[data-explore-toggle]')?.click());
+  await page.waitForTimeout(600);
+  const all = await visibleScenes();
+  const expected = await page.evaluate((rr) => document.querySelectorAll(`.scene[data-scene-route='shared'], .scene[data-scene-route='${rr}']`).length, r);
+  check(`7M-E «Explorar todo» ruta ${r}: muestra todas las escenas de la ruta (${all.length}/${expected})`, all.length === expected && all.length > ids.length, `${all.length}/${expected}`);
+  const persisted = await page.evaluate(() => JSON.parse(sessionStorage.getItem('publia.visitor.v1') ?? '{}').exploreAll === true);
+  check(`7M-E exploreAll persiste en estado (ruta ${r})`, persisted);
+  await page.evaluate(() => document.querySelector('[data-explore-toggle]')?.click());
+  await page.waitForTimeout(400);
+}
+// recarga conserva exploreAll
+await page.evaluate(() => document.querySelector('[data-explore-toggle]')?.click());
+await page.reload({ waitUntil: 'networkidle', timeout: 60000 });
+await page.waitForTimeout(2200);
+check('7M-E exploreAll sobrevive a la recarga (html[data-explore=all])', await page.evaluate(() => document.documentElement.dataset.explore === 'all'));
+await page.evaluate(() => document.querySelector('[data-explore-toggle]')?.click());
+
+// P0-01 ecosistema: estado vacío al inicio; clic persiste; demo no lo pisa; recarga restaura
+await page.evaluate(() => { try { sessionStorage.clear(); } catch {} });
+await page.goto(BASE, { waitUntil: 'networkidle', timeout: 60000 });
+await page.waitForTimeout(2400);
+check('7M-E P0-01: al cargar, answers.servicio sigue vacío (select(0) no persiste)', (await sceneState()).answers?.servicio == null, JSON.stringify((await sceneState()).answers));
+await page.evaluate(() => document.querySelector('#escena-e25')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
+await waitBound('[data-demo="ecosystem"]');
+await clickJs('#escena-e25 [data-eco-node="3"]');
+await page.waitForTimeout(400);
+check('7M-E P0-01: clic en nodo persiste servicio', (await sceneState()).answers?.servicio != null, String((await sceneState()).answers?.servicio));
+const ecoSelE = (await sceneState()).answers.servicio;
+await clickJs('#escena-e25 [data-eco-play]');
+await page.waitForTimeout(2600);
+check('7M-E P0-01: la demo no sobrescribe el servicio elegido', (await sceneState()).answers?.servicio === ecoSelE);
+await page.reload({ waitUntil: 'networkidle', timeout: 60000 });
+await page.waitForTimeout(2200);
+await page.evaluate(() => document.querySelector('#escena-e25')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
+await waitBound('[data-demo="ecosystem"]');
+const ecoAfter = await page.evaluate(() => ({
+  state: JSON.parse(sessionStorage.getItem('publia.visitor.v1') ?? '{}').answers?.servicio,
+  pressed: document.querySelector('#escena-e25 [data-eco-node="3"]')?.getAttribute('aria-pressed'),
+  title: document.querySelector('#escena-e25 [data-eco-title]')?.textContent ?? '',
+}));
+check('7M-E P0-01: recarga restaura servicio elegido (estado + aria-pressed + panel)', ecoAfter.state === ecoSelE && ecoAfter.pressed === 'true' && ecoAfter.title === ecoSelE, JSON.stringify(ecoAfter));
+
+// P0-02: sesión nueva sólo con scroll llega a E15 (Red Colaborativa) sin elegir botón
+await page.evaluate(() => { try { sessionStorage.clear(); } catch {} });
+await page.goto(BASE, { waitUntil: 'networkidle', timeout: 60000 });
+await page.waitForTimeout(2400);
+await wheelUntilExplorer(page);
+await page.evaluate(() => document.querySelector('#escena-e15')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
+await waitBound('[data-demo="red"]');
+const e15vis = await page.evaluate(() => {
+  const el = document.querySelector('#escena-e15');
+  return { route: document.documentElement.dataset.route, visible: !!el && getComputedStyle(el).display !== 'none', bound: el?.querySelector('[data-demo="red"]')?.dataset.bound === '1' };
+});
+check('7M-E P0-02: scroll libre sin botones llega a E15 visible y enlazada', e15vis.visible && e15vis.bound, JSON.stringify(e15vis));
+
+// A06: 5 SVG reales servidos + stage cambia con el área + 3 demos ejecutan
+// (E26 es opcional en el recorrido esencial → activar "explorar todo")
+await clickJs('[data-explore-toggle]');
+await page.waitForTimeout(900);
+await page.evaluate(() => document.querySelector('#escena-e26')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
+await waitBound('[data-demo="marketing"]');
+const a06 = await page.evaluate(async () => {
+  const names = ['estudio', 'pantallas', 'campanas', 'audiovisual', 'redes'];
+  const out = [];
+  for (const n of names) {
+    const head = await fetch(`/assets/a06/${n}.svg`, { method: 'HEAD' }).then((r) => `${r.headers.get('content-type')} ${r.status}`).catch(() => 'fail');
+    out.push({ src: `${n}.svg`, ok: head.startsWith('image/svg+xml 200') });
+  }
+  return out;
+});
+check('7M-E A06: los 5 SVG definitivos servidos (image/svg+xml 200)', a06.every((x) => x.ok), JSON.stringify(a06));
+await clickJs('#escena-e26 [data-mkt-area="audiovisual"]');
+await page.waitForTimeout(400);
+const stage = await page.evaluate(() => document.querySelector('#escena-e26 [data-mkt-stage-img]')?.getAttribute('src') ?? '');
+check('7M-E A06: elegir área mueve el foco visual del stage', stage.includes('audiovisual.svg'), stage);
+for (const demo of ['campana-local', 'contenido-mes', 'redes']) {
+  await clickJs(`#escena-e26 [data-mkt-demo="${demo}"]`);
+  await clickJs('#escena-e26 [data-mkt-run]');
+  await page.waitForFunction((sel) => (document.querySelector(sel)?.textContent ?? '').length > 5, '#escena-e26 [data-mkt-result]', { timeout: 12000 }).catch(() => {});
+  check(`7M-E A06: demo «${demo}» ejecuta y produce resultado`, (await page.evaluate(() => document.querySelector('#escena-e26 [data-mkt-result]')?.textContent ?? '')).length > 5);
+}
+
+// sin etiquetas internas visibles
+check('7M-E: sin etiquetas de placeholder/rutas internas visibles', await page.evaluate(() => !document.querySelector('.art-slot-tag') && !document.querySelector('.mkt__panel-note')));
+await clickJs('[data-explore-toggle]');
+await page.waitForTimeout(600);
 
 // --- cierre ---------------------------------------------------------------------
 await page.screenshot({ path: `${OUT}/13-cierre.png` });
