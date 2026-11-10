@@ -87,7 +87,7 @@ const mobileReady = slot ? isPrimary && existsSync(`public${slot.mobile}`) : fal
   </div>
   {slot && (
     <picture>
-      {mobileReady && <source media="(max-width: 760px)" srcset={slot.mobile} type="image/avif" />}
+      {mobileReady && <source media="(max-width: 760px)" srcset={slot.mobile} type="image/webp" />}
       <img
         data-asset-img
         src={assetReady ? slot.desktop : undefined}
@@ -99,7 +99,6 @@ const mobileReady = slot ? isPrimary && existsSync(`public${slot.mobile}`) : fal
       />
     </picture>
   )}
-  <span class="art-slot-tag">{assetReady ? `arte ${slotId} · recurso real` : `arte ${slotId} · placeholder`}</span>
 </div>
 
 <style>

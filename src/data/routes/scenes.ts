@@ -39,19 +39,19 @@ const ART_DIRECTION: Record<string, { tone: SceneTone; layout: SceneLayout; art?
   E12: { tone: 'electric', layout: 'split' , chapter: 'mundo'},
   E13: { tone: 'emerald', layout: 'center' , chapter: 'mundo'},
   E14: { tone: 'emerald', layout: 'center' , chapter: 'mundo'},
-  E15: { tone: 'emerald', layout: 'split', art: 'A05' , chapter: 'mundo'},
+  E15: { tone: 'emerald', layout: 'split', chapter: 'mundo'},  // Red Colaborativa: el módulo redDemo ES el visual (sin A05 GeoNodos)
   E16: { tone: 'emerald', layout: 'map', art: 'A05' , chapter: 'mundo'},
   E17: { tone: 'emerald', layout: 'map', art: 'A05' , chapter: 'mundo'},
   E18: { tone: 'emerald', layout: 'center' , chapter: 'mundo'},
   E19: { tone: 'violet', layout: 'split' , chapter: 'interaccion'},
-  E20: { art: 'A02', tone: 'emerald', layout: 'split' , chapter: 'interaccion'},
+  E20: { tone: 'emerald', layout: 'split' , chapter: 'interaccion'},  // huella ambiental: sin A02 (galaxia de soluciones no corresponde)
   E21: { tone: 'graphite', layout: 'split', art: 'A04' , chapter: 'interaccion'},
-  E22: { tone: 'graphite', layout: 'split', art: 'A08' , chapter: 'interaccion'},
+  E22: { tone: 'graphite', layout: 'split', chapter: 'interaccion'},  // housingCompare es el visual; sin tile genérico A08
   E23: { tone: 'cream', layout: 'editorial' , chapter: 'interaccion'},
   E24: { tone: 'cream', layout: 'split' , chapter: 'interaccion'},
   E25: { tone: 'violet', layout: 'mosaic' , chapter: 'interaccion'},
-  E26: { tone: 'violet', layout: 'mosaic', art: 'A06' , chapter: 'interaccion'},
-  E27: { tone: 'sun', layout: 'plans', art: 'A09' , chapter: 'convergencia'},
+  E26: { tone: 'violet', layout: 'mosaic', chapter: 'interaccion'},  // MarketingModule es el visual; sin tile genérico A06
+  E27: { tone: 'sun', layout: 'plans', chapter: 'convergencia'},  // membershipsDemo es el visual; sin tile genérico A09
   E28: { tone: 'sun', layout: 'plans' , chapter: 'convergencia'},
   E29: { tone: 'cosmos', layout: 'center' , chapter: 'cierre'},
   E30: { tone: 'cosmos', layout: 'split' , chapter: 'cierre'},
