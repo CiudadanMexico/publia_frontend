@@ -12,6 +12,8 @@ export function bindMarketing(): void {
   const chips = [...root.querySelectorAll<HTMLButtonElement>('[data-mkt-demo]')];
   const areas = [...root.querySelectorAll<HTMLButtonElement>('[data-mkt-area]')];
   const panels = [...root.querySelectorAll<HTMLElement>('[data-mkt-panel]')];
+  const stageImg = root.querySelector<HTMLImageElement>('[data-mkt-stage-img]');
+  const stageName = root.querySelector<HTMLElement>('[data-mkt-stage-name]');
   const stepsEl = root.querySelector<HTMLElement>('[data-mkt-steps]');
   const resultEl = root.querySelector<HTMLElement>('[data-mkt-result]');
   const runBtn = root.querySelector<HTMLButtonElement>('[data-mkt-run]');
@@ -74,6 +76,9 @@ export function bindMarketing(): void {
       if (!open) {
         a.setAttribute('aria-expanded', 'true');
         a.classList.add('is-active');
+        const area = MARKETING_AREAS.find((x) => x.id === id);
+        if (area && stageImg) { stageImg.src = area.art; }
+        if (area && stageName) { stageName.textContent = area.name; }
         const demoIdx = MARKETING_DEMOS.findIndex((d) => d.areaId === id);
         if (demoIdx >= 0) {
           stop();

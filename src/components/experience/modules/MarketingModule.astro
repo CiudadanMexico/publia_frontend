@@ -17,6 +17,10 @@ void scene;
 ---
 
 <div class="mkt" data-demo="marketing">
+  <div class="mkt__stage" data-mkt-stage>
+    <img data-mkt-stage-img src={MARKETING_AREAS[0]?.art} alt="" aria-hidden="true" />
+    <span class="mkt__stage-name" data-mkt-stage-name>{MARKETING_AREAS[0]?.name}</span>
+  </div>
   <div class="mkt__areas" role="group" aria-label="Áreas del estudio multimedia">
     {MARKETING_AREAS.map((a, i) => (
       <div class="mkt__area-wrap">
@@ -53,6 +57,9 @@ void scene;
 
 <style>
   .mkt { display: grid; gap: 22px; }
+  .mkt__stage { position: relative; border: 1px solid rgba(167,139,250,.35); border-radius: 18px; overflow: hidden; background: radial-gradient(ellipse at 50% 40%, rgba(167,139,250,.14), rgba(10,6,30,.6)); margin-bottom: 14px; }
+  .mkt__stage img { display: block; width: 100%; max-height: 300px; object-fit: contain; transition: opacity .25s; }
+  .mkt__stage-name { position: absolute; left: 12px; bottom: 10px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #d9ccff; background: rgba(10,6,30,.55); padding: 3px 8px; border-radius: 999px; }
   .mkt__areas { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
   .mkt__area-wrap { border: 1px solid rgba(167, 139, 250, 0.35); border-radius: 16px; background: rgba(30, 20, 60, 0.35); overflow: hidden; }
   .mkt__area { display: flex; align-items: center; gap: 10px; width: 100%; border: 0; background: transparent; color: #e6defc; padding: 14px; cursor: pointer; text-align: left; font: inherit; }
