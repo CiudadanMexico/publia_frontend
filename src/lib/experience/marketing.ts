@@ -77,7 +77,7 @@ export function bindMarketing(): void {
         a.setAttribute('aria-expanded', 'true');
         a.classList.add('is-active');
         const area = MARKETING_AREAS.find((x) => x.id === id);
-        if (area && stageImg) { stageImg.src = area.art; }
+        if (area?.art && stageImg) { stageImg.src = area.art; }
         if (area && stageName) { stageName.textContent = area.name; }
         const demoIdx = MARKETING_DEMOS.findIndex((d) => d.areaId === id);
         if (demoIdx >= 0) {
