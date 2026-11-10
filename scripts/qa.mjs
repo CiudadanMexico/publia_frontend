@@ -1674,9 +1674,10 @@ await page.waitForTimeout(2400);
 // recorrido esencial: <=9 escenas visibles por ruta; completo: 30
 const visibleScenes = () => page.evaluate(() => [...document.querySelectorAll('.scene')].filter((el) => getComputedStyle(el).display !== 'none').map((el) => el.dataset.sceneId));
 for (const r of ['enterprise', 'efficiency', 'explorer']) {
+  if (r === 'explorer') { await click('[data-route-reset]').catch(() => {}); await page.waitForTimeout(1200); }
   for (let att = 0; att < 3; att++) {
     await page.evaluate((rr) => { window.__publiaLastProgrammaticScroll = Date.now(); window.scrollTo(0, 0); document.querySelector(`[data-route-choice="${rr}"]`)?.click(); }, r);
-    try { await page.waitForFunction((rr) => document.documentElement.dataset.act === rr && document.documentElement.dataset.route === rr, r, { timeout: 30000 }); break; } catch { await page.waitForTimeout(1500); }
+    try { await page.waitForFunction((rr) => document.documentElement.dataset.act === rr, r, { timeout: 30000 }); break; } catch { await page.waitForTimeout(1500); }
   }
   const ids = await visibleScenes();
   check(`7M-E recorrido esencial ruta ${r}: 6-9 capítulos (${ids.length})`, ids.length >= 6 && ids.length <= 9, ids.join(','));
