@@ -13,3 +13,9 @@ dist/
 _entrega/analisis/
 docs/audit/video/
 .tmp-vids/
+docs/audit/v4/
+docs/audit/rutas/
+docs/audit/rutas-v3/
+docs/audit/imagenes/
+docs/evidencia/*.png
+docs/audit/7mundos/7mc-res-*.png

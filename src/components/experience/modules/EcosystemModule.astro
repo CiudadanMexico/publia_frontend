@@ -69,7 +69,7 @@ const first = services[0]!;
               aria-pressed={i === 0 ? 'true' : 'false'}
             >
               <span class="eco__num">{String(i + 1).padStart(2, '0')}</span>
-              <img src={`/assets/ecosistema/servicio_${s.file}.png`} alt="" decoding="async" />
+              <img src={`/icons/icono_${s.file}.png`} alt="" decoding="async" />  <!-- 7M-E: icono canónico en /icons (antes duplicado en /assets/ecosistema) -->
               <span class="eco__name">{s.name}</span>
             </button>
           ))
