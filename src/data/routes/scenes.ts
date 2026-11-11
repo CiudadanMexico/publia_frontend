@@ -760,7 +760,7 @@ const SCENES_RAW: SceneDefinition[] = [
   },
   {
     id: 'E27',
-    eyebrow: '🧩 EMPIEZA POR LO QUE NECESITAS',
+    eyebrow: 'MEMBRESÍAS PUBLIA',
     title: "Elige tu combinación. Crece a tu ritmo.",
     lead: "Empieza con una base para tu negocio. Suma inteligencia, contenidos y acompañamiento conforme los necesites.",
     body: "El soporte humano se comparte entre clientes. La disponibilidad del equipo no equivale a horas de atención exclusiva.",
@@ -781,7 +781,7 @@ const SCENES_RAW: SceneDefinition[] = [
       },
     ],
     purpose: 'Presentar el catálogo comercial sin ambigüedad.',
-    modules: ['statement', 'membershipsDemo'],
+    modules: ['membershipsDemo'],
     segments: [],
     route: 'shared',
     duration: 3,
