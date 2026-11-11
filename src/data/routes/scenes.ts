@@ -26,7 +26,7 @@ import type { SceneDefinition, SceneLayout, SceneTone } from '../../lib/experien
  */
 const ART_DIRECTION: Record<string, { tone: SceneTone; layout: SceneLayout; art?: string; chapter?: string }> = {
   E00: { tone: 'cream', layout: 'split', chapter: 'descubrimiento'}, // 7M-F: el umbral usa su propio paisaje; A01 nunca se entregó como archivo
-  E02: { tone: 'cream', layout: 'split', art: 'A01' , chapter: 'descubrimiento'},
+  E02: { tone: 'cream', layout: 'split', chapter: 'descubrimiento'}, // 7M-F: A01 retirado (sin archivo entregado)
   E03: { tone: 'petrol', layout: 'split', art: 'A04' , chapter: 'mundo'},
   E04: { tone: 'petrol', layout: 'split', art: 'A04' , chapter: 'mundo'},
   E05: { tone: 'petrol', layout: 'editorial' , chapter: 'mundo'},

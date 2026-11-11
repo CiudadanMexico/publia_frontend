@@ -27,11 +27,10 @@ export interface AssetSlot {
 export const SCENE_ASSETS: readonly AssetSlot[] = [
   {
     id: 'A01',
-    scenes: ['E00', 'E02'],
+    scenes: [], // 7M-F: A01 nunca se entregó como archivo (no existía ni en avif); slot retirado sin borrar el registro
     desktop: '/assets/scenes/A01-tunel-prismatico-2560x1440.webp',
     mobile: '/assets/scenes/A01-tunel-prismatico-1080x1350.webp',
     layers: ['/assets/scenes/A01-overlay.png'],
-    preload: true,
     alt: 'Túnel prismático elegante con líneas de energía azules y amarillas, profundidad real.',
   },
   {

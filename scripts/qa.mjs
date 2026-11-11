@@ -1015,7 +1015,7 @@ const art = await page.evaluate(() => {
 check('v3: >=5 composiciones distintas', art.layouts >= 5, JSON.stringify(art.layouts));
 check('v3: >=4 atmósferas de fondo distintas', art.tones >= 4, JSON.stringify(art.tones));
 check('v3/7M-F: acentos en titulares (em presentes)', art.accentEm >= 1, `${art.accentEm} em`);
-check('v3/7M-E: slots de arte en uso (A01,A03,A04,A05; A02 retirado con E20)', ['A01', 'A03', 'A04', 'A05'].every((id) => art.artSlots.includes(id)), art.artSlots.join(','));
+check('v3/7M-F: slots de arte en uso (A03,A04,A05; A01/A02 retirados sin archivo/p prestamo)', ['A03', 'A04', 'A05'].every((id) => art.artSlots.includes(id)) && !art.artSlots.includes('A01') && !art.artSlots.includes('A02'), art.artSlots.join(','));
 check('v3: eyebrows con emoji semántico', art.emojiEyebrows >= 5, `${art.emojiEyebrows} eyebrows`);
 
 // Contraste en escena clara (cream): tinta oscura sobre fondo claro.

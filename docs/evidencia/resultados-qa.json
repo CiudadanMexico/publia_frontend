@@ -1,7 +1,7 @@
 {
   "base": "https://dam-boulevard-explaining-alaska.trycloudflare.com",
-  "total": 235,
-  "fallos": 12,
+  "total": 233,
+  "fallos": 1,
   "resultados": [
     {
       "name": "carga inicial sin errores JS",
@@ -46,7 +46,7 @@
     {
       "name": "prisma: la escena 3D se renderiza y cambia (animación real)",
       "ok": true,
-      "detail": "640122 vs 650146 bytes"
+      "detail": "639938 vs 650146 bytes"
     },
     {
       "name": "prisma: pinta una fracción útil del viewport",
@@ -86,7 +86,7 @@
     {
       "name": "hero 3D: la animación ambiental cambia entre fotogramas",
       "ok": true,
-      "detail": "661427 vs 659223 bytes"
+      "detail": "661427 vs 659006 bytes"
     },
     {
       "name": "marca: el encabezado usa el logotipo oficial",
@@ -116,7 +116,7 @@
     {
       "name": "transición enterprise: el contenido de la escena destino aparece",
       "ok": true,
-      "detail": "scrollY 4477 · act=enterprise"
+      "detail": "scrollY 4277 · act=enterprise"
     },
     {
       "name": "transición enterprise: volver regresa al hero sin recargar",
@@ -131,7 +131,7 @@
     {
       "name": "transición efficiency: el contenido de la escena destino aparece",
       "ok": true,
-      "detail": "scrollY 4477 · act=efficiency"
+      "detail": "scrollY 4277 · act=efficiency"
     },
     {
       "name": "transición efficiency: volver regresa al hero sin recargar",
@@ -141,12 +141,12 @@
     {
       "name": "transición cooperative: la cámara viaja a otro mundo del mismo universo",
       "ok": true,
-      "detail": "mundo hero→cooperative · cámara [0,2.4,11.6]→[-0.016666666666666673,1.8050110741971206,9.274086378737541] · tinte #050b1b→#060d08"
+      "detail": "mundo hero→cooperative · cámara [0,2.4,11.6]→[-0.016666666666666673,2.5613229212467066,11.048314329167596] · tinte #050b1b→#060d08"
     },
     {
       "name": "transición cooperative: el contenido de la escena destino aparece",
       "ok": true,
-      "detail": "scrollY 2320 · act=cooperative"
+      "detail": "scrollY 700 · act=cooperative"
     },
     {
       "name": "transición cooperative: volver regresa al hero sin recargar",
@@ -176,7 +176,7 @@
     {
       "name": "P0: el scroll conduce la cámara (scrub) hacia el mundo cooperativo",
       "ok": true,
-      "detail": "world=cooperative · cámara=[-0.016666666666666673,2.244460500963391,9.762363519588954] · scrollY=3020"
+      "detail": "world=cooperative · cámara=[-0.016666666666666673,2.1210743836381636,9.848587311732713] · scrollY=1400"
     },
     {
       "name": "P0: tras elegir empresa, el scroll NO cambia a exploración",
@@ -286,7 +286,7 @@
     {
       "name": "ruta eficiencia: escena propia visible",
       "ok": true,
-      "detail": "1696px · route=efficiency act=efficiency world=efficiency scrollY=24"
+      "detail": "1696px · route=efficiency act=efficiency world=efficiency scrollY=10"
     },
     {
       "name": "ruta eficiencia: mensaje propio de la escena",
@@ -506,7 +506,7 @@
     {
       "name": "v3/7M-E: slots de arte en uso (A01,A03,A04,A05; A02 retirado con E20)",
       "ok": true,
-      "detail": "A01,A01,A04,A04,A03,A03,A03,A03,A05,A05,A04"
+      "detail": "A01,A04,A04,A03,A03,A03,A03,A05,A05,A04"
     },
     {
       "name": "v3: eyebrows con emoji semántico",
@@ -521,12 +521,12 @@
     {
       "name": "v3 scroll: la cámara se transforma en 30/60/90% (ida)",
       "ok": true,
-      "detail": "30=[1.9,1.6852601156069364,8.372511239563263] 60=[2.547337278106509,1.8802514792899407,8.432211538461539] 90=[1.9,1.9844221105527637,8.94070351758794]"
+      "detail": "30=[2.873372781065089,2.002514792899408,8.697115384615385] 60=[2.547337278106509,1.8802514792899407,8.432211538461539] 90=[1.9,1.9768844221105528,8.928140703517588]"
     },
     {
       "name": "v3 scroll: recorrido inverso mueve la cámara en sentido inverso (reversible)",
       "ok": true,
-      "detail": "90=[1.9,1.9844221105527637,8.94070351758794] ida60=[2.547337278106509,1.8802514792899407,8.432211538461539] vuelta60=[1.9,1.2591492776886035,7.713483146067416]"
+      "detail": "90=[1.9,1.9768844221105528,8.928140703517588] ida60=[2.547337278106509,1.8802514792899407,8.432211538461539] vuelta60=[2.2794025157232705,1.4487421383647798,7.77185534591195]"
     },
     {
       "name": "7M-F E03: 4 escenarios con botones aria-pressed",
@@ -601,7 +601,7 @@
     {
       "name": "7M-E: A02 ya no aparece como arte de escena (E20 sin ilustración prestada)",
       "ok": true,
-      "detail": "A01,A01,A04,A04,A03,A03,A03,A03,A05,A05,A04"
+      "detail": "A01,A04,A04,A03,A03,A03,A03,A05,A05,A04"
     },
     {
       "name": "auditoría imágenes: cada asset real aparece UNA sola vez (sin duplicados)",
@@ -716,7 +716,7 @@
     {
       "name": "7M-B personas: ejecutar arranca la demo (texto cambia y hay etapa activa)",
       "ok": true,
-      "detail": "{\"text\":\"● Simulando…\",\"pauseOff\":true,\"out\":\"🤖 Primer análisis\"}"
+      "detail": "{\"text\":\"● Simulando…\",\"pauseOff\":true,\"out\":\"🚨 Problema reportado\"}"
     },
     {
       "name": "7M-F E27: 5 tarjetas desde memberships.plans",
@@ -791,7 +791,7 @@
     {
       "name": "v4-A transición botón: cámara cambia en 3 momentos (inicio/medio/fin)",
       "ok": true,
-      "detail": "0=[0,2.4,11.6] mid=[1.9,2.1083815028901736,8. fin=[2.547337278106509,1.88025"
+      "detail": "0=[0,2.4,11.6] mid=[1.9,1.9696531791907514,8. fin=[2.547337278106509,1.88025"
     },
     {
       "name": "v4-A transición botón: portal visible a mitad del viaje",
@@ -836,7 +836,7 @@
     {
       "name": "portal: oculto tras aterrizar (ruta botón)",
       "ok": true,
-      "detail": "{\"progress\":\"0\",\"maxOp\":0.0009,\"visible\":false}"
+      "detail": "{\"progress\":\"0\",\"maxOp\":0,\"visible\":false}"
     },
     {
       "name": "7M-F E03: superficie 16:9 con un único SVG visible y display activo",
@@ -849,9 +849,9 @@
       "detail": "null"
     },
     {
-      "name": "7M-C membresías: BASE es solo visual; estado queda en null",
-      "ok": false,
-      "detail": ""
+      "name": "7M-F E27: antes del CTA no hay membresía persistida (selección vacía)",
+      "ok": true,
+      "detail": "null"
     },
     {
       "name": "7M-C housing: default compartido 50/25/25",
@@ -954,33 +954,23 @@
       "detail": ""
     },
     {
-      "name": "7M-D P0-02: la sugerencia se marca con badge, sin pisar la selección (aria-pressed sigue en BASE, estado null)",
-      "ok": false,
-      "detail": "{\"badge\":true,\"chosen\":\"\"}"
-    },
-    {
-      "name": "7M-D P0-02: «Elegir este plan» persiste COBERTURA",
-      "ok": false,
+      "name": "7M-F E27: sin diagnóstico de 2 preguntas (bloque retirado)",
+      "ok": true,
       "detail": ""
     },
     {
-      "name": "7M-D P0-02: nueva sugerencia (BASE) no reemplaza la selección confirmada (COBERTURA)",
-      "ok": false,
-      "detail": "{\"badgeBase\":true,\"chosen\":\"\"}"
-    },
-    {
-      "name": "7M-D P0-02: infraestructura → recomendación Housing independiente, sin plan forzado ni tarifas",
-      "ok": false,
-      "detail": ""
+      "name": "7M-F E27: el CTA «Me interesa este plan» persiste COBERTURA en estado",
+      "ok": true,
+      "detail": "\"cobertura\""
     },
     {
       "name": "7M-D P0-03: lista visible refleja membresía + housing + capacidad elegidas",
-      "ok": false,
-      "detail": "ElegisteTus 1 capacidad(es)Añadiste: WEB. Puedes quitarlas o sumar otras en las tarjetas de arriba.HousingModalidad priv"
+      "ok": true,
+      "detail": "ElegisteTus 1 capacidad(es)Añadiste: WEB. Puedes quitarlas o sumar otras en las tarjetas de arriba.Tu selecciónMembresía"
     },
     {
       "name": "7M-D P0-03: meta y enlace WhatsApp coherentes con la lista (mismo estado)",
-      "ok": false,
+      "ok": true,
       "detail": "https://wa.me/525573724660?text=Hola Publia, vengo del recorrido web.\n\nPropuesta Publia.mx — explora"
     },
     {
@@ -1125,7 +1115,7 @@
     },
     {
       "name": "7M-F simulador: defaults 65/18/40/55 -> 19,5 h y 4,3 h (es-MX, 1 decimal)",
-      "ok": false,
+      "ok": true,
       "detail": "19.5 h / 4.3 h"
     },
     {
@@ -1140,17 +1130,17 @@
     },
     {
       "name": "7M-F simulador: 100%/100% -> total completo (19,5 h)",
-      "ok": false,
+      "ok": true,
       "detail": "{\"t\":\"19.5 h\",\"a\":\"19.5 h\",\"err\":false}"
     },
     {
       "name": "7M-F simulador: inválido (-5) muestra error y no actualiza cifra",
-      "ok": false,
+      "ok": true,
       "detail": "{\"t\":\"19.5 h\",\"a\":\"4.3 h\",\"err\":true}"
     },
     {
       "name": "7M-F simulador: reset restaura exactamente 19,5 / 4,3",
-      "ok": false,
+      "ok": true,
       "detail": "{\"t\":\"19.5 h\",\"a\":\"4.3 h\",\"err\":false}"
     },
     {
