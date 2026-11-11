@@ -112,12 +112,11 @@ const legacyServices = PUBLISHABLE_SERVICES.map((service) => {
 const SCENES_RAW: SceneDefinition[] = [
   {
     id: 'E00',
-    eyebrow: '✨ HOLA, SOMOS PUBLIA',
-    title: 'TU NEGOCIO. TUS IDEAS. **OTRAS REGLAS.**',
-    lead: 'No somos una agencia que vende horas. Somos una red cooperativa que construye capacidad.',
-    body: 'Publia reúne desarrolladores, especialistas, mentores, becarios y agentes de inteligencia artificial dentro del ecosistema Ciudadan. Lo que sigue no es un catálogo: es una forma de entender tu negocio y decidir, contigo, qué se construye.',
-    purpose: 'Presentar el universo y el tono antes de pedir ninguna decisión.',
-    modules: ['statement'],
+    eyebrow: 'MÁS ALLÁ DE TU NEGOCIO',
+    title: 'Tu independencia crece en red.',
+    lead: 'Umbral de entrada al recorrido (7M-F): textos servidos literalmente desde copy.es-MX.json en UmbralModule.',
+    purpose: 'Umbral conceptual con paisaje, beneficios, simulador y paneles (7M-F §6).',
+    modules: ['umbral'],
     segments: [],
     route: 'shared',
     duration: 1,

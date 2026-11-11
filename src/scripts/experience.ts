@@ -814,6 +814,8 @@ export async function startExperience(): Promise<void> {
   lazyBind('[data-demo="ecosystem"]', () => import('../lib/experience/ecosystem').then((m) => m.bindEcosystem(universe)));
   // Bloques 7M-B: binders en chunks propios, cargados sólo al acercarse a su escena
   lazyBind('[data-demo="red"]', () => import('../lib/experience/red').then((m) => m.bindRed(universe)));
+  // 7M-F §6: simulador del umbral (entradas numéricas + slider sincronizados)
+  lazyBind('[data-simulator]', () => import('../lib/experience/simulator').then((m) => m.bindSimulator()));
   lazyBind('[data-demo="infra2"]', () => import('../lib/experience/infra').then((m) => m.bindInfra(universe)));
   lazyBind('[data-demo="personas"]', () => import('../lib/experience/personas').then((m) => m.bindPersonas()));
   lazyBind('[data-demo="memberships"]', () => import('../lib/experience/memberships').then((m) => m.bindMemberships()));

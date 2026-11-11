@@ -1,0 +1,163 @@
+---
+/**
+ * Umbral (E00) — bloque 7M-F §6.
+ * Textos literales desde copy.es-MX.json (COPY_7MF). Layout cerrado §4:
+ * fila 1 texto 1–5 + paisaje 6–12; fila 2 beneficios 1–6 + simulador 7–12;
+ * cuatro <details> debajo. Sin alturas fijas ni object-fit.
+ */
+import { COPY_7MF } from '../../../data/copy7mf';
+import type { ResolvedScene } from '../../../lib/experience/graph';
+import { accentify } from '../../../lib/experience/accent';
+
+interface Props {
+  scene: ResolvedScene;
+}
+
+const { scene } = Astro.props;
+const u = COPY_7MF.umbral;
+const sim = COPY_7MF.simulator;
+const fmt = new Intl.NumberFormat('es-MX', { maximumFractionDigits: 1 });
+const d = sim.defaults;
+const total0 = (d.tasks * d.minutes) / 60;
+const addr0 = (total0 * d.fraction * d.adoption) / 10000;
+---
+
+<section class="umbral" data-module="umbral" data-umbral-fade id={scene.id === 'E00' ? 'umbral' : undefined}>
+  <div class="umbral__row umbral__row--hero">
+    <div class="umbral__text">
+      {u.eyebrow && <p class="umbral__eyebrow" data-reveal set:html={accentify(u.eyebrow)} />}
+      <h2 class="umbral__title" data-reveal="lines" set:html={accentify(u.title)} />
+      <p class="umbral__lead" data-reveal>{u.lead}</p>
+    </div>
+    <figure class="umbral__paisaje">
+      <img src="/assets/publia-7mf/ecoaldea_red_productiva.png" alt={u.alt} width="1600" height="900" loading="eager" />
+      <figcaption class="umbral__caption">{u.caption}</figcaption>
+    </figure>
+  </div>
+
+  <div class="umbral__row umbral__row--second">
+    <div class="umbral__benefits">
+      <h3 class="umbral__benefits-title" data-reveal>{u.benefitsTitle}</h3>
+      <img class="umbral__benefits-art" src="/assets/publia-7mf/beneficios.svg" alt="Cuatro beneficios: control, tiempo, talento y conocimiento." width="640" height="360" loading="lazy" />
+      <ul class="umbral__benefits-grid">
+        {
+          u.benefits.map((b) => (
+            <li>
+              <strong>{b.title}</strong>
+              <p>{b.body}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div class="umbral__sim" data-simulator>
+      <h3 class="umbral__sim-title" data-reveal>{sim.title}</h3>
+      <p class="umbral__sim-lead" data-reveal>{sim.lead}</p>
+      <div class="umbral__sim-fields">
+        <label class="umbral__field">
+          <span>{sim.tasks}</span>
+          <input type="number" inputmode="numeric" data-sim-input="tasks" min={sim.limits.tasks[0]} max={sim.limits.tasks[1]} step={sim.limits.tasks[2]} value={d.tasks} />
+          <input type="range" data-sim-range="tasks" min={sim.limits.tasks[0]} max={sim.limits.tasks[1]} step={sim.limits.tasks[2]} value={d.tasks} aria-hidden="true" tabindex="-1" />
+        </label>
+        <label class="umbral__field">
+          <span>{sim.minutes}</span>
+          <input type="number" inputmode="numeric" data-sim-input="minutes" min={sim.limits.minutes[0]} max={sim.limits.minutes[1]} step={sim.limits.minutes[2]} value={d.minutes} />
+          <input type="range" data-sim-range="minutes" min={sim.limits.minutes[0]} max={sim.limits.minutes[1]} step={sim.limits.minutes[2]} value={d.minutes} aria-hidden="true" tabindex="-1" />
+        </label>
+        <label class="umbral__field">
+          <span>{sim.fraction} (%)</span>
+          <input type="number" inputmode="numeric" data-sim-input="fraction" min={sim.limits.fraction[0]} max={sim.limits.fraction[1]} step={sim.limits.fraction[2]} value={d.fraction} />
+          <input type="range" data-sim-range="fraction" min={sim.limits.fraction[0]} max={sim.limits.fraction[1]} step={sim.limits.fraction[2]} value={d.fraction} aria-hidden="true" tabindex="-1" />
+        </label>
+        <label class="umbral__field">
+          <span>{sim.adoption} (%)</span>
+          <input type="number" inputmode="numeric" data-sim-input="adoption" min={sim.limits.adoption[0]} max={sim.limits.adoption[1]} step={sim.limits.adoption[2]} value={d.adoption} />
+          <input type="range" data-sim-range="adoption" min={sim.limits.adoption[0]} max={sim.limits.adoption[1]} step={sim.limits.adoption[2]} value={d.adoption} aria-hidden="true" tabindex="-1" />
+        </label>
+      </div>
+      <p class="umbral__sim-error" data-sim-error hidden role="alert">{sim.error}</p>
+      <dl class="umbral__sim-results">
+        <div><dt>{sim.baseline}</dt><dd data-sim-result="total">{fmt.format(total0)} h</dd></div>
+        <div><dt>{sim.result}</dt><dd data-sim-result="addressable">{fmt.format(addr0)} h</dd></div>
+      </dl>
+      <p class="umbral__sim-formula">{sim.formula}</p>
+      <p class="umbral__sim-note">{sim.note}</p>
+      <button type="button" class="button button--ghost" data-sim-reset>{sim.reset}</button>
+      <p class="umbral__sim-live" data-sim-live aria-live="polite"></p>
+    </div>
+  </div>
+
+  <div class="umbral__panels">
+    {
+      u.panels.map((panel) => (
+        <details class="umbral__panel">
+          <summary>{panel.title}</summary>
+          <p>{panel.body}</p>
+        </details>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .umbral {
+    --page-gutter: clamp(20px, 4vw, 76px);
+    --content-max: 1440px;
+    width: min(calc(100% - 2 * var(--page-gutter)), var(--content-max));
+    margin-inline: auto;
+    display: grid;
+    gap: 64px;
+    padding-block: 64px;
+    color: var(--scene-ink, #eef0f6);
+  }
+  .umbral__row { display: grid; grid-template-columns: repeat(12, 1fr); gap: 32px; align-items: start; }
+  .umbral__text { grid-column: 1 / 6; }
+  .umbral__paisaje { grid-column: 6 / 13; margin: 0; }
+  .umbral__paisaje img { display: block; width: 100%; height: auto; border-radius: 24px; }
+  .umbral__caption { margin-top: 8px; font-size: 0.8rem; opacity: 0.75; }
+  .umbral__eyebrow { letter-spacing: 0.14em; text-transform: uppercase; font-size: 0.78rem; color: var(--scene-accent, #80e5ff); margin: 0 0 12px; }
+  .umbral__title { font-size: clamp(30px, 3.2vw, 56px); line-height: 1.08; margin: 0 0 16px; max-width: 22ch; }
+  .umbral__lead { max-width: 58ch; font-size: 18px; line-height: 1.55; margin: 0; }
+  .umbral__benefits { grid-column: 1 / 7; }
+  .umbral__sim { grid-column: 7 / 13; border: 1px solid var(--scene-border, rgba(128, 229, 255, 0.22)); border-radius: 24px; padding: 28px; background: rgba(5, 11, 27, 0.5); }
+  .umbral__benefits-title, .umbral__sim-title { font-size: clamp(24px, 2.4vw, 34px); line-height: 1.12; margin: 0 0 14px; }
+  .umbral__benefits-art { display: block; width: 100%; height: auto; margin-bottom: 18px; }
+  .umbral__benefits-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; }
+  .umbral__benefits-grid strong { display: block; margin-bottom: 4px; }
+  .umbral__benefits-grid p { margin: 0; font-size: 0.92rem; line-height: 1.5; opacity: 0.9; }
+  .umbral__sim-lead { margin: 0 0 16px; opacity: 0.85; }
+  .umbral__sim-fields { display: grid; gap: 12px; margin-bottom: 14px; }
+  .umbral__field { display: grid; gap: 4px; font-size: 0.86rem; }
+  .umbral__field input[type='number'] { min-height: 48px; padding: 10px 14px; border-radius: 12px; border: 1px solid var(--scene-border, rgba(128, 229, 255, 0.3)); background: rgba(3, 8, 20, 0.6); color: inherit; font-size: 16px; width: 100%; }
+  .umbral__field input[type='range'] { width: 100%; accent-color: var(--scene-accent, #80e5ff); }
+  .umbral__sim-error { color: #fa5964; font-size: 0.9rem; margin: 0 0 8px; }
+  .umbral__sim-results { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0 0 12px; }
+  .umbral__sim-results div { border: 1px solid var(--scene-border, rgba(128,229,255,.2)); border-radius: 16px; padding: 12px 14px; }
+  .umbral__sim-results dt { font-size: 0.78rem; opacity: 0.8; margin-bottom: 4px; }
+  .umbral__sim-results dd { margin: 0; font-size: 1.5rem; font-variant-numeric: tabular-nums; }
+  .umbral__sim-formula { font-size: 0.82rem; opacity: 0.85; margin: 0 0 6px; }
+  .umbral__sim-note { font-size: 0.8rem; opacity: 0.7; margin: 0 0 14px; }
+  .umbral__sim-live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .umbral__panels { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .umbral__panel { border: 1px solid var(--scene-border, rgba(128, 229, 255, 0.22)); border-radius: 24px; padding: 20px 28px; }
+  .umbral__panel summary { cursor: pointer; font-weight: 600; min-height: 28px; }
+  .umbral__panel summary:focus-visible { outline: 3px solid var(--scene-accent, #ffca34); outline-offset: 3px; }
+  .umbral__panel p { margin: 10px 0 0; line-height: 1.55; font-size: 0.94rem; opacity: 0.92; }
+  .button { min-height: 48px; padding: 14px 22px; font-size: 16px; border-radius: 999px; cursor: pointer; }
+  .button--ghost { border: 1px solid var(--scene-border, rgba(128,229,255,.35)); background: transparent; color: inherit; }
+  .button--ghost:focus-visible { outline: 3px solid var(--scene-accent, #ffca34); outline-offset: 3px; }
+  @media (max-width: 1023px) {
+    .umbral__row { grid-template-columns: 1fr 1fr; gap: 24px; }
+    .umbral__text, .umbral__paisaje, .umbral__benefits, .umbral__sim { grid-column: auto; }
+  }
+  @media (max-width: 639px) {
+    .umbral { gap: 40px; padding-block: 40px; }
+    .umbral__row { grid-template-columns: 1fr; gap: 20px; }
+    .umbral__lead { font-size: 16px; }
+    .umbral__benefits-grid { grid-template-columns: 1fr; }
+    .umbral__sim { padding: 20px; }
+    .umbral__panels { grid-template-columns: 1fr; }
+    .umbral__panel { padding: 16px 20px; }
+  }
+</style>
