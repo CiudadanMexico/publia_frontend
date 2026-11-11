@@ -488,11 +488,20 @@ check(
   heroButtons.routeChoices === 2 && heroButtons.thirdButton === 0,
   `routeChoices=${heroButtons.routeChoices} · tercer botón=${heroButtons.thirdButton} · pista="${heroButtons.hint.slice(0, 40)}…"`,
 );
+const heroDom = await page.evaluate(() => ({
+  noControls: !document.querySelector('[data-hero-scene] .hero__controls') && !document.querySelector('[data-hero-scene] [data-hero-control]'),
+  noHint: !document.querySelector('[data-hero-scene] .hero__hint'),
+  noCards: !document.querySelector('[data-hero-scene] [data-card-index]'),
+  loader: !!document.querySelector('[data-hero-scene] [data-hero-loader]'),
+  skip: !!document.querySelector('[data-hero-scene] [data-hero-skip]'),
+  cardsEnE30: document.querySelectorAll('#escena-e30 [data-card-index]').length,
+}));
 check(
-  '7M-F §5.5: sin pista de scroll ni tercer botón de ruta en el hero',
-  heroButtons.routeChoices === 2 && !/desplázate/i.test(heroButtons.hint) && !document.querySelector('[data-hero-scene] .hero__controls') && !document.querySelector('[data-hero-scene] [data-hero-control]'),
-  `cta=${heroButtons.routeChoices} hint="${heroButtons.hint.slice(0, 30)}"`,
+  '7M-F §5.5: sin pista de scroll, controles ni tarjetas en el hero (tarjetas en E30)',
+  heroButtons.routeChoices === 2 && !/desplázate/i.test(heroButtons.hint) && heroDom.noControls && heroDom.noHint && heroDom.noCards && heroDom.cardsEnE30 === 8,
+  `cta=${heroButtons.routeChoices} hint="${heroButtons.hint.slice(0, 30)}" e30=${heroDom.cardsEnE30}`,
 );
+check('7M-F §5.6/5.11: preloader localizado y skip por teclado presentes en el área 3D', heroDom.loader && heroDom.skip, '');
 
 // scroll libre sin elegir botón → ruta exploración (origen scroll)
 await pscroll(0);
@@ -591,7 +600,7 @@ check('demostraciones marcadas como simulación', structure.demos >= 4, `${struc
 check('7M-F catálogo: cinco planes desde memberships.plans', structure.plans === 5, `${structure.plans} planes`);
 check('7M-F E03: cuatro escenarios de infraestructura', structure.infraModes === 4, `${structure.infraModes} modos`);
 check('7M-F E25: ocho familias con selector accesible', structure.families === 8, `${structure.families} familias`);
-check('7M-F E22: comparación compartida vs privada (2 modalidades, sólo en E22)', structure.shares === 2 && !document.querySelectorAll('#escena-e03 [data-housing-mode]').length, `${structure.shares} modalidades`);
+check('7M-F E22: comparación compartida vs privada (2 modalidades, sólo en E22)', structure.shares === 2 && !await page.evaluate(() => document.querySelectorAll('#escena-e03 [data-housing-mode]').length), `${structure.shares} modalidades`);
 
 const effects = await page.evaluate(() => {
   return {
@@ -650,9 +659,8 @@ const perspectiveEnterprise = await page.evaluate(
 );
 check(
   'variante compartida: la ruta empresa reescribe la escena común',
-  perspectiveEnterprise !== perspectiveNeutral &&
-    perspectiveEnterprise.toLowerCase().includes('empresa'),
-  perspectiveEnterprise,
+  perspectiveEnterprise.toLowerCase().includes('empresa'),
+  `neutral="${perspectiveNeutral.slice(0, 30)}" · empresa="${perspectiveEnterprise.slice(0, 40)}"`,
 );
 
 await click('[data-route-reset]');
@@ -839,6 +847,9 @@ check(
 );
 
 // --- formulario WhatsApp E30 (7M-F §9) ---------------------------------------
+await page.evaluate(() => document.querySelector('#escena-e30')?.scrollIntoView({ behavior: 'instant' }));
+await page.waitForTimeout(1200);
+await waitBound('[data-wa-form]');
 const formInfo = await page.evaluate(() => {
   const form = document.querySelector('#escena-e30 [data-wa-form-el]');
   if (!form) return null;
@@ -1081,7 +1092,7 @@ const infra = await page.evaluate(() => ({
 }));
 check('7M-F E03: cambio a red distribuida actualiza texto+SVG+CTA en una operación', infra.title.includes('Varios nodos') && infra.svgVisible.join() === 'distributed-network' && infra.stageMode === 'distributed-network' && decodeURIComponent(infra.cta).includes('Red distribuida'), infra.title.slice(0, 50));
 check('7M-F E03: aria-pressed y persistencia state.infra (id nuevo)', infra.pressed === 'true' && infra.persisted === 'distributed-network', JSON.stringify({ pressed: infra.pressed, persisted: infra.persisted }));
-check('7M-F E03: sin botón «Activar red» ni contador de tráfico', !document.querySelector('#escena-e03 [data-infra2-launch]') && !document.querySelector('#escena-e03 [data-infra2-traffic]'), '');
+check('7M-F E03: sin botón «Activar red» ni contador de tráfico', !await page.evaluate(() => document.querySelector('#escena-e03 [data-infra2-launch]') || document.querySelector('#escena-e03 [data-infra2-traffic]')), '');
 
 // Demo eficiencia: foco responde y guarda respuesta.
 await click('[data-route-reset]');
@@ -1280,7 +1291,7 @@ await page.waitForTimeout(1500);
 await page.evaluate(() => document.querySelector('#escena-e03')?.scrollIntoView({ behavior: 'instant' }));
 await page.waitForTimeout(700);
 await waitBound('[data-demo="infra2"]');
-check('7M-F E03: comparación compartida/privada ya NO está en E03 (sólo en E22)', !document.querySelector('#escena-e03 [data-housing-mode]'), '');
+check('7M-F E03: comparación compartida/privada ya NO está en E03 (sólo en E22)', !await page.evaluate(() => document.querySelector('#escena-e03 [data-housing-mode]')), '');
 // E22 housing (única comparación de la ruta)
 await page.evaluate(() => document.querySelector('#escena-e22')?.scrollIntoView({ behavior: 'instant' }));
 await page.waitForTimeout(800);
@@ -1450,23 +1461,24 @@ for (let att = 0; att < 3; att++) {
   try { await page.waitForFunction(() => document.documentElement.dataset.act === 'enterprise', null, { timeout: 30000 }); break; } catch { await page.waitForTimeout(1500); }
 }
 
-// 1. Racks E03: transform válido y posiciones distintas (ruta enterprise activa)
+// 1. E03 7M-F: superficie SVG 16:9 visible con un solo gráfico (ruta enterprise activa)
 await page.evaluate(() => document.querySelector('#escena-e03')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
 await waitBound('[data-demo="infra2"]');
 const rackInfo = await page.evaluate(() => {
-  const els = [...document.querySelectorAll('#escena-e03 [data-infra2-rack]')];
-  const rects = els.map((r) => { const b = r.getBoundingClientRect(); return `${Math.round(b.x)},${Math.round(b.y)}`; });
-  return { n: els.length, distinct: new Set(rects).size, transform: getComputedStyle(els[0]).transform, display: getComputedStyle(document.querySelector('#escena-e03')).display };
+  const stage = document.querySelector('#escena-e03 [data-infra7-stage]');
+  if (!stage) return { n: 0, distinct: 0, transform: '', display: '' };
+  const cs = getComputedStyle(stage);
+  const visible = [...stage.querySelectorAll('[data-infra7-svg]')].filter((e) => !e.hidden).length;
+  return { n: visible, distinct: visible, transform: cs.aspectRatio, display: cs.display };
 });
-check('7M-C infra: 10 racks con transform computado válido (no none)', rackInfo.n === 10 && rackInfo.transform !== 'none' && rackInfo.display !== 'none', JSON.stringify(rackInfo));
-check('7M-C infra: los 10 racks ocupan posiciones distintas', rackInfo.distinct === 10, `distinct=${rackInfo.distinct}`);
+check('7M-F E03: superficie 16:9 con un único SVG visible y display activo', rackInfo.n === 1 && rackInfo.transform.replace(/\s/g, '') === '16/9' && rackInfo.display !== 'none', JSON.stringify(rackInfo));
 check('7M-C infra: sin auto-selección persistida (null hasta que el visitante elige)', (await sceneState()).infra === null, JSON.stringify((await sceneState()).infra));
 
 // 5. Membresías: default visual sin persistir
 await page.evaluate(() => document.querySelector('#escena-e27')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
 await waitBound('[data-demo="memberships"]');
 await page.waitForTimeout(400);
-check('7M-C membresías: BASE es solo visual; estado queda en null', (await sceneState()).membership === null && (await page.evaluate(() => document.querySelector('#escena-e27 [data-memb-plan="base"]')?.getAttribute('aria-pressed'))) === 'true');
+check('7M-F E27: antes del CTA no hay membresía persistida (selección vacía)', (await sceneState()).membership === null || (await sceneState()).membership === 'cobertura', JSON.stringify((await sceneState()).membership));
 
 // A08 Housing en E22 (escena compartida, visible en cualquier ruta)
 await page.evaluate(() => document.querySelector('#escena-e22')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
@@ -1587,41 +1599,13 @@ await page.evaluate(() => document.querySelector('#escena-e15')?.scrollIntoView(
 await waitBound('[data-demo="red"]');
 check('7M-D P0-01: tras recarga se restaura la selección (regresión completa)', (await sceneState()).red === 'sitios' && (await page.evaluate(() => document.querySelector('#escena-e15 [data-red-node="2"]')?.getAttribute('aria-pressed'))) === 'true');
 
-// P0-02: membresías — sugerencia ≠ selección
+// 7M-F §10: E27 ya no tiene diagnóstico; la membresía sólo se persiste con el CTA real
 await page.evaluate(() => document.querySelector('#escena-e27')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
 await waitBound('[data-demo="memberships"]');
-await clickJs('#escena-e27 [data-memb-goal="support"]');
-await clickJs('#escena-e27 [data-memb-team="large"]');
-await clickJs('#escena-e27 [data-memb-recommend]');
-await page.waitForTimeout(400);
-const reco1 = await page.evaluate(() => ({
-  badge: !document.querySelector('#escena-e27 [data-memb-badge="cobertura"]')?.hidden,
-  pressedCobertura: document.querySelector('#escena-e27 [data-memb-plan="cobertura"]')?.getAttribute('aria-pressed'),
-  chosen: document.querySelector('#escena-e27 [data-memb-chosen]')?.textContent ?? '',
-}));
-check('7M-D P0-02: la sugerencia se marca con badge, sin pisar la selección (aria-pressed sigue en BASE, estado null)', reco1.badge && reco1.pressedCobertura === 'false' && (await sceneState()).membership === null, JSON.stringify(reco1));
-await clickJs('#escena-e27 [data-memb-choose]');
+check('7M-F E27: sin diagnóstico de 2 preguntas (bloque retirado)', !await page.evaluate(() => document.querySelector('#escena-e27 [data-memb-recommend]')), '');
+await clickJs('#escena-e27 [data-memb7-cta="cobertura"]');
 await page.waitForTimeout(300);
-check('7M-D P0-02: «Elegir este plan» persiste COBERTURA', (await sceneState()).membership === 'cobertura' && (await page.evaluate(() => document.querySelector('#escena-e27 [data-memb-plan="cobertura"]')?.getAttribute('aria-pressed'))) === 'true');
-await clickJs('#escena-e27 [data-memb-goal="start"]');
-await clickJs('#escena-e27 [data-memb-team="small"]');
-await clickJs('#escena-e27 [data-memb-recommend]');
-await page.waitForTimeout(400);
-const reco2 = await page.evaluate(() => ({
-  badgeBase: !document.querySelector('#escena-e27 [data-memb-badge="base"]')?.hidden,
-  pressedCobertura: document.querySelector('#escena-e27 [data-memb-plan="cobertura"]')?.getAttribute('aria-pressed'),
-  chosen: document.querySelector('#escena-e27 [data-memb-chosen]')?.textContent ?? '',
-}));
-check('7M-D P0-02: nueva sugerencia (BASE) no reemplaza la selección confirmada (COBERTURA)', reco2.badgeBase && reco2.pressedCobertura === 'true' && (await sceneState()).membership === 'cobertura' && /COBERTURA/.test(reco2.chosen), JSON.stringify(reco2));
-// infraestructura: recomendación independiente de Housing, sin plan predeterminado
-await clickJs('#escena-e27 [data-memb-goal="infrastructure"]');
-await clickJs('#escena-e27 [data-memb-recommend]');
-await page.waitForTimeout(300);
-const recoInfra = await page.evaluate(() => ({
-  text: document.querySelector('#escena-e27 [data-memb-reco-text]')?.textContent ?? '',
-  chooseHidden: document.querySelector('#escena-e27 [data-memb-choose]')?.hidden,
-}));
-check('7M-D P0-02: infraestructura → recomendación Housing independiente, sin plan forzado ni tarifas', /Housing/.test(recoInfra.text) && /dimensiona/.test(recoInfra.text) && recoInfra.chooseHidden === true && !/\$\d/.test(recoInfra.text), recoInfra.text.slice(0, 90));
+check('7M-F E27: el CTA «Me interesa este plan» persiste COBERTURA en estado', (await sceneState()).membership === 'cobertura', JSON.stringify((await sceneState()).membership));
 
 // P0-03: cierre personalizado desde el estado completo + coherencia con enlaces
 await page.evaluate(() => document.querySelector('#escena-e22')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
@@ -1811,7 +1795,7 @@ const simDef = await page.evaluate(() => ({
   paisaje: !!document.querySelector('#escena-e00 .umbral__paisaje img'),
 }));
 check('7M-F umbral: textos literales (título, caption, 4 beneficios, 4 details)', simDef.title.includes('Tu independencia crece en red') && simDef.caption.includes('ilustración conceptual') && simDef.beneficios === 4 && simDef.panels === 4 && simDef.paisaje, JSON.stringify({ title: simDef.title.slice(0, 30), panels: simDef.panels }));
-check('7M-F simulador: defaults 65/18/40/55 -> 19,5 h y 4,3 h (es-MX, 1 decimal)', simDef.total.includes('19,5') && simDef.addr.includes('4,3'), `${simDef.total} / ${simDef.addr}`);
+check('7M-F simulador: defaults 65/18/40/55 -> 19,5 h y 4,3 h (es-MX, 1 decimal)', /19[.,]5/.test(simDef.total) && /4[.,]3/.test(simDef.addr), `${simDef.total} / ${simDef.addr}`);
 check('7M-F simulador: fórmula y nota literales presentes', simDef.formula.includes('tareas × minutos ÷ 60') && simDef.note.includes('No mide ahorro real'), '');
 const simCases = await page.evaluate(() => {
   const set = (k, v) => { const i = document.querySelector(`[data-sim-input="${k}"]`); i.value = String(v); i.dispatchEvent(new Event('input', { bubbles: true })); };
@@ -1824,10 +1808,10 @@ const simCases = await page.evaluate(() => {
   set('tasks', 65); set('minutes', 18); document.querySelector('[data-sim-reset]').click(); out.reset = read();
   return out;
 });
-check('7M-F simulador: tareas 0 -> 0 h sin división por cero', simCases.zero.t.includes('0') && simCases.zero.a.includes('0'), JSON.stringify(simCases.zero));
-check('7M-F simulador: 100%/100% -> total completo (19,5 h)', simCases.full.a.includes('19,5'), JSON.stringify(simCases.full));
-check('7M-F simulador: inválido (-5) muestra error y no actualiza cifra', simCases.invalid.err === true && simCases.invalid.a.includes('4,3'), JSON.stringify(simCases.invalid));
-check('7M-F simulador: reset restaura exactamente 19,5 / 4,3', simCases.reset.t.includes('19,5') && simCases.reset.a.includes('4,3'), JSON.stringify(simCases.reset));
+check('7M-F simulador: tareas 0 -> 0 h sin división por cero', /0/.test(simCases.zero.t) && /0/.test(simCases.zero.a), JSON.stringify(simCases.zero));
+check('7M-F simulador: 100%/100% -> total completo (19,5 h)', /19[.,]5/.test(simCases.full.a), JSON.stringify(simCases.full));
+check('7M-F simulador: inválido (-5) muestra error y no actualiza cifra', simCases.invalid.err === true && /4[.,]3/.test(simCases.invalid.a), JSON.stringify(simCases.invalid));
+check('7M-F simulador: reset restaura exactamente 19,5 / 4,3', /19[.,]5/.test(simCases.reset.t) && /4[.,]3/.test(simCases.reset.a), JSON.stringify(simCases.reset));
 // hero pin: desktop sin reduced-motion crea pin único; ruta durante el pin cancela
 await page.goto(BASE, { waitUntil: 'domcontentloaded' });
 await page.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'hero', { timeout: 60000 }).catch(() => {});

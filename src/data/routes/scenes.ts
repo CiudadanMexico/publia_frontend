@@ -25,7 +25,7 @@ import type { SceneDefinition, SceneLayout, SceneTone } from '../../lib/experien
  * aquí queda el placeholder con API estable).
  */
 const ART_DIRECTION: Record<string, { tone: SceneTone; layout: SceneLayout; art?: string; chapter?: string }> = {
-  E00: { tone: 'cream', layout: 'split', art: 'A01' , chapter: 'descubrimiento'},
+  E00: { tone: 'cream', layout: 'split', art: null, chapter: 'descubrimiento'}, // 7M-F: el umbral usa su propio paisaje; A01 nunca se entregó como archivo
   E02: { tone: 'cream', layout: 'split', art: 'A01' , chapter: 'descubrimiento'},
   E03: { tone: 'petrol', layout: 'split', art: 'A04' , chapter: 'mundo'},
   E04: { tone: 'petrol', layout: 'split', art: 'A04' , chapter: 'mundo'},

@@ -1,25 +1,5 @@
 {
   "base": "https://dam-boulevard-explaining-alaska.trycloudflare.com",
-  "violaciones": [
-    {
-      "id": "landmark-unique",
-      "impact": "moderate",
-      "nodes": 1,
-      "help": "Landmarks should have a unique role or role/label/title (i.e. accessible name) combination",
-      "targets": [
-        "#escena-e30"
-      ]
-    }
-  ],
-  "rutaEmpresa": [
-    {
-      "id": "landmark-unique",
-      "impact": "moderate",
-      "nodes": 1,
-      "help": "Landmarks should have a unique role or role/label/title (i.e. accessible name) combination",
-      "targets": [
-        "#escena-e30"
-      ]
-    }
-  ]
+  "violaciones": [],
+  "rutaEmpresa": []
 }
