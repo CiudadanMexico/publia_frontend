@@ -46,12 +46,12 @@
     {
       "name": "prisma: la escena 3D se renderiza y cambia (animación real)",
       "ok": true,
-      "detail": "639938 vs 650146 bytes"
+      "detail": "640122 vs 655525 bytes"
     },
     {
       "name": "prisma: pinta una fracción útil del viewport",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.20326234567901236}"
+      "detail": "{\"paintedRatio\":0.20960802469135803}"
     },
     {
       "name": "hero 3D: lienzo único presente con WebGL activo",
@@ -81,12 +81,12 @@
     {
       "name": "hero 3D: pinta la escena (mascota, prisma, tarjetas)",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.205625}"
+      "detail": "{\"paintedRatio\":0.21225}"
     },
     {
       "name": "hero 3D: la animación ambiental cambia entre fotogramas",
       "ok": true,
-      "detail": "661427 vs 659006 bytes"
+      "detail": "663119 vs 663162 bytes"
     },
     {
       "name": "marca: el encabezado usa el logotipo oficial",
@@ -116,7 +116,7 @@
     {
       "name": "transición enterprise: el contenido de la escena destino aparece",
       "ok": true,
-      "detail": "scrollY 4277 · act=enterprise"
+      "detail": "scrollY 4077 · act=enterprise"
     },
     {
       "name": "transición enterprise: volver regresa al hero sin recargar",
@@ -131,7 +131,7 @@
     {
       "name": "transición efficiency: el contenido de la escena destino aparece",
       "ok": true,
-      "detail": "scrollY 4277 · act=efficiency"
+      "detail": "scrollY 4077 · act=efficiency"
     },
     {
       "name": "transición efficiency: volver regresa al hero sin recargar",
@@ -141,12 +141,12 @@
     {
       "name": "transición cooperative: la cámara viaja a otro mundo del mismo universo",
       "ok": true,
-      "detail": "mundo hero→cooperative · cámara [0,2.4,11.6]→[-0.016666666666666673,2.5613229212467066,11.048314329167596] · tinte #050b1b→#060d08"
+      "detail": "mundo hero→cooperative · cámara [0,2.4,11.6]→[-0.016666666666666673,1.7585112692763938,9.222419928825623] · tinte #050b1b→#060d08"
     },
     {
       "name": "transición cooperative: el contenido de la escena destino aparece",
       "ok": true,
-      "detail": "scrollY 700 · act=cooperative"
+      "detail": "scrollY 2320 · act=cooperative"
     },
     {
       "name": "transición cooperative: volver regresa al hero sin recargar",
@@ -286,7 +286,7 @@
     {
       "name": "ruta eficiencia: escena propia visible",
       "ok": true,
-      "detail": "1696px · route=efficiency act=efficiency world=efficiency scrollY=10"
+      "detail": "1696px · route=efficiency act=efficiency world=efficiency scrollY=3512"
     },
     {
       "name": "ruta eficiencia: mensaje propio de la escena",
@@ -504,9 +504,9 @@
       "detail": "7 em"
     },
     {
-      "name": "v3/7M-E: slots de arte en uso (A01,A03,A04,A05; A02 retirado con E20)",
+      "name": "v3/7M-F: slots de arte en uso (A03,A04,A05; A01/A02 retirados sin archivo/p prestamo)",
       "ok": true,
-      "detail": "A01,A04,A04,A03,A03,A03,A03,A05,A05,A04"
+      "detail": "A04,A04,A03,A03,A03,A03,A05,A05,A04"
     },
     {
       "name": "v3: eyebrows con emoji semántico",
@@ -521,12 +521,12 @@
     {
       "name": "v3 scroll: la cámara se transforma en 30/60/90% (ida)",
       "ok": true,
-      "detail": "30=[2.873372781065089,2.002514792899408,8.697115384615385] 60=[2.547337278106509,1.8802514792899407,8.432211538461539] 90=[1.9,1.9768844221105528,8.928140703517588]"
+      "detail": "30=[2.926627218934911,2.0224852071005914,8.740384615384615] 60=[2.547337278106509,1.8802514792899407,8.432211538461539] 90=[1.9,1.9693467336683417,8.915577889447237]"
     },
     {
       "name": "v3 scroll: recorrido inverso mueve la cámara en sentido inverso (reversible)",
       "ok": true,
-      "detail": "90=[1.9,1.9768844221105528,8.928140703517588] ida60=[2.547337278106509,1.8802514792899407,8.432211538461539] vuelta60=[2.2794025157232705,1.4487421383647798,7.77185534591195]"
+      "detail": "90=[1.9,1.9693467336683417,8.915577889447237] ida60=[2.547337278106509,1.8802514792899407,8.432211538461539] vuelta60=[2.3674528301886792,1.4235849056603773,7.708962264150944]"
     },
     {
       "name": "7M-F E03: 4 escenarios con botones aria-pressed",
@@ -601,7 +601,7 @@
     {
       "name": "7M-E: A02 ya no aparece como arte de escena (E20 sin ilustración prestada)",
       "ok": true,
-      "detail": "A01,A04,A04,A03,A03,A03,A03,A05,A05,A04"
+      "detail": "A04,A04,A03,A03,A03,A03,A05,A05,A04"
     },
     {
       "name": "auditoría imágenes: cada asset real aparece UNA sola vez (sin duplicados)",
@@ -716,7 +716,7 @@
     {
       "name": "7M-B personas: ejecutar arranca la demo (texto cambia y hay etapa activa)",
       "ok": true,
-      "detail": "{\"text\":\"● Simulando…\",\"pauseOff\":true,\"out\":\"🚨 Problema reportado\"}"
+      "detail": "{\"text\":\"● Simulando…\",\"pauseOff\":true,\"out\":\"🤖 Primer análisis\"}"
     },
     {
       "name": "7M-F E27: 5 tarjetas desde memberships.plans",
@@ -791,7 +791,7 @@
     {
       "name": "v4-A transición botón: cámara cambia en 3 momentos (inicio/medio/fin)",
       "ok": true,
-      "detail": "0=[0,2.4,11.6] mid=[1.9,1.9696531791907514,8. fin=[2.547337278106509,1.88025"
+      "detail": "0=[0,2.4,11.6] mid=[1.9,1.8951731761238024,8. fin=[2.547337278106509,1.88025"
     },
     {
       "name": "v4-A transición botón: portal visible a mitad del viaje",
