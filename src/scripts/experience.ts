@@ -39,6 +39,7 @@ import type { PrimaryRoute, VisitorState, VisitorTrait } from '../lib/experience
 import type { SceneVariant, StageState } from '../lib/experience/types';
 
 gsap.registerPlugin(ScrollTrigger);
+(window as unknown as { ScrollTrigger: typeof ScrollTrigger }).ScrollTrigger = ScrollTrigger; // QA: sondeo de pins
 
 let started = false;
 

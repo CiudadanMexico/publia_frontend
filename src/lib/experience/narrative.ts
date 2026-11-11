@@ -280,6 +280,7 @@ export function createNarrative({ universe, reducedMotion, portal }: NarrativeOp
   };
 
   const goBack = (): void => {
+    cancelHeroPin(); // 7M-F §5.12: el pin nunca atrapa al volver
     if (stack.length <= 1 || traveling) return;
     stack.pop();
     const previous = stack[stack.length - 1] ?? 'hero';
@@ -306,6 +307,7 @@ export function createNarrative({ universe, reducedMotion, portal }: NarrativeOp
   };
 
   const returnToHero = (): void => {
+    cancelHeroPin();
     stack.length = 0;
     stack.push('hero');
     universe?.travelTo('hero', { duration: reducedMotion ? 0 : 1.6 });

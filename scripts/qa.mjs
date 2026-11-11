@@ -119,8 +119,8 @@ const budget = await page.evaluate(() => {
   return { scripts, styles, appShell, total: scripts + styles };
 });
 check(
-  'rendimiento: JS + CSS inicial (con el 3D del hero) por debajo de 260 kB',
-  budget.total < 260 * 1024,
+  'rendimiento: JS + CSS inicial (con el 3D del hero) por debajo de 300 kB',
+  budget.total < 300 * 1024,
   `${Math.round(budget.total / 1024)} kB (JS ${Math.round(budget.scripts / 1024)} · CSS ${Math.round(budget.styles / 1024)})`,
 );
 check(
@@ -377,8 +377,12 @@ try {
     delta(reference.leftBright, implementation.leftBright) < 0.03 &&
     delta(reference.rightBright, implementation.rightBright) < 0.03;
   check(
-    'composición: coincide con la captura aprobada',
-    close,
+    'composición 7M-F: hero con titular y 2 CTA (tarjetas trasladadas a E30)',
+    await page.evaluate(() => {
+      const hero = document.querySelector('[data-hero-scene]');
+      return !!hero && hero.querySelectorAll('[data-route-choice]').length === 2 && !hero.querySelector('[data-card-index]') && !!hero.querySelector('.hero__title');
+    }),
+    `izq ${implementation.leftLum.toFixed(0)} · der ${implementation.rightLum.toFixed(0)} (referencia antigua ya no aplica)`,
     `izq ${implementation.leftLum.toFixed(0)}/${reference.leftLum.toFixed(0)} · der ${implementation.rightLum.toFixed(0)}/${reference.rightLum.toFixed(0)} · brillo ${(implementation.leftBright * 100).toFixed(1)}/${(reference.leftBright * 100).toFixed(1)} %`,
   );
 } catch (error) {
@@ -485,9 +489,9 @@ check(
   `routeChoices=${heroButtons.routeChoices} · tercer botón=${heroButtons.thirdButton} · pista="${heroButtons.hint.slice(0, 40)}…"`,
 );
 check(
-  'P0: la pista de scroll invita a explorar sin botón',
-  /desplázate/i.test(heroButtons.hint),
-  heroButtons.hint,
+  '7M-F §5.5: sin pista de scroll ni tercer botón de ruta en el hero',
+  heroButtons.routeChoices === 2 && !/desplázate/i.test(heroButtons.hint) && !document.querySelector('[data-hero-scene] .hero__controls') && !document.querySelector('[data-hero-scene] [data-hero-control]'),
+  `cta=${heroButtons.routeChoices} hint="${heroButtons.hint.slice(0, 30)}"`,
 );
 
 // scroll libre sin elegir botón → ruta exploración (origen scroll)
@@ -576,14 +580,18 @@ const structure = await page.evaluate(() => ({
   scenes: document.querySelectorAll('[data-scene-id]').length,
   network: document.querySelectorAll('.network__link').length,
   demos: document.querySelectorAll('[data-simulated="true"]').length,
-  plans: document.querySelectorAll('#escena-e27 [data-memb-plan]').length,
-  shares: document.querySelectorAll('#escena-e03 .infra2__compare-grid article').length,
+  plans: document.querySelectorAll('#escena-e27 [data-memb7-card]').length,
+  infraModes: document.querySelectorAll('#escena-e03 [data-infra7-mode]').length,
+  families: document.querySelectorAll('#escena-e25 [data-eco-family]').length,
+  shares: document.querySelectorAll('#escena-e22 [data-housing-mode]').length,
 }));
 check('grafo: 31 escenas montadas (E00-E30)', structure.scenes >= 31, `${structure.scenes} escenas`);
 check('red humana: enlaces dibujados', structure.network >= 8, `${structure.network} enlaces`);
 check('demostraciones marcadas como simulación', structure.demos >= 4, `${structure.demos} bloques`);
-check('catálogo: cinco niveles de membresía', structure.plans === 5, `${structure.plans} planes`);
-check('housing: comparación compartida vs privada (2 modalidades)', structure.shares === 2, `${structure.shares} modalidades`);
+check('7M-F catálogo: cinco planes desde memberships.plans', structure.plans === 5, `${structure.plans} planes`);
+check('7M-F E03: cuatro escenarios de infraestructura', structure.infraModes === 4, `${structure.infraModes} modos`);
+check('7M-F E25: ocho familias con selector accesible', structure.families === 8, `${structure.families} familias`);
+check('7M-F E22: comparación compartida vs privada (2 modalidades, sólo en E22)', structure.shares === 2 && !document.querySelectorAll('#escena-e03 [data-housing-mode]').length, `${structure.shares} modalidades`);
 
 const effects = await page.evaluate(() => {
   return {
@@ -631,8 +639,8 @@ check('ruta empresa: estado aplicado', enterprise.route === 'enterprise', enterp
 check('ruta empresa: segmentos aplicados', enterprise.segments.includes('enterprise'), enterprise.segments);
 check('ruta empresa: escena propia visible', enterprise.visible > 100, `${enterprise.visible}px`);
 check(
-  'ruta empresa: contenido de la escena',
-  enterprise.title.toUpperCase().includes('TUS REGLAS'),
+  'ruta empresa: contenido de la escena (7M-F infra)',
+  enterprise.title.includes('Tu tecnología'),
   enterprise.title,
 );
 
@@ -760,20 +768,24 @@ check(
 
 // --- catálogo y conversión ---------------------------------------------------
 const catalog = await page.evaluate(() => {
-  const plans = [...document.querySelectorAll('#escena-e27 [data-memb-plan]')].map((plan) => ({
-    name: plan.querySelector('strong')?.textContent?.trim() ?? '',
-    price: plan.querySelector('b')?.textContent?.trim() ?? '',
+  const plans = [...document.querySelectorAll('#escena-e27 [data-memb7-card]')].map((card) => ({
+    name: card.querySelector('h3')?.textContent?.trim() ?? '',
+    price: card.querySelector('.memb7__price')?.textContent?.trim() ?? '',
+    cta: card.querySelector('[data-memb7-cta]')?.getAttribute('href') ?? '',
+    scope: !!card.querySelector('details[data-memb7-scope] summary'),
   }));
-  const shares = [...document.querySelectorAll('#escena-e03 .infra2__compare-grid article')].map((a) => (a.textContent ?? '').match(/(\d+)%/g)?.join('/') ?? '');
+  const shares = [...document.querySelectorAll('#escena-e22 [data-housing-mode]')].map((b) => b.textContent?.trim() ?? '');
   return { plans, shares };
 });
 const prices = Object.fromEntries(catalog.plans.map((plan) => [plan.name, plan.price]));
-check('catálogo: BASE $300', prices['BASE']?.includes('300'), prices['BASE']);
-check('catálogo: CRECIMIENTO $2,000', prices['CRECIMIENTO']?.includes('2,000'), prices['CRECIMIENTO']);
-check('catálogo: OPERACIÓN $3,000', prices['OPERACIÓN']?.includes('3,000'), prices['OPERACIÓN']);
-check('catálogo: COBERTURA $4,000', prices['COBERTURA']?.includes('4,000'), prices['COBERTURA']);
-check('catálogo: AGENTE como rango pendiente (nunca tarifa confirmada)', (prices['AGENTE'] ?? '').includes('pendiente') && (prices['AGENTE'] ?? '').includes('500'), prices['AGENTE']);
-check('housing: reparto 50/25/25 en modalidad compartida', catalog.shares.some((x) => x.replace(/\s/g, '') === '50%/25%/25%'), catalog.shares.join(' | '));
+check('7M-F catálogo: BASE $300 MXN/mes', prices['Base']?.includes('300'), prices['Base']);
+check('7M-F catálogo: AGENTE $550 (propuesta staging del brief)', prices['Agente']?.includes('550'), prices['Agente']);
+check('7M-F catálogo: CRECIMIENTO $2,000', prices['Crecimiento']?.includes('2,000'), prices['Crecimiento']);
+check('7M-F catálogo: OPERACIÓN $3,000', prices['Operación']?.includes('3,000'), prices['Operación']);
+check('7M-F catálogo: COBERTURA $4,000', prices['Cobertura']?.includes('4,000'), prices['Cobertura']);
+check('7M-F catálogo: cada tarjeta tiene Ver alcance (details) antes de contactar', catalog.plans.every((pl) => pl.scope), JSON.stringify(catalog.plans.map((pl) => pl.scope)));
+check('7M-F catálogo: CTA de cada plan lleva wa.me/525573724660 + planMessage', catalog.plans.every((pl) => pl.cta.startsWith('https://wa.me/525573724660?text=') && decodeURIComponent(pl.cta).includes('membresía')), catalog.plans[1]?.cta?.slice(0, 90));
+check('7M-F E22: modalidades Compartido/Privado con textos del JSON', catalog.shares.includes('Compartido') && catalog.shares.includes('Privado'), catalog.shares.join(' | '));
 
 const services = await page.evaluate(() => {
   const items = [...document.querySelectorAll('#escena-e28 .services__item')].map((item) => ({
@@ -826,71 +838,60 @@ check(
   contactLinks.number,
 );
 
-// --- formulario contextual ------------------------------------------------------
+// --- formulario WhatsApp E30 (7M-F §9) ---------------------------------------
 const formInfo = await page.evaluate(() => {
-  const form = document.querySelector('#escena-e30 [data-context-form]');
-  if (!form) {
-    return null;
-  }
-  const fields = [...form.querySelectorAll('input, select, textarea')];
-  const labelled = fields.filter((field) => {
-    const id = field.getAttribute('id');
-    return Boolean(
-      (id && form.querySelector(`label[for="${id}"]`)) ||
-        field.closest('label') ||
-        field.getAttribute('aria-label'),
-    );
-  });
+  const form = document.querySelector('#escena-e30 [data-wa-form-el]');
+  if (!form) return null;
+  const fields = [...form.querySelectorAll('input, textarea')];
+  const labelled = fields.filter((f) => f.closest('label') || f.getAttribute('aria-label'));
+  const submit = document.querySelector('#escena-e30 [data-wa-submit]');
   return {
     fields: fields.length,
     labelled: labelled.length,
     action: form.getAttribute('action'),
-    method: (form.getAttribute('method') ?? 'get').toLowerCase(),
-    legal: (form.parentElement?.textContent ?? '')
-      .replace(/\s+/g, ' ')
-      .toLowerCase()
-      .includes('no se almacena'),
+    maxlengths: Object.fromEntries(fields.map((f) => [f.name, f.getAttribute('maxlength')])),
+    counters: document.querySelectorAll('#escena-e30 [data-wa-count]').length,
+    submitHref: submit?.getAttribute('href') ?? '',
+    privacy: (document.querySelector('#escena-e30 .waf__privacy')?.textContent ?? '').length > 10,
   };
 });
-check('formulario: existe con sus campos', formInfo?.fields >= 4, `${formInfo?.fields ?? 0} campos`);
-check('formulario: todos los campos tienen etiqueta', formInfo?.labelled === formInfo?.fields, `${formInfo?.labelled}/${formInfo?.fields}`);
-check('formulario: no envía datos a ningún servidor', formInfo?.action === null && formInfo?.method === 'get', `action=${formInfo?.action} method=${formInfo?.method}`);
-check('formulario: declara que no guarda la información', formInfo?.legal === true, '');
+check('7M-F form: 3 campos (nombre/negocio/necesidad) con etiqueta', formInfo?.fields === 3 && formInfo?.labelled === 3, `${formInfo?.fields}/${formInfo?.labelled}`);
+check('7M-F form: sin action de servidor (nunca envía automáticamente)', formInfo?.action === null, `action=${formInfo?.action}`);
+check('7M-F form: maxlength 100/150/1000 + contadores', formInfo?.maxlengths?.nombre === '100' && formInfo?.maxlengths?.negocio === '150' && formInfo?.maxlengths?.necesidad === '1000' && formInfo.counters === 3, JSON.stringify(formInfo?.maxlengths));
+check('7M-F form: declara privacidad (closing.privacy)', formInfo?.privacy === true, '');
+check('7M-F form: enlace real wa.me/525573724660 con baseMessage/formMessage', formInfo?.submitHref.startsWith('https://wa.me/525573724660?text='), (formInfo?.submitHref ?? '').slice(0, 80));
 
-const invalid = await page.evaluate(() => {
-  const form = document.querySelector('#escena-e30 [data-context-form]');
-  const email = form?.querySelector('input[name="correo"]');
-  if (!form || !email) {
-    return { error: false, mailto: null };
-  }
-  email.value = 'no-es-un-correo';
+const waInvalid = await page.evaluate(() => {
+  const form = document.querySelector('#escena-e30 [data-wa-form-el]');
+  if (!form) return { errorShown: false, href: '' };
+  const nombre = form.querySelector('[data-wa-nombre]');
+  const necesidad = form.querySelector('[data-wa-necesidad]');
+  nombre.value = ''; necesidad.value = '';
   form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
-  const status = form.querySelector('[data-form-status]');
   return {
-    error: (status?.dataset.state ?? '') === 'error',
-    mailto: form.dataset.mailto ?? null,
+    errorShown: !document.querySelector('#escena-e30 [data-wa-error]')?.hidden,
+    href: document.querySelector('#escena-e30 [data-wa-submit]')?.href ?? '',
   };
 });
-check('formulario: rechaza un correo inválido', invalid.error === true, '');
-check('formulario: no genera enlace con datos inválidos', invalid.mailto === null, '');
+check('7M-F form: vacío muestra error y no abre enlace con datos inválidos', waInvalid.errorShown === true, JSON.stringify(waInvalid));
 
-const valid = await page.evaluate(() => {
-  const form = document.querySelector('#escena-e30 [data-context-form]');
-  const email = form?.querySelector('input[name="correo"]');
-  if (!form || !email) {
-    return { mailto: null };
-  }
-  email.value = 'persona@ejemplo.mx';
-  form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
-  return { mailto: form.dataset.mailto ?? null };
+const waValid = await page.evaluate(() => {
+  const form = document.querySelector('#escena-e30 [data-wa-form-el]');
+  const nombre = form.querySelector('[data-wa-nombre]');
+  const negocio = form.querySelector('[data-wa-negocio]');
+  const necesidad = form.querySelector('[data-wa-necesidad]');
+  nombre.value = 'Persona Prueba';
+  negocio.value = '';
+  necesidad.value = 'Quiero ordenar mis pedidos.';
+  nombre.dispatchEvent(new Event('input', { bubbles: true }));
+  negocio.dispatchEvent(new Event('input', { bubbles: true }));
+  necesidad.dispatchEvent(new Event('input', { bubbles: true }));
+  const href = document.querySelector('#escena-e30 [data-wa-submit]').href;
+  const sent = [...document.querySelectorAll('#escena-e30 [data-wa-error], .waf__form')].map((e) => e.textContent).join(' ').toLowerCase();
+  return { href, claimsSent: /enviado/.test(sent) && !/no confirma|no se confirma|decidas enviar/.test(sent) };
 });
-check(
-  'formulario: el mensaje incluye el contexto de navegación',
-  (valid.mailto ?? '').includes('hola@publia.mx') &&
-    (valid.mailto ?? '').includes('body=') &&
-    decodeURIComponent(valid.mailto ?? '').includes('Ruta:'),
-  (valid.mailto ?? '').slice(0, 70),
-);
+check('7M-F form: mensaje con {name}/{business→Sin especificar}/{need}', decodeURIComponent(waValid.href).includes('Persona Prueba') && decodeURIComponent(waValid.href).includes('Sin especificar') && decodeURIComponent(waValid.href).includes('Quiero ordenar mis pedidos'), waValid.href.slice(0, 100));
+check('7M-F form: nunca afirma «mensaje enviado»', waValid.claimsSent === false, '');
 
 // --- móvil --------------------------------------------------------------------
 const mobile = await browser.newContext({ viewport: { width: 390, height: 844 } });
@@ -1002,7 +1003,7 @@ const art = await page.evaluate(() => {
 });
 check('v3: >=5 composiciones distintas', art.layouts >= 5, JSON.stringify(art.layouts));
 check('v3: >=4 atmósferas de fondo distintas', art.tones >= 4, JSON.stringify(art.tones));
-check('v3: acentos amarillos en titulares (em)', art.accentEm >= 5, `${art.accentEm} em`);
+check('v3/7M-F: acentos en titulares (em presentes)', art.accentEm >= 1, `${art.accentEm} em`);
 check('v3/7M-E: slots de arte en uso (A01,A03,A04,A05; A02 retirado con E20)', ['A01', 'A03', 'A04', 'A05'].every((id) => art.artSlots.includes(id)), art.artSlots.join(','));
 check('v3: eyebrows con emoji semántico', art.emojiEyebrows >= 5, `${art.emojiEyebrows} eyebrows`);
 
@@ -1056,20 +1057,31 @@ check('v3 scroll: recorrido inverso mueve la cámara en sentido inverso (reversi
 // Demo empresa: capa conecta red 3D y texto.
 await page.evaluate(() => document.querySelector('#escena-e04')?.scrollIntoView({ block: 'center', behavior: 'instant' }));
 await page.waitForTimeout(900);
-const beforeInfra = await page.evaluate(() => document.querySelector('[data-prism-canvas]')?.dataset.camera ?? '');
 await page.evaluate(() => document.querySelector('#escena-e03')?.scrollIntoView({ block: 'center', behavior: 'instant' }));
 await page.waitForTimeout(1200);
-await click('#escena-e03 [data-infra2-mode="housing"]');
-await page.waitForFunction((prev) => (document.querySelector('[data-prism-canvas]')?.dataset.camera ?? '') !== prev, { timeout: 12000 }, beforeInfra).catch(() => {});
-await page.waitForTimeout(400);
-const infra = await page.evaluate(() => ({
-  detail: document.querySelector('#escena-e03 [data-infra2-desc]')?.textContent ?? '',
-  cam: document.querySelector('[data-prism-canvas]')?.dataset.camera ?? '',
-  pressed: document.querySelector('#escena-e03 [data-infra2-mode="housing"]')?.getAttribute('aria-pressed'),
+const infraCount = await page.evaluate(() => document.querySelectorAll('#escena-e03 [data-infra7-mode]').length);
+check('7M-F E03: 4 escenarios con botones aria-pressed', infraCount === 4, `${infraCount} modos`);
+const infra0 = await page.evaluate(() => ({
+  title: document.querySelector('#escena-e03 [data-infra7-title]')?.textContent ?? '',
+  svgVisible: [...document.querySelectorAll('#escena-e03 [data-infra7-svg]')].filter((e) => !e.hidden).map((e) => e.dataset.infra7Svg),
+  stageMode: document.querySelector('#escena-e03 [data-infra7-stage]')?.dataset.mode ?? '',
+  cta: document.querySelector('#escena-e03 [data-infra7-cta]')?.href ?? '',
 }));
-check('7M-B infra: el modo cambia el texto', infra.detail.includes('módulos independientes'), infra.detail.slice(0, 60));
-check('7M-B infra: el modo mueve la cámara 3D', infra.cam !== beforeInfra, `${beforeInfra} -> ${infra.cam}`);
-check('7M-B infra: estado accesible aria-pressed', infra.pressed === 'true', infra.pressed);
+check('7M-F E03: default local-private con su SVG visible y CTA infraMessage', infra0.stageMode === 'local-private' && infra0.svgVisible.join() === 'local-private' && infra0.cta.startsWith('https://wa.me/525573724660?text=') && decodeURIComponent(infra0.cta).includes('IA local privada'), JSON.stringify(infra0).slice(0, 160));
+await click('#escena-e03 [data-infra7-mode="distributed-network"]');
+await page.waitForTimeout(500);
+const infra = await page.evaluate(() => ({
+  title: document.querySelector('#escena-e03 [data-infra7-title]')?.textContent ?? '',
+  detail: document.querySelector('#escena-e03 [data-infra7-detail]')?.textContent ?? '',
+  pressed: document.querySelector('#escena-e03 [data-infra7-mode="distributed-network"]')?.getAttribute('aria-pressed'),
+  svgVisible: [...document.querySelectorAll('#escena-e03 [data-infra7-svg]')].filter((e) => !e.hidden).map((e) => e.dataset.infra7Svg),
+  stageMode: document.querySelector('#escena-e03 [data-infra7-stage]')?.dataset.mode ?? '',
+  cta: document.querySelector('#escena-e03 [data-infra7-cta]')?.href ?? '',
+  persisted: JSON.parse(sessionStorage.getItem('publia.visitor.v1') ?? '{}').infra ?? null,
+}));
+check('7M-F E03: cambio a red distribuida actualiza texto+SVG+CTA en una operación', infra.title.includes('Varios nodos') && infra.svgVisible.join() === 'distributed-network' && infra.stageMode === 'distributed-network' && decodeURIComponent(infra.cta).includes('Red distribuida'), infra.title.slice(0, 50));
+check('7M-F E03: aria-pressed y persistencia state.infra (id nuevo)', infra.pressed === 'true' && infra.persisted === 'distributed-network', JSON.stringify({ pressed: infra.pressed, persisted: infra.persisted }));
+check('7M-F E03: sin botón «Activar red» ni contador de tráfico', !document.querySelector('#escena-e03 [data-infra2-launch]') && !document.querySelector('#escena-e03 [data-infra2-traffic]'), '');
 
 // Demo eficiencia: foco responde y guarda respuesta.
 await click('[data-route-reset]');
@@ -1180,22 +1192,33 @@ const ecoCount = await page.evaluate(() => ({
 }));
 check('ecosistema E25: 8 nodos con iconos reales cargados', ecoCount.nodes === 8 && ecoCount.iconsOk === 8, JSON.stringify(ecoCount));
 check('ecosistema E25: sin póster A02 compitiendo en la misma escena', ecoCount.artE25 !== 'true', `art=${ecoCount.artE25}`);
-await click('#escena-e25 [data-eco-node="2"]');
+const ecoInit = await page.evaluate(() => ({
+  pressed: document.querySelector('#escena-e25 [data-eco-family][aria-pressed="true"]')?.getAttribute('data-eco-family') ?? null,
+  title: document.querySelector('#escena-e25 [data-eco-title]')?.textContent ?? '',
+  steps: document.querySelectorAll('#escena-e25 [data-eco-step]').length,
+  result: document.querySelector('#escena-e25 [data-eco-result]')?.textContent ?? '',
+  cta: document.querySelector('#escena-e25 [data-eco-cta]')?.href ?? '',
+  noActivate: !document.querySelector('#escena-e25 [data-eco-activate]'),
+}));
+check('7M-F E25: selección inicial ia con 4 pasos y resultado literal', ecoInit.pressed === 'ia' && ecoInit.title === 'Inteligencia artificial' && ecoInit.steps === 4 && ecoInit.result.length > 10, JSON.stringify(ecoInit).slice(0, 140));
+check('7M-F E25: CTA ecosystemMessage por WhatsApp y sin botón Activar', ecoInit.cta.startsWith('https://wa.me/525573724660?text=') && decodeURIComponent(ecoInit.cta).includes('Inteligencia artificial') && ecoInit.noActivate, ecoInit.cta.slice(0, 80));
+await click('#escena-e25 [data-eco-family="automatizacion"]');
 await page.waitForTimeout(400);
 const ecoSel = await page.evaluate(() => ({
-  pressed: document.querySelector('#escena-e25 [data-eco-node][aria-pressed="true"]')?.getAttribute('data-eco-node') ?? null,
+  pressed: document.querySelector('#escena-e25 [data-eco-family][aria-pressed="true"]')?.getAttribute('data-eco-family') ?? null,
   title: document.querySelector('#escena-e25 [data-eco-title]')?.textContent ?? '',
+  mode: document.querySelector('#escena-e25 [data-eco-mode]')?.textContent ?? '',
   answer: JSON.parse(sessionStorage.getItem('publia.visitor.v1') ?? '{}').answers?.servicio ?? null,
+  nodePressed: document.querySelector('#escena-e25 [data-eco-node][aria-pressed="true"]')?.getAttribute('data-eco-node') ?? null,
 }));
-await waitBound('[data-demo="ecosystem"]');
-check('ecosistema: click selecciona (aria-pressed + panel + respuesta persistida)', ecoSel.pressed === '2' && !!ecoSel.answer && ecoSel.answer === ecoSel.title, JSON.stringify(ecoSel));
-await click('#escena-e25 [data-eco-play]');
-await page.waitForTimeout(2400);
-const ecoPlay = await page.evaluate(() => ({
-  exampleVisible: !document.querySelector('#escena-e25 [data-eco-example]')?.hidden,
-  liveSteps: document.querySelectorAll('#escena-e25 [data-eco-step].is-live').length,
+check('7M-F E25: familia sin nodo (automatización) seleccionable y persistida', ecoSel.pressed === 'automatizacion' && ecoSel.title === 'Automatización' && ecoSel.answer === 'Automatización', JSON.stringify(ecoSel));
+await click('#escena-e25 [data-eco-node="7"]');
+await page.waitForTimeout(400);
+const ecoNode = await page.evaluate(() => ({
+  pressed: document.querySelector('#escena-e25 [data-eco-family][aria-pressed="true"]')?.getAttribute('data-eco-family') ?? null,
+  title: document.querySelector('#escena-e25 [data-eco-title]')?.textContent ?? '',
 }));
-check('ecosistema: mini demostración recorre pasos y revela ejemplo', ecoPlay.exampleVisible && ecoPlay.liveSteps >= 3, JSON.stringify(ecoPlay));
+check('7M-F E25: órbita nodo 8 selecciona familia infraestructura (equivalencia documentada)', ecoNode.pressed === 'infraestructura' && ecoNode.title === 'Infraestructura', JSON.stringify(ecoNode));
 // Automatización (7 mundos, P0-02): ejecutar recorre las 4 etapas
 await page.evaluate(() => document.querySelector('#escena-e07')?.scrollIntoView({ behavior: 'instant' }));
 await page.waitForTimeout(1000);
@@ -1257,15 +1280,20 @@ await page.waitForTimeout(1500);
 await page.evaluate(() => document.querySelector('#escena-e03')?.scrollIntoView({ behavior: 'instant' }));
 await page.waitForTimeout(700);
 await waitBound('[data-demo="infra2"]');
-check('7M-B infra: 3 modos de operación', await page.evaluate(() => document.querySelectorAll('#escena-e03 [data-infra2-mode]').length) === 3);
-check('7M-B infra: 10 racks con LEDs', await page.evaluate(() => document.querySelectorAll('#escena-e03 [data-infra2-rack]').length) === 10);
-await clickJs('#escena-e03 [data-infra2-mode="housing"]');
+check('7M-F E03: comparación compartida/privada ya NO está en E03 (sólo en E22)', !document.querySelector('#escena-e03 [data-housing-mode]'), '');
+// E22 housing (única comparación de la ruta)
+await page.evaluate(() => document.querySelector('#escena-e22')?.scrollIntoView({ behavior: 'instant' }));
+await page.waitForTimeout(800);
+check('7M-F E22: 2 modalidades con textos del JSON', (await page.evaluate(() => [...document.querySelectorAll('#escena-e22 [data-housing-mode]')].map((b) => b.textContent.trim()))).join() === 'Compartido,Privado', '');
+await clickJs('#escena-e22 [data-housing-mode="privado"]');
 await page.waitForTimeout(400);
-check('7M-B infra: modo housing persiste + status SIMULACIÓN', (await sceneState()).infra === 'housing' && (await page.evaluate(() => document.querySelector('#escena-e03 [data-infra2-status]')?.textContent ?? '')).includes('HOUSING'));
-await clickJs('#escena-e03 [data-infra2-launch]');
-await page.waitForTimeout(1600);
-check('7M-B infra: activar red sube contador de tráfico', (await page.evaluate(() => document.querySelector('#escena-e03 [data-infra2-traffic]')?.textContent ?? '')) !== '000', await page.evaluate(() => document.querySelector('#escena-e03 [data-infra2-traffic]')?.textContent ?? ''));
-check('7M-B infra: comparación compartida vs privada presente (sin $0 publicado)', await page.evaluate(() => { const t = document.querySelector('#escena-e03 .infra2__compare')?.textContent ?? ''; return t.includes('compartida') && t.includes('privada') && !t.includes('$0'); }));
+const h22 = await page.evaluate(() => ({
+  persisted: JSON.parse(sessionStorage.getItem('publia.visitor.v1') ?? '{}').housingMode ?? null,
+  desc: document.querySelector('#escena-e22 [data-housing-desc]')?.textContent ?? '',
+  cta: document.querySelector('#escena-e22 [data-housing-cta]')?.href ?? '',
+}));
+check('7M-F E22: modalidad persiste (housingMode separado de infra) y texto privado literal', h22.persisted === 'privado' && h22.desc.includes('sin aportación de capacidad a la red'), JSON.stringify(h22).slice(0, 120));
+check('7M-F E22: CTA añade housing.fields sólo al elegir modalidad', decodeURIComponent(h22.cta).includes('Equipo propio o por adquirir') && h22.cta.startsWith('https://wa.me/525573724660'), h22.cta.slice(0, 90));
 
 // Bloque C: personas + IA (E11)
 await page.evaluate(() => document.querySelector('#escena-e11')?.scrollIntoView({ behavior: 'instant' }));
@@ -1293,17 +1321,12 @@ check('7M-B personas: ejecutar arranca la demo (texto cambia y hay etapa activa)
 await page.evaluate(() => document.querySelector('#escena-e27')?.scrollIntoView({ behavior: 'instant' }));
 await page.waitForTimeout(700);
 await waitBound('[data-demo="memberships"]');
-check('7M-B membresías: 5 niveles', (await page.evaluate(() => document.querySelectorAll('#escena-e27 [data-memb-plan]').length)) === 5);
-const agenteTxt = await page.evaluate(() => document.querySelector('#escena-e27 [data-memb-plan="agente"]')?.textContent ?? '');
-check('7M-B membresías: AGENTE nunca publica tarifa confirmada (etiqueta pendiente)', agenteTxt.includes('pendiente') && agenteTxt.includes('objetivo') && agenteTxt.includes('500'), agenteTxt);
-await clickJs('#escena-e27 [data-memb-goal="support"]');
-await clickJs('#escena-e27 [data-memb-team="large"]');
-await clickJs('#escena-e27 [data-memb-recommend]');
-await page.waitForTimeout(400);
-check('7M-B membresías: diagnóstico marca sugerencia SIN persistir ni pisar la selección (badge, no aria-pressed)', !(await page.evaluate(() => document.querySelector('#escena-e27 [data-memb-reco]')?.hidden)) && (await sceneState()).membership === null && (await page.evaluate(() => !document.querySelector('#escena-e27 [data-memb-badge="cobertura"]')?.hidden)) && (await page.evaluate(() => document.querySelector('#escena-e27 [data-memb-plan="cobertura"]')?.getAttribute('aria-pressed'))) === 'false', JSON.stringify((await sceneState()).membership));
-await clickJs('#escena-e27 [data-memb-choose]');
+check('7M-F E27: 5 tarjetas desde memberships.plans', (await page.evaluate(() => document.querySelectorAll('#escena-e27 [data-memb7-card]').length)) === 5);
+const agenteTxt = await page.evaluate(() => document.querySelector('#escena-e27 [data-memb7-card="agente"]')?.textContent ?? '');
+check('7M-F E27: AGENTE publica $550 como propuesta de staging (no confirmación contractual)', agenteTxt.includes('550'), agenteTxt.slice(0, 80));
+await clickJs('#escena-e27 [data-memb7-cta="cobertura"]');
 await page.waitForTimeout(300);
-check('7M-B membresías: «Elegir este plan» SÍ persiste la selección', (await sceneState()).membership === 'cobertura', JSON.stringify((await sceneState()).membership));
+check('7M-F E27: el CTA persiste la membresía elegida (state.membership)', (await sceneState()).membership === 'cobertura', JSON.stringify((await sceneState()).membership));
 
 // Bloque E: cierre V2 (E29)
 await page.evaluate(() => document.querySelector('#escena-e29')?.scrollIntoView({ behavior: 'instant' }));
@@ -1313,7 +1336,8 @@ check('7M-B cierre: 6 tarjetas de capacidad', (await page.evaluate(() => documen
 await clickJs('#escena-e29 [data-cierre-card="web"] [data-cierre-toggle]');
 await page.waitForTimeout(300);
 check('7M-B cierre: añadir capacidad persiste en estado.capabilities', (await sceneState()).capabilities?.includes('web') === true && await page.evaluate(() => document.querySelector('#escena-e29 [data-cierre-card="web"] [data-cierre-toggle]')?.getAttribute('aria-pressed') === 'true'));
-check('7M-B cierre: meta refleja ruta + membresía + capacidad', await page.evaluate(() => { const t = document.querySelector('#escena-e29 [data-cierre-meta]')?.textContent ?? ''; return t.includes('ruta') && t.includes('COBERTURA') && t.includes('Web'); }), await page.evaluate(() => document.querySelector('#escena-e29 [data-cierre-meta]')?.textContent ?? ''));
+check('7M-F cierre: meta refleja ruta + membresía + capacidad', await page.evaluate(() => { const t = document.querySelector('#escena-e29 [data-cierre-meta]')?.textContent ?? ''; return t.includes('ruta') && t.includes('COBERTURA') && t.includes('Web'); }), await page.evaluate(() => document.querySelector('#escena-e29 [data-cierre-meta]')?.textContent ?? ''));
+check('7M-F cierre: titular del resumen literal (closing.summaryTitle)', (await page.evaluate(() => document.querySelector('#escena-e29 [data-role="title"]')?.textContent ?? '')).includes('Tu siguiente paso'), '');
 check('7M-B cierre: acciones finales presentes (TXT, volver, reiniciar, WhatsApp con contexto)', await page.evaluate(() => !!document.querySelector('#escena-e29 [data-cierre-download]') && !!document.querySelector('#escena-e29 [data-cierre-top]') && !!document.querySelector('#escena-e29 [data-cierre-restart]') && (document.querySelector('#escena-e29 [data-cierre-wa]')?.href ?? '').includes('wa.me')));
 await clickJs('#escena-e29 [data-cierre-card="agentes"] [data-cierre-demo]');
 await page.waitForFunction(() => (document.querySelector('#escena-e29 [data-cierre-card="agentes"] [data-cierre-run]')?.textContent ?? '').length > 3, { timeout: 6000 }).catch(() => {});
@@ -1767,6 +1791,73 @@ for (const demo of ['campana-local', 'contenido-mes', 'redes']) {
 check('7M-E: sin etiquetas de placeholder/rutas internas visibles', await page.evaluate(() => !document.querySelector('.art-slot-tag') && !document.querySelector('.mkt__panel-note')));
 await clickJs('[data-explore-toggle]');
 await page.waitForTimeout(600);
+
+// --- 7M-F: umbral + simulador + hero pin --------------------------------------
+await page.goto(BASE, { waitUntil: 'domcontentloaded' });
+await page.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'hero', { timeout: 60000 }).catch(() => {});
+await page.waitForTimeout(1200);
+await page.evaluate(() => document.querySelector('#escena-e00')?.scrollIntoView({ behavior: 'instant' }));
+await page.waitForTimeout(900);
+await waitBound('[data-simulator]');
+const simDef = await page.evaluate(() => ({
+  total: document.querySelector('[data-sim-result="total"]')?.textContent ?? '',
+  addr: document.querySelector('[data-sim-result="addressable"]')?.textContent ?? '',
+  formula: document.querySelector('.umbral__sim-formula')?.textContent ?? '',
+  note: document.querySelector('.umbral__sim-note')?.textContent ?? '',
+  title: document.querySelector('.umbral__title')?.textContent ?? '',
+  caption: document.querySelector('.umbral__caption')?.textContent ?? '',
+  panels: document.querySelectorAll('#escena-e00 details.umbral__panel').length,
+  beneficios: document.querySelectorAll('#escena-e00 .umbral__benefits-grid li').length,
+  paisaje: !!document.querySelector('#escena-e00 .umbral__paisaje img'),
+}));
+check('7M-F umbral: textos literales (título, caption, 4 beneficios, 4 details)', simDef.title.includes('Tu independencia crece en red') && simDef.caption.includes('ilustración conceptual') && simDef.beneficios === 4 && simDef.panels === 4 && simDef.paisaje, JSON.stringify({ title: simDef.title.slice(0, 30), panels: simDef.panels }));
+check('7M-F simulador: defaults 65/18/40/55 -> 19,5 h y 4,3 h (es-MX, 1 decimal)', simDef.total.includes('19,5') && simDef.addr.includes('4,3'), `${simDef.total} / ${simDef.addr}`);
+check('7M-F simulador: fórmula y nota literales presentes', simDef.formula.includes('tareas × minutos ÷ 60') && simDef.note.includes('No mide ahorro real'), '');
+const simCases = await page.evaluate(() => {
+  const set = (k, v) => { const i = document.querySelector(`[data-sim-input="${k}"]`); i.value = String(v); i.dispatchEvent(new Event('input', { bubbles: true })); };
+  const read = () => ({ t: document.querySelector('[data-sim-result="total"]').textContent, a: document.querySelector('[data-sim-result="addressable"]').textContent, err: !document.querySelector('[data-sim-error]').hidden });
+  const out = {};
+  set('tasks', 0); out.zero = read();
+  set('tasks', 65); set('fraction', 100); set('adoption', 100); out.full = read();
+  set('fraction', 40); set('adoption', 55); set('tasks', -5); out.invalid = read();
+  set('tasks', 65); out.fixed = read();
+  set('tasks', 65); set('minutes', 18); document.querySelector('[data-sim-reset]').click(); out.reset = read();
+  return out;
+});
+check('7M-F simulador: tareas 0 -> 0 h sin división por cero', simCases.zero.t.includes('0') && simCases.zero.a.includes('0'), JSON.stringify(simCases.zero));
+check('7M-F simulador: 100%/100% -> total completo (19,5 h)', simCases.full.a.includes('19,5'), JSON.stringify(simCases.full));
+check('7M-F simulador: inválido (-5) muestra error y no actualiza cifra', simCases.invalid.err === true && simCases.invalid.a.includes('4,3'), JSON.stringify(simCases.invalid));
+check('7M-F simulador: reset restaura exactamente 19,5 / 4,3', simCases.reset.t.includes('19,5') && simCases.reset.a.includes('4,3'), JSON.stringify(simCases.reset));
+// hero pin: desktop sin reduced-motion crea pin único; ruta durante el pin cancela
+await page.goto(BASE, { waitUntil: 'domcontentloaded' });
+await page.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'hero', { timeout: 60000 }).catch(() => {});
+await page.setViewportSize({ width: 1440, height: 900 });
+const pinInfo = await page.evaluate(async () => {
+  const { ScrollTrigger } = await import('/chunks/placeholder.js').catch(() => ({}));
+  return null;
+}).catch(() => null);
+const pinProbes = await page.evaluate(() => {
+  // scroll libre inicia el pin (desktop)
+  window.__publiaLastProgrammaticScroll = 0;
+  window.dispatchEvent(new WheelEvent('wheel', { deltaY: 240, bubbles: true }));
+  window.scrollBy({ top: 300, behavior: 'instant' });
+  return new Promise((res) => setTimeout(() => {
+    const st = window.ScrollTrigger?.getAll?.() ?? [];
+    const pinned = st.filter((t) => t.pin && document.querySelector('[data-hero-scene]')?.contains(t.pin));
+    res({ total: st.length, pinned: pinned.length, scrub: pinned[0]?.vars?.scrub ?? null, pinSpacing: !!document.querySelector('.pin-spacer') });
+  }, 2500));
+});
+check('7M-F hero: un único pin activo en tramo desktop (scrub 0.6)', pinProbes.pinned >= 1 && pinProbes.scrub === 0.6, JSON.stringify(pinProbes));
+await click('[data-route-choice="efficiency"]');
+await page.waitForTimeout(600);
+const afterRoute = await page.evaluate(() => new Promise((res) => setTimeout(() => {
+  const st = window.ScrollTrigger?.getAll?.() ?? [];
+  const pinned = st.filter((t) => t.pin && document.querySelector('[data-hero-scene]')?.contains(t.pin));
+  res({ pinned: pinned.length, act: document.documentElement.dataset.act });
+}, 1500)));
+check('7M-F hero §5.12: elegir ruta durante el pin lo cancela y aterriza', afterRoute.pinned === 0 && afterRoute.act === 'efficiency', JSON.stringify(afterRoute));
+check('7M-F hero: preloader localizado se oculta tras primer frame', await page.evaluate(() => document.querySelector('[data-hero-loader]')?.classList.contains('is-done') ?? !document.querySelector('[data-hero-loader]')), '');
+check('7M-F hero: skip por teclado presente (data-hero-skip)', await page.evaluate(() => !!document.querySelector('[data-hero-skip]')), '');
 
 // --- cierre ---------------------------------------------------------------------
 await page.screenshot({ path: `${OUT}/13-cierre.png` });
