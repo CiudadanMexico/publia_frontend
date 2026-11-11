@@ -8,6 +8,7 @@
 import type { ResolvedScene } from '../../../lib/experience/graph';
 import { accentify } from '../../../lib/experience/accent';
 import { ECOSYSTEM_SERVICES } from '../../../data/ecosystem';
+import { COPY_7MF } from '../../../data/copy7mf';
 
 interface Props {
   scene: ResolvedScene;
@@ -16,6 +17,12 @@ interface Props {
 const { scene } = Astro.props;
 const services = ECOSYSTEM_SERVICES;
 const first = services[0]!;
+const eco = COPY_7MF.ecosystem;
+const families = eco.families;
+const fam0 = families[0]!;
+// Correspondencia documentada familia→nodo de la órbita (por significado); sin nodo = null
+const FAMILY_NODE: Record<string, number | null> = { ia: 0, web: 1, agentes: 2, cooperacion: 3, multimedia: 4, marketing: 5, automatizacion: null, infraestructura: 7 };
+const waEco = `https://wa.me/${COPY_7MF.contact.number}?text=${encodeURIComponent(COPY_7MF.contact.ecosystemMessage.replace('{label}', fam0.label))}`;
 ---
 
 <section class="eco" data-module="ecosystem" data-demo="ecosystem">
@@ -23,32 +30,34 @@ const first = services[0]!;
     {scene.eyebrow && <p class="catalog__eyebrow" data-role="eyebrow" data-reveal set:html={accentify(scene.eyebrow)} />}
     <h2 class="catalog__title" data-role="title" data-reveal="lines" set:html={accentify(scene.title)} />
     {scene.lead && <p class="catalog__lead" data-role="lead" data-reveal>{scene.lead}</p>}
+    <p class="eco__continuity" data-reveal>{eco.continuity}</p>
+    <p class="eco__ribbon" data-reveal>{eco.ribbon}</p>
   </div>
 
   <div class="eco__grid">
     <div class="eco__panel" data-eco-panel aria-live="polite">
-      <div class="eco__top">
-        <span class="eco__index" data-eco-index>01 / 08</span>
-        <span class="eco__signal"><i></i> MÓDULO SELECCIONADO</span>
+      <div class="eco__selector" role="group" aria-label="Familias del ecosistema">
+        {families.map((f, i) => (
+          <button type="button" class="eco__family" data-eco-family={f.id} aria-pressed={i === 0 ? 'true' : 'false'}>{f.label}</button>
+        ))}
       </div>
       <div class="eco__body">
-        <div class="eco__icon" data-eco-emoji aria-hidden="true">{first.emoji}</div>
         <div>
-          <h3 class="eco__title" data-eco-title>{first.title}</h3>
-          <p class="eco__detail" data-eco-detail>{first.detail}</p>
+          <h3 class="eco__title" data-eco-title>{fam0.label}</h3>
+          <p class="eco__mode" data-eco-mode>{fam0.mode}</p>
         </div>
       </div>
-      <div class="eco__flow" data-eco-flow aria-label="Pasos del módulo">
-        {first.flow.map((f, i) => (<>{i > 0 && <b aria-hidden="true">⟶</b>}<span data-eco-step={String(i)}>{f}</span></>))}
-      </div>
+      <p class="eco__demo-label" data-eco-demo-label>{eco.demoLabel}</p>
+      <ol class="eco__steps" data-eco-steps>
+        {fam0.steps.map((st) => (
+          <li data-eco-step><strong data-eco-step-title>{st.title}</strong><span data-eco-step-body>{st.body}</span></li>
+        ))}
+      </ol>
+      <p class="eco__result-label" data-eco-result-label>{eco.resultLabel}</p>
+      <p class="eco__result" data-eco-result>{fam0.result}</p>
       <div class="eco__actions">
-        <button type="button" class="eco__btn eco__btn--primary" data-eco-play>▶ Ver mini demostración</button>
-        <button type="button" class="eco__btn" data-eco-more aria-expanded="false">¿Qué hace? ↗</button>
-        <button type="button" class="eco__btn eco__btn--round" data-eco-next aria-label="Siguiente solución">➜</button>
-        <button type="button" class="eco__btn eco__btn--activate" data-eco-activate>⚡ Activar ecosistema</button>
+        <a class="eco__btn eco__btn--primary" data-eco-cta href={waEco} target="_blank" rel="noopener noreferrer">{eco.cta}</a>
       </div>
-      <p class="eco__example" data-eco-example hidden>{first.example}</p>
-      <p class="eco__toast" data-eco-toast role="status" aria-live="polite"></p>
     </div>
 
     <div class="eco__orbit" data-eco-orbit>
@@ -142,4 +151,21 @@ const first = services[0]!;
   @media (prefers-reduced-motion: reduce) {
     .eco__hub-star { animation: none; }
   }
+  .eco__continuity { max-width: 58ch; font-size: 0.9rem; opacity: 0.85; margin: 10px 0 0; }
+  .eco__ribbon { display: inline-block; margin-top: 10px; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--scene-border, rgba(128,229,255,.3)); font-size: 0.85rem; color: var(--scene-accent, #80e5ff); }
+  .eco__selector { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .eco__family { min-height: 40px; padding: 8px 14px; font-size: 0.85rem; border-radius: 999px; border: 1px solid var(--scene-border, rgba(128,229,255,.3)); background: transparent; color: inherit; cursor: pointer; }
+  .eco__family[aria-pressed='true'] { background: var(--scene-accent, #80e5ff); color: #06121f; font-weight: 600; }
+  .eco__family:focus-visible { outline: 3px solid var(--scene-accent, #ffca34); outline-offset: 3px; }
+  .eco__mode { margin: 4px 0 0; font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--scene-accent, #80e5ff); }
+  .eco__demo-label, .eco__result-label { margin: 12px 0 6px; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.7; }
+  .eco__steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; counter-reset: step; }
+  .eco__steps li { border: 1px solid var(--scene-border, rgba(128,229,255,.18)); border-radius: 14px; padding: 10px 12px; display: grid; gap: 3px; }
+  .eco__steps strong { font-size: 0.9rem; }
+  .eco__steps span { font-size: 0.82rem; line-height: 1.45; opacity: 0.88; }
+  .eco__result { margin: 0; font-size: 0.92rem; line-height: 1.5; }
+  .eco__actions { margin-top: 14px; }
+  .eco__btn--primary { display: inline-flex; align-items: center; min-height: 48px; padding: 14px 22px; font-size: 16px; border-radius: 999px; text-decoration: none; }
+  .eco__btn--primary:focus-visible { outline: 3px solid var(--scene-accent, #ffca34); outline-offset: 3px; }
+  @media (max-width: 639px) { .eco__steps { grid-template-columns: 1fr; } }
 </style>

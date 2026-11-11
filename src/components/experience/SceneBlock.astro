@@ -27,6 +27,7 @@ import MembershipsModule from './modules/MembershipsModule.astro';
 import HousingCompare from './modules/HousingCompare.astro';
 import MarketingModule from './modules/MarketingModule.astro';
 import UmbralModule from './modules/UmbralModule.astro';
+import KnowledgeModule from './modules/KnowledgeModule.astro';
 
 interface Props {
   scene: ResolvedScene;
@@ -77,6 +78,9 @@ const stageVariants = Object.fromEntries(
         scene.modules.map((module) => {
           if (module === 'umbral') {
             return <UmbralModule scene={scene} />;
+          }
+          if (module === 'knowledge') {
+            return <KnowledgeModule scene={scene} />;
           }
           if (module === 'statement' || module === 'branch') {
             return <StatementModule scene={scene} />;

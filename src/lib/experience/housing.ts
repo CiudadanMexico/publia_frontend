@@ -8,6 +8,7 @@
  */
 import { HOUSING_PLANS, HOUSING_DISCLAIMER, type HousingMode } from '../../data/housing';
 import { setHousingMode, getState } from './state';
+import { COPY_7MF } from '../../data/copy7mf';
 import { track } from './events';
 import { buildSummary } from './cierre';
 
@@ -51,9 +52,16 @@ export function bindHousing(): void {
       stage.dataset.demoState = playing && !paused ? 'on' : 'off';
     }
     modes.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.housingMode === id)));
-    if (elTitle) elTitle.textContent = plan.title;
-    if (elDesc) elDesc.textContent = plan.text;
-    if (elNote) elNote.textContent = plan.note;
+    if (elTitle) elTitle.textContent = id === 'compartido' ? COPY_7MF.housing.sharedTitle : COPY_7MF.housing.privateTitle;
+    if (elDesc) elDesc.textContent = id === 'compartido' ? COPY_7MF.housing.sharedBody : COPY_7MF.housing.privateBody;
+    if (elNote) elNote.textContent = COPY_7MF.housing.note;
+    // §9: el CTA añade las etiquetas de housing.fields sólo si el visitante eligió modalidad
+    const cta = root.querySelector<HTMLAnchorElement>('[data-housing-cta]');
+    if (cta) {
+      const base = COPY_7MF.contact.housingMessage;
+      const extra = id ? '\n' + COPY_7MF.housing.fields.join('\n') : '';
+      cta.href = `https://wa.me/${COPY_7MF.contact.number}?text=${encodeURIComponent(base + extra)}`;
+    }
     if (elSegs) {
       elSegs.replaceChildren(
         ...plan.distribution.map((d) => {

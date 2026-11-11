@@ -1,193 +1,67 @@
 ---
 /**
- * Formulario contextual de conversión.
- *
- * Reglas:
- * - El formulario **no captura nada en este sitio**: compone un mensaje
- *   estructurado y abre el cliente de correo del visitante. No hay servidor,
- *   ni base de datos, ni cookies de perfil.
- * - El contexto de navegación (ruta y rasgos) se añade automáticamente, para
- *   que la persona no tenga que repetir lo que ya nos dijo.
- * - Se piden los datos mínimos: correo (obligatorio), nombre (opcional),
- *   situación (selección) y mensaje (opcional).
+ * E30 Contacto — bloque 7M-F §9 (decisión cerrada).
+ * Formulario: nombre obligatorio (máx 100), negocio opcional (máx 150; vacío
+ * → «Sin especificar»), necesidad obligatoria (máx 1000). Con maxlength y
+ * contador, sin truncar en silencio. Al enviar se abre el enlace REAL de
+ * WhatsApp con contact.formMessage (placeholders sustituidos por selecciones
+ * explícitas); nunca se afirma «mensaje enviado» ni se envía automáticamente.
+ * Textos literales de copy.es-MX.json (`closing`).
  */
 import type { ResolvedScene } from '../../../lib/experience/graph';
-import { accentify } from '../../../lib/experience/accent';
+import { COPY_7MF } from '../../../data/copy7mf';
 
 interface Props {
   scene: ResolvedScene;
 }
 
 const { scene } = Astro.props;
-
-const situaciones = [
-  { value: 'empresa-en-marcha', label: 'Empresa en marcha' },
-  { value: 'negocio-en-arranque', label: 'Negocio en arranque' },
-  { value: 'proyecto-puntual', label: 'Proyecto puntual' },
-  { value: 'cooperativa', label: 'Cooperativa o red' },
-  { value: 'infraestructura', label: 'Infraestructura o nodo' },
-  { value: 'capacitacion', label: 'Capacitación' },
-];
+const c = COPY_7MF.closing;
+const waBase = `https://wa.me/${COPY_7MF.contact.number}?text=`;
 ---
 
-<section class="conversion-form" data-module="form" aria-labelledby={`${scene.id}-form-titulo`}>
-  <h3 class="conversion-form__title" id={`${scene.id}-form-titulo`}>Cuéntanos en una línea</h3>
-  <p class="conversion-form__lead">
-    El mensaje se arma con lo que ya elegiste en este recorrido. Se abre en tu
-    correo: este sitio no guarda lo que escribes.
-  </p>
+<section class="waf" data-module="form" data-wa-form aria-labelledby={`${scene.id}-form-titulo`}>
+  <h3 class="waf__title" id={`${scene.id}-form-titulo`}>{c.title}</h3>
+  <p class="waf__lead">{c.lead}</p>
 
-  <form class="conversion-form__form" data-context-form novalidate>
-    <div class="conversion-form__row">
-      <label class="conversion-form__field">
-        <span class="conversion-form__label">Tu nombre <span class="conversion-form__optional">(opcional)</span></span>
-        <input type="text" name="nombre" autocomplete="name" placeholder="Cómo te llamas" />
-      </label>
-
-      <label class="conversion-form__field">
-        <span class="conversion-form__label">Correo <span class="conversion-form__required">(obligatorio)</span></span>
-        <input type="email" name="correo" autocomplete="email" required placeholder="tu@correo.mx" />
-      </label>
-    </div>
-
-    <label class="conversion-form__field">
-      <span class="conversion-form__label">¿En qué punto estás?</span>
-      <select name="situacion">
-        {situaciones.map((item) => (
-          <option value={item.value}>{item.label}</option>
-        ))}
-      </select>
+  <form class="waf__form" data-wa-form-el novalidate>
+    <label class="waf__field">
+      <span class="waf__label">{c.name} *</span>
+      <input type="text" name="nombre" autocomplete="name" required maxlength="100" placeholder={c.name} data-wa-nombre />
+      <span class="waf__count" data-wa-count="nombre">0/100</span>
     </label>
-
-    <label class="conversion-form__field">
-      <span class="conversion-form__label">¿Qué necesitas? <span class="conversion-form__optional">(opcional)</span></span>
-      <textarea name="mensaje" rows="3" placeholder="Una o dos líneas bastan."></textarea>
+    <label class="waf__field">
+      <span class="waf__label">{c.business}</span>
+      <input type="text" name="negocio" autocomplete="organization" maxlength="150" placeholder={c.business} data-wa-negocio />
+      <span class="waf__count" data-wa-count="negocio">0/150</span>
     </label>
-
-    <div class="conversion-form__actions">
-      <button type="submit" class="button button--primary">Preparar mensaje</button>
-      <p class="conversion-form__status" data-form-status role="status" aria-live="polite"></p>
+    <label class="waf__field">
+      <span class="waf__label">{c.need} *</span>
+      <textarea name="necesidad" rows="3" required maxlength="1000" placeholder={c.needPlaceholder} data-wa-necesidad></textarea>
+      <span class="waf__count" data-wa-count="necesidad">0/1000</span>
+    </label>
+    <p class="waf__error" data-wa-error hidden role="alert">{c.error}</p>
+    <div class="waf__actions">
+      <a class="button button--primary waf__submit" data-wa-submit href={waBase} target="_blank" rel="noopener noreferrer">{c.submit} ↗</a>
+      <p class="waf__privacy">{c.privacy}</p>
     </div>
-
-    <p class="conversion-form__legal">
-      Al continuar se abrirá tu programa de correo con el mensaje escrito. No
-      se almacena información en este sitio ni se envían datos a servidores de
-      terceros. Si prefieres escribir directamente, usa
-      <a href="mailto:hola@publia.mx">hola@publia.mx</a>.
-    </p>
   </form>
 </section>
 
 <style>
-  .conversion-form {
-    display: grid;
-    gap: var(--space-2);
-    margin-top: var(--space-3);
-    padding: var(--space-3);
-    border: 1px solid color-mix(in oklab, var(--scene-accent) 26%, transparent);
-    border-radius: 1.25rem;
-    background: color-mix(in oklab, var(--ink-900) 76%, transparent);
-    max-width: 46rem;
-  }
-
-  .conversion-form__title {
-    margin: 0;
-    font-size: var(--step-1);
-  }
-
-  .conversion-form__lead {
-    margin: 0;
-    color: var(--ink-300);
-    font-size: var(--step--1);
-    max-width: 48ch;
-  }
-
-  .conversion-form__form {
-    display: grid;
-    gap: var(--space-2);
-  }
-
-  .conversion-form__row {
-    display: grid;
-    gap: var(--space-2);
-  }
-
-  @media (min-width: 640px) {
-    .conversion-form__row {
-      grid-template-columns: 1fr 1fr;
-    }
-  }
-
-  .conversion-form__field {
-    display: grid;
-    gap: 0.35rem;
-  }
-
-  .conversion-form__label {
-    font-size: var(--step--1);
-    letter-spacing: 0.06em;
-    color: var(--ink-200);
-  }
-
-  .conversion-form__optional {
-    color: var(--ink-300);
-    letter-spacing: 0;
-  }
-
-  .conversion-form__required {
-    color: var(--scene-accent);
-    letter-spacing: 0;
-  }
-
-  .conversion-form__field input,
-  .conversion-form__field select,
-  .conversion-form__field textarea {
-    width: 100%;
-    padding: 0.7rem 0.8rem;
-    border-radius: 0.75rem;
-    border: 1px solid var(--border-subtle);
-    background: color-mix(in oklab, var(--ink-950) 70%, transparent);
-    color: var(--paper);
-    font: inherit;
-    font-size: var(--step-0);
-  }
-
-  .conversion-form__field textarea {
-    resize: vertical;
-  }
-
-  .conversion-form__field input:focus-visible,
-  .conversion-form__field select:focus-visible,
-  .conversion-form__field textarea:focus-visible {
-    outline: 2px solid var(--scene-accent);
-    outline-offset: 2px;
-  }
-
-  .conversion-form__actions {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-2);
-  }
-
-  .conversion-form__status {
-    margin: 0;
-    font-size: var(--step--1);
-    color: var(--scene-accent);
-  }
-
-  .conversion-form__status[data-state='error'] {
-    color: #ff9b8a;
-  }
-
-  .conversion-form__legal {
-    margin: 0;
-    font-size: var(--step--1);
-    color: var(--ink-300);
-    max-width: 62ch;
-  }
-
-  .conversion-form__legal a {
-    color: var(--scene-accent);
-  }
+  .waf { display: grid; gap: 14px; margin-top: 24px; padding: 28px; border: 1px solid var(--scene-border, rgba(128,229,255,.25)); border-radius: 24px; max-width: 46rem; background: rgba(5,11,27,.45); }
+  .waf__title { margin: 0; font-size: clamp(22px, 2vw, 30px); }
+  .waf__lead { margin: 0; max-width: 58ch; line-height: 1.55; opacity: .9; }
+  .waf__form { display: grid; gap: 14px; }
+  .waf__field { display: grid; gap: 6px; position: relative; }
+  .waf__label { font-size: .9rem; font-weight: 600; }
+  .waf__field input, .waf__field textarea { min-height: 48px; padding: 12px 14px; font-size: 16px; border-radius: 12px; border: 1px solid var(--scene-border, rgba(128,229,255,.3)); background: rgba(3,8,20,.6); color: inherit; width: 100%; resize: vertical; }
+  .waf__field input:focus-visible, .waf__field textarea:focus-visible { outline: 3px solid var(--scene-accent, #ffca34); outline-offset: 3px; }
+  .waf__count { justify-self: end; font-size: .72rem; opacity: .6; }
+  .waf__error { margin: 0; color: #fa5964; font-size: .9rem; }
+  .waf__actions { display: grid; gap: 8px; justify-items: start; }
+  .waf__submit { min-height: 48px; padding: 14px 22px; font-size: 16px; border-radius: 999px; text-decoration: none; display: inline-flex; align-items: center; }
+  .waf__submit:focus-visible { outline: 3px solid var(--scene-accent, #ffca34); outline-offset: 3px; }
+  .waf__privacy { margin: 0; font-size: .8rem; opacity: .7; max-width: 52ch; }
+  @media (max-width: 639px) { .waf { padding: 20px; } }
 </style>

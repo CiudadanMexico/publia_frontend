@@ -1,0 +1,38 @@
+---
+/**
+ * Conocimiento (7M-F §3/§10): dos paneles compactos al final del recorrido
+ * con textos literales de copy.es-MX.json (`knowledge`) y CTA de contacto
+ * con contact.baseMessage. Conserva los enlaces actuales al material.
+ */
+import { COPY_7MF } from '../../../data/copy7mf';
+
+const k = COPY_7MF.knowledge;
+const waBase = `https://wa.me/${COPY_7MF.contact.number}?text=${encodeURIComponent(COPY_7MF.contact.baseMessage)}`;
+---
+
+<div class="know7" data-module="knowledge">
+  <h3 class="know7__title">{k.title}</h3>
+  <div class="know7__grid">
+    <article class="know7__panel">
+      <h4>{k.trainingLabel}</h4>
+      <p>{k.trainingBody}</p>
+    </article>
+    <article class="know7__panel">
+      <h4>{k.adviceLabel}</h4>
+      <p>{k.adviceBody}</p>
+    </article>
+  </div>
+  <a class="button button--ghost know7__cta" href={waBase} target="_blank" rel="noopener noreferrer">{k.cta} ↗</a>
+</div>
+
+<style>
+  .know7 { display: grid; gap: 16px; margin-top: 40px; }
+  .know7__title { margin: 0; font-size: clamp(22px, 2vw, 30px); }
+  .know7__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .know7__panel { border: 1px solid var(--scene-border, rgba(128,229,255,.22)); border-radius: 24px; padding: 20px 28px; }
+  .know7__panel h4 { margin: 0 0 6px; font-size: 1.05rem; }
+  .know7__panel p { margin: 0; line-height: 1.55; font-size: 0.94rem; opacity: 0.92; }
+  .know7__cta { justify-self: start; min-height: 48px; padding: 14px 22px; font-size: 16px; border-radius: 999px; text-decoration: none; border: 1px solid var(--scene-border, rgba(128,229,255,.35)); color: inherit; display: inline-flex; align-items: center; }
+  .know7__cta:focus-visible { outline: 3px solid var(--scene-accent, #ffca34); outline-offset: 3px; }
+  @media (max-width: 639px) { .know7__grid { grid-template-columns: 1fr; } .know7__panel { padding: 16px 20px; } }
+</style>

@@ -1,10 +1,12 @@
 /**
- * Ecosistema (P0-04): órbita de 8 soluciones + panel de lectura.
- * Selección persiste en answers.servicio y alimenta el cierre V2.
- * Progreso de órbita ligado al scroll de la escena (reversible); sin rAF
- * cuando hay prefers-reduced-motion.
+ * Ecosistema (7M-F §8): órbita visual conservada; el panel muestra las ocho
+ * familias textuales literales de copy.es-MX.json (`ecosystem.families`) con
+ * tipo de intervención, cuatro pasos y resultado. La órbita selecciona la
+ * familia correspondiente cuando existe equivalencia documentada (abajo);
+ * una familia sin nodo sigue disponible en el selector. Selección inicial ia.
+ * Persiste en answers.servicio sólo con interacción explícita (7M-E P0-01).
  */
-import { ECOSYSTEM_SERVICES } from '../../data/ecosystem';
+import { COPY_7MF } from '../../data/copy7mf';
 import { getState, setAnswer } from './state';
 import { track } from './events';
 
@@ -13,187 +15,99 @@ export interface EcosystemUniverse {
   gesture(): void;
 }
 
-const pad = (n: number): string => String(n).padStart(2, '0');
+/** Correspondencia documentada por significado: familia → índice de nodo de la órbita. */
+const FAMILY_NODE: Record<string, number> = { ia: 0, web: 1, agentes: 2, cooperacion: 3, multimedia: 4, marketing: 5, infraestructura: 7 };
+const NODE_FAMILY: Record<number, string> = Object.fromEntries(Object.entries(FAMILY_NODE).map(([f, n]) => [n, f]));
+
+const eco = COPY_7MF.ecosystem;
+const families = eco.families;
+type FamilyId = (typeof families)[number]['id'];
+const byId = new Map<string, (typeof families)[number]>(families.map((f) => [f.id, f]));
+const waBase = `https://wa.me/${COPY_7MF.contact.number}?text=`;
 
 export function bindEcosystem(universe: EcosystemUniverse | null): void {
   const wrap = document.querySelector<HTMLElement>('[data-demo="ecosystem"]');
   if (!wrap || wrap.dataset.bound === '1') return;
+  wrap.dataset.bound = '1';
   const cloud = wrap.querySelector<HTMLElement>('[data-eco-cloud]');
   const orbit = wrap.querySelector<HTMLElement>('[data-eco-orbit]');
   const scene = wrap.closest<HTMLElement>('section[id]');
   if (!cloud || !orbit) return;
   const nodes = [...cloud.querySelectorAll<HTMLButtonElement>('[data-eco-node]')];
-  const elIndex = wrap.querySelector('[data-eco-index]');
-  const elEmoji = wrap.querySelector('[data-eco-emoji]');
-  const elTitle = wrap.querySelector('[data-eco-title]');
-  const elDetail = wrap.querySelector('[data-eco-detail]');
-  const elFlow = wrap.querySelector('[data-eco-flow]');
-  const elExample = wrap.querySelector<HTMLElement>('[data-eco-example]');
-  const elToast = wrap.querySelector<HTMLElement>('[data-eco-toast]');
-  const elPanel = wrap.querySelector<HTMLElement>('[data-eco-panel]');
-  const btnPlay = wrap.querySelector<HTMLButtonElement>('[data-eco-play]');
-  const btnMore = wrap.querySelector<HTMLButtonElement>('[data-eco-more]');
-  const btnNext = wrap.querySelector<HTMLButtonElement>('[data-eco-next]');
-  const btnActivate = wrap.querySelector<HTMLButtonElement>('[data-eco-activate]');
+  const familyBtns = [...wrap.querySelectorAll<HTMLButtonElement>('[data-eco-family]')];
+  const elTitle = wrap.querySelector<HTMLElement>('[data-eco-title]');
+  const elMode = wrap.querySelector<HTMLElement>('[data-eco-mode]');
+  const elSteps = wrap.querySelector<HTMLOListElement>('[data-eco-steps]');
+  const elResult = wrap.querySelector<HTMLElement>('[data-eco-result]');
+  const elCta = wrap.querySelector<HTMLAnchorElement>('[data-eco-cta]');
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  let selected = 0;
-  let toastTimer = 0;
-  let playTimers: number[] = [];
+  let selected: string = 'ia';
 
-  const toast = (msg: string): void => {
-    if (!elToast) return;
-    elToast.textContent = msg;
-    elToast.classList.add('visible');
-    window.clearTimeout(toastTimer);
-    toastTimer = window.setTimeout(() => elToast.classList.remove('visible'), 2400);
-  };
-
-  const select = (i: number, persist = true): void => {
-    selected = ((i % nodes.length) + nodes.length) % nodes.length;
-    const s = ECOSYSTEM_SERVICES[selected];
-    if (!s) return;
-    nodes.forEach((n, j) => n.setAttribute('aria-pressed', String(j === selected)));
-    if (elIndex) elIndex.textContent = `${pad(selected + 1)} / ${pad(nodes.length)}`;
-    if (elEmoji) {
-      elEmoji.textContent = s.emoji;
-      (elEmoji as HTMLElement).style.color = s.color;
-    }
-    if (elTitle) elTitle.textContent = s.title;
-    if (elDetail) elDetail.textContent = s.detail;
-    if (elFlow) {
-      elFlow.innerHTML = s.flow
-        .map((f, k) => `${k ? '<b aria-hidden="true">⟶</b>' : ''}<span data-eco-step="${k}">${f}</span>`)
+  const select = (id: FamilyId | string, persist = true): void => {
+    const fam = byId.get(id);
+    if (!fam) return;
+    selected = id;
+    familyBtns.forEach((b) => b.setAttribute('aria-pressed', b.dataset['ecoFamily'] === id ? 'true' : 'false'));
+    const nodeIdx = FAMILY_NODE[id];
+    nodes.forEach((n, j) => n.setAttribute('aria-pressed', nodeIdx === j ? 'true' : 'false'));
+    if (elTitle) elTitle.textContent = fam.label;
+    if (elMode) elMode.textContent = fam.mode;
+    if (elSteps) {
+      elSteps.innerHTML = fam.steps
+        .map((st) => `<li data-eco-step><strong data-eco-step-title>${st.title}</strong><span data-eco-step-body>${st.body}</span></li>`)
         .join('');
     }
-    if (elExample) elExample.hidden = true;
-    if (btnMore) btnMore.setAttribute('aria-expanded', 'false');
-    if (elPanel) elPanel.style.borderColor = s.color;
-    if (persist) setAnswer('servicio', s.title);
-    universe?.cardPulse(selected);
-    track('ecosystem_selected', { servicio: s.title });
-  };
-
-  const playExample = (): void => {
-    const s = ECOSYSTEM_SERVICES[selected];
-    if (!s || !elFlow) return;
-    playTimers.forEach(window.clearTimeout);
-    playTimers = [];
-    const spans = [...elFlow.querySelectorAll('[data-eco-step]')] as HTMLElement[];
-    spans.forEach((sp) => sp.classList.remove('is-live'));
-    if (elExample) elExample.hidden = true;
-    toast(`▶ Demostración conceptual: ${s.name.toLowerCase()}`);
-    spans.forEach((sp, i) => {
-      playTimers.push(
-        window.setTimeout(() => {
-          sp.classList.add('is-live');
-          if (i === spans.length - 1 && elExample) {
-            elExample.hidden = false;
-            elExample.textContent = s.example;
-          }
-        }, reduced ? 0 : i * 590),
-      );
-    });
-    if (orbit) {
-      orbit.classList.remove('is-burst');
-      void orbit.offsetWidth;
-      orbit.classList.add('is-burst');
+    if (elResult) elResult.textContent = fam.result;
+    if (elCta) elCta.href = `${waBase}${encodeURIComponent(COPY_7MF.contact.ecosystemMessage.replace('{label}', fam.label))}`;
+    if (persist) {
+      setAnswer('servicio', fam.label);
+      track('ecosystem_selected', { familia: fam.label });
     }
-    track('ecosystem_demo', { servicio: s.title });
+    if (nodeIdx !== undefined) universe?.cardPulse(nodeIdx);
   };
 
+  familyBtns.forEach((b) => b.addEventListener('click', () => {
+    const id = b.dataset['ecoFamily'];
+    if (id) select(id);
+  }));
   nodes.forEach((node, i) => {
-    node.addEventListener('click', () => select(i));
-  });
-  btnNext?.addEventListener('click', () => select(selected + 1));
-  btnPlay?.addEventListener('click', playExample);
-  btnMore?.addEventListener('click', () => {
-    if (!elExample) return;
-    elExample.hidden = !elExample.hidden;
-    btnMore.setAttribute('aria-expanded', String(!elExample.hidden));
-    if (!elExample.hidden) {
-      const s = ECOSYSTEM_SERVICES[selected];
-      if (s) elExample.textContent = s.example;
-    }
-  });
-  btnActivate?.addEventListener('click', () => {
-    toast('⚡ Los ocho servicios conectados en una misma red');
-    if (orbit) {
-      orbit.classList.remove('is-burst');
-      void orbit.offsetWidth;
-      orbit.classList.add('is-burst');
-    }
-    universe?.gesture();
-    track('ecosystem_activated', {});
+    node.addEventListener('click', () => {
+      const famId = NODE_FAMILY[i];
+      if (famId) select(famId);
+    });
   });
   wrap.addEventListener('keydown', (ev) => {
     const tag = (ev.target as HTMLElement).tagName;
-    if (ev.key === 'ArrowRight' && !['BUTTON', 'INPUT', 'TEXTAREA'].includes(tag)) select(selected + 1);
-    if (ev.key === 'ArrowLeft' && !['BUTTON', 'INPUT', 'TEXTAREA'].includes(tag)) select(selected - 1);
+    const idx = families.findIndex((f) => f.id === selected);
+    if (ev.key === 'ArrowRight' && !['BUTTON', 'INPUT', 'TEXTAREA'].includes(tag)) select(families[(idx + 1) % families.length]!.id);
+    if (ev.key === 'ArrowLeft' && !['BUTTON', 'INPUT', 'TEXTAREA'].includes(tag)) select(families[(idx - 1 + families.length) % families.length]!.id);
   });
 
-  // P0-01 7M-E: al iniciar se restaura la selección previa SIN persistir;
-  // sólo los clics del visitante (o next/play) escriben answers.servicio.
-  const prevServicio = getState().answers.servicio;
-  const initialIdx = Math.max(0, ECOSYSTEM_SERVICES.findIndex((sv) => sv.title === prevServicio));
-  select(initialIdx, false);
+  // 7M-E P0-01: restaurar sin persistir; default 'ia' (§8)
+  const prev = getState().answers.servicio;
+  const initial = prev && families.some((f) => f.label === prev) ? families.find((f) => f.label === prev)!.id : 'ia';
+  select(initial, false);
 
-  // Órbita continua ligada al progreso de scroll de la escena (reversible).
-  //Sólo corre mientras la órbita está cerca del viewport (sin costo en el hero).
+  // Órbita continua ligada al scroll de la escena (reversible), sólo cerca del viewport
   if (!reduced) {
     let raf = 0;
     let rot = 0;
     let visible = false;
-    let sceneTop = 0;
-    let sceneTotal = 1;
-    const measure = (): void => {
-      if (!scene) return;
-      sceneTop = scene.getBoundingClientRect().top + window.scrollY;
-      sceneTotal = Math.max(1, scene.offsetHeight - window.innerHeight);
-    };
+    const measure = (): void => { void scene; };
     measure();
-    window.addEventListener('resize', measure, { passive: true });
     if ('IntersectionObserver' in window) {
-      new IntersectionObserver((entries) => {
-        visible = entries.some((e) => e.isIntersecting);
-        if (visible) measure();
-      }, { rootMargin: '40% 0px' }).observe(orbit);
-    } else {
-      visible = true;
+      new IntersectionObserver((entries) => { visible = entries.some((e) => e.isIntersecting); }, { rootMargin: '40% 0px' }).observe(orbit);
     }
     const tick = (): void => {
-      raf = requestAnimationFrame(tick);
-      if (!visible) return;
-      rot += 0.0022;
-      const progress = Math.min(1, Math.max(0, (window.scrollY - sceneTop) / sceneTotal));
-      const w = orbit.clientWidth;
-      const h = orbit.clientHeight;
-      const rx = Math.min(w * 0.36, 340);
-      const ry = h * 0.3;
-      cloud.style.transform = `rotateY(${rot * 40 + progress * 30}deg) rotateX(${-4 + Math.sin(progress * Math.PI) * 10}deg)`;
-      nodes.forEach((el, i) => {
-        const angle = (i * Math.PI * 2) / nodes.length - Math.PI / 2 + rot + progress * 0.6;
-        const x = Math.cos(angle) * rx;
-        const y = Math.sin(angle) * ry;
-        const z = Math.sin(angle * 1.3) * 60 + (i === selected ? 70 : 0);
-        const scale = (i === selected ? 1.18 : 1) * (window.innerWidth < 900 ? 0.78 : 0.95);
-        el.style.transform = `translate3d(calc(-50% + ${x}px), calc(-50% + ${y}px), ${z}px) scale(${scale})`;
-        el.style.zIndex = String(20 + Math.floor(z));
-      });
+      if (visible && !document.hidden) {
+        rot = (rot + 0.05) % 360;
+        cloud.style.transform = `rotate(${rot}deg)`;
+        nodes.forEach((n) => { n.style.transform = `rotate(${-rot}deg)`; });
+      }
+      raf = window.requestAnimationFrame(tick);
     };
-    raf = requestAnimationFrame(tick);
-    // limpieza al salir de la página
-    window.addEventListener('pagehide', () => cancelAnimationFrame(raf), { once: true });
-  } else {
-    // reducido: distribución estática en anillo
-    const w = orbit.clientWidth;
-    const h = orbit.clientHeight;
-    const rx = Math.min(w * 0.36, 340);
-    const ry = h * 0.3;
-    nodes.forEach((el, i) => {
-      const angle = (i * Math.PI * 2) / nodes.length - Math.PI / 2;
-      el.style.transform = `translate3d(calc(-50% + ${Math.cos(angle) * rx}px), calc(-50% + ${Math.sin(angle) * ry}px), 0)`;
-    });
+    raf = window.requestAnimationFrame(tick);
+    window.addEventListener('pagehide', () => window.cancelAnimationFrame(raf));
   }
-  wrap.dataset.bound = '1';
 }

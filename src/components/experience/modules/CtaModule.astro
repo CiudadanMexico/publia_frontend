@@ -28,17 +28,13 @@ const mailto = buildMailto({ route: 'unclassified', traits: [] });
   <div class="conversion__actions" data-reveal>
     <a
       class="button button--primary button--large"
-      href={mailto}
+      href={`https://wa.me/${COPY_7MF.contact.number}?text=${encodeURIComponent(COPY_7MF.contact.baseMessage)}`}
       data-contact-cta="true"
-      data-scene-cta={mailto}
-      data-event="consultation_requested"
+      target="_blank"
+      rel="noopener noreferrer"
     >
-      Escribir a {SITE.email}
+      {COPY_7MF.contact.cta} ↗
     </a>
-    <p class="conversion__note">
-      Atiende una persona de la red, no un bot. Si prefieres, llámanos o escríbenos por WhatsApp:
-      <a href={SITE.whatsapp} rel="noopener noreferrer" target="_blank">WhatsApp</a>.
-    </p>
   </div>
 
   <div class="conversion__more">

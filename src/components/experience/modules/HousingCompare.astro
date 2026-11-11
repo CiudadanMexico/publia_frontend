@@ -8,6 +8,7 @@
  */
 import type { ResolvedScene } from '../../../lib/experience/graph';
 import { HOUSING_PLANS, HOUSING_DISCLAIMER } from '../../../data/housing';
+import { COPY_7MF } from '../../../data/copy7mf';
 
 interface Props {
   scene: ResolvedScene;
@@ -16,6 +17,8 @@ interface Props {
 const { scene } = Astro.props;
 const compartido = HOUSING_PLANS.compartido;
 const privado = HOUSING_PLANS.privado;
+const h7 = COPY_7MF.housing;
+const waH = `https://wa.me/${COPY_7MF.contact.number}?text=${encodeURIComponent(COPY_7MF.contact.housingMessage)}`;
 
 const rack = (i: number, title: string, foot: string) => ({ i, title, foot });
 const racks = [rack(0, 'NODE / 01', 'PUBLIA · RTX / AI'), rack(1, 'NODE / 02', 'PUBLIA · RED'), rack(2, 'NODE / 03', 'PUBLIA · MEMBERS')];
@@ -25,10 +28,10 @@ const racks = [rack(0, 'NODE / 01', 'PUBLIA · RTX / AI'), rack(1, 'NODE / 02', 
   <div class="housing__panel">
     <div class="housing__glass">
       <div class="housing__glass-top">
-        <h3 data-housing-title>{compartido.title}</h3>
+        <h3 data-housing-title>{h7.sharedTitle}</h3>
         <span class="housing__pill">COMPARACIÓN</span>
       </div>
-      <p data-housing-desc>{compartido.text}</p>
+      <p data-housing-desc>{h7.sharedBody}</p>
       <div class="housing__segments" data-housing-segments role="img" aria-label="Distribución porcentual de la capacidad">
         {compartido.distribution.map((d) => <span class={`housing__seg housing__seg--${d.tone}`} style={`width:${d.porcentaje}%`} />)}
       </div>
@@ -40,17 +43,17 @@ const racks = [rack(0, 'NODE / 01', 'PUBLIA · RTX / AI'), rack(1, 'NODE / 02', 
           </div>
         ))}
       </div>
-      <p class="housing__note" data-housing-note>{compartido.note}</p>
+      <p class="housing__note" data-housing-note>{h7.note}</p>
       <div class="housing__selector" role="group" aria-label="Elegir modalidad de Housing">
-        <button class="housing__mode" type="button" data-housing-mode="compartido" aria-pressed="true">{compartido.label}</button>
-        <button class="housing__mode" type="button" data-housing-mode="privado" aria-pressed="false">{privado.label}</button>
+        <button class="housing__mode" type="button" data-housing-mode="compartido" aria-pressed="true">{h7.sharedTitle}</button>
+        <button class="housing__mode" type="button" data-housing-mode="privado" aria-pressed="false">{h7.privateTitle}</button>
       </div>
       <div class="housing__actions">
         <button class="housing__btn housing__btn--primary" type="button" data-housing-play>▶ Simular tráfico</button>
         <span class="housing__scope">Animación ilustrativa: no simula cargas, solicitudes ni rendimiento real</span>
         <button class="housing__btn" type="button" data-housing-pause disabled>Ⅱ Pausar</button>
         <button class="housing__btn" type="button" data-housing-reset>↺ Restablecer</button>
-        <button class="housing__btn" type="button" data-housing-copy>⧉ Copiar resumen</button>
+        <a class="housing__btn housing__btn--wa" data-housing-cta href={waH} target="_blank" rel="noopener noreferrer">{h7.cta} ↗</a>
       </div>
       <p class="housing__status" data-housing-status role="status" aria-live="polite">Selecciona una modalidad para explorarla.</p>
     </div>

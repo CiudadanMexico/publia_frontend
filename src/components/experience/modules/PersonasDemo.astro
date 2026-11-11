@@ -8,6 +8,7 @@
 import type { ResolvedScene } from '../../../lib/experience/graph';
 import { accentify } from '../../../lib/experience/accent';
 import { PERSONAS_CASES } from '../../../data/personas';
+import { COPY_7MF } from '../../../data/copy7mf';
 
 interface Props {
   scene: ResolvedScene;
@@ -23,6 +24,10 @@ const c0 = cases[0]!;
     {scene.eyebrow && <p class="catalog__eyebrow" data-reveal set:html={accentify(scene.eyebrow)} />}
     <h2 class="catalog__title" data-role="title" data-reveal="lines" set:html={accentify(scene.title)} />
     {scene.lead && <p class="catalog__lead" data-reveal>{scene.lead}</p>}
+    {scene.body && <p class="catalog__body" data-reveal>{scene.body}</p>}
+    <p class="pers__cta-row" data-reveal>
+      <a class="button button--ghost pers__cta" href="#escena-e27" data-open-alcance>{COPY_7MF.personas.cta} ↗</a>
+    </p>
   </div>
 
   <div class="pers__grid">
@@ -192,4 +197,8 @@ const c0 = cases[0]!;
   @media (prefers-reduced-motion: reduce) {
     .pers__source.pulse { animation: none; }
   }
+  .pers__cta-row { margin-top: 14px; }
+  .pers__cta { display: inline-flex; align-items: center; min-height: 48px; padding: 14px 22px; font-size: 16px; border-radius: 999px; text-decoration: none; border: 1px solid var(--scene-border, rgba(128,229,255,.35)); color: inherit; }
+  .pers__cta:focus-visible { outline: 3px solid var(--scene-accent, #ffca34); outline-offset: 3px; }
+  .catalog__body { max-width: 58ch; line-height: 1.55; opacity: 0.9; }
 </style>

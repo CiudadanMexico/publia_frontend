@@ -19,10 +19,10 @@ test('P0-02: infraestructura/Housing NO recomienda COBERTURA por defecto', () =>
 });
 
 test('P0-02: otros objetivos sí sugieren un plan concreto', () => {
-  assert.equal(recommend('support', 'large')?.plan?.slug, 'cobertura');
-  assert.equal(recommend('support', 'small')?.plan?.slug, 'operacion');
-  assert.equal(recommend('agent', 'solo')?.plan?.slug, 'agente');
-  assert.equal(recommend('start', 'small')?.plan?.slug, 'base');
+  assert.equal(recommend('support', 'large')?.plan, 'cobertura');
+  assert.equal(recommend('support', 'small')?.plan, 'operacion');
+  assert.equal(recommend('agent', 'solo')?.plan, 'agente');
+  assert.equal(recommend('start', 'small')?.plan, 'base');
   assert.equal(recommend(null, 'small'), null);
 });
 
