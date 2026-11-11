@@ -60,6 +60,7 @@ export type SceneLayout =
 
 /** Módulos visuales que una escena puede componer. */
 export type SceneModule =
+  | 'umbral'
   | 'statement'
   | 'form'
   | 'split'
