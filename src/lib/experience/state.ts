@@ -39,8 +39,15 @@ export const CAPABILITY_IDS: readonly CapabilityId[] = [
   'capacitacion',
 ];
 
-/** Preferencia de infraestructura (Bloque A). */
-export type InfraPreference = 'ia_privada' | 'housing' | 'red_distribuida';
+/** Preferencia de infraestructura (7M-F §7): cuatro escenarios canónicos. */
+export type InfraPreference = 'local-private' | 'local-collaborative' | 'managed-housing' | 'distributed-network';
+
+/** Migración 7M-F §7: valores antiguos por significado comprobable; desconocidos → local-private. */
+export const INFRA_MIGRATION: Record<string, InfraPreference> = {
+  ia_privada: 'local-private',
+  housing: 'managed-housing',
+  red_distribuida: 'distributed-network',
+};
 
 export type HousingMode = 'compartido' | 'privado';
 
@@ -51,9 +58,10 @@ function isHousingMode(value: unknown): value is HousingMode {
 }
 
 export const INFRA_PREFERENCES: readonly InfraPreference[] = [
-  'ia_privada',
-  'housing',
-  'red_distribuida',
+  'local-private',
+  'local-collaborative',
+  'managed-housing',
+  'distributed-network',
 ];
 
 /** Niveles de membresía (Bloque D). */
@@ -165,8 +173,13 @@ function isCapability(value: unknown): value is CapabilityId {
   return typeof value === 'string' && (CAPABILITY_IDS as readonly string[]).includes(value);
 }
 
+function migrateInfra(value: unknown): InfraPreference | null {
+  if (typeof value !== 'string') return null;
+  if ((INFRA_PREFERENCES as readonly string[]).includes(value)) return value as InfraPreference;
+  return INFRA_MIGRATION[value] ?? 'local-private'; // §7: no reconocidos → local-private
+}
 function isInfra(value: unknown): value is InfraPreference {
-  return typeof value === 'string' && (INFRA_PREFERENCES as readonly string[]).includes(value);
+  return migrateInfra(value) !== null;
 }
 
 function isMembership(value: unknown): value is MembershipSlug {
@@ -215,7 +228,7 @@ function load(): VisitorState {
         ? candidate.capabilities.filter(isCapability)
         : [],
       membership: isMembership(candidate.membership) ? candidate.membership : null,
-      infra: isInfra(candidate.infra) ? candidate.infra : null,
+      infra: migrateInfra(candidate.infra),
       red: typeof candidate.red === 'string' && candidate.red.trim() ? candidate.red : null,
       proposalTouched: candidate.proposalTouched === true,
       housingMode: isHousingMode(candidate.housingMode) ? candidate.housingMode : null,

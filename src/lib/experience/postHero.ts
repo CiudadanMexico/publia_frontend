@@ -43,7 +43,7 @@ function renderRecommendation(): void {
     items.push({ tag: 'Tu selección', title: `Membresía ${state.membership.toUpperCase()}`, body: 'La elegiste tú en E27; la recomendación del diagnóstico no la reemplaza.' });
   }
   if (state.infra) {
-    items.push({ tag: 'Infraestructura', title: INFRA_LABEL[state.infra] ?? state.infra, body: state.infra === 'housing' ? 'Explora la modalidad compartida o privada en E22.' : 'Preferencia guardada de tu recorrido.' });
+    items.push({ tag: 'Infraestructura', title: INFRA_LABEL[state.infra] ?? state.infra, body: state.infra === 'managed-housing' ? 'Explora la modalidad compartida o privada en E22.' : 'Preferencia guardada de tu recorrido.' });
   }
   if (state.housingMode) {
     items.push({ tag: 'Housing', title: state.housingMode === 'privado' ? 'Modalidad privada (100% dedicada)' : 'Modalidad compartida (50/25/25)', body: 'Elegida en E22; sin elegirla no se asume contratación.' });

@@ -18,11 +18,11 @@ const ROUTE_LABEL: Record<string, string> = {
   efficiency: 'ruta Eficiencia',
   explorer: 'exploración libre',
 };
-export const INFRA_LABEL: Record<string, string> = {
-  ia_privada: 'IA privada',
-  housing: 'Housing administrado',
-  red_distribuida: 'Red distribuida',
-};
+import { COPY_7MF } from '../../data/copy7mf';
+
+export const INFRA_LABEL: Record<string, string> = Object.fromEntries(
+  COPY_7MF.infra.modes.map((m) => [m.id, m.label]),
+);
 
 export function buildSummary(): string {
   const s = getState();

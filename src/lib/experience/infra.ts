@@ -1,100 +1,75 @@
 /**
- * Infraestructura soberana (Bloque A): selección de modo con cambio de
- * cámara/iluminación en el universo, demo "activar red" con contador y
- * pulsos, y persistencia de la preferencia en state.infra.
+ * E03 Infraestructura — binder 7M-F §7.
+ * Cuatro escenarios (ids canónicos de copy.es-MX.json), un solo SVG visible,
+ * crossfade 180ms (CSS), persistencia migrada en state.infra (state.ts aplica
+ * INFRA_MIGRATION: valores viejos por significado, desconocidos → local-private).
+ * IntersectionObserver + visibilitychange pausan las animaciones fuera de vista.
  */
-import { INFRA_MODES } from '../../data/infra';
-import type { InfraPreference } from './state';
-import { setInfraPreference, getState } from './state';
+import { COPY_7MF } from '../../data/copy7mf';
+import { getState, setInfraPreference, type InfraPreference } from './state';
 import { track } from './events';
 
-export interface InfraUniverse {
-  setSceneLook(params: Record<string, unknown>): void;
-  cardPulse(index: number): void;
-}
+const modes = COPY_7MF.infra.modes;
+const byId = new Map(modes.map((m) => [m.id as InfraPreference, m]));
+const waBase = `https://wa.me/${COPY_7MF.contact.number}?text=`;
 
-export function bindInfra(universe: InfraUniverse | null): void {
-  document.querySelectorAll<HTMLElement>('[data-demo="infra2"]').forEach((w) => {
-    if (w.dataset.bound === '1') return;
-    w.dataset.bound = '1';
-    bindOne(w, universe);
-  });
-}
-
-function bindOne(wrap: HTMLElement, universe: InfraUniverse | null): void {
-  const modeBtns = [...wrap.querySelectorAll<HTMLButtonElement>('[data-infra2-mode]')];
-  const elStatus = wrap.querySelector('[data-infra2-status]');
-  const elDesc = wrap.querySelector('[data-infra2-desc]');
-  const elBenefits = wrap.querySelector('[data-infra2-benefits]');
-  const elLimits = wrap.querySelector('[data-infra2-limits]');
-  const elLaunch = wrap.querySelector<HTMLButtonElement>('[data-infra2-launch]');
-  const elToast = wrap.querySelector<HTMLElement>('[data-infra2-toast]');
-  const elTraffic = wrap.querySelector('[data-infra2-traffic]');
-  const racks = [...wrap.querySelectorAll<HTMLElement>('[data-infra2-rack]')];
-  const flow = wrap.querySelector<SVGPathElement>('[data-infra2-flow]');
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  let traffic = 0;
-  let toastTimer = 0;
-  const timers: number[] = [];
-
-  const toast = (msg: string): void => {
-    if (!elToast) return;
-    elToast.textContent = msg;
-    elToast.classList.add('visible');
-    window.clearTimeout(toastTimer);
-    toastTimer = window.setTimeout(() => elToast.classList.remove('visible'), 2200);
-  };
-
-  const render = (id: string): void => {
-    const mode = INFRA_MODES.find((m) => m.id === id);
-    if (!mode) return;
-    modeBtns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.infra2Mode === id)));
-    if (elStatus) elStatus.textContent = mode.status;
-    if (elDesc) elDesc.textContent = mode.description;
-    if (elBenefits) elBenefits.innerHTML = mode.benefits.map((b) => `<li>${b}</li>`).join('');
-    if (elLimits) elLimits.innerHTML = mode.limitations.map((l) => `<li>${l}</li>`).join('');
-    universe?.setSceneLook({
-      tintHex: mode.tintHex,
-      tintMix: 0.55,
-      network: mode.id === 'red_distribuida' ? 1 : 0.85,
-      spread: mode.id === 'housing' ? 0.55 : 0.4,
-      lightBoost: 1.15,
-      ...mode.cam,
+export function bindInfra(_universe?: unknown): void {
+  document.querySelectorAll<HTMLElement>('[data-infra7]').forEach((wrap) => {
+    const buttons = [...wrap.querySelectorAll<HTMLButtonElement>('[data-infra7-mode]')];
+    const stage = wrap.querySelector<HTMLElement>('[data-infra7-stage]');
+    const svgs = new Map<string, HTMLElement>();
+    wrap.querySelectorAll<HTMLElement>('[data-infra7-svg]').forEach((el) => {
+      const id = el.dataset['infra7Svg'];
+      if (id) svgs.set(id, el);
     });
-    universe?.cardPulse(INFRA_MODES.indexOf(mode));
-  };
-  // Selección explícita: renderiza Y persiste la preferencia.
-  const select = (id: string): void => {
-    render(id);
-    setInfraPreference(id as InfraPreference);
-    track('infra_selected', { modo: id });
-  };
+    const elTitle = wrap.querySelector<HTMLElement>('[data-infra7-title]');
+    const elBody = wrap.querySelector<HTMLElement>('[data-infra7-body]');
+    const elDetail = wrap.querySelector<HTMLElement>('[data-infra7-detail]');
+    const elCta = wrap.querySelector<HTMLAnchorElement>('[data-infra7-cta]');
 
-  modeBtns.forEach((b) => b.addEventListener('click', () => select(b.dataset.infra2Mode ?? 'ia_privada')));
+    const apply = (id: InfraPreference, persist: boolean): void => {
+      const mode = byId.get(id);
+      if (!mode) return;
+      buttons.forEach((b) => b.setAttribute('aria-pressed', b.dataset['infra7Mode'] === id ? 'true' : 'false'));
+      svgs.forEach((el, key) => {
+        el.hidden = key !== id;
+      });
+      if (stage) {
+        stage.dataset['mode'] = id;
+        stage.setAttribute('aria-label', mode.alt); // único nombre accesible del gráfico
+      }
+      if (elTitle) elTitle.textContent = mode.title;
+      if (elBody) elBody.textContent = mode.body;
+      if (elDetail) elDetail.textContent = mode.detail;
+      if (elCta) {
+        elCta.href = `${waBase}${encodeURIComponent(COPY_7MF.contact.infraMessage.replace('{label}', mode.label))}`;
+      }
+      if (persist) {
+        setInfraPreference(id as InfraPreference);
+        track('scene_viewed', { scene: 'E03', mode: id });
+      }
+    };
 
-  elLaunch?.addEventListener('click', () => {
-    timers.forEach(window.clearTimeout);
-    if (elLaunch) elLaunch.disabled = true;
-    traffic += 17;
-    if (elTraffic) elTraffic.textContent = String(traffic).padStart(3, '0');
-    racks.forEach((rack, i) => {
-      timers.push(
-        window.setTimeout(() => {
-          rack.classList.add('is-on');
-          timers.push(window.setTimeout(() => rack.classList.remove('is-on'), 460));
-        }, reduced ? 0 : i * 65),
+    buttons.forEach((b) => {
+      b.addEventListener('click', () => {
+        const id = b.dataset['infra7Mode'] as InfraPreference | undefined;
+        if (id && byId.has(id)) apply(id, true);
+      });
+    });
+
+    // estado persistido (ya migrado por state.ts); default local-private
+    const saved = getState().infra ?? 'local-private';
+    apply(saved, false);
+
+    // pausa fuera de viewport / pestaña oculta (§7)
+    const pause = (on: boolean): void => { wrap.classList.toggle('is-paused', on); };
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver(
+        (entries) => { entries.forEach((e) => pause(!e.isIntersecting || document.hidden)); },
+        { threshold: 0.05 },
       );
-    });
-    if (flow) {
-      flow.style.filter = 'drop-shadow(0 0 11px #fff482)';
-      timers.push(window.setTimeout(() => (flow.style.filter = ''), reduced ? 80 : 1000));
+      io.observe(wrap);
     }
-    toast('✓ Simulación: tráfico distribuido entre nodos');
-    timers.push(window.setTimeout(() => { if (elLaunch) elLaunch.disabled = false; }, reduced ? 200 : 1200));
-    track('infra_red_activated', {});
+    document.addEventListener('visibilitychange', () => pause(document.hidden));
   });
-
-  // Default visual sin persistir; preferencia previa se restaura sin reescribir.
-  render(getState().infra ?? 'ia_privada');
 }
