@@ -154,7 +154,19 @@ export function bindCierre(universe: CierreUniverse | null): void {
   });
 
   const contextLinks = (): void => {
-    const text = encodeURIComponent(`Hola Publia, vengo del recorrido web.\n\n${buildSummary()}`);
+    // 7M-G §7: el mensaje de WhatsApp incluye el resumen VISIBLE de elecciones
+    // explícitas con los prefijos acordados; se omiten campos no elegidos.
+    const st = getState();
+    const picks: string[] = [];
+    if (st.membership) {
+      const plan = COPY_7MF.memberships.plans.find((pl) => pl.id === st.membership);
+      picks.push(`Plan de interés: ${plan?.label ?? st.membership}`);
+    }
+    if (st.answers.servicio) picks.push(`Área de interés: ${st.answers.servicio}`);
+    if (st.infra) picks.push(`Infraestructura: ${INFRA_LABEL[st.infra] ?? st.infra}`);
+    if (st.housingMode) picks.push(`Housing: ${st.housingMode === 'privado' ? 'modalidad privada' : 'modalidad compartida'}`);
+    const visible = picks.length ? `\n\n${picks.join('\n')}` : '';
+    const text = encodeURIComponent(`Hola Publia, vengo del recorrido web.${visible}\n\n${buildSummary()}`);
     if (waLink) waLink.href = `${CONTACTO.whatsapp}?text=${text}`;
     if (mailLink) mailLink.href = `mailto:${CONTACTO.email}?subject=${encodeURIComponent('Mi propuesta desde publia.mx')}&body=${text}`;
   };

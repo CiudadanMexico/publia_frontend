@@ -17,11 +17,21 @@ export function bindInfra(_universe?: unknown): void {
   document.querySelectorAll<HTMLElement>('[data-infra7]').forEach((wrap) => {
     const buttons = [...wrap.querySelectorAll<HTMLButtonElement>('[data-infra7-mode]')];
     const stage = wrap.querySelector<HTMLElement>('[data-infra7-stage]');
+    const schemeStage = wrap.querySelector<HTMLElement>('[data-infra7-scheme-stage]');
+    const sharedTag = wrap.querySelector<HTMLElement>('[data-infra7-shared]');
+    const racks = [...wrap.querySelectorAll<HTMLElement>('[data-infra7-rack]')];
     const svgs = new Map<string, HTMLElement>();
     wrap.querySelectorAll<HTMLElement>('[data-infra7-svg]').forEach((el) => {
       const id = el.dataset['infra7Svg'];
       if (id) svgs.set(id, el);
     });
+    // 7M-G §4: qué racks quedan encendidos por modo (stage nativo restaurado)
+    const RACKS_ON: Record<string, number[]> = {
+      'local-private': racks.map((_, i) => i),
+      'local-collaborative': racks.map((_, i) => i),
+      'managed-housing': racks.slice(0, 4).map((_, i) => i),
+      'distributed-network': [3],
+    };
     const elTitle = wrap.querySelector<HTMLElement>('[data-infra7-title]');
     const elBody = wrap.querySelector<HTMLElement>('[data-infra7-body]');
     const elDetail = wrap.querySelector<HTMLElement>('[data-infra7-detail]');
@@ -36,8 +46,12 @@ export function bindInfra(_universe?: unknown): void {
       });
       if (stage) {
         stage.dataset['mode'] = id;
-        stage.setAttribute('aria-label', mode.alt); // único nombre accesible del gráfico
+        stage.setAttribute('aria-label', mode.alt);
       }
+      if (schemeStage) schemeStage.dataset['mode'] = id;
+      if (sharedTag) sharedTag.hidden = id !== 'local-collaborative'; // etiqueta HTML del modo compartido
+      const on = new Set(RACKS_ON[id] ?? []);
+      racks.forEach((r, i) => r.classList.toggle('is-on', on.has(i)));
       if (elTitle) elTitle.textContent = mode.title;
       if (elBody) elBody.textContent = mode.body;
       if (elDetail) elDetail.textContent = mode.detail;

@@ -49,14 +49,20 @@ export function bindWaForm(): void {
     [nombre, negocio, necesidad].forEach((el) => el.addEventListener('input', updateLink));
     updateLink();
 
+    const guard = (): boolean => {
+      if (updateLink()) return true;
+      if (elError) elError.hidden = false;
+      (nombre.value.trim() ? necesidad : nombre).focus();
+      return false;
+    };
     form.addEventListener('submit', (ev) => {
       ev.preventDefault(); // el envío real lo hace el enlace de WhatsApp
-      if (!updateLink()) {
-        if (elError) elError.hidden = false;
-        (nombre.value.trim() ? necesidad : nombre).focus();
-        return;
-      }
+      if (!guard()) return;
       submit.click(); // abre WhatsApp con el mensaje ya compuesto
+    });
+    // 7M-G §7: el click directo del CTA también pasa por la validación
+    submit.addEventListener('click', (ev) => {
+      if (!guard()) ev.preventDefault();
     });
   });
 }

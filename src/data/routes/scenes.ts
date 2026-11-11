@@ -27,7 +27,7 @@ import type { SceneDefinition, SceneLayout, SceneTone } from '../../lib/experien
 const ART_DIRECTION: Record<string, { tone: SceneTone; layout: SceneLayout; art?: string; chapter?: string }> = {
   E00: { tone: 'cream', layout: 'umbral', chapter: 'descubrimiento'}, // 7M-G: umbral a ancho completo con su propio layout
   E02: { tone: 'cream', layout: 'split', chapter: 'descubrimiento'}, // 7M-F: A01 retirado (sin archivo entregado)
-  E03: { tone: 'petrol', layout: 'split', art: 'A04' , chapter: 'mundo'},
+  E03: { tone: 'petrol', layout: 'split', chapter: 'mundo'}, // 7M-G §4: sin póster A04 en el wrapper de E03 (stage nativo dentro del módulo); A04 se conserva en otras escenas
   E04: { tone: 'petrol', layout: 'split', art: 'A04' , chapter: 'mundo'},
   E05: { tone: 'petrol', layout: 'editorial' , chapter: 'mundo'},
   E06: { tone: 'petrol', layout: 'pipeline', art: 'A04' , chapter: 'mundo'},

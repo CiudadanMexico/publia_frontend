@@ -16,11 +16,13 @@ export interface EcosystemUniverse {
 }
 
 /** Correspondencia documentada por significado: familia → índice de nodo de la órbita. */
-const FAMILY_NODE: Record<string, number> = { ia: 0, web: 1, agentes: 2, cooperacion: 3, multimedia: 4, marketing: 5, infraestructura: 7 };
+const FAMILY_NODE: Record<string, number> = { ia: 0, web: 1, agentes: 2, cooperacion: 3, multimedia: 4, marketing: 5, ecologia: 6, infraestructura: 7 };
 const NODE_FAMILY: Record<number, string> = Object.fromEntries(Object.entries(FAMILY_NODE).map(([f, n]) => [n, f]));
 
 const eco = COPY_7MF.ecosystem;
-const families = eco.families;
+/** 7M-G §5: familia Ecología restaurada (nodo 6) con los textos definitivos de la orden. */
+import { ECOLOGIA_FAMILY } from '../../data/copy7mg';
+const families = [...eco.families, ECOLOGIA_FAMILY] as unknown as typeof eco.families;
 type FamilyId = (typeof families)[number]['id'];
 const byId = new Map<string, (typeof families)[number]>(families.map((f) => [f.id, f]));
 const waBase = `https://wa.me/${COPY_7MF.contact.number}?text=`;
@@ -89,25 +91,64 @@ export function bindEcosystem(universe: EcosystemUniverse | null): void {
   const initial = prev && families.some((f) => f.label === prev) ? families.find((f) => f.label === prev)!.id : 'ia';
   select(initial, false);
 
-  // Órbita continua ligada al scroll de la escena (reversible), sólo cerca del viewport
+  // 7M-G §5: órbita ligada al progreso de scroll de la escena (reversible),
+  // restaurada del binder previo; tiempo ambiental con delta subordinado al
+  // scroll. Sólo corre cerca del viewport y fuera de pestaña oculta.
   if (!reduced) {
     let raf = 0;
     let rot = 0;
+    let lastT = 0;
     let visible = false;
-    const measure = (): void => { void scene; };
+    let sceneTop = 0;
+    let sceneTotal = 1;
+    const measure = (): void => {
+      if (!scene) return;
+      sceneTop = scene.getBoundingClientRect().top + window.scrollY;
+      sceneTotal = Math.max(1, scene.offsetHeight - window.innerHeight);
+    };
     measure();
+    window.addEventListener('resize', measure, { passive: true });
     if ('IntersectionObserver' in window) {
-      new IntersectionObserver((entries) => { visible = entries.some((e) => e.isIntersecting); }, { rootMargin: '40% 0px' }).observe(orbit);
+      new IntersectionObserver((entries) => {
+        visible = entries.some((e) => e.isIntersecting);
+        if (visible) measure();
+      }, { rootMargin: '40% 0px' }).observe(orbit);
+    } else {
+      visible = true;
     }
-    const tick = (): void => {
-      if (visible && !document.hidden) {
-        rot = (rot + 0.05) % 360;
-        cloud.style.transform = `rotate(${rot}deg)`;
-        nodes.forEach((n) => { n.style.transform = `rotate(${-rot}deg)`; });
-      }
+    const tick = (t: number): void => {
       raf = window.requestAnimationFrame(tick);
+      if (!visible || document.hidden) { lastT = t; return; }
+      const dt = Math.min(0.05, (t - lastT) / 1000 || 0);
+      lastT = t;
+      rot += dt * 0.09; // ambiental, con delta
+      const progress = Math.min(1, Math.max(0, (window.scrollY - sceneTop) / sceneTotal));
+      const w = orbit.clientWidth;
+      const h = orbit.clientHeight;
+      const rx = Math.min(w * 0.36, 340);
+      const ry = h * 0.3;
+      cloud.style.transform = `rotateY(${rot * 40 + progress * 30}deg) rotateX(${-4 + Math.sin(progress * Math.PI) * 10}deg)`;
+      nodes.forEach((el, i) => {
+        const angle = (i * Math.PI * 2) / nodes.length - Math.PI / 2 + rot + progress * 0.6;
+        const x = Math.cos(angle) * rx;
+        const y = Math.sin(angle) * ry;
+        const z = Math.sin(angle * 1.3) * 60 + (i === nodes.findIndex((n) => n.getAttribute('aria-pressed') === 'true') ? 70 : 0);
+        const scale = (i === nodes.findIndex((n) => n.getAttribute('aria-pressed') === 'true') ? 1.18 : 1) * (window.innerWidth < 900 ? 0.78 : 0.95);
+        el.style.transform = `translate3d(calc(-50% + ${x}px), calc(-50% + ${y}px), ${z}px) scale(${scale})`;
+        el.style.zIndex = String(20 + Math.floor(z));
+      });
     };
     raf = window.requestAnimationFrame(tick);
-    window.addEventListener('pagehide', () => window.cancelAnimationFrame(raf));
+    window.addEventListener('pagehide', () => window.cancelAnimationFrame(raf), { once: true });
+  } else {
+    // reduced-motion: anillo estático
+    const w = orbit.clientWidth;
+    const h = orbit.clientHeight;
+    const rx = Math.min(w * 0.36, 340);
+    const ry = h * 0.3;
+    nodes.forEach((el, i) => {
+      const angle = (i * Math.PI * 2) / nodes.length - Math.PI / 2;
+      el.style.transform = `translate3d(calc(-50% + ${Math.cos(angle) * rx}px), calc(-50% + ${Math.sin(angle) * ry}px), 0)`;
+    });
   }
 }

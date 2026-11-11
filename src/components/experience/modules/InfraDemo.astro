@@ -1,15 +1,18 @@
 ---
 /**
- * E03 Infraestructura — bloque 7M-F §7.
- * Cuatro escenarios con el SVG vectorial exacto incrustado (sin regenerar,
- * IDs conservados, aria-hidden=true), selector con aria-pressed, un solo SVG
- * visible en superficie 16:9, caption fuera del gráfico y CTA único dentro
- * del panel de explicación. Textos literales de copy.es-MX.json (`infra`).
- * Sin botón «Activar red», sin contador de tráfico ni porcentajes ilustrativos.
+ * E03 Infraestructura — 7M-G §4: se restaura el stage nativo previo (racks,
+ * núcleo y mapa de conexiones) como vista protagonista; los cuatro SVG de
+ * 7M-F quedan como detalle opcional colapsado «Ver esquema de conexiones».
+ * Se conservan de 7M-F: 4 escenarios con textos literales de copy.es-MX.json,
+ * selector aria-pressed, migración/ids de estado, CTA comercial y ausencia de
+ * falsa telemetría (sin «Activar red» ni contador). art:'A04' retirado sólo
+ * del wrapper de E03 (ver scenes.ts). Modo local colaborativo reutiliza el
+ * stage local + etiqueta HTML «Servicio compartido autorizado».
  */
 import type { ResolvedScene } from '../../../lib/experience/graph';
 import { accentify } from '../../../lib/experience/accent';
 import { COPY_7MF } from '../../../data/copy7mf';
+import { RACK_POSITIONS, MAP_NODES, MAP_LINES } from '../../../data/infra';
 import svgPrivada from '../../../assets/7mf/infra_local_privada.svg?raw';
 import svgColaborativa from '../../../assets/7mf/infra_local_colaborativa.svg?raw';
 import svgHousing from '../../../assets/7mf/infra_housing.svg?raw';
@@ -34,8 +37,8 @@ const waBase = `https://wa.me/${COPY_7MF.contact.number}?text=`;
 
 <section class="infra7" data-module="infraDemo" data-demo="infra2" data-infra7>
   <div class="infra7__head">
-    <p class="infra7__eyebrow" data-reveal set:html={accentify(infra.eyebrow)} />
-    <h2 class="infra7__title" data-role="title" data-reveal="lines" set:html={accentify(infra.title)} />
+    {scene.eyebrow && <p class="infra7__eyebrow" data-reveal set:html={accentify(scene.eyebrow)} />}
+    <h2 class="infra7__title" data-role="title" data-reveal="lines" set:html={accentify(scene.title)} />
     <p class="infra7__lead" data-reveal>{infra.lead}</p>
   </div>
 
@@ -57,13 +60,30 @@ const waBase = `https://wa.me/${COPY_7MF.contact.number}?text=`;
 
   <div class="infra7__body">
     <div class="infra7__stage" data-infra7-stage data-mode={first.id} role="img" aria-label={first.alt}>
-      {
-        modes.map((m, i) => (
-          <div class="infra7__svg" data-infra7-svg={m.id} hidden={i !== 0} aria-hidden="true" set:html={svgById[m.id]} />
-        ))
-      }
+      <div class="infra7__city" data-infra7-city>
+        <svg class="infra7__map" viewBox="0 0 340 115" aria-hidden="true">
+          {MAP_LINES.map((d) => <path class="infra7__mapline" d={d} />)}
+          <path class="infra7__mapflow" data-infra7-flow d={MAP_LINES[0]} />
+          {MAP_NODES.map((n, i) => <circle class="infra7__mapnode" cx={n[0]} cy={n[1]} r={i === 3 ? 5 : 3.5} />)}
+        </svg>
+        <div class="infra7__racks" data-infra7-racks>
+          {
+            RACK_POSITIONS.map((pos, i) => (
+              <div class="infra7__rack" data-infra7-rack={String(i)} style={`--rx:${pos[0]}%;--ry:${pos[1]}%`}>
+                <span class="infra7__racknum">N-{String(i + 1).padStart(2, '0')}</span>
+                <div class="infra7__slots">
+                  {Array.from({ length: 9 }, (_, j) => <i style={`--d:${(i * 0.2 + j * 0.1).toFixed(2)}s`} />)}
+                </div>
+              </div>
+            ))
+          }
+        </div>
+        <div class="infra7__core"><span>P</span></div>
+        <p class="infra7__shared-tag" data-infra7-shared hidden>Servicio compartido autorizado</p>
+      </div>
       <p class="infra7__caption" data-infra7-caption>{infra.caption}</p>
     </div>
+
     <div class="infra7__panel" data-infra7-panel aria-live="polite">
       <h3 data-infra7-title>{first.title}</h3>
       <p data-infra7-body>{first.body}</p>
@@ -79,6 +99,17 @@ const waBase = `https://wa.me/${COPY_7MF.contact.number}?text=`;
       </a>
     </div>
   </div>
+
+  <details class="infra7__schemes" data-infra7-schemes>
+    <summary>Ver esquema de conexiones</summary>
+    <div class="infra7__scheme-stage" data-infra7-scheme-stage data-mode={first.id}>
+      {
+        modes.map((m, i) => (
+          <div class="infra7__svg" data-infra7-svg={m.id} hidden={i !== 0} aria-hidden="true" set:html={svgById[m.id]} />
+        ))
+      }
+    </div>
+  </details>
 </section>
 
 <style>
@@ -96,34 +127,59 @@ const waBase = `https://wa.me/${COPY_7MF.contact.number}?text=`;
   .infra7__mode[aria-pressed='true'] { background: var(--scene-accent, #80e5ff); color: #06121f; font-weight: 600; }
   .infra7__mode:focus-visible { outline: 3px solid var(--scene-accent, #ffca34); outline-offset: 3px; }
   .infra7__body { display: grid; grid-template-columns: repeat(12, 1fr); gap: 32px; align-items: start; }
-  .infra7__stage { grid-column: 1 / 9; position: relative; aspect-ratio: 16 / 9; border: 1px solid var(--scene-border, rgba(128,229,255,.25)); border-radius: 24px; overflow: hidden; background: #101a35; }
-  .infra7__svg { position: absolute; inset: 0; transition: opacity 180ms ease; }
-  .infra7__svg[hidden] { display: block; opacity: 0; pointer-events: none; }
-  .infra7__svg:not([hidden]) { opacity: 1; }
-  .infra7__svg :global(svg) { display: block; width: 100%; height: 100%; }
+  /* Stage nativo restaurado (racks + núcleo + mapa) */
+  .infra7__stage { grid-column: 1 / 9; position: relative; border: 1px solid rgba(41, 149, 233, 0.35); border-radius: 24px; overflow: hidden; background: radial-gradient(circle at 50% 45%, rgba(23, 72, 145, 0.35), rgba(3, 6, 23, 0.6) 75%); }
+  .infra7__city { position: relative; height: 340px; }
+  .infra7__racks { position: absolute; inset: 0; }
+  .infra7__rack { position: absolute; left: calc(50% + var(--rx) * 0.1); top: calc(50% + var(--ry) * 0.085); width: 34px; height: 62px; transform: translate(-50%, -50%); border: 1px solid rgba(41,149,233,.6); border-radius: 4px; background: linear-gradient(180deg, #07152a, #143c62 55%, #061222); padding: 3px 2px; transition: filter .3s; }
+  .infra7__rack.is-on { filter: drop-shadow(0 0 23px #42f4ff); }
+  .infra7__racknum { position: absolute; top: 1px; left: 3px; font-size: 6px; color: #ffdf52; letter-spacing: .05em; }
+  .infra7__slots { display: grid; gap: 2px; margin-top: 8px; }
+  .infra7__slots i { display: block; height: 3px; border-radius: 1px; background: repeating-linear-gradient(90deg, #3af3ff 0 3px, transparent 3px 6px); animation: infra7led 1.8s steps(3) infinite; animation-delay: var(--d); }
+  .infra7__slots i::before { content: ''; display: block; width: 3px; height: 3px; border-radius: 50%; background: #ffce39; margin-bottom: 1px; }
+  @keyframes infra7led { 0% { opacity: 1; } 33% { opacity: .55; } 66% { opacity: .85; } 100% { opacity: 1; } }
+  .infra7__core { position: absolute; left: 50%; top: 50%; translate: -50% -50%; width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle at 35% 30%, #ffe9a3, #ffcf31 55%, #b8860b); box-shadow: 0 0 26px rgba(255, 207, 49, .55); }
+  .infra7__core span { font-weight: 1000; font-size: 1.6rem; color: #06132e; }
+  .infra7__map { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 34%; opacity: .9; }
+  .infra7__mapline { fill: none; stroke: #33cafa; stroke-width: 2.2; stroke-dasharray: 4 5; opacity: .45; }
+  .infra7__mapflow { fill: none; stroke: #ffe360; stroke-width: 3; stroke-dasharray: 22 60; animation: infra7flow 3s linear infinite; }
+  @keyframes infra7flow { to { stroke-dashoffset: -82; } }
+  .infra7__mapnode { fill: #ffd13c; stroke: #a9f6ff; stroke-width: 1; }
+  .infra7__shared-tag { position: absolute; top: 12px; left: 12px; margin: 0; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #06121f; background: #ffd12e; border-radius: 999px; padding: 6px 12px; }
+  .infra7__shared-tag[hidden] { display: none; }
   .infra7__caption { position: absolute; left: 16px; bottom: 12px; margin: 0; font-size: 0.78rem; color: #aebadd; background: rgba(6, 12, 28, 0.72); padding: 4px 10px; border-radius: 999px; }
+  /* Panel de explicación */
   .infra7__panel { grid-column: 9 / 13; border: 1px solid var(--scene-border, rgba(128, 229, 255, 0.22)); border-radius: 24px; padding: 28px; display: grid; gap: 12px; align-content: start; }
   .infra7__panel h3 { margin: 0; font-size: clamp(22px, 2vw, 30px); line-height: 1.15; }
   .infra7__panel p { margin: 0; line-height: 1.55; }
   .infra7__detail { font-size: 0.9rem; opacity: 0.85; border-left: 3px solid var(--scene-accent, #80e5ff); padding-left: 12px; }
   .infra7__cta { min-height: 48px; padding: 14px 22px; font-size: 16px; border-radius: 999px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
   .infra7__cta:focus-visible { outline: 3px solid var(--scene-accent, #ffca34); outline-offset: 3px; }
-  .infra7__stage[data-mode='local-private'] #private-flow-0,
-  .infra7__stage[data-mode='local-private'] #private-flow-1,
-  .infra7__stage[data-mode='local-private'] #private-flow-2 { stroke-dasharray: 12 10; animation: infra7-flow 2.8s linear infinite; }
-  .infra7__stage[data-mode='local-collaborative'] #private-flow-0,
-  .infra7__stage[data-mode='local-collaborative'] #private-flow-1 { stroke-dasharray: 12 10; animation: infra7-flow 2.8s linear infinite; }
-  .infra7__stage[data-mode='local-collaborative'] #shared-service-flow,
-  .infra7__stage[data-mode='local-collaborative'] #external-flow { stroke-dasharray: 12 10; animation: infra7-flow 3.6s linear infinite; }
-  .infra7__stage[data-mode='managed-housing'] #business-flow { stroke-dasharray: 12 10; animation: infra7-flow 3s linear infinite; }
-  .infra7__stage[data-mode='distributed-network'] #route-primary { animation: infra7-flow 4s linear infinite, infra7-route-primary 8s linear infinite; }
-  .infra7__stage[data-mode='distributed-network'] #route-alternative { animation: infra7-route-alt 8s linear infinite; }
+  /* Esquemas SVG como detalle opcional colapsado */
+  .infra7__schemes { border: 1px solid var(--scene-border, rgba(128,229,255,.22)); border-radius: 16px; padding: 12px 18px; }
+  .infra7__schemes summary { cursor: pointer; min-height: 44px; display: inline-flex; align-items: center; font-weight: 600; color: var(--scene-accent, #80e5ff); }
+  .infra7__schemes summary:focus-visible { outline: 3px solid var(--scene-accent, #ffca34); outline-offset: 3px; }
+  .infra7__scheme-stage { position: relative; aspect-ratio: 16 / 9; border-radius: 16px; overflow: hidden; background: #101a35; margin-top: 12px; }
+  .infra7__svg { position: absolute; inset: 0; transition: opacity 180ms ease; }
+  .infra7__svg[hidden] { display: block; opacity: 0; pointer-events: none; }
+  .infra7__svg:not([hidden]) { opacity: 1; }
+  .infra7__svg :global(svg) { display: block; width: 100%; height: 100%; }
+  .infra7__scheme-stage[data-mode='local-private'] #private-flow-0,
+  .infra7__scheme-stage[data-mode='local-private'] #private-flow-1,
+  .infra7__scheme-stage[data-mode='local-private'] #private-flow-2 { stroke-dasharray: 12 10; animation: infra7-flow 2.8s linear infinite; }
+  .infra7__scheme-stage[data-mode='local-collaborative'] #private-flow-0,
+  .infra7__scheme-stage[data-mode='local-collaborative'] #private-flow-1 { stroke-dasharray: 12 10; animation: infra7-flow 2.8s linear infinite; }
+  .infra7__scheme-stage[data-mode='local-collaborative'] #shared-service-flow,
+  .infra7__scheme-stage[data-mode='local-collaborative'] #external-flow { stroke-dasharray: 12 10; animation: infra7-flow 3.6s linear infinite; }
+  .infra7__scheme-stage[data-mode='managed-housing'] #business-flow { stroke-dasharray: 12 10; animation: infra7-flow 3s linear infinite; }
+  .infra7__scheme-stage[data-mode='distributed-network'] #route-primary { animation: infra7-flow 4s linear infinite, infra7-route-primary 8s linear infinite; }
+  .infra7__scheme-stage[data-mode='distributed-network'] #route-alternative { animation: infra7-route-alt 8s linear infinite; }
   @keyframes infra7-flow { to { stroke-dashoffset: -44; } }
   @keyframes infra7-route-primary { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0.45; } }
   @keyframes infra7-route-alt { 0%, 49.9% { opacity: 0.45; } 50%, 100% { opacity: 1; } }
-  .infra7.is-paused [data-infra7-svg] * { animation-play-state: paused !important; }
+  .infra7.is-paused [data-infra7-svg] *, .infra7.is-paused .infra7__slots i, .infra7.is-paused .infra7__mapflow { animation-play-state: paused !important; }
   @media (prefers-reduced-motion: reduce) {
-    .infra7__stage [data-infra7-svg] * { animation: none !important; }
+    .infra7 [data-infra7-svg] *, .infra7__slots i, .infra7__mapflow { animation: none !important; }
     .infra7__svg { transition: none; }
   }
   @media (max-width: 1023px) {
@@ -131,6 +187,7 @@ const waBase = `https://wa.me/${COPY_7MF.contact.number}?text=`;
     .infra7__body { grid-template-columns: 1fr; gap: 24px; }
     .infra7__stage, .infra7__panel { grid-column: auto; }
     .infra7__panel { padding: 20px; }
+    .infra7__city { height: 260px; }
   }
   @media (max-width: 639px) {
     .infra7 { gap: 24px; }
