@@ -25,7 +25,7 @@ import type { SceneDefinition, SceneLayout, SceneTone } from '../../lib/experien
  * aquí queda el placeholder con API estable).
  */
 const ART_DIRECTION: Record<string, { tone: SceneTone; layout: SceneLayout; art?: string; chapter?: string }> = {
-  E00: { tone: 'cream', layout: 'split', chapter: 'descubrimiento'}, // 7M-F: el umbral usa su propio paisaje; A01 nunca se entregó como archivo
+  E00: { tone: 'cream', layout: 'umbral', chapter: 'descubrimiento'}, // 7M-G: umbral a ancho completo con su propio layout
   E02: { tone: 'cream', layout: 'split', chapter: 'descubrimiento'}, // 7M-F: A01 retirado (sin archivo entregado)
   E03: { tone: 'petrol', layout: 'split', art: 'A04' , chapter: 'mundo'},
   E04: { tone: 'petrol', layout: 'split', art: 'A04' , chapter: 'mundo'},
@@ -170,7 +170,7 @@ const SCENES_RAW: SceneDefinition[] = [
     eyebrow: 'SOBERANÍA DIGITAL',
     title: 'Tu tecnología. Tu operación. Tus decisiones.',
     lead: 'Integra inteligencia, sistemas y datos en la operación que ya conoces. Elige una arquitectura.',
-    body: 'Cuatro escenarios de infraestructura (7M-F §7) con textos literales de copy.es-MX.json servidos por InfraDemo.',
+    body: 'Elige dónde opera tu inteligencia y cómo se conectan tus recursos.',
     purpose: 'Validar que la ruta empresarial habla de su realidad antes de proponer nada.',
     modules: ['statement', 'infraDemo'],
     segments: ['enterprise', 'established', 'advanced'],

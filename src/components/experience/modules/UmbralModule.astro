@@ -38,17 +38,17 @@ const addr0 = (total0 * d.fraction * d.adoption) / 10000;
   <div class="umbral__row umbral__row--second">
     <div class="umbral__benefits">
       <h3 class="umbral__benefits-title" data-reveal>{u.benefitsTitle}</h3>
-      <img class="umbral__benefits-art" src="/assets/publia-7mf/beneficios.svg" alt="Cuatro beneficios: control, tiempo, talento y conocimiento." width="640" height="360" loading="lazy" />
-      <ul class="umbral__benefits-grid">
+      <ol class="umbral__benefits-grid">
         {
-          u.benefits.map((b) => (
+          u.benefits.map((b, i) => (
             <li>
+              <span class="umbral__benefit-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
               <strong>{b.title}</strong>
               <p>{b.body}</p>
             </li>
           ))
         }
-      </ul>
+      </ol>
     </div>
 
     <div class="umbral__sim" data-simulator>
@@ -81,7 +81,10 @@ const addr0 = (total0 * d.fraction * d.adoption) / 10000;
         <div><dt>{sim.baseline}</dt><dd data-sim-result="total">{fmt.format(total0)} h</dd></div>
         <div><dt>{sim.result}</dt><dd data-sim-result="addressable">{fmt.format(addr0)} h</dd></div>
       </dl>
-      <p class="umbral__sim-formula">{sim.formula}</p>
+      <details class="umbral__sim-formula">
+        <summary>Cómo se calcula</summary>
+        <p>{sim.formula}</p>
+      </details>
       <p class="umbral__sim-note">{sim.note}</p>
       <button type="button" class="button button--ghost" data-sim-reset>{sim.reset}</button>
       <p class="umbral__sim-live" data-sim-live aria-live="polite"></p>
@@ -102,51 +105,60 @@ const addr0 = (total0 * d.fraction * d.adoption) / 10000;
 
 <style>
   .umbral {
-    --page-gutter: clamp(20px, 4vw, 76px);
-    --content-max: 1440px;
-    width: min(calc(100% - 2 * var(--page-gutter)), var(--content-max));
-    margin-inline: auto;
+    /* 7M-G: paleta local del tono cream, independiente de la ruta */
+    --u-ink: #091933;
+    --u-muted: #3d5878;
+    --u-accent: #e8a400;
+    --u-focus: #1655bc;
+    --u-border: rgba(9, 25, 51, 0.16);
+    --u-card: #fffdf6;
+    width: 100%;
     display: grid;
     gap: 64px;
     padding-block: 64px;
-    color: var(--scene-ink, #eef0f6);
+    color: var(--u-ink);
   }
   .umbral__row { display: grid; grid-template-columns: repeat(12, 1fr); gap: 32px; align-items: start; }
   .umbral__text { grid-column: 1 / 6; }
   .umbral__paisaje { grid-column: 6 / 13; margin: 0; }
   .umbral__paisaje img { display: block; width: 100%; height: auto; border-radius: 24px; }
-  .umbral__caption { margin-top: 8px; font-size: 0.8rem; opacity: 0.75; }
-  .umbral__eyebrow { letter-spacing: 0.14em; text-transform: uppercase; font-size: 0.78rem; color: var(--scene-accent, #80e5ff); margin: 0 0 12px; }
+  .umbral__caption { margin-top: 8px; font-size: 0.8rem; color: var(--u-muted); }
+  .umbral__eyebrow { letter-spacing: 0.14em; text-transform: uppercase; font-size: 0.78rem; color: var(--u-accent); margin: 0 0 12px; }
   .umbral__title { font-size: clamp(30px, 3.2vw, 56px); line-height: 1.08; margin: 0 0 16px; max-width: 22ch; }
   .umbral__lead { max-width: 58ch; font-size: 18px; line-height: 1.55; margin: 0; }
-  .umbral__benefits { grid-column: 1 / 7; }
-  .umbral__sim { grid-column: 7 / 13; border: 1px solid var(--scene-border, rgba(128, 229, 255, 0.22)); border-radius: 24px; padding: 28px; background: rgba(5, 11, 27, 0.5); }
+  .umbral__benefits { grid-column: 1 / 8; }
+  .umbral__sim { grid-column: 8 / 13; border: 1px solid var(--u-border); border-radius: 24px; padding: 28px; background: var(--u-card); color: var(--u-ink); }
   .umbral__benefits-title, .umbral__sim-title { font-size: clamp(24px, 2.4vw, 34px); line-height: 1.12; margin: 0 0 14px; }
-  .umbral__benefits-art { display: block; width: 100%; height: auto; margin-bottom: 18px; }
-  .umbral__benefits-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; }
+  .umbral__benefits-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; counter-reset: umbral-benefit; }
+  .umbral__benefit-num { display: block; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.12em; color: var(--u-accent); margin-bottom: 6px; }
   .umbral__benefits-grid strong { display: block; margin-bottom: 4px; }
-  .umbral__benefits-grid p { margin: 0; font-size: 0.92rem; line-height: 1.5; opacity: 0.9; }
-  .umbral__sim-lead { margin: 0 0 16px; opacity: 0.85; }
+  .umbral__benefits-grid p { margin: 0; font-size: 0.92rem; line-height: 1.5; color: var(--u-muted); }
+  .umbral__sim-lead { margin: 0 0 16px; color: var(--u-muted); }
   .umbral__sim-fields { display: grid; gap: 12px; margin-bottom: 14px; }
   .umbral__field { display: grid; gap: 4px; font-size: 0.86rem; }
-  .umbral__field input[type='number'] { min-height: 48px; padding: 10px 14px; border-radius: 12px; border: 1px solid var(--scene-border, rgba(128, 229, 255, 0.3)); background: rgba(3, 8, 20, 0.6); color: inherit; font-size: 16px; width: 100%; }
-  .umbral__field input[type='range'] { width: 100%; accent-color: var(--scene-accent, #80e5ff); }
-  .umbral__sim-error { color: #fa5964; font-size: 0.9rem; margin: 0 0 8px; }
+  .umbral__field { color: var(--u-muted); }
+  .umbral__field input[type='number'] { min-height: 48px; padding: 10px 14px; border-radius: 12px; border: 1px solid var(--u-border); background: #ffffff; color: var(--u-ink); font-size: 16px; width: 100%; }
+  .umbral__field input[type='number']:focus-visible { outline: 3px solid var(--u-focus); outline-offset: 2px; }
+  .umbral__field input[type='range'] { width: 100%; accent-color: var(--u-focus); }
+  .umbral__sim-error { color: #b3261e; font-size: 0.9rem; margin: 0 0 8px; }
   .umbral__sim-results { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0 0 12px; }
-  .umbral__sim-results div { border: 1px solid var(--scene-border, rgba(128,229,255,.2)); border-radius: 16px; padding: 12px 14px; }
-  .umbral__sim-results dt { font-size: 0.78rem; opacity: 0.8; margin-bottom: 4px; }
+  .umbral__sim-results div { border: 1px solid var(--u-border); background: #ffffff; border-radius: 16px; padding: 12px 14px; }
+  .umbral__sim-results dt { font-size: 0.78rem; color: var(--u-muted); margin-bottom: 4px; }
   .umbral__sim-results dd { margin: 0; font-size: 1.5rem; font-variant-numeric: tabular-nums; }
-  .umbral__sim-formula { font-size: 0.82rem; opacity: 0.85; margin: 0 0 6px; }
-  .umbral__sim-note { font-size: 0.8rem; opacity: 0.7; margin: 0 0 14px; }
+  .umbral__sim-formula { font-size: 0.82rem; margin: 0 0 6px; }
+  .umbral__sim-formula summary { cursor: pointer; font-weight: 600; color: var(--u-focus); min-height: 28px; }
+  .umbral__sim-formula summary:focus-visible { outline: 3px solid var(--u-focus); outline-offset: 3px; }
+  .umbral__sim-formula p { margin: 8px 0 0; color: var(--u-muted); line-height: 1.5; }
+  .umbral__sim-note { font-size: 0.8rem; color: var(--u-muted); margin: 0 0 14px; }
   .umbral__sim-live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
   .umbral__panels { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  .umbral__panel { border: 1px solid var(--scene-border, rgba(128, 229, 255, 0.22)); border-radius: 24px; padding: 20px 28px; }
+  .umbral__panel { border: 1px solid var(--u-border); background: var(--u-card); border-radius: 24px; padding: 20px 28px; }
   .umbral__panel summary { cursor: pointer; font-weight: 600; min-height: 28px; }
-  .umbral__panel summary:focus-visible { outline: 3px solid var(--scene-accent, #ffca34); outline-offset: 3px; }
-  .umbral__panel p { margin: 10px 0 0; line-height: 1.55; font-size: 0.94rem; opacity: 0.92; }
+  .umbral__panel summary:focus-visible { outline: 3px solid var(--u-focus); outline-offset: 3px; }
+  .umbral__panel p { margin: 10px 0 0; line-height: 1.55; font-size: 0.94rem; color: var(--u-muted); }
   .button { min-height: 48px; padding: 14px 22px; font-size: 16px; border-radius: 999px; cursor: pointer; }
-  .button--ghost { border: 1px solid var(--scene-border, rgba(128,229,255,.35)); background: transparent; color: inherit; }
-  .button--ghost:focus-visible { outline: 3px solid var(--scene-accent, #ffca34); outline-offset: 3px; }
+  .button--ghost { border: 1px solid var(--u-border); background: transparent; color: var(--u-ink); }
+  .button--ghost:focus-visible { outline: 3px solid var(--u-focus); outline-offset: 3px; }
   @media (max-width: 1023px) {
     .umbral__row { grid-template-columns: 1fr 1fr; gap: 24px; }
     .umbral__text, .umbral__paisaje, .umbral__benefits, .umbral__sim { grid-column: auto; }

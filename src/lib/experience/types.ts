@@ -56,7 +56,8 @@ export type SceneLayout =
   | 'pipeline'
   | 'map'
   | 'editorial'
-  | 'plans';
+  | 'plans'
+  | 'umbral';
 
 /** Módulos visuales que una escena puede componer. */
 export type SceneModule =

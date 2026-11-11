@@ -179,8 +179,13 @@ button {
   position: relative;
   padding-block: var(--space-6);
   isolation: isolate;
-  background: var(--scene-bg);
-  color: var(--scene-ink);
+  background: var(--tone-bg, var(--scene-bg));
+  color: var(--tone-ink, var(--scene-ink));
+  /* 7M-G: el tono local de la escena prevalece sobre el color global de ruta */
+  --scene-ink: var(--tone-ink, #eef0f6);
+  --scene-muted: var(--tone-muted, #b9c0d4);
+  --scene-accent: var(--tone-accent, #ffca34);
+  --scene-border: var(--tone-border, rgba(255, 255, 255, 0.14));
   transition:
     background-color var(--dur-slow) var(--ease-in-out),
     color var(--dur-slow) var(--ease-in-out);
@@ -370,6 +375,13 @@ html[data-act='hero'] .prism-layer {
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
 }
 .scene[data-layout='split'] .scene__surface { display: contents; }
+/* 7M-G: umbral = layout dedicado de ancho completo (una columna, un contenedor) */
+.scene[data-layout='umbral'] .scene__inner { grid-template-columns: 1fr; align-items: stretch; }
+.scene[data-layout='umbral'] .scene__surface {
+  display: block;
+  width: min(calc(100% - 2 * clamp(20px, 4vw, 76px)), 1440px);
+  margin-inline: auto;
+}
 .scene[data-layout='split'] .scene__art {
   grid-column: 2;
   grid-row: 1 / span 6;
