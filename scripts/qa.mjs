@@ -90,6 +90,7 @@ page.on('response', (response) => {
   responses.push({ url: response.url(), status: response.status() });
 });
 page.on('pageerror', (error) => errors.push(String(error)));
+page.on('response', (r) => { if (r.status() >= 400) errors.push(`http ${r.status()} ${r.url()}`); });
 page.on('console', (message) => {
   if (message.type() === 'error') {
     errors.push(`console: ${message.text()}`);
@@ -1816,10 +1817,6 @@ check('7M-F simulador: reset restaura exactamente 19,5 / 4,3', /19[.,]5/.test(si
 await page.goto(BASE, { waitUntil: 'domcontentloaded' });
 await page.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'hero', { timeout: 60000 }).catch(() => {});
 await page.setViewportSize({ width: 1440, height: 900 });
-const pinInfo = await page.evaluate(async () => {
-  const { ScrollTrigger } = await import('/chunks/placeholder.js').catch(() => ({}));
-  return null;
-}).catch(() => null);
 const pinProbes = await page.evaluate(() => {
   // scroll libre inicia el pin (desktop)
   window.__publiaLastProgrammaticScroll = 0;

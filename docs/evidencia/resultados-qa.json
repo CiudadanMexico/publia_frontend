@@ -1,7 +1,7 @@
 {
   "base": "https://dam-boulevard-explaining-alaska.trycloudflare.com",
   "total": 233,
-  "fallos": 1,
+  "fallos": 0,
   "resultados": [
     {
       "name": "carga inicial sin errores JS",
@@ -46,12 +46,12 @@
     {
       "name": "prisma: la escena 3D se renderiza y cambia (animación real)",
       "ok": true,
-      "detail": "640122 vs 655525 bytes"
+      "detail": "639938 vs 654678 bytes"
     },
     {
       "name": "prisma: pinta una fracción útil del viewport",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.20960802469135803}"
+      "detail": "{\"paintedRatio\":0.20937345679012345}"
     },
     {
       "name": "hero 3D: lienzo único presente con WebGL activo",
@@ -81,12 +81,12 @@
     {
       "name": "hero 3D: pinta la escena (mascota, prisma, tarjetas)",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.21225}"
+      "detail": "{\"paintedRatio\":0.2120625}"
     },
     {
       "name": "hero 3D: la animación ambiental cambia entre fotogramas",
       "ok": true,
-      "detail": "663119 vs 663162 bytes"
+      "detail": "661252 vs 659006 bytes"
     },
     {
       "name": "marca: el encabezado usa el logotipo oficial",
@@ -286,7 +286,7 @@
     {
       "name": "ruta eficiencia: escena propia visible",
       "ok": true,
-      "detail": "1696px · route=efficiency act=efficiency world=efficiency scrollY=3512"
+      "detail": "1696px · route=efficiency act=efficiency world=efficiency scrollY=16"
     },
     {
       "name": "ruta eficiencia: mensaje propio de la escena",
@@ -521,7 +521,7 @@
     {
       "name": "v3 scroll: la cámara se transforma en 30/60/90% (ida)",
       "ok": true,
-      "detail": "30=[2.926627218934911,2.0224852071005914,8.740384615384615] 60=[2.547337278106509,1.8802514792899407,8.432211538461539] 90=[1.9,1.9693467336683417,8.915577889447237]"
+      "detail": "30=[1.9,1.7837509211495948,8.481945467943994] 60=[2.547337278106509,1.8802514792899407,8.432211538461539] 90=[1.9,1.9693467336683417,8.915577889447237]"
     },
     {
       "name": "v3 scroll: recorrido inverso mueve la cámara en sentido inverso (reversible)",
@@ -716,7 +716,7 @@
     {
       "name": "7M-B personas: ejecutar arranca la demo (texto cambia y hay etapa activa)",
       "ok": true,
-      "detail": "{\"text\":\"● Simulando…\",\"pauseOff\":true,\"out\":\"🤖 Primer análisis\"}"
+      "detail": "{\"text\":\"● Simulando…\",\"pauseOff\":true,\"out\":\"🚨 Problema reportado\"}"
     },
     {
       "name": "7M-F E27: 5 tarjetas desde memberships.plans",
@@ -791,7 +791,7 @@
     {
       "name": "v4-A transición botón: cámara cambia en 3 momentos (inicio/medio/fin)",
       "ok": true,
-      "detail": "0=[0,2.4,11.6] mid=[1.9,1.8951731761238024,8. fin=[2.547337278106509,1.88025"
+      "detail": "0=[0,2.4,11.6] mid=[1.9,2.156484893146647,8.8 fin=[2.547337278106509,1.88025"
     },
     {
       "name": "v4-A transición botón: portal visible a mitad del viaje",
@@ -836,7 +836,7 @@
     {
       "name": "portal: oculto tras aterrizar (ruta botón)",
       "ok": true,
-      "detail": "{\"progress\":\"0\",\"maxOp\":0,\"visible\":false}"
+      "detail": "{\"progress\":\"0\",\"maxOp\":0.0009,\"visible\":false}"
     },
     {
       "name": "7M-F E03: superficie 16:9 con un único SVG visible y display activo",
@@ -1165,8 +1165,8 @@
     },
     {
       "name": "sin errores JS al final del recorrido",
-      "ok": false,
-      "detail": "console: Failed to load resource: the server responded with a status of 404 ()"
+      "ok": true,
+      "detail": ""
     }
   ]
 }
