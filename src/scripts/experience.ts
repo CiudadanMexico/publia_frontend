@@ -776,12 +776,11 @@ export async function startExperience(): Promise<void> {
       }
     }, 120);
   }
-  // 7M-F §5.11: salto por teclado al final del tramo pineado
+  // 7M-G §1: salto por teclado al final del tramo pineado (misma fuente: heroPinEnd)
   document.querySelectorAll<HTMLButtonElement>('[data-hero-skip]').forEach((btn) => {
     btn.addEventListener('click', () => {
-      const heroEl = document.querySelector<HTMLElement>('[data-hero-scene]');
-      const end = (heroEl?.offsetTop ?? 0) + window.innerHeight * 1.8;
-      window.scrollTo({ top: end, behavior: reduced ? 'auto' : 'smooth' });
+      const end = narrative.heroPinEnd();
+      window.scrollTo({ top: end ?? window.innerHeight * 18, behavior: reduced ? 'auto' : 'smooth' });
     });
   });
   // Portal prismático P0-01 (se crea antes que la narrativa para unificar transiciones)

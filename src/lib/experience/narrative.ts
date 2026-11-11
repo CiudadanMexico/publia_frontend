@@ -71,8 +71,11 @@ interface NarrativeOptions {
 export interface NarrativeHandle {
   /** Entra a un acto: viaje de cámara + scroll + estado. */
   enterAct(act: ActId): void;
-  /** 7M-F §5.12: cancela el pin del hero si se elige ruta durante la animación. */
+  /** 7M-F §5.12 / 7M-G §1: cancela el pin del hero si se elige ruta durante la animación. */
   cancelHeroPin(): void;
+  /** Fin absoluto del tramo pineado (+1); el salto por teclado usa este valor. */
+  heroPinEnd(): number | null;
+  heroPinScreens(): number;
   /**
    * Ruta C por scroll silencioso: el visitante desplaza la página desde el
    * hero SIN elegir botón. El viaje de cámara lo conduce el propio scroll
@@ -92,13 +95,28 @@ export interface NarrativeHandle {
 export function createNarrative({ universe, reducedMotion, portal }: NarrativeOptions): NarrativeHandle {
   const stack: ActId[] = ['hero'];
   let traveling = false;
-  // 7M-F §5.8-10: un único ScrollTrigger con pin conduce el tramo del hero
+  // 7M-G §1: un único pin del hero; HERO_PIN_SCREENS es la única fuente de
+  // duración (end, salto por teclado y navegación lo reutilizan).
+  const HERO_PIN_SCREENS = 18;
   let heroPin: ScrollTrigger | null = null;
+  let heroPinTl: gsap.core.Timeline | null = null;
+  let heroPinEls: { actions: HTMLElement | null; copy: HTMLElement[]; umbral: HTMLElement | null } = {
+    actions: null,
+    copy: [],
+    umbral: null,
+  };
+
+  const clearHeroPinFx = (): void => {
+    if (heroPinEls.actions) gsap.set(heroPinEls.actions, { y: 0, opacity: 1 });
+    heroPinEls.copy.forEach((el) => gsap.set(el, { opacity: 1, y: 0 }));
+    if (heroPinEls.umbral) gsap.set(heroPinEls.umbral, { opacity: 1 });
+    heroPinEls = { actions: null, copy: [], umbral: null };
+  };
 
   const cancelHeroPin = (): void => {
-    if (!heroPin) return;
-    heroPin.kill();
-    heroPin = null;
+    if (heroPinTl) { heroPinTl.kill(); heroPinTl = null; }
+    if (heroPin) { heroPin.kill(); heroPin = null; }
+    clearHeroPinFx();
     universe?.setHeroPin(0);
     const heroEl = document.querySelector<HTMLElement>('[data-hero-scene]');
     const actions = heroEl?.querySelector<HTMLElement>('.hero__actions');
@@ -224,44 +242,56 @@ export function createNarrative({ universe, reducedMotion, portal }: NarrativeOp
     stack.push('cooperative');
     if (stack.length > 12) stack.shift();
 
-    // 7M-F §5.8: desktop >=1024 y sin reduced-motion → UN pin con scrub 0.6 y
-    // distancia 1.8×vh; móvil/tablet/reduced-motion → scroll natural sin pin.
+    // 7M-G §1: desktop >=1024 y sin reduced-motion → UN pin con scrub 0.6 y
+    // distancia HERO_PIN_SCREENS×vh (18 pantallas); móvil/tablet/reduced-motion
+    // → scroll natural sin pin. Un solo timeline dentro del ScrollTrigger para
+    // que el scrub amortigüe de verdad los tweens (no gsap.set en onUpdate).
     const canPin = !reducedMotion && window.innerWidth >= 1024 && heroElement;
     if (canPin && heroElement) {
       const actions = heroElement.querySelector<HTMLElement>('.hero__actions');
+      const copy = [...heroElement.querySelectorAll<HTMLElement>('.hero__eyebrow, .hero__title, .hero__subtitle')];
+      const inner = heroElement.querySelector<HTMLElement>('.hero__inner');
       const navbar = document.querySelector<HTMLElement>('[data-navbar]');
       const navbarH = navbar?.offsetHeight ?? 64;
-      let maxShift = 0;
-      if (actions) {
-        const r = actions.getBoundingClientRect();
-        const center = r.top + r.height / 2;
-        maxShift = Math.max(0, center - (navbarH + 32 + r.height / 2));
-      }
+      const H = window.innerHeight;
+      // Rebote medido en coordenadas del hero, sin transformaciones aplicadas
+      const heroTop = heroElement.getBoundingClientRect().top;
+      const actionsTop0 = actions ? actions.getBoundingClientRect().top - heroTop : 0;
+      const actionsH = actions?.offsetHeight ?? 0;
+      const topNear = navbarH + 40;
+      const topLow = Math.min(0.62 * H, H - actionsH - 56);
+      const canBounce = actions !== null && topLow >= topNear;
+      const yNear = topNear - actionsTop0;
+      const yLow = topLow - actionsTop0;
       const umbral = document.querySelector<HTMLElement>('[data-umbral-fade]');
-      heroPin = ScrollTrigger.create({
-        trigger: heroElement,
-        start: 'top top',
-        end: `+=${Math.round(window.innerHeight * 1.8)}`,
-        pin: true,
-        scrub: 0.6,
-        onUpdate: (self) => {
-          const p = self.progress;
-          universe?.setHeroPin(p);
-          // §5.10: desplazamiento vertical del CTA (sube limitado, +18px de respiro)
-          if (actions) {
-            let y = 0;
-            if (maxShift > 0) {
-              if (p <= 0.36) y = -maxShift * (p / 0.36);
-              else if (p <= 0.54) { const t = (p - 0.36) / 0.18; y = -maxShift + 18 * (1 - (1 - t) * (1 - t)); }
-              else y = -maxShift + 18;
-            }
-            gsap.set(actions, { y });
-          }
-          // §5.9: entrada del umbral 0.88–1
-          if (umbral) gsap.set(umbral, { opacity: Math.min(1, Math.max(0, (p - 0.88) / 0.12)) });
+      heroPinEls = { actions, copy, umbral };
+
+      heroPinTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: heroElement,
+          start: 'top top',
+          end: `+=${Math.round(H * HERO_PIN_SCREENS)}`,
+          pin: true,
+          scrub: 0.6,
+          invalidateOnRefresh: true, // end recalculable con el viewport
+          onUpdate: (self) => { universe?.setHeroPin(self.progress); },
+          onLeave: () => { if (umbral) gsap.set(umbral, { opacity: 1 }); },
+          onRefresh: () => { /* invalidateOnRefresh recalcula end; nada que limpiar */ },
         },
-        onLeave: () => { if (umbral) gsap.set(umbral, { opacity: 1 }); },
       });
+      heroPin = heroPinTl.scrollTrigger as ScrollTrigger | null;
+      if (actions && canBounce) {
+        // 0–0.12 subida hacia yNear; 0.12–0.22 descenso hacia yLow (power3.out)
+        heroPinTl.to(actions, { y: yNear, duration: 0.12, ease: 'none' }, 0);
+        heroPinTl.to(actions, { y: yLow, duration: 0.10, ease: 'power3.out' }, 0.12);
+      }
+      // El bloque de copy se desvanece durante la subida para que los CTA no
+      // crucen encima de las letras (0–0.12)
+      copy.forEach((el) => heroPinTl?.to(el, { opacity: 0.08, y: -28, duration: 0.12, ease: 'power1.out' }, 0));
+      // 0.70–0.88 apertura del prisma + conexión visual con el umbral
+      if (umbral) heroPinTl.fromTo(umbral, { opacity: 0 }, { opacity: 1, duration: 0.18, ease: 'none' }, 0.70);
+      // 0.88–1 salida gradual del hero (CTA operativos hasta el final)
+      if (inner) heroPinTl.to(inner, { opacity: 0, duration: 0.12, ease: 'power1.in' }, 0.88);
       universe?.travelTo('cooperative', { duration: 0 }); // fija mundo destino; el pin conduce
     } else {
       universe?.travelTo('cooperative', {
@@ -320,6 +350,14 @@ export function createNarrative({ universe, reducedMotion, portal }: NarrativeOp
     enterAct,
     enterFreeRoute,
     cancelHeroPin,
+    heroPinEnd(): number | null {
+      if (heroPin) return heroPin.end + 1;
+      const heroEl = document.querySelector<HTMLElement>('[data-hero-scene]');
+      return heroEl ? heroEl.offsetTop + window.innerHeight * HERO_PIN_SCREENS + 1 : null;
+    },
+    heroPinScreens(): number {
+      return HERO_PIN_SCREENS;
+    },
     goBack,
     currentAct(): ActId {
       return stack[stack.length - 1] ?? 'hero';

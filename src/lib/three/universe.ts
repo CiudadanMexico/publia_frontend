@@ -681,7 +681,6 @@ export async function createUniverse({
     const sceneBoost = current.world === 'hero' ? 0 : sceneProgress;
     const spread = current.prism.spread + sceneBoost * 0.25 + sceneLook.spread;
 
-    framesRendered += 1;
     // amortiguación independiente de FPS (damping ~8/s)
     const damp = 1 - Math.exp(-dt * 8);
     pointerSmooth.yaw += (pointerTarget.yaw - pointerSmooth.yaw) * damp;
@@ -768,6 +767,7 @@ export async function createUniverse({
     camera.lookAt(lookTarget);
 
     composer.render();
+    framesRendered += 1; // 7M-G: sólo tras render exitoso
   }
 
   renderer.setAnimationLoop(frame);
@@ -941,19 +941,23 @@ export async function createUniverse({
       paused = Boolean(value);
     },
     setHeroPin(progress: number): void {
-      // 7M-F §5.9: timeline normalizada mapeada al parámetro de fragmentación existente
+      // 7M-G §1: timeline normalizada — 0–0.12 acercamiento, 0.22–0.70 cuatro
+      // momentos de cámara/prisma, 0.70–0.88 apertura del prisma, 0.88–1 salida.
       const p = Math.min(1, Math.max(0, progress));
       const lerp = (a: number, b: number, t: number) => a + (b - a) * Math.min(1, Math.max(0, t));
       const seg = (p0: number, p1: number) => (p - p0) / (p1 - p0);
       current.prism.scale =
-        p <= 0.18 ? lerp(1, 1.06, seg(0, 0.18)) :
-        p <= 0.36 ? lerp(1.06, 1.12, seg(0.18, 0.36)) : 1.12;
+        p <= 0.12 ? lerp(1, 1.05, seg(0, 0.12)) :
+        p <= 0.22 ? lerp(1.05, 1.08, seg(0.12, 0.22)) :
+        p <= 0.70 ? 1.08 :
+        p <= 0.88 ? lerp(1.08, 1.16, seg(0.70, 0.88)) : 1.12;
       current.prism.spread =
-        p <= 0.18 ? 0 :
-        p <= 0.36 ? lerp(0, 0.12, seg(0.18, 0.36)) :
-        p <= 0.54 ? lerp(0.12, 0.30, seg(0.36, 0.54)) :
-        p <= 0.72 ? lerp(0.30, 0.45, seg(0.54, 0.72)) :
-        p <= 0.88 ? lerp(0.45, 0.60, seg(0.72, 0.88)) : 0.60;
+        p <= 0.22 ? 0 :
+        p <= 0.34 ? lerp(0, 0.15, seg(0.22, 0.34)) :
+        p <= 0.46 ? lerp(0.15, 0.30, seg(0.34, 0.46)) :
+        p <= 0.58 ? lerp(0.30, 0.45, seg(0.46, 0.58)) :
+        p <= 0.70 ? lerp(0.45, 0.55, seg(0.58, 0.70)) :
+        p <= 0.88 ? lerp(0.55, 0.85, seg(0.70, 0.88)) : 0.60;
       // la cámara acompaña el mismo progreso (hero → cooperativo), sin nuevo modelo
       const from = WORLDS.hero;
       const to = WORLDS.cooperative;
