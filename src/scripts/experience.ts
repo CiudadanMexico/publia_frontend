@@ -238,7 +238,7 @@ async function initUniverse(): Promise<UniverseHandleLike | null> {
  * sólo con intención real del visitante (rueda, touch, teclado o arrastre de
  * barra) y nunca durante un desplazamiento programático ni una transición.
  */
-function bindFreeScrollIntent(narrative: NarrativeHandle | null): void {
+function bindFreeScrollIntent(getNarrative: () => NarrativeHandle | null): void {
   let armed = true;
   const tryFreeRoute = (fromRealInput: boolean): void => {
     if (!armed) return;
@@ -253,10 +253,10 @@ function bindFreeScrollIntent(narrative: NarrativeHandle | null): void {
     }
     const state = getState();
     if (state.primary !== 'unclassified' || state.transitioning) return;
-    if (narrative?.currentAct() !== 'hero') return;
+    if (getNarrative()?.currentAct() !== 'hero') return;
     if (window.scrollY > window.innerHeight * 0.8) return;
     armed = false;
-    narrative?.enterFreeRoute();
+    getNarrative()?.enterFreeRoute();
   };
   window.addEventListener('wheel', () => tryFreeRoute(true), { passive: true });
   window.addEventListener('touchmove', () => tryFreeRoute(true), { passive: true });
@@ -320,7 +320,7 @@ function lazyBind(selector: string, load: () => Promise<void>): void {
           void load();
         }
       },
-      { rootMargin: '80% 0px' },
+      { rootMargin: '600px 0px' }, // 7M-G §6: precalienta el import/bind ~600px antes del viewport
     );
     io.observe(el);
   }
@@ -539,7 +539,7 @@ function bindHeroCards(universe: UniverseHandleLike | null): void {
 }
 
 function bindRouteControls(
-  narrative: NarrativeHandle | null,
+  getNarrative: () => NarrativeHandle | null,
   universe: UniverseHandleLike | null,
 ): void {
   void universe;
@@ -549,8 +549,8 @@ function bindRouteControls(
     button.addEventListener('click', () => {
       const route = button.dataset['routeChoice'];
       if (route === 'enterprise' || route === 'efficiency') {
-        narrative?.cancelHeroPin();
-        narrative?.enterAct(route);
+        getNarrative()?.cancelHeroPin();
+        getNarrative()?.enterAct(route);
       }
     });
   });
@@ -558,7 +558,7 @@ function bindRouteControls(
   // Control «volver»: regresa al acto anterior sin reiniciar la experiencia.
   const backButton = document.querySelector<HTMLButtonElement>('[data-act-back]');
   backButton?.addEventListener('click', () => {
-    narrative?.goBack();
+    getNarrative()?.goBack();
     window.setTimeout(() => ScrollTrigger.refresh(), 200);
   });
 
@@ -649,7 +649,7 @@ function bindRouteControls(
     button.addEventListener('click', () => {
       implicitSuppressed = true;
       resetExperience();
-      narrative?.returnToHero();
+      getNarrative()?.returnToHero();
       track('scene_viewed', { scene: 'route_reset' });
       window.setTimeout(() => {
         ScrollTrigger.refresh();
@@ -763,29 +763,95 @@ export async function startExperience(): Promise<void> {
   window.addEventListener('publia:state', syncExploreToggle);
 
   const reduced = prefersReducedMotion();
-  const universe = await initUniverse();
-  // 7M-F §5.6: preloader localizado dentro del área 3D; fuera tras 1er frame, error o 8s
+  // 7M-G §6: contrato de carga de la superficie 3D. Estado inicial, reloj de
+  // 8s, manejo de error y token de generación ANTES de importar/inicializar;
+  // los binds de rutas/formularios/accesibilidad NO esperan al WebGL.
+  let universe: UniverseHandleLike | null = null;
+  let narrative: NarrativeHandle | null = null;
+  const layer = document.querySelector<HTMLElement>('.prism-layer');
   const loader = document.querySelector<HTMLElement>('[data-hero-loader]');
-  if (loader) {
-    const t0 = Date.now();
-    const loaderTimer = window.setInterval(() => {
-      const done = (universe?.frames() ?? 0) > 0 || (universe?.errors().length ?? 0) > 0 || Date.now() - t0 > 8000;
-      if (done) {
-        loader.classList.add('is-done');
-        window.clearInterval(loaderTimer);
+  const loadMsg = document.querySelector<HTMLElement>('[data-prism-msg]');
+  const loadMsgText = document.querySelector<HTMLElement>('[data-prism-msg-text]');
+  const retryBtn = document.querySelector<HTMLButtonElement>('[data-prism-retry]');
+  let loadGen = 0;
+  const setLoadState = (st: 'loading' | 'ready' | 'fallback' | 'error'): void => {
+    layer?.setAttribute('data-load-state', st);
+    layer?.setAttribute('aria-busy', st === 'loading' ? 'true' : 'false');
+    loader?.classList.toggle('is-done', st !== 'loading');
+    layer?.classList.toggle('is-fallback', st === 'fallback' || st === 'error');
+    layer?.classList.toggle('is-ready', st === 'ready');
+    if (loadMsg && loadMsgText) {
+      if (st === 'fallback') {
+        loadMsgText.textContent = 'La escena está tardando. Puedes seguir explorando.';
+        loadMsg.hidden = false;
+        if (retryBtn) retryBtn.hidden = false;
+      } else if (st === 'error') {
+        loadMsgText.textContent = 'No pudimos cargar esta escena. Puedes seguir explorando.';
+        loadMsg.hidden = false;
+        if (retryBtn) retryBtn.hidden = true;
+      } else {
+        loadMsg.hidden = true;
       }
+    }
+  };
+  const armWatch = (myGen: number): void => {
+    const t0 = Date.now();
+    const iv = window.setInterval(() => {
+      if (myGen !== loadGen) { window.clearInterval(iv); return; } // token de generación
+      if ((universe?.frames() ?? 0) > 0) { window.clearInterval(iv); setLoadState('ready'); return; }
+      if ((universe?.errors().length ?? 0) > 0) { window.clearInterval(iv); setLoadState('error'); return; }
+      if (Date.now() - t0 > 8000) { window.clearInterval(iv); setLoadState('fallback'); }
     }, 120);
-  }
+  };
+  const bootUniverse = async (myGen: number): Promise<void> => {
+    try {
+      const u = await initUniverse();
+      if (myGen !== loadGen) return; // una carga vieja nunca reemplaza a la nueva
+      universe = u;
+      bindUniverseDeps(u);
+    } catch (err) {
+      console.warn('[universe] init falló:', err);
+      if (myGen === loadGen) setLoadState('error');
+    }
+  };
+  const bindUniverseDeps = (u: UniverseHandleLike | null): void => {
+    if (narrative) return; // una sola vez
+    narrative = createNarrative({ universe: u, reducedMotion: reduced, portal });
+    // bindRouteControls/bindFreeScrollIntent ya están atados con getters antes
+    bindSceneLooks(u);
+    bindDemos(u);
+    bindHeroCards(u);
+    lazyBind('[data-demo="ecosystem"]', () => import('../lib/experience/ecosystem').then((m) => m.bindEcosystem(u)));
+    lazyBind('[data-demo="red"]', () => import('../lib/experience/red').then((m) => m.bindRed(u)));
+    lazyBind('[data-simulator]', () => import('../lib/experience/simulator').then((m) => m.bindSimulator()));
+    lazyBind('[data-wa-form]', () => import('../lib/experience/waform').then((m) => m.bindWaForm()));
+    lazyBind('[data-demo="infra2"]', () => import('../lib/experience/infra').then((m) => m.bindInfra(u)));
+    lazyBind('[data-demo="personas"]', () => import('../lib/experience/personas').then((m) => m.bindPersonas()));
+    lazyBind('[data-demo="memberships"]', () => import('../lib/experience/memberships').then((m) => m.bindMemberships()));
+    lazyBind('[data-recommendation]', () => import('../lib/experience/cierre').then((m) => m.bindCierre(u)));
+    lazyBind('[data-demo="ecosystem"]', () => import('../lib/experience/postHero').then((m) => m.bindPostHero(u)));
+    lazyBind('[data-recommendation]', () => import('../lib/experience/postHero').then((m) => m.bindPostHero(u)));
+    lazyBind('[data-demo="housing"]', () => import('../lib/experience/housing').then((m) => m.bindHousing()));
+    lazyBind('[data-demo="marketing"]', () => import('../lib/experience/marketing').then((m) => m.bindMarketing()));
+  };
+  setLoadState('loading');
+  armWatch(++loadGen);
+  void bootUniverse(loadGen);
+  retryBtn?.addEventListener('click', () => {
+    loadGen += 1;
+    setLoadState('loading');
+    armWatch(loadGen);
+    void bootUniverse(loadGen);
+  });
   // 7M-G §1: salto por teclado al final del tramo pineado (misma fuente: heroPinEnd)
   document.querySelectorAll<HTMLButtonElement>('[data-hero-skip]').forEach((btn) => {
     btn.addEventListener('click', () => {
-      const end = narrative.heroPinEnd();
+      const end = narrative?.heroPinEnd() ?? null;
       window.scrollTo({ top: end ?? window.innerHeight * 18, behavior: reduced ? 'auto' : 'smooth' });
     });
   });
   // Portal prismático P0-01 (se crea antes que la narrativa para unificar transiciones)
   const portal: PortalHandle = createPortal();
-  const narrative = createNarrative({ universe, reducedMotion: reduced, portal });
   const progressByScene = new Map<string, number>();
 
   const applyActiveScene = (): void => {
@@ -809,22 +875,6 @@ export async function startExperience(): Promise<void> {
   };
 
   const reducedMotion = reduced;
-  const sceneLookTriggers = bindSceneLooks(universe);
-  bindDemos(universe);
-  lazyBind('[data-demo="ecosystem"]', () => import('../lib/experience/ecosystem').then((m) => m.bindEcosystem(universe)));
-  // Bloques 7M-B: binders en chunks propios, cargados sólo al acercarse a su escena
-  lazyBind('[data-demo="red"]', () => import('../lib/experience/red').then((m) => m.bindRed(universe)));
-  // 7M-F §6: simulador del umbral (entradas numéricas + slider sincronizados)
-  lazyBind('[data-simulator]', () => import('../lib/experience/simulator').then((m) => m.bindSimulator()));
-  lazyBind('[data-wa-form]', () => import('../lib/experience/waform').then((m) => m.bindWaForm()));
-  lazyBind('[data-demo="infra2"]', () => import('../lib/experience/infra').then((m) => m.bindInfra(universe)));
-  lazyBind('[data-demo="personas"]', () => import('../lib/experience/personas').then((m) => m.bindPersonas()));
-  lazyBind('[data-demo="memberships"]', () => import('../lib/experience/memberships').then((m) => m.bindMemberships()));
-  lazyBind('[data-recommendation]', () => import('../lib/experience/cierre').then((m) => m.bindCierre(universe)));
-  lazyBind('[data-demo="ecosystem"]', () => import('../lib/experience/postHero').then((m) => m.bindPostHero(universe)));
-  lazyBind('[data-recommendation]', () => import('../lib/experience/postHero').then((m) => m.bindPostHero(universe)));
-  lazyBind('[data-demo="housing"]', () => import('../lib/experience/housing').then((m) => m.bindHousing()));
-  lazyBind('[data-demo="marketing"]', () => import('../lib/experience/marketing').then((m) => m.bindMarketing()));
   let lastPortalKey = '';
   const drivePortal = (state: ReturnType<typeof getState>): void => {
     const heroElement = document.querySelector<HTMLElement>('[data-hero-scene]');
@@ -880,11 +930,14 @@ export async function startExperience(): Promise<void> {
     { passive: true },
   );
 
-  bindRouteControls(narrative, universe);
+  // Las rutas, el seguimiento y la accesibilidad NO dependen del 3D:
+  // bindRouteControls/bindFreeScrollIntent se invocan dentro de bindUniverseDeps
+  // con getters, de modo que también funcionan si el universo tarda o falla.
   bindSceneTracking();
   bindImplicitRouteWatcher();
-  bindFreeScrollIntent(narrative);
-  bindHeroCards(universe);
+  // Bind inmediato (seguro sin universo): navegación por teclado/rutas vía getters
+  bindRouteControls(() => narrative, null);
+  bindFreeScrollIntent(() => narrative);
 
   // Un refresco de ScrollTrigger recalcula el scroll y cancela los scrolls
   // suaves en curso: sólo se hace cuando cambia la visibilidad (ruta o
@@ -912,12 +965,12 @@ export async function startExperience(): Promise<void> {
 
   // El acto activo también se refleja en el documento (viñeta y control volver).
   const actObserver = setInterval(() => {
-    const act = narrative.currentAct();
+    const act = narrative?.currentAct() ?? 'hero';
     if (act === 'hero') portal.reset();
     applyActMarker(act);
     const back = document.querySelector<HTMLElement>('[data-act-back]');
     if (back) {
-      back.style.display = narrative.history().length > 1 ? 'inline-flex' : 'none';
+      back.style.display = (narrative?.history().length ?? 0) > 1 ? 'inline-flex' : 'none';
     }
   }, 400);
 
