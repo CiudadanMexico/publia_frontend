@@ -10,6 +10,7 @@
  * escenas posteriores pueden adaptar su contenido sin preguntar de nuevo.
  */
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 import type { UniverseHandle, UniverseWorld } from '../three/universe';
 import type { PrimaryRoute, VisitorTrait } from './state';
@@ -70,6 +71,8 @@ interface NarrativeOptions {
 export interface NarrativeHandle {
   /** Entra a un acto: viaje de cámara + scroll + estado. */
   enterAct(act: ActId): void;
+  /** 7M-F §5.12: cancela el pin del hero si se elige ruta durante la animación. */
+  cancelHeroPin(): void;
   /**
    * Ruta C por scroll silencioso: el visitante desplaza la página desde el
    * hero SIN elegir botón. El viaje de cámara lo conduce el propio scroll
@@ -89,6 +92,21 @@ export interface NarrativeHandle {
 export function createNarrative({ universe, reducedMotion, portal }: NarrativeOptions): NarrativeHandle {
   const stack: ActId[] = ['hero'];
   let traveling = false;
+  // 7M-F §5.8-10: un único ScrollTrigger con pin conduce el tramo del hero
+  let heroPin: ScrollTrigger | null = null;
+
+  const cancelHeroPin = (): void => {
+    if (!heroPin) return;
+    heroPin.kill();
+    heroPin = null;
+    universe?.setHeroPin(0);
+    const heroEl = document.querySelector<HTMLElement>('[data-hero-scene]');
+    const actions = heroEl?.querySelector<HTMLElement>('.hero__actions');
+    if (actions) gsap.set(actions, { y: 0 });
+    const umbral = document.querySelector<HTMLElement>('[data-umbral-fade]');
+    if (umbral) gsap.set(umbral, { opacity: 1 });
+    ScrollTrigger.refresh();
+  };
 
   const scrollTo = (anchor: string): void => {
     const element = document.querySelector<HTMLElement>(anchor);
@@ -150,6 +168,7 @@ export function createNarrative({ universe, reducedMotion, portal }: NarrativeOp
     }
     const act = ACTS[actId];
     if (!act) return;
+    cancelHeroPin(); // 7M-F §5.12: nunca quedar atrapado por el pin
     if (traveling) return;
     traveling = true;
     setTransitioning(true);
@@ -205,20 +224,52 @@ export function createNarrative({ universe, reducedMotion, portal }: NarrativeOp
     stack.push('cooperative');
     if (stack.length > 12) stack.shift();
 
-    // El scroll del visitante conduce la transición (pin + scrub sobre el hero):
-    // la cámara atraviesa el prisma hacia el mundo cooperativo mientras bajan.
-    universe?.travelTo('cooperative', {
-      scrub: heroElement
-        ? { trigger: heroElement, start: 'top top', end: '+=150%' }
-        : undefined,
-      duration: reducedMotion ? 0 : 1.9,
-      onComplete: () => {
-        traveling = false;
-        setTransitioning(false);
-      },
-    });
-    if (reducedMotion || !heroElement) {
-      universe?.travelTo('cooperative', { duration: 0 });
+    // 7M-F §5.8: desktop >=1024 y sin reduced-motion → UN pin con scrub 0.6 y
+    // distancia 1.8×vh; móvil/tablet/reduced-motion → scroll natural sin pin.
+    const canPin = !reducedMotion && window.innerWidth >= 1024 && heroElement;
+    if (canPin && heroElement) {
+      const actions = heroElement.querySelector<HTMLElement>('.hero__actions');
+      const navbar = document.querySelector<HTMLElement>('[data-navbar]');
+      const navbarH = navbar?.offsetHeight ?? 64;
+      let maxShift = 0;
+      if (actions) {
+        const r = actions.getBoundingClientRect();
+        const center = r.top + r.height / 2;
+        maxShift = Math.max(0, center - (navbarH + 32 + r.height / 2));
+      }
+      const umbral = document.querySelector<HTMLElement>('[data-umbral-fade]');
+      heroPin = ScrollTrigger.create({
+        trigger: heroElement,
+        start: 'top top',
+        end: `+=${Math.round(window.innerHeight * 1.8)}`,
+        pin: true,
+        scrub: 0.6,
+        onUpdate: (self) => {
+          const p = self.progress;
+          universe?.setHeroPin(p);
+          // §5.10: desplazamiento vertical del CTA (sube limitado, +18px de respiro)
+          if (actions) {
+            let y = 0;
+            if (maxShift > 0) {
+              if (p <= 0.36) y = -maxShift * (p / 0.36);
+              else if (p <= 0.54) { const t = (p - 0.36) / 0.18; y = -maxShift + 18 * (1 - (1 - t) * (1 - t)); }
+              else y = -maxShift + 18;
+            }
+            gsap.set(actions, { y });
+          }
+          // §5.9: entrada del umbral 0.88–1
+          if (umbral) gsap.set(umbral, { opacity: Math.min(1, Math.max(0, (p - 0.88) / 0.12)) });
+        },
+        onLeave: () => { if (umbral) gsap.set(umbral, { opacity: 1 }); },
+      });
+      universe?.travelTo('cooperative', { duration: 0 }); // fija mundo destino; el pin conduce
+    } else {
+      universe?.travelTo('cooperative', {
+        scrub: heroElement ? { trigger: heroElement, start: 'top top', end: '+=150%' } : undefined,
+        duration: reducedMotion ? 0 : 1.9,
+        onComplete: () => { traveling = false; setTransitioning(false); },
+      });
+      if (reducedMotion || !heroElement) universe?.travelTo('cooperative', { duration: 0 });
     }
 
     document.documentElement.dataset['act'] = 'cooperative';
@@ -266,6 +317,7 @@ export function createNarrative({ universe, reducedMotion, portal }: NarrativeOp
   return {
     enterAct,
     enterFreeRoute,
+    cancelHeroPin,
     goBack,
     currentAct(): ActId {
       return stack[stack.length - 1] ?? 'hero';

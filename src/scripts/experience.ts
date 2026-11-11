@@ -27,6 +27,7 @@ import {
   subscribe,
 } from '../lib/experience/state';
 import { initAnalytics, track } from '../lib/experience/events';
+import { COPY_7MF } from '../data/copy7mf';
 import { initEffects } from '../lib/animation/effects';
 import { pickVariantFrom, visitorSegments } from '../lib/experience/graph';
 import { accentify } from '../lib/experience/accent';
@@ -176,6 +177,8 @@ interface UniverseHandleLike {
   setActive: (active: boolean) => void;
   setPaused: (paused: boolean) => void;
   burst: () => void;
+  setHeroPin: (progress: number) => void;
+  frames: () => number;
   cardsInView: () => number;
   cameraPosition: () => [number, number, number];
   dominantTint: () => string;
@@ -221,23 +224,8 @@ async function initUniverse(): Promise<UniverseHandleLike | null> {
     console.warn('[universe] recursos incompletos:', failures.join(' · '));
   }
 
-  // Controles del hero (pausa, fragmentación y reinicio) sobre el universo.
-  const controls = document.querySelectorAll<HTMLButtonElement>('[data-hero-control]');
-  controls.forEach((button) => {
-    button.addEventListener('click', () => {
-      const action = button.dataset['heroControl'];
-      if (action === 'burst') {
-        universe.burst();
-      } else if (action === 'reset') {
-        universe.travelTo(universe.world(), { duration: reduced ? 0 : 1.1 });
-      } else if (action === 'pause') {
-        const paused = button.getAttribute('aria-pressed') === 'true';
-        universe.setPaused(!paused);
-        button.setAttribute('aria-pressed', String(!paused));
-        button.textContent = paused ? 'Ⅱ Pausar' : '▶ Reanudar';
-      }
-    });
-  });
+  // 7M-F §5.5: los controles Pausar/Fragmentar/Reiniciar salen de la interfaz;
+  // las APIs del universo (setPaused/burst/travelTo) se conservan para uso interno.
 
   return universe;
 }
@@ -560,6 +548,7 @@ function bindRouteControls(
     button.addEventListener('click', () => {
       const route = button.dataset['routeChoice'];
       if (route === 'enterprise' || route === 'efficiency') {
+        narrative?.cancelHeroPin();
         narrative?.enterAct(route);
       }
     });
@@ -759,7 +748,7 @@ export async function startExperience(): Promise<void> {
     const all = getState().exploreAll;
     document.querySelectorAll<HTMLButtonElement>('[data-explore-toggle]').forEach((b) => {
       b.setAttribute('aria-pressed', String(all));
-      b.textContent = all ? 'Ver recorrido esencial' : 'Explorar todo el recorrido';
+      b.textContent = all ? 'Ver recorrido esencial' : COPY_7MF.hero.exploreAll;
     });
   };
   document.querySelectorAll<HTMLButtonElement>('[data-explore-toggle]').forEach((b) =>
@@ -774,6 +763,26 @@ export async function startExperience(): Promise<void> {
 
   const reduced = prefersReducedMotion();
   const universe = await initUniverse();
+  // 7M-F §5.6: preloader localizado dentro del área 3D; fuera tras 1er frame, error o 8s
+  const loader = document.querySelector<HTMLElement>('[data-hero-loader]');
+  if (loader) {
+    const t0 = Date.now();
+    const loaderTimer = window.setInterval(() => {
+      const done = (universe?.frames() ?? 0) > 0 || (universe?.errors().length ?? 0) > 0 || Date.now() - t0 > 8000;
+      if (done) {
+        loader.classList.add('is-done');
+        window.clearInterval(loaderTimer);
+      }
+    }, 120);
+  }
+  // 7M-F §5.11: salto por teclado al final del tramo pineado
+  document.querySelectorAll<HTMLButtonElement>('[data-hero-skip]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const heroEl = document.querySelector<HTMLElement>('[data-hero-scene]');
+      const end = (heroEl?.offsetTop ?? 0) + window.innerHeight * 1.8;
+      window.scrollTo({ top: end, behavior: reduced ? 'auto' : 'smooth' });
+    });
+  });
   // Portal prismático P0-01 (se crea antes que la narrativa para unificar transiciones)
   const portal: PortalHandle = createPortal();
   const narrative = createNarrative({ universe, reducedMotion: reduced, portal });

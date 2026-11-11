@@ -4,6 +4,8 @@
  * (ruta e intereses), sin datos personales ni sensibles.
  */
 import { SITE, buildMailto } from '../../../data/site';
+import { HERO_CARDS } from '../../../data/copy';
+import { COPY_7MF } from '../../../data/copy7mf';
 import type { ResolvedScene } from '../../../lib/experience/graph';
 import { accentify } from '../../../lib/experience/accent';
 
@@ -38,4 +40,41 @@ const mailto = buildMailto({ route: 'unclassified', traits: [] });
       <a href={SITE.whatsapp} rel="noopener noreferrer" target="_blank">WhatsApp</a>.
     </p>
   </div>
+
+  <div class="conversion__more">
+    <h3 class="conversion__more-title">{COPY_7MF.hero.more}</h3>
+    <ul class="hero__cards" aria-label="Ocho soluciones de Publia">
+      {
+        HERO_CARDS.map((card, index) => (
+          <li>
+            <button
+              type="button"
+              class="hero__card-chip"
+              data-card-index={index}
+              aria-describedby={`hero-card-info-${index}`}
+              aria-expanded="false"
+            >
+              <img src={`/icons/${card.icon}`} alt="" width="18" height="18" loading="lazy" />
+              <span>{card.label}</span>
+            </button>
+            <span class="hero__card-info" id={`hero-card-info-${index}`} role="tooltip" hidden>
+              {card.blurb}{' '}
+              <a href={card.target} data-card-link={index}>Ver en el recorrido ↓</a>
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
 </section>
+<style>
+  .conversion__more { margin-top: 3rem; }
+  .conversion__more-title { font-size: 1.05rem; letter-spacing: .06em; text-transform: uppercase; color: var(--scene-ink, #eef0f6); opacity: .85; margin: 0 0 .8rem; }
+  .hero__cards { list-style: none; display: flex; flex-wrap: wrap; gap: .4rem; padding: 0; margin: 0; max-width: 34rem; }
+  .hero__cards li { position: relative; }
+  .hero__card-chip { display: inline-flex; align-items: center; gap: .4rem; border: 1px solid rgba(128,229,255,.25); border-radius: 999px; background: rgba(5,11,27,.55); color: inherit; font: inherit; font-size: .78rem; padding: .4rem .7rem; cursor: pointer; min-height: 34px; }
+  .hero__card-chip:focus-visible { outline: 3px solid var(--scene-accent, #ffca34); outline-offset: 3px; }
+  .hero__card-chip img { width: 18px; height: 18px; object-fit: contain; }
+  .hero__card-info { position: absolute; left: 0; bottom: calc(100% + .4rem); z-index: 3; max-width: 15rem; background: rgba(3,8,20,.95); border: 1px solid rgba(128,229,255,.3); border-radius: .5rem; padding: .45rem .6rem; font-size: .75rem; line-height: 1.35; }
+  .hero__card-info a { color: #80e5ff; }
+</style>

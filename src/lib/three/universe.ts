@@ -88,6 +88,10 @@ export interface UniverseHandle {
   setPaused(paused: boolean): void;
   /** Fragmentación y recomposición del prisma (control «Fragmentar»). */
   burst(): void;
+  /** 7M-F §5.9: conduce el prisma con el progreso normalizado (0–1) del pin del hero. */
+  setHeroPin(progress: number): void;
+  /** Frames renderizados (para retirar el preloader tras el primer frame). */
+  frames(): number;
   /** Posición de cámara actual (para QA). */
   cameraPosition(): [number, number, number];
   /** Color dominante de la escena (para QA). */
@@ -595,6 +599,18 @@ export async function createUniverse({
   let travel: gsap.core.Timeline | null = null;
   let scrollTriggerTravel: ScrollTrigger | null = null;
   const gestureOffset = { x: 0, y: 0, rz: 0 };
+  // 7M-F §5.7: Pubix sigue el puntero sólo con pointer:fine (yaw ±0.12, pitch ±0.06)
+  const pointerTarget = { yaw: 0, pitch: 0 };
+  const pointerSmooth = { yaw: 0, pitch: 0 };
+  let framesRendered = 0;
+  if (window.matchMedia('(pointer: fine)').matches) {
+    window.addEventListener('pointermove', (ev) => {
+      pointerTarget.yaw = (ev.clientX / window.innerWidth - 0.5) * 2 * 0.12;
+      pointerTarget.pitch = (ev.clientY / window.innerHeight - 0.5) * 2 * 0.06;
+    });
+    window.addEventListener('pointerleave', () => { pointerTarget.yaw = 0; pointerTarget.pitch = 0; });
+    document.addEventListener('mouseleave', () => { pointerTarget.yaw = 0; pointerTarget.pitch = 0; });
+  }
   const cardFocusSet = new Set<number>();
 
   const pointer = new THREE.Vector2();
@@ -665,9 +681,14 @@ export async function createUniverse({
     const sceneBoost = current.world === 'hero' ? 0 : sceneProgress;
     const spread = current.prism.spread + sceneBoost * 0.25 + sceneLook.spread;
 
+    framesRendered += 1;
+    // amortiguación independiente de FPS (damping ~8/s)
+    const damp = 1 - Math.exp(-dt * 8);
+    pointerSmooth.yaw += (pointerTarget.yaw - pointerSmooth.yaw) * damp;
+    pointerSmooth.pitch += (pointerTarget.pitch - pointerSmooth.pitch) * damp;
     if (mascot) {
-      mascot.rotation.y = 0.13 * Math.sin(t * 0.5) + spread * 0.65;
-      mascot.rotation.x = 0.045 * Math.sin(t * 0.7);
+      mascot.rotation.y = 0.13 * Math.sin(t * 0.5) + spread * 0.65 + pointerSmooth.yaw;
+      mascot.rotation.x = 0.045 * Math.sin(t * 0.7) + pointerSmooth.pitch;
       mascot.position.y = 2.18 + Math.sin(t * 1.1) * 0.095 + gestureOffset.y;
       mascot.position.x = gestureOffset.x;
       mascot.rotation.z = gestureOffset.rz;
@@ -918,6 +939,36 @@ export async function createUniverse({
     setPaused(value: boolean): void {
       if (reducedMotion) return;
       paused = Boolean(value);
+    },
+    setHeroPin(progress: number): void {
+      // 7M-F §5.9: timeline normalizada mapeada al parámetro de fragmentación existente
+      const p = Math.min(1, Math.max(0, progress));
+      const lerp = (a: number, b: number, t: number) => a + (b - a) * Math.min(1, Math.max(0, t));
+      const seg = (p0: number, p1: number) => (p - p0) / (p1 - p0);
+      current.prism.scale =
+        p <= 0.18 ? lerp(1, 1.06, seg(0, 0.18)) :
+        p <= 0.36 ? lerp(1.06, 1.12, seg(0.18, 0.36)) : 1.12;
+      current.prism.spread =
+        p <= 0.18 ? 0 :
+        p <= 0.36 ? lerp(0, 0.12, seg(0.18, 0.36)) :
+        p <= 0.54 ? lerp(0.12, 0.30, seg(0.36, 0.54)) :
+        p <= 0.72 ? lerp(0.30, 0.45, seg(0.54, 0.72)) :
+        p <= 0.88 ? lerp(0.45, 0.60, seg(0.72, 0.88)) : 0.60;
+      // la cámara acompaña el mismo progreso (hero → cooperativo), sin nuevo modelo
+      const from = WORLDS.hero;
+      const to = WORLDS.cooperative;
+      current.world = 'cooperative';
+      current.camera.x = lerp(from.camera[0], to.camera[0], p);
+      current.camera.y = lerp(from.camera[1], to.camera[1], p);
+      current.camera.z = lerp(from.camera[2], to.camera[2], p);
+      current.target.x = lerp(from.target[0], to.target[0], p);
+      current.target.y = lerp(from.target[1], to.target[1], p);
+      current.target.z = lerp(from.target[2], to.target[2], p);
+      current.rig.scale = lerp(from.rig.scale, to.rig.scale, p);
+      if (reducedMotion) frame();
+    },
+    frames(): number {
+      return framesRendered;
     },
     burst(): void {
       if (reducedMotion || disposed) return;
