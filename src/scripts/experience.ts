@@ -768,6 +768,12 @@ export async function startExperience(): Promise<void> {
   // los binds de rutas/formularios/accesibilidad NO esperan al WebGL.
   let universe: UniverseHandleLike | null = null;
   let narrative: NarrativeHandle | null = null;
+  // 7M-G §6: el universo entra por proxy — la narrativa y las rutas existen
+  // desde el primer frame aunque el WebGL aún no haya terminado de cargar.
+  const universeBox: { current: UniverseHandleLike | null } = { current: null };
+  const universeProxy = new Proxy({} as UniverseHandleLike, {
+    get: (_t, key) => (universeBox.current as unknown as Record<PropertyKey, unknown>)?.[key],
+  });
   const layer = document.querySelector<HTMLElement>('.prism-layer');
   const loader = document.querySelector<HTMLElement>('[data-hero-loader]');
   const loadMsg = document.querySelector<HTMLElement>('[data-prism-msg]');
@@ -808,6 +814,7 @@ export async function startExperience(): Promise<void> {
       const u = await initUniverse();
       if (myGen !== loadGen) return; // una carga vieja nunca reemplaza a la nueva
       universe = u;
+      universeBox.current = u;
       bindUniverseDeps(u);
     } catch (err) {
       console.warn('[universe] init falló:', err);
@@ -815,9 +822,8 @@ export async function startExperience(): Promise<void> {
     }
   };
   const bindUniverseDeps = (u: UniverseHandleLike | null): void => {
-    if (narrative) return; // una sola vez
-    narrative = createNarrative({ universe: u, reducedMotion: reduced, portal });
-    // bindRouteControls/bindFreeScrollIntent ya están atados con getters antes
+    // bindRouteControls/bindFreeScrollIntent ya están atados con getters;
+    // la narrativa también ya existe (con el proxy del universo)
     bindSceneLooks(u);
     bindDemos(u);
     bindHeroCards(u);
@@ -852,6 +858,8 @@ export async function startExperience(): Promise<void> {
   });
   // Portal prismático P0-01 (se crea antes que la narrativa para unificar transiciones)
   const portal: PortalHandle = createPortal();
+  // 7M-G §6: narrativa creada YA, con el universo por proxy (puede ser null al inicio)
+  narrative = createNarrative({ universe: universeProxy, reducedMotion: reduced, portal });
   const progressByScene = new Map<string, number>();
 
   const applyActiveScene = (): void => {

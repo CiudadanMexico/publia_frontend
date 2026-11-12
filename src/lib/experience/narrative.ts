@@ -117,7 +117,7 @@ export function createNarrative({ universe, reducedMotion, portal }: NarrativeOp
     if (heroPinTl) { heroPinTl.kill(); heroPinTl = null; }
     if (heroPin) { heroPin.kill(); heroPin = null; }
     clearHeroPinFx();
-    universe?.setHeroPin(0);
+    universe?.setHeroPin?.(0);
     const heroEl = document.querySelector<HTMLElement>('[data-hero-scene]');
     const actions = heroEl?.querySelector<HTMLElement>('.hero__actions');
     if (actions) gsap.set(actions, { y: 0 });
@@ -194,7 +194,7 @@ export function createNarrative({ universe, reducedMotion, portal }: NarrativeOp
     setPrimaryRoute(act.route, 'button');
     if (act.traits) addTraits(act.traits);
     track(act.event as 'hero_enterprise_selected' | 'hero_efficiency_selected' | 'hero_cooperative_selected', { world: act.world });
-    universe?.gesture();
+    universe?.gesture?.();
 
     stack.push(act.id);
     if (stack.length > 12) stack.shift();
@@ -209,7 +209,7 @@ export function createNarrative({ universe, reducedMotion, portal }: NarrativeOp
       },
     });
     portal?.playOnTimeline(tl, duration);
-    universe?.travelTo(act.world, { duration, timeline: tl });
+    universe?.travelTo?.(act.world, { duration, timeline: tl });
     reveal(act.anchor, tl);
     scrollTo(act.anchor);
 
@@ -237,7 +237,7 @@ export function createNarrative({ universe, reducedMotion, portal }: NarrativeOp
     const heroElement = document.querySelector<HTMLElement>('[data-hero-scene]');
     setPrimaryRoute('explorer', 'scroll');
     track('iniciar_scroll_libre', { world: 'cooperative' });
-    universe?.gesture();
+    universe?.gesture?.();
 
     stack.push('cooperative');
     if (stack.length > 12) stack.shift();
@@ -274,7 +274,7 @@ export function createNarrative({ universe, reducedMotion, portal }: NarrativeOp
           pin: true,
           scrub: 0.6,
           invalidateOnRefresh: true, // end recalculable con el viewport
-          onUpdate: (self) => { universe?.setHeroPin(self.progress); },
+          onUpdate: (self) => { universe?.setHeroPin?.(self.progress); },
           onLeave: () => { if (umbral) gsap.set(umbral, { opacity: 1 }); },
           onRefresh: () => { /* invalidateOnRefresh recalcula end; nada que limpiar */ },
         },
@@ -292,14 +292,14 @@ export function createNarrative({ universe, reducedMotion, portal }: NarrativeOp
       if (umbral) heroPinTl.fromTo(umbral, { opacity: 0 }, { opacity: 1, duration: 0.18, ease: 'none' }, 0.70);
       // 0.88–1 salida gradual del hero (CTA operativos hasta el final)
       if (inner) heroPinTl.to(inner, { opacity: 0, duration: 0.12, ease: 'power1.in' }, 0.88);
-      universe?.travelTo('cooperative', { duration: 0 }); // fija mundo destino; el pin conduce
+      universe?.travelTo?.('cooperative', { duration: 0 }); // fija mundo destino; el pin conduce
     } else {
-      universe?.travelTo('cooperative', {
+      universe?.travelTo?.('cooperative', {
         scrub: heroElement ? { trigger: heroElement, start: 'top top', end: '+=150%' } : undefined,
         duration: reducedMotion ? 0 : 1.9,
         onComplete: () => { traveling = false; setTransitioning(false); },
       });
-      if (reducedMotion || !heroElement) universe?.travelTo('cooperative', { duration: 0 });
+      if (reducedMotion || !heroElement) universe?.travelTo?.('cooperative', { duration: 0 });
     }
 
     document.documentElement.dataset['act'] = 'cooperative';
@@ -323,7 +323,7 @@ export function createNarrative({ universe, reducedMotion, portal }: NarrativeOp
     }
     track('act_back', { to: previous });
 
-    universe?.travelTo(act.world, {
+    universe?.travelTo?.(act.world, {
       duration: reducedMotion ? 0 : 1.6,
       onComplete: () => {
         traveling = false;
@@ -340,7 +340,7 @@ export function createNarrative({ universe, reducedMotion, portal }: NarrativeOp
     cancelHeroPin();
     stack.length = 0;
     stack.push('hero');
-    universe?.travelTo('hero', { duration: reducedMotion ? 0 : 1.6 });
+    universe?.travelTo?.('hero', { duration: reducedMotion ? 0 : 1.6 });
     scrollTo(HERO_ACT.anchor);
     document.documentElement.dataset['act'] = 'hero';
     track('hero_returned', {});

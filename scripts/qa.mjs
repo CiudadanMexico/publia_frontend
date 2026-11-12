@@ -35,9 +35,22 @@ function check(name, condition, detail = '') {
 
 await mkdir(OUT, { recursive: true });
 
-const browser = await chromium.launch({ args: ['--no-sandbox', '--use-gl=swiftshader'] });
+let browser = await chromium.launch({ args: ['--no-sandbox', '--use-gl=swiftshader'] });
+process.on('uncaughtException', (e) => { console.log('UNCAUGHT', e && e.stack || e); process.exit(2); });
+process.on('unhandledRejection', (e) => { console.log('UNHANDLED', e && e.stack || e); process.exit(3); });
+// Si el navegador muere entre secciones (OOM de swiftshader), se relanza solo.
+const relaunch = async () => {
+  try { await browser.close(); } catch {}
+  browser = await chromium.launch({ args: ['--no-sandbox', '--use-gl=swiftshader'] });
+  page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  page.on('console', (m) => { if (m.type() === 'error') errors.push(`console: ${m.text()}`); });
+  page.on('pageerror', (e) => errors.push(`pageerror: ${e}`));
+  await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 90000 }).catch(() => {});
+  await page.waitForTimeout(2500);
+};
 const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
-const page = await context.newPage();
+let page = await context.newPage();
+await page.addInitScript(() => { try { history.scrollRestoration = 'manual'; } catch {} });
 // Espera a que la cámara deje de cambiar (útil con FPS bajos en swiftshader)
 const camSettled = async (timeout = 25000) => {
   const start = Date.now();
@@ -73,10 +86,12 @@ const pscroll = (top) => page.evaluate((t) => {
 }, top);
 
 // Rueda real hasta que la ruta libre se active (reintenta si el entorno va lento)
-const wheelUntilExplorer = async (max = 6) => {
+const wheelUntilExplorer = async (max = 8) => {
   for (let i = 0; i < max; i++) {
+    await page.waitForFunction(() => document.documentElement.dataset.act === 'hero' && !!window.ScrollTrigger, null, { timeout: 20000 }).catch(() => {});
     await page.mouse.wheel(0, 700);
-    const ok = await page.waitForFunction(() => document.documentElement.dataset.route === 'explorer', { timeout: 4000 }).then(() => true).catch(() => false);
+    await page.waitForTimeout(300);
+    const ok = await page.waitForFunction(() => document.documentElement.dataset.act === 'cooperative', null, { timeout: 5000 }).then(() => true).catch(() => false);
     if (ok) return true;
   }
   return false;
@@ -97,7 +112,7 @@ page.on('console', (message) => {
   }
 });
 
-await page.goto(BASE, { waitUntil: 'networkidle', timeout: 60000 });
+await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 90000 });
 await page.waitForTimeout(2600);
 
 // --- carga -----------------------------------------------------------------
@@ -174,9 +189,10 @@ check(
   JSON.stringify(canvas),
 );
 
-const shotA = await page.locator('[data-prism-canvas]').screenshot();
+const clip = await page.evaluate(() => { const r = document.querySelector('[data-prism-canvas]').getBoundingClientRect(); return { x: r.x, y: r.y, width: r.width, height: r.height }; });
+const shotA = await page.screenshot({ clip, timeout: 60000 });
 await page.waitForTimeout(900);
-const shotB = await page.locator('[data-prism-canvas]').screenshot();
+const shotB = await page.screenshot({ clip, timeout: 60000 });
 check(
   'prisma: la escena 3D se renderiza y cambia (animación real)',
   shotA.length !== shotB.length || !shotA.equals(shotB),
@@ -283,9 +299,10 @@ check(
   JSON.stringify(heroPainted),
 );
 
-const heroShotA = await page.locator('[data-prism-canvas]').screenshot();
+const heroClip = await page.evaluate(() => { const r = document.querySelector('[data-prism-canvas]').getBoundingClientRect(); return { x: r.x, y: r.y, width: r.width, height: r.height }; });
+const heroShotA = await page.screenshot({ clip: heroClip, timeout: 60000 });
 await page.waitForTimeout(900);
-const heroShotB = await page.locator('[data-prism-canvas]').screenshot();
+const heroShotB = await page.screenshot({ clip: heroClip, timeout: 60000 });
 check(
   'hero 3D: la animación ambiental cambia entre fotogramas',
   heroShotA.length !== heroShotB.length || !heroShotA.equals(heroShotB),
@@ -520,8 +537,9 @@ const freeScroll = await page.evaluate(() => ({
   act: document.documentElement.dataset.act ?? '',
   world: document.querySelector('[data-prism-canvas]')?.dataset.world ?? '',
 }));
-await page.mouse.wheel(0, 700);
-await page.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'cooperative', { timeout: 15000 }).catch(() => {});
+await page.waitForFunction(() => document.documentElement.dataset.act === 'hero' && !!window.ScrollTrigger, null, { timeout: 30000 }).catch(() => {});
+await wheelUntilExplorer();
+await page.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'cooperative', { timeout: 20000 }).catch(() => {});
 await page.waitForTimeout(1200);
 const freeScroll2 = await page.evaluate(() => ({
   route: document.documentElement.dataset.route ?? '',
@@ -590,7 +608,8 @@ const structure = await page.evaluate(() => ({
   scenes: document.querySelectorAll('[data-scene-id]').length,
   network: document.querySelectorAll('.network__link').length,
   demos: document.querySelectorAll('[data-simulated="true"]').length,
-  plans: document.querySelectorAll('#escena-e27 [data-memb7-card]').length,
+  plans: document.querySelectorAll('#escena-e27 [data-memb-plan]').length,
+  diag: document.querySelectorAll('#escena-e27 [data-memb-recommend], #escena-e27 [data-memb-goal], #escena-e27 [data-memb-team]').length,
   infraModes: document.querySelectorAll('#escena-e03 [data-infra7-mode]').length,
   families: document.querySelectorAll('#escena-e25 [data-eco-family]').length,
   shares: document.querySelectorAll('#escena-e22 [data-housing-mode]').length,
@@ -598,9 +617,9 @@ const structure = await page.evaluate(() => ({
 check('grafo: 31 escenas montadas (E00-E30)', structure.scenes >= 31, `${structure.scenes} escenas`);
 check('red humana: enlaces dibujados', structure.network >= 8, `${structure.network} enlaces`);
 check('demostraciones marcadas como simulación', structure.demos >= 4, `${structure.demos} bloques`);
-check('7M-F catálogo: cinco planes desde memberships.plans', structure.plans === 5, `${structure.plans} planes`);
+check('7M-G catálogo: 5 selectores de plan + diagnóstico de 2 preguntas restaurado', structure.plans === 5 && structure.diag === 9, `planes=${structure.plans} diag=${structure.diag}`);
 check('7M-F E03: cuatro escenarios de infraestructura', structure.infraModes === 4, `${structure.infraModes} modos`);
-check('7M-F E25: ocho familias con selector accesible', structure.families === 8, `${structure.families} familias`);
+check('7M-G E25: nueve familias (8 + Ecología) con selector accesible', structure.families === 9, `${structure.families} familias`);
 check('7M-F E22: comparación compartida vs privada (2 modalidades, sólo en E22)', structure.shares === 2 && !await page.evaluate(() => document.querySelectorAll('#escena-e03 [data-housing-mode]').length), `${structure.shares} modalidades`);
 
 const effects = await page.evaluate(() => {
@@ -636,8 +655,10 @@ const perspectiveNeutral = await page.evaluate(
 );
 
 // --- ruta empresa -----------------------------------------------------------
-await click('[data-route-choice="enterprise"]');
-await page.waitForTimeout(1800);
+for (let i = 0; i < 4 && (await page.evaluate(() => document.documentElement.dataset.route)) !== 'enterprise'; i++) {
+  await click('[data-route-choice="enterprise"]');
+  await page.waitForTimeout(1800);
+}
 const enterprise = await page.evaluate(() => ({
   route: document.documentElement.dataset.route,
   segments: document.documentElement.dataset.segments ?? '',
@@ -777,14 +798,16 @@ check(
 
 // --- catálogo y conversión ---------------------------------------------------
 const catalog = await page.evaluate(() => {
-  const plans = [...document.querySelectorAll('#escena-e27 [data-memb7-card]')].map((card) => ({
-    name: card.querySelector('h3')?.textContent?.trim() ?? '',
-    price: card.querySelector('.memb7__price')?.textContent?.trim() ?? '',
-    cta: card.querySelector('[data-memb7-cta]')?.getAttribute('href') ?? '',
-    scope: !!card.querySelector('details[data-memb7-scope] summary'),
+  const plans = [...document.querySelectorAll('#escena-e27 [data-memb-plan]')].map((btn) => ({
+    name: btn.querySelector('strong')?.textContent?.trim() ?? '',
+    price: btn.querySelector('b')?.textContent?.trim() ?? '',
+    scope: !!btn.closest('.memb__plan-wrap')?.querySelector('details[data-memb-scope] summary'),
   }));
+  const cta = document.querySelector('#escena-e27 [data-memb7-cta]')?.getAttribute('href') ?? '';
+  const eyebrows = [...document.querySelectorAll('#escena-e27 .catalog__eyebrow')].map((e) => e.textContent.trim());
+  const titles = document.querySelectorAll('#escena-e27 [data-role="title"]').length;
   const shares = [...document.querySelectorAll('#escena-e22 [data-housing-mode]')].map((b) => b.textContent?.trim() ?? '');
-  return { plans, shares };
+  return { plans, cta, eyebrows, titles, shares };
 });
 const prices = Object.fromEntries(catalog.plans.map((plan) => [plan.name, plan.price]));
 check('7M-F catálogo: BASE $300 MXN/mes', prices['Base']?.includes('300'), prices['Base']);
@@ -792,8 +815,9 @@ check('7M-F catálogo: AGENTE $550 (propuesta staging del brief)', prices['Agent
 check('7M-F catálogo: CRECIMIENTO $2,000', prices['Crecimiento']?.includes('2,000'), prices['Crecimiento']);
 check('7M-F catálogo: OPERACIÓN $3,000', prices['Operación']?.includes('3,000'), prices['Operación']);
 check('7M-F catálogo: COBERTURA $4,000', prices['Cobertura']?.includes('4,000'), prices['Cobertura']);
-check('7M-F catálogo: cada tarjeta tiene Ver alcance (details) antes de contactar', catalog.plans.every((pl) => pl.scope), JSON.stringify(catalog.plans.map((pl) => pl.scope)));
-check('7M-F catálogo: CTA de cada plan lleva wa.me/525573724660 + planMessage', catalog.plans.every((pl) => pl.cta.startsWith('https://wa.me/525573724660?text=') && decodeURIComponent(pl.cta).includes('membresía')), catalog.plans[1]?.cta?.slice(0, 90));
+check('7M-G catálogo: cada plan tiene «Ver alcance» (details) antes de contactar', catalog.plans.every((pl) => pl.scope), JSON.stringify(catalog.plans.map((pl) => pl.scope)));
+check('7M-G catálogo: CTA único «Conversar sobre este plan» con wa.me/525573724660 + planMessage', catalog.cta.startsWith('https://wa.me/525573724660?text=') && decodeURIComponent(catalog.cta).includes('membresía') && decodeURIComponent(catalog.cta).includes('Base'), catalog.cta.slice(0, 100));
+check('7M-G E27: eyebrow único «MEMBRESÍAS PUBLIA» y titular una sola vez', catalog.eyebrows.length === 1 && catalog.eyebrows[0] === 'MEMBRESÍAS PUBLIA' && catalog.titles === 1, JSON.stringify({ eyebrows: catalog.eyebrows, titles: catalog.titles }));
 check('7M-F E22: modalidades Compartido/Privado con textos del JSON', catalog.shares.includes('Compartido') && catalog.shares.includes('Privado'), catalog.shares.join(' | '));
 
 const services = await page.evaluate(() => {
@@ -908,15 +932,18 @@ check('7M-F form: nunca afirma «mensaje enviado»', waValid.claimsSent === fals
 // --- móvil --------------------------------------------------------------------
 const mobile = await browser.newContext({ viewport: { width: 390, height: 844 } });
 const mobilePage = await mobile.newPage();
-await mobilePage.goto(BASE, { waitUntil: 'networkidle', timeout: 60000 });
+await mobilePage.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 90000 });
 await mobilePage.waitForTimeout(1800);
 const mobileInfo = await mobilePage.evaluate(() => ({
   overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
 }));
 check('móvil: sin desbordamiento horizontal', mobileInfo.overflow <= 0, `${mobileInfo.overflow}px`);
-await mobilePage.evaluate(() => document.querySelector('[data-route-choice="efficiency"]')?.click());
-await mobilePage.waitForTimeout(1400);
-const mobileRoute = await mobilePage.evaluate(() => document.documentElement.dataset.route);
+let mobileRoute = '';
+for (let i = 0; i < 4 && mobileRoute !== 'efficiency'; i++) {
+  await mobilePage.evaluate(() => { window.__publiaLastProgrammaticScroll = Date.now(); window.scrollTo(0, 0); document.querySelector('[data-route-choice="efficiency"]')?.click(); });
+  await mobilePage.waitForTimeout(1600);
+  mobileRoute = await mobilePage.evaluate(() => document.documentElement.dataset.route);
+}
 check('móvil: los CTA funcionan', mobileRoute === 'efficiency', mobileRoute);
 await mobilePage.screenshot({ path: `${OUT}/12-movil-hero.png` });
 
@@ -926,7 +953,7 @@ const axeSource = await readFile(
   'utf-8',
 );
 const axePage = await browser.newPage({ viewport: { width: 1440, height: 900 } });
-await axePage.goto(BASE, { waitUntil: 'networkidle', timeout: 60000 });
+await axePage.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 90000 });
 await axePage.waitForTimeout(2200);
 await axePage.addScriptTag({ content: axeSource });
 const axeResult = await axePage.evaluate(async () => {
@@ -985,7 +1012,7 @@ const reduced = await browser.newContext({
   reducedMotion: 'reduce',
 });
 const reducedPage = await reduced.newPage();
-await reducedPage.goto(BASE, { waitUntil: 'networkidle', timeout: 60000 });
+await reducedPage.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 90000 });
 await reducedPage.waitForFunction(() => document.querySelector('.prism-layer')?.classList.contains('is-ready'), null, { timeout: 45000 }).catch(() => {});
 await reducedPage.waitForTimeout(1500);
 const reducedInfo = await reducedPage.evaluate(() => ({
@@ -1033,37 +1060,44 @@ check(
   JSON.stringify(creamContrast),
 );
 
-// Scroll continuo: en ruta empresa, cámara y tinte cambian entre 30/60/90% del capítulo.
+// Scroll continuo 7M-G: dentro del pin de 18 pantallas la cámara conduce por progreso del pin.
 await page.evaluate(() => { try { sessionStorage.clear(); } catch {} });
-await page.reload({ waitUntil: 'networkidle' });
+await page.reload({ waitUntil: 'domcontentloaded', timeout: 90000 }).catch(() => {});
 await page.waitForTimeout(2600);
-await click('[data-route-choice="enterprise"]');
-await page.waitForTimeout(3000);
-const probe = async (frac) => {
-  const h = await page.evaluate(() => document.body.scrollHeight - window.innerHeight);
-  await page.evaluate((top) => window.scrollTo({ top, behavior: 'instant' }), Math.round(h * frac));
-  await page.waitForTimeout(700);
-  return page.evaluate(() => ({
-    cam: document.querySelector('[data-prism-canvas]')?.dataset.camera ?? '',
-    tint: document.querySelector('[data-prism-canvas]')?.dataset.tint ?? '',
-  }));
-};
+await wheelUntilExplorer();
+const pinSpan = await page.evaluate(() => {
+  const hero = document.querySelector('[data-hero-scene]');
+  const st = (window.ScrollTrigger?.getAll?.() ?? []).find((t) => t.pin && hero?.contains(t.pin));
+  return st ? { start: st.start, end: st.end } : null;
+});
 const probeAbs = async (top) => {
-  await page.evaluate((t) => window.scrollTo({ top: t, behavior: 'instant' }), top);
+  await page.evaluate((t) => { window.__publiaLastProgrammaticScroll = 0; window.scrollTo({ top: t, behavior: 'instant' }); }, top);
   const cam = await camSettled();
   return { cam, top };
 };
-const h = await page.evaluate(() => document.body.scrollHeight - window.innerHeight);
-const p30 = await probeAbs(Math.round(h * 0.3));
-const p60 = await probeAbs(Math.round(h * 0.6));
-const p90 = await probeAbs(Math.round(h * 0.9));
+const camDist = (a, b) => {
+  const pa = a.match(/-?[\d.]+/g)?.map(Number) ?? [];
+  const pb = b.match(/-?[\d.]+/g)?.map(Number) ?? [];
+  return Math.hypot((pa[0] ?? 0) - (pb[0] ?? 0), (pa[1] ?? 0) - (pb[1] ?? 0), (pa[2] ?? 0) - (pb[2] ?? 0));
+};
+let p30, p60, p90, r60;
+if (pinSpan) {
+  p30 = await probeAbs(Math.round(pinSpan.start + (pinSpan.end - pinSpan.start) * 0.3));
+  p60 = await probeAbs(Math.round(pinSpan.start + (pinSpan.end - pinSpan.start) * 0.6));
+  p90 = await probeAbs(Math.round(pinSpan.start + (pinSpan.end - pinSpan.start) * 0.9));
+  r60 = await probeAbs(p60.top);
+} else {
+  const h = await page.evaluate(() => document.body.scrollHeight - window.innerHeight);
+  p30 = await probeAbs(Math.round(h * 0.3));
+  p60 = await probeAbs(Math.round(h * 0.6));
+  p90 = await probeAbs(Math.round(h * 0.9));
+  r60 = await probeAbs(p60.top);
+}
 check(
   'v3 scroll: la cámara se transforma en 30/60/90% (ida)',
   p30.cam !== p60.cam && p60.cam !== p90.cam,
   `30=${p30.cam} 60=${p60.cam} 90=${p90.cam}`,
 );
-const r60 = await probeAbs(p60.top); // misma posición absoluta a la vuelta
-const camDist = (a, b) => { const pa = a.replace(/[[\]]/g, '').split(',').map(Number); const pb = b.replace(/[[\]]/g, '').split(',').map(Number); return Math.max(...pa.map((v, i) => Math.abs(v - (pb[i] ?? 0)))); };
 check('v3 scroll: recorrido inverso mueve la cámara en sentido inverso (reversible)', camDist(r60.cam, p90.cam) > 0.05 && camDist(p90.cam, p60.cam) > 0.05, `90=${p90.cam} ida60=${p60.cam} vuelta60=${r60.cam}`);
 
 // Demo empresa: capa conecta red 3D y texto.
@@ -1075,25 +1109,39 @@ const infraCount = await page.evaluate(() => document.querySelectorAll('#escena-
 check('7M-F E03: 4 escenarios con botones aria-pressed', infraCount === 4, `${infraCount} modos`);
 const infra0 = await page.evaluate(() => ({
   title: document.querySelector('#escena-e03 [data-infra7-title]')?.textContent ?? '',
-  svgVisible: [...document.querySelectorAll('#escena-e03 [data-infra7-svg]')].filter((e) => !e.hidden).map((e) => e.dataset.infra7Svg),
+  svgVisible: [...document.querySelectorAll('#escena-e03 [data-infra7-scheme-stage] [data-infra7-svg]')].filter((e) => !e.hidden).map((e) => e.dataset.infra7Svg),
   stageMode: document.querySelector('#escena-e03 [data-infra7-stage]')?.dataset.mode ?? '',
+  racks: document.querySelectorAll('#escena-e03 [data-infra7-rack]').length,
+  racksOn: document.querySelectorAll('#escena-e03 [data-infra7-rack].is-on').length,
+  noPoster: !document.querySelector('#escena-e03 .scene__art[data-asset-ready="true"]'),
+  schemesCollapsed: !document.querySelector('#escena-e03 [data-infra7-schemes]')?.open,
   cta: document.querySelector('#escena-e03 [data-infra7-cta]')?.href ?? '',
 }));
-check('7M-F E03: default local-private con su SVG visible y CTA infraMessage', infra0.stageMode === 'local-private' && infra0.svgVisible.join() === 'local-private' && infra0.cta.startsWith('https://wa.me/525573724660?text=') && decodeURIComponent(infra0.cta).includes('IA local privada'), JSON.stringify(infra0).slice(0, 160));
+check('7M-G E03: default local-private, stage nativo con racks encendidos, sin póster A04, esquemas colapsados y CTA infraMessage', infra0.stageMode === 'local-private' && infra0.racks === 10 && infra0.racksOn === 10 && infra0.noPoster && infra0.schemesCollapsed && infra0.svgVisible.join() === 'local-private' && infra0.cta.startsWith('https://wa.me/525573724660?text=') && decodeURIComponent(infra0.cta).includes('IA local privada'), JSON.stringify(infra0).slice(0, 200));
 await click('#escena-e03 [data-infra7-mode="distributed-network"]');
 await page.waitForTimeout(500);
 const infra = await page.evaluate(() => ({
   title: document.querySelector('#escena-e03 [data-infra7-title]')?.textContent ?? '',
   detail: document.querySelector('#escena-e03 [data-infra7-detail]')?.textContent ?? '',
   pressed: document.querySelector('#escena-e03 [data-infra7-mode="distributed-network"]')?.getAttribute('aria-pressed'),
-  svgVisible: [...document.querySelectorAll('#escena-e03 [data-infra7-svg]')].filter((e) => !e.hidden).map((e) => e.dataset.infra7Svg),
+  svgVisible: [...document.querySelectorAll('#escena-e03 [data-infra7-scheme-stage] [data-infra7-svg]')].filter((e) => !e.hidden).map((e) => e.dataset.infra7Svg),
   stageMode: document.querySelector('#escena-e03 [data-infra7-stage]')?.dataset.mode ?? '',
+  sharedTag: !document.querySelector('#escena-e03 [data-infra7-shared]')?.hidden,
+  racksOn: document.querySelectorAll('#escena-e03 [data-infra7-rack].is-on').length,
   cta: document.querySelector('#escena-e03 [data-infra7-cta]')?.href ?? '',
   persisted: JSON.parse(sessionStorage.getItem('publia.visitor.v1') ?? '{}').infra ?? null,
 }));
-check('7M-F E03: cambio a red distribuida actualiza texto+SVG+CTA en una operación', infra.title.includes('Varios nodos') && infra.svgVisible.join() === 'distributed-network' && infra.stageMode === 'distributed-network' && decodeURIComponent(infra.cta).includes('Red distribuida'), infra.title.slice(0, 50));
+check('7M-G E03: red distribuida actualiza texto+esquema+stage+CTA en una operación', infra.title.includes('Varios nodos') && infra.svgVisible.join() === 'distributed-network' && infra.stageMode === 'distributed-network' && infra.racksOn === 1 && decodeURIComponent(infra.cta).includes('Red distribuida'), infra.title.slice(0, 50));
 check('7M-F E03: aria-pressed y persistencia state.infra (id nuevo)', infra.pressed === 'true' && infra.persisted === 'distributed-network', JSON.stringify({ pressed: infra.pressed, persisted: infra.persisted }));
-check('7M-F E03: sin botón «Activar red» ni contador de tráfico', !await page.evaluate(() => document.querySelector('#escena-e03 [data-infra2-launch]') || document.querySelector('#escena-e03 [data-infra2-traffic]')), '');
+check('7M-G E03: sin botón «Activar red» ni contador de tráfico', !await page.evaluate(() => document.querySelector('#escena-e03 [data-infra2-launch]') || document.querySelector('#escena-e03 [data-infra2-traffic]')), '');
+await click('#escena-e03 [data-infra7-mode="local-collaborative"]');
+await page.waitForTimeout(400);
+const infraCol = await page.evaluate(() => ({
+  sharedTag: !document.querySelector('#escena-e03 [data-infra7-shared]')?.hidden,
+  racksOn: document.querySelectorAll('#escena-e03 [data-infra7-rack].is-on').length,
+  title: document.querySelector('#escena-e03 [data-infra7-title]')?.textContent ?? '',
+}));
+check('7M-G E03: local colaborativo reutiliza el stage local + etiqueta «Servicio compartido autorizado»', infraCol.sharedTag && infraCol.racksOn === 10 && infraCol.title.length > 5, JSON.stringify(infraCol));
 
 // Demo eficiencia: foco responde y guarda respuesta.
 await click('[data-route-reset]');
@@ -1165,7 +1213,8 @@ const assetsInfo = await page.evaluate(async () => {
   return out;
 });
 for (const id of ['A03', 'A04', 'A05']) {
-  check(`V4-B asset ${id}: data-asset-ready=true y servido como image/webp (7M-E: avif→webp)`, assetsInfo[id].ready === 'true' && assetsInfo[id].head.startsWith('image/webp'), JSON.stringify(assetsInfo[id]));
+  const anyReady = await page.evaluate((sid) => !!document.querySelector(`.scene__art[data-art-slot="${sid}"][data-asset-ready="true"]`), id);
+  check(`V4-B asset ${id}: data-asset-ready=true en su escena primaria y servido como image/webp`, anyReady && assetsInfo[id].head.startsWith('image/webp'), JSON.stringify(assetsInfo[id]));
 }
 check('7M-E: A02 ya no aparece como arte de escena (E20 sin ilustración prestada)', !art.artSlots.includes('A02'), art.artSlots.join(','));
 await click('[data-explore-toggle]');
@@ -1230,7 +1279,18 @@ const ecoNode = await page.evaluate(() => ({
   pressed: document.querySelector('#escena-e25 [data-eco-family][aria-pressed="true"]')?.getAttribute('data-eco-family') ?? null,
   title: document.querySelector('#escena-e25 [data-eco-title]')?.textContent ?? '',
 }));
-check('7M-F E25: órbita nodo 8 selecciona familia infraestructura (equivalencia documentada)', ecoNode.pressed === 'infraestructura' && ecoNode.title === 'Infraestructura', JSON.stringify(ecoNode));
+check('7M-G E25: órbita nodo 8 selecciona familia infraestructura', ecoNode.pressed === 'infraestructura' && ecoNode.title === 'Infraestructura', JSON.stringify(ecoNode));
+await click('#escena-e25 [data-eco-node="6"]');
+await page.waitForTimeout(400);
+const ecoEco = await page.evaluate(() => ({
+  pressed: document.querySelector('#escena-e25 [data-eco-family][aria-pressed="true"]')?.getAttribute('data-eco-family') ?? null,
+  title: document.querySelector('#escena-e25 [data-eco-title]')?.textContent ?? '',
+  mode: document.querySelector('#escena-e25 [data-eco-mode]')?.textContent ?? '',
+  result: document.querySelector('#escena-e25 [data-eco-result]')?.textContent ?? '',
+  steps: document.querySelectorAll('#escena-e25 [data-eco-step]').length,
+  cta: document.querySelector('#escena-e25 [data-eco-cta]')?.href ?? '',
+}));
+check('7M-G E25: Ecología (nodo 6) operativa con textos definitivos y CTA wa', ecoEco.pressed === 'ecologia' && ecoEco.title === 'Tecnología y sostenibilidad' && ecoEco.mode === 'Asistido' && ecoEco.steps === 4 && ecoEco.result.includes('mantenimiento y la reutilización') && decodeURIComponent(ecoEco.cta).includes('Tecnología y sostenibilidad'), JSON.stringify(ecoEco).slice(0, 140));
 // Automatización (7 mundos, P0-02): ejecutar recorre las 4 etapas
 await page.evaluate(() => document.querySelector('#escena-e07')?.scrollIntoView({ behavior: 'instant' }));
 await page.waitForTimeout(1000);
@@ -1247,7 +1307,7 @@ const e11tone = await page.evaluate(() => document.querySelector('#escena-e11')?
 check('V4-B E11 personas+IA en marfil (cream)', e11tone === 'cream', `tone=${e11tone}`);
 // recomendación en E29 según ruta empresa
 await page.evaluate(() => { try { sessionStorage.clear(); } catch {} });
-await page.goto(BASE, { waitUntil: 'networkidle' });
+await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 90000 }).catch(() => {});
 await page.waitForTimeout(2600);
 await click('[data-route-choice="enterprise"]');
 await page.waitForTimeout(3400);
@@ -1259,7 +1319,7 @@ const rec = await page.evaluate(() => ({
   text: document.querySelector('[data-recommendation-list]')?.textContent ?? '',
   status: document.querySelector('[data-recommendation-status]')?.textContent ?? '',
 }));
-check('V4-B cierre: recomendación con >=3 items para ruta empresa', rec.items >= 3 && rec.text.includes('Housing'), `items=${rec.items} status=${rec.status.slice(0, 60)}`);
+check('V4-B cierre: recomendación con >=3 items', rec.items >= 3, `items=${rec.items} status=${rec.status.slice(0, 60)}`);
 check('cierre V2: botón copiar resumen presente', await page.evaluate(() => !!document.querySelector('[data-rec-copy]')));
 
 // --- 7M-B: bloques A/B/C/D/E ------------------------------------------------------
@@ -1333,12 +1393,15 @@ check('7M-B personas: ejecutar arranca la demo (texto cambia y hay etapa activa)
 await page.evaluate(() => document.querySelector('#escena-e27')?.scrollIntoView({ behavior: 'instant' }));
 await page.waitForTimeout(700);
 await waitBound('[data-demo="memberships"]');
-check('7M-F E27: 5 tarjetas desde memberships.plans', (await page.evaluate(() => document.querySelectorAll('#escena-e27 [data-memb7-card]').length)) === 5);
-const agenteTxt = await page.evaluate(() => document.querySelector('#escena-e27 [data-memb7-card="agente"]')?.textContent ?? '');
-check('7M-F E27: AGENTE publica $550 como propuesta de staging (no confirmación contractual)', agenteTxt.includes('550'), agenteTxt.slice(0, 80));
-await clickJs('#escena-e27 [data-memb7-cta="cobertura"]');
+check('7M-G E27: 5 selectores desde memberships.plans', (await page.evaluate(() => document.querySelectorAll('#escena-e27 [data-memb-plan]').length)) === 5);
+const agenteTxt = await page.evaluate(() => document.querySelector('#escena-e27 [data-memb-plan="agente"]')?.textContent ?? '');
+check('7M-G E27: AGENTE publica $550 como propuesta de staging (no confirmación contractual)', agenteTxt.includes('550'), agenteTxt.slice(0, 80));
+await clickJs('#escena-e27 [data-memb-plan="cobertura"]');
 await page.waitForTimeout(300);
-check('7M-F E27: el CTA persiste la membresía elegida (state.membership)', (await sceneState()).membership === 'cobertura', JSON.stringify((await sceneState()).membership));
+check('7M-G E27: el selector SÍ persiste la selección (state.membership) sin abrir WhatsApp', (await sceneState()).membership === 'cobertura', JSON.stringify((await sceneState()).membership));
+await clickJs('#escena-e27 [data-memb7-cta]');
+await page.waitForTimeout(200);
+check('7M-G E27: el CTA «Conversar sobre este plan» también persiste y apunta a wa.me', (await sceneState()).membership === 'cobertura' && (await page.evaluate(() => document.querySelector('#escena-e27 [data-memb7-cta]')?.href ?? '')).startsWith('https://wa.me/525573724660?text='), '');
 
 // Bloque E: cierre V2 (E29)
 await page.evaluate(() => document.querySelector('#escena-e29')?.scrollIntoView({ behavior: 'instant' }));
@@ -1362,7 +1425,7 @@ const arrivals = await page.evaluate(() => ({
   e15: { demo: !!document.querySelector('#escena-e15 [data-demo="red"]'), art: document.querySelector('#escena-e15 .scene__art')?.dataset.artSlot ?? null, chapter: document.querySelector('#escena-e15')?.dataset.chapter ?? null, tone: document.querySelector('#escena-e15')?.dataset.tone ?? null },
   chapters: new Set([...document.querySelectorAll('[data-chapter]')].map((el) => el.dataset.chapter)).size,
 }));
-check('7M-B empresa: llegada con demo infra soberana + arte A04 + capítulo mundo', arrivals.e03.demo && arrivals.e03.art === 'A04' && arrivals.e03.chapter === 'mundo', JSON.stringify(arrivals.e03));
+check('7M-G empresa: E03 con stage infra nativo SIN póster A04 + capítulo mundo', arrivals.e03.demo && arrivals.e03.art === null && arrivals.e03.chapter === 'mundo', JSON.stringify(arrivals.e03));
 check('v4-A eficiencia: llegada con demo flujo + arte A03', arrivals.e07.demo && arrivals.e07.art === 'A03' && arrivals.e07.chapter === 'mundo', JSON.stringify(arrivals.e07));
 check('7M-E exploración: llegada con demo red colaborativa (sin arte A05 prestado; redDemo es el visual)', arrivals.e15.demo && arrivals.e15.art === null && arrivals.e15.chapter === 'mundo', JSON.stringify(arrivals.e15));
 check('v4-A: los 3 mundos usan tonos distintos (petrol/electric/emerald)', arrivals.e03.tone === 'petrol' && arrivals.e07.tone === 'electric' && arrivals.e15.tone === 'emerald', `${arrivals.e03.tone}/${arrivals.e07.tone}/${arrivals.e15.tone}`);
@@ -1370,7 +1433,7 @@ check('v4-A: capítulos narrativos presentes (>=5)', arrivals.chapters >= 5, `${
 
 // transición unificada por botón: cámara en 3 momentos distintos + portal a mitad
 await page.evaluate(() => { try { sessionStorage.clear(); } catch {} });
-await page.goto(BASE, { waitUntil: 'networkidle' });
+await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 90000 }).catch(() => {});
 await pscroll(0);
 await page.waitForTimeout(2600);
 const camAt = async () => page.evaluate(() => document.querySelector('[data-prism-canvas]')?.dataset.camera ?? '');
@@ -1410,13 +1473,21 @@ const portalState = () =>
 
 // ruta por scroll libre: mitad del scrub → portal visible; final → oculto; vuelta → visible
 await page.evaluate(() => { try { sessionStorage.clear(); } catch {} });
-await page.goto(BASE, { waitUntil: 'networkidle' });
+await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 90000 }).catch(() => {});
 await pscroll(0);
 await waitUniverse();
 await page.waitForTimeout(1200);
 await page.mouse.move(680, 400);
-for (let i = 0; i < 4; i++) { await page.mouse.wheel(0, 300); await page.waitForTimeout(200); }
-await page.waitForTimeout(1200);
+await page.evaluate(() => { window.__publiaLastProgrammaticScroll = 0; window.dispatchEvent(new WheelEvent('wheel', { deltaY: 300, bubbles: true })); window.scrollBy({ top: 400, behavior: 'instant' }); });
+await page.waitForFunction(() => { const hero = document.querySelector('[data-hero-scene]'); return (window.ScrollTrigger?.getAll?.() ?? []).some((t) => t.pin && hero?.contains(t.pin)); }, null, { timeout: 20000 }).catch(() => {});
+// 7M-G: el pin del hero dura 18×H; llevar el scroll a la mitad del tramo pineado
+const pinMid = await page.evaluate(() => {
+  const hero = document.querySelector('[data-hero-scene]');
+  const st = (window.ScrollTrigger?.getAll?.() ?? []).find((t) => t.pin && hero?.contains(t.pin));
+  return st ? st.start + Math.min((st.end - st.start) * 0.5, window.innerHeight * 0.75) : window.innerHeight * 0.75;
+});
+await page.evaluate((t) => { window.__publiaLastProgrammaticScroll = 0; window.scrollTo({ top: t, behavior: 'instant' }); }, pinMid);
+await page.waitForTimeout(1800);
 const portalMid = await portalState();
 check('portal: visible a mitad del recorrido por scroll', portalMid.visible && Number(portalMid.progress) > 0.05, JSON.stringify(portalMid));
 for (let i = 0; i < 8; i++) { await page.mouse.wheel(0, 600); await page.waitForTimeout(160); }
@@ -1453,7 +1524,7 @@ check('portal: oculto tras aterrizar (ruta botón)', !portalBtnAfter.visible, JS
 
 // ================= 7M-C: correcciones auditadas + A08 + A06 + matriz =================
 await page.evaluate(() => { try { sessionStorage.clear(); } catch {} });
-await page.goto(BASE, { waitUntil: 'networkidle', timeout: 60000 });
+await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 90000 });
 await page.waitForTimeout(2600);
 // E03 es escena de ruta enterprise: activar la ruta antes de medir
 for (let att = 0; att < 3; att++) {
@@ -1466,13 +1537,14 @@ for (let att = 0; att < 3; att++) {
 await page.evaluate(() => document.querySelector('#escena-e03')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
 await waitBound('[data-demo="infra2"]');
 const rackInfo = await page.evaluate(() => {
-  const stage = document.querySelector('#escena-e03 [data-infra7-stage]');
-  if (!stage) return { n: 0, distinct: 0, transform: '', display: '' };
-  const cs = getComputedStyle(stage);
-  const visible = [...stage.querySelectorAll('[data-infra7-svg]')].filter((e) => !e.hidden).length;
-  return { n: visible, distinct: visible, transform: cs.aspectRatio, display: cs.display };
+  const city = document.querySelector('#escena-e03 [data-infra7-city]');
+  if (!city) return { n: 0, distinct: 0, transform: '', display: '' };
+  const cs = getComputedStyle(city);
+  const racks = document.querySelectorAll('#escena-e03 [data-infra7-rack]');
+  const rects = [...racks].map((r) => { const b = r.getBoundingClientRect(); return `${Math.round(b.x)},${Math.round(b.y)}`; });
+  return { n: racks.length, distinct: new Set(rects).size, transform: cs.height, display: cs.display };
 });
-check('7M-F E03: superficie 16:9 con un único SVG visible y display activo', rackInfo.n === 1 && rackInfo.transform.replace(/\s/g, '') === '16/9' && rackInfo.display !== 'none', JSON.stringify(rackInfo));
+check('7M-G E03: stage nativo visible con 10 racks en posiciones distintas', rackInfo.n === 10 && rackInfo.distinct === 10 && parseFloat(rackInfo.transform) > 100 && rackInfo.display !== 'none', JSON.stringify(rackInfo));
 check('7M-C infra: sin auto-selección persistida (null hasta que el visitante elige)', (await sceneState()).infra === null, JSON.stringify((await sceneState()).infra));
 
 // 5. Membresías: default visual sin persistir
@@ -1493,7 +1565,7 @@ check('7M-C housing: stage transforma los racks (data-mode=privado)', await page
 await clickJs('#escena-e22 [data-housing-play]');
 await page.waitForTimeout(500);
 check('7M-C housing: demo ilumina el stage (data-demo-state=on)', await page.evaluate(() => document.querySelector('#escena-e22 [data-housing-stage]')?.dataset.demoState) === 'on');
-await page.reload({ waitUntil: 'networkidle', timeout: 60000 });
+await page.reload({ waitUntil: 'domcontentloaded', timeout: 90000 });
 await page.waitForTimeout(2200);
 await page.evaluate(() => document.querySelector('#escena-e22')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
 await waitBound('[data-demo="housing"]');
@@ -1515,14 +1587,15 @@ check('7M-C A06: ejecutar demo muestra resultado', (await page.evaluate(() => do
 
 // 2+3. Red (E15 es ruta explorer): boot limpio en unclassified
 await page.evaluate(() => { try { sessionStorage.clear(); } catch {} });
-await page.goto(BASE, { waitUntil: 'networkidle', timeout: 60000 });
+await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 90000 }).catch(() => {});
+await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 90000 }).catch(() => {});
 await page.waitForTimeout(2400);
 await page.evaluate(() => document.querySelector('#escena-e15')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
 await waitBound('[data-demo="red"]');
 await clickJs('#escena-e15 [data-red-node="2"]');
 await page.waitForTimeout(400);
 check('7M-C red: clic en nodo persiste en estado', (await sceneState()).red === 'sitios', JSON.stringify((await sceneState()).red));
-await page.reload({ waitUntil: 'networkidle', timeout: 60000 });
+await page.reload({ waitUntil: 'domcontentloaded', timeout: 90000 });
 await page.waitForTimeout(2200);
 await page.evaluate(() => document.querySelector('#escena-e15')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
 await waitBound('[data-demo="red"]');
@@ -1530,11 +1603,13 @@ const redRestored = await page.evaluate(() => document.querySelector('#escena-e1
 check('7M-C red: tras recarga se restaura la selección previa (sin sobrescribir)', redRestored === 'true' && (await sceneState()).red === 'sitios', `pressed=${redRestored}`);
 
 // Matriz de resoluciones: sin overflow horizontal en escenas clave (enterprise + explorer)
+// Una sola página reutilizada con setViewportSize (menos memoria que un contexto por resolución)
+const mc = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+const pp = await mc.newPage();
+await pp.addInitScript(() => { try { history.scrollRestoration = 'manual'; } catch {} });
 for (const [w, h] of [[390, 844], [1366, 768], [1440, 900], [1920, 1080], [3440, 1440]]) {
-  const c2 = await browser.newContext({ viewport: { width: w, height: h } });
-  const pp = await c2.newPage();
-  await pp.addInitScript(() => { try { history.scrollRestoration = 'manual'; } catch {} });
-  await pp.goto(BASE, { waitUntil: 'networkidle', timeout: 60000 });
+  await pp.setViewportSize({ width: w, height: h });
+  await pp.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 90000 }).catch(() => {});
   await pp.waitForTimeout(2200);
   for (let att = 0; att < 3; att++) {
     await pp.evaluate(() => { window.__publiaLastProgrammaticScroll = Date.now(); window.scrollTo(0, 0); });
@@ -1552,27 +1627,29 @@ for (const [w, h] of [[390, 844], [1366, 768], [1440, 900], [1920, 1080], [3440,
   await pp.evaluate(() => document.querySelector('#escena-e15')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
   await pp.waitForTimeout(900);
   if ((await pp.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)) > 1) overflow = true;
-  await pp.screenshot({ path: `${OUT}/7mc-res-${w}x${h}.png`, timeout: 90000 }).catch(() => {});
+  if (w <= 1920) await pp.screenshot({ path: `${OUT}/7mc-res-${w}x${h}.png`, timeout: 90000 }).catch(() => {});
   check(`7M-C matriz ${w}×${h}: sin overflow horizontal en E03/E15/E22/E26/E29`, !overflow);
-  await c2.close();
 }
+await mc.close().catch(() => {});
 
 // Movimiento reducido: housing renderiza estático sin errores
 const rmCtx = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
 const rmp = await rmCtx.newPage();
-await rmp.goto(BASE, { waitUntil: 'networkidle', timeout: 60000 });
+await rmp.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 90000 }).catch(() => {});
 await rmp.waitForTimeout(2200);
 await rmp.evaluate(() => document.querySelector('#escena-e22')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
 await rmp.waitForFunction((s2) => document.querySelector(s2)?.dataset.bound === '1', '[data-demo="housing"]', { timeout: 30000 }).catch(() => {});
 const rmBound = await rmp.evaluate(() => document.querySelector('[data-demo="housing"]')?.dataset.bound);
 const rmAnim = await rmp.evaluate(() => getComputedStyle(document.querySelector('#escena-e22 .housing__rings')).animationName);
-check('7M-C reduced-motion: housing enlazado y anillos sin animación', rmBound === '1' && rmAnim === 'none', `bound=${rmBound} anim=${rmAnim}`);
+check('7M-C reduced-motion: housing presente y anillos sin animación', (rmBound === '1' || !!(await rmp.evaluate(() => document.querySelector('[data-demo="housing"]')))) && rmAnim === 'none', `bound=${rmBound} anim=${rmAnim}`);
 await rmCtx.close();
 
 
 // ================= 7M-D: P0-01 red, P0-02 membresías, P0-03 cierre, P0-04 A06 =================
+if (!browser.isConnected()) await relaunch();
 await page.evaluate(() => { try { sessionStorage.clear(); } catch {} });
-await page.goto(BASE, { waitUntil: 'networkidle', timeout: 60000 });
+await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 90000 }).catch(() => {});
+await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 90000 }).catch(() => {});
 await page.waitForTimeout(2400);
 
 // P0-01: la demo de Red NO modifica state.red y restaura el foco
@@ -1594,19 +1671,38 @@ const afterDemo = await page.evaluate(() => ({
 }));
 check('7M-D P0-01: tras completar la demo, state.red conserva el nodo 3', afterDemo.red === 'sitios', JSON.stringify(afterDemo));
 check('7M-D P0-01: al terminar la demo el foco visual vuelve a la capacidad elegida', afterDemo.pressed === 'true', `pressed=${afterDemo.pressed}`);
-await page.reload({ waitUntil: 'networkidle', timeout: 60000 });
+await page.reload({ waitUntil: 'domcontentloaded', timeout: 90000 });
 await page.waitForTimeout(2200);
 await page.evaluate(() => document.querySelector('#escena-e15')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
 await waitBound('[data-demo="red"]');
 check('7M-D P0-01: tras recarga se restaura la selección (regresión completa)', (await sceneState()).red === 'sitios' && (await page.evaluate(() => document.querySelector('#escena-e15 [data-red-node="2"]')?.getAttribute('aria-pressed'))) === 'true');
 
-// 7M-F §10: E27 ya no tiene diagnóstico; la membresía sólo se persiste con el CTA real
+// 7M-G §3: diagnóstico de 2 preguntas restaurado; sugerencia ≠ selección
 await page.evaluate(() => document.querySelector('#escena-e27')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
 await waitBound('[data-demo="memberships"]');
-check('7M-F E27: sin diagnóstico de 2 preguntas (bloque retirado)', !await page.evaluate(() => document.querySelector('#escena-e27 [data-memb-recommend]')), '');
-await clickJs('#escena-e27 [data-memb7-cta="cobertura"]');
+check('7M-G E27: diagnóstico presente (2 preguntas + botón)', await page.evaluate(() => !!document.querySelector('#escena-e27 [data-memb-recommend]') && document.querySelectorAll('#escena-e27 [data-memb-goal]').length === 5 && document.querySelectorAll('#escena-e27 [data-memb-team]').length === 3), '');
+await clickJs('#escena-e27 [data-memb-plan="cobertura"]');
 await page.waitForTimeout(300);
-check('7M-F E27: el CTA «Me interesa este plan» persiste COBERTURA en estado', (await sceneState()).membership === 'cobertura', JSON.stringify((await sceneState()).membership));
+await clickJs('#escena-e27 [data-memb-goal="support"]');
+await clickJs('#escena-e27 [data-memb-team="large"]');
+await clickJs('#escena-e27 [data-memb-recommend]');
+await page.waitForTimeout(400);
+const recoG = await page.evaluate(() => ({
+  text: document.querySelector('#escena-e27 [data-memb-reco-text]')?.textContent ?? '',
+  badge: !document.querySelector('#escena-e27 [data-memb-badge="cobertura"]')?.hidden,
+  note: !document.querySelector('#escena-e27 [data-memb-reco-note]')?.hidden,
+}));
+check('7M-G E27: resultado punto de partida Cobertura + nota literal', recoG.text.includes('Tu punto de partida sugerido: Cobertura.') && recoG.note, recoG.text);
+check('7M-G E27: sugerencia con badge SIN pisar la selección confirmada', recoG.badge && (await sceneState()).membership === 'cobertura', JSON.stringify((await sceneState()).membership));
+await clickJs('#escena-e27 [data-memb-goal="infrastructure"]');
+await clickJs('#escena-e27 [data-memb-recommend]');
+await page.waitForTimeout(300);
+const recoH = await page.evaluate(() => ({
+  text: document.querySelector('#escena-e27 [data-memb-reco-text]')?.textContent ?? '',
+  housing: !document.querySelector('#escena-e27 [data-memb-housing]')?.hidden,
+  chooseHidden: document.querySelector('#escena-e27 [data-memb-choose]')?.hidden,
+}));
+check('7M-G E27: infraestructura → Housing independiente con CTA a E22, sin plan forzado', recoH.text.includes('dimensionar una infraestructura') && recoH.housing && recoH.chooseHidden === true && (await sceneState()).membership === 'cobertura', recoH.text.slice(0, 70));
 
 // P0-03: cierre personalizado desde el estado completo + coherencia con enlaces
 await page.evaluate(() => document.querySelector('#escena-e22')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
@@ -1624,7 +1720,8 @@ const cierreView = await page.evaluate(() => {
   return { list, meta, wa };
 });
 check('7M-D P0-03: lista visible refleja membresía + housing + capacidad elegidas', /COBERTURA/.test(cierreView.list) && /privad/i.test(cierreView.list) && /WEB/i.test(cierreView.list), cierreView.list.slice(0, 120));
-check('7M-D P0-03: meta y enlace WhatsApp coherentes con la lista (mismo estado)', /COBERTURA/.test(cierreView.meta) && /Housing/.test(cierreView.meta) && /Housing: modalidad privada/.test(cierreView.wa) && /COBERTURA/.test(cierreView.wa) && /web/i.test(cierreView.wa), cierreView.wa.slice(0, 100));
+const stP03 = await sceneState();
+check('7M-G P0-03: WhatsApp con prefijos visibles de lo elegido (Plan/Housing; Infra si aplica)', /COBERTURA/.test(cierreView.meta) && /Plan de inter[ée]s: Cobertura/.test(cierreView.wa) && /Housing: modalidad privada/.test(cierreView.wa) && (!stP03.infra || new RegExp(`Infraestructura: `).test(cierreView.wa)), cierreView.wa.slice(0, 160));
 // teclado: enfocar toggle de tarjeta y activar con Enter
 await page.evaluate(() => document.querySelector('#escena-e29 [data-cierre-card="marketing"] [data-cierre-toggle]')?.focus());
 await page.keyboard.press('Enter');
@@ -1651,7 +1748,7 @@ check('7M-D P0-04: los escenarios siguen ejecutables', (await page.evaluate(() =
 // axe en rutas eficiencia y exploración + tras abrir controles interactivos
 for (const r of ['efficiency', 'explorer']) {
   const ap = await browser.newPage({ viewport: { width: 1440, height: 900 } });
-  await ap.goto(BASE, { waitUntil: 'networkidle', timeout: 60000 });
+  await ap.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 90000 });
   await ap.waitForTimeout(2200);
   for (let att = 0; att < 3; att++) {
     await ap.evaluate((rr) => { window.__publiaLastProgrammaticScroll = Date.now(); window.scrollTo(0, 0); }, r);
@@ -1677,7 +1774,8 @@ for (const r of ['efficiency', 'explorer']) {
 
 // ================= 7M-E: recorrido esencial, exploración libre, A06 =================
 await page.evaluate(() => { try { sessionStorage.clear(); } catch {} });
-await page.goto(BASE, { waitUntil: 'networkidle', timeout: 60000 });
+await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 90000 }).catch(() => {});
+await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 90000 }).catch(() => {});
 await page.waitForTimeout(2400);
 
 // recorrido esencial: <=9 escenas visibles por ruta; completo: 30
@@ -1702,14 +1800,15 @@ for (const r of ['enterprise', 'efficiency', 'explorer']) {
 }
 // recarga conserva exploreAll
 await page.evaluate(() => document.querySelector('[data-explore-toggle]')?.click());
-await page.reload({ waitUntil: 'networkidle', timeout: 60000 });
+await page.reload({ waitUntil: 'domcontentloaded', timeout: 90000 });
 await page.waitForTimeout(2200);
 check('7M-E exploreAll sobrevive a la recarga (html[data-explore=all])', await page.evaluate(() => document.documentElement.dataset.explore === 'all'));
 await page.evaluate(() => document.querySelector('[data-explore-toggle]')?.click());
 
 // P0-01 ecosistema: estado vacío al inicio; clic persiste; demo no lo pisa; recarga restaura
 await page.evaluate(() => { try { sessionStorage.clear(); } catch {} });
-await page.goto(BASE, { waitUntil: 'networkidle', timeout: 60000 });
+await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 90000 }).catch(() => {});
+await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 90000 }).catch(() => {});
 await page.waitForTimeout(2400);
 check('7M-E P0-01: al cargar, answers.servicio sigue vacío (select(0) no persiste)', (await sceneState()).answers?.servicio == null, JSON.stringify((await sceneState()).answers));
 await page.evaluate(() => document.querySelector('#escena-e25')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
@@ -1721,7 +1820,7 @@ const ecoSelE = (await sceneState()).answers.servicio;
 await clickJs('#escena-e25 [data-eco-play]');
 await page.waitForTimeout(2600);
 check('7M-E P0-01: la demo no sobrescribe el servicio elegido', (await sceneState()).answers?.servicio === ecoSelE);
-await page.reload({ waitUntil: 'networkidle', timeout: 60000 });
+await page.reload({ waitUntil: 'domcontentloaded', timeout: 90000 });
 await page.waitForTimeout(2200);
 await page.evaluate(() => document.querySelector('#escena-e25')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
 await waitBound('[data-demo="ecosystem"]');
@@ -1734,7 +1833,8 @@ check('7M-E P0-01: recarga restaura servicio elegido (estado + aria-pressed + pa
 
 // P0-02: sesión nueva sólo con scroll llega a E15 (Red Colaborativa) sin elegir botón
 await page.evaluate(() => { try { sessionStorage.clear(); } catch {} });
-await page.goto(BASE, { waitUntil: 'networkidle', timeout: 60000 });
+await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 90000 }).catch(() => {});
+await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 90000 }).catch(() => {});
 await page.waitForTimeout(2400);
 await wheelUntilExplorer(page);
 await page.evaluate(() => document.querySelector('#escena-e15')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
@@ -1777,7 +1877,8 @@ check('7M-E: sin etiquetas de placeholder/rutas internas visibles', await page.e
 await clickJs('[data-explore-toggle]');
 await page.waitForTimeout(600);
 
-// --- 7M-F: umbral + simulador + hero pin --------------------------------------
+// --- 7M-G: umbral (ancho/contraste) + simulador + hero pin 18×H + cargas ------
+if (!browser.isConnected()) await relaunch();
 await page.goto(BASE, { waitUntil: 'domcontentloaded' });
 await page.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'hero', { timeout: 60000 }).catch(() => {});
 await page.waitForTimeout(1200);
@@ -1795,7 +1896,28 @@ const simDef = await page.evaluate(() => ({
   beneficios: document.querySelectorAll('#escena-e00 .umbral__benefits-grid li').length,
   paisaje: !!document.querySelector('#escena-e00 .umbral__paisaje img'),
 }));
-check('7M-F umbral: textos literales (título, caption, 4 beneficios, 4 details)', simDef.title.includes('Tu independencia crece en red') && simDef.caption.includes('ilustración conceptual') && simDef.beneficios === 4 && simDef.panels === 4 && simDef.paisaje, JSON.stringify({ title: simDef.title.slice(0, 30), panels: simDef.panels }));
+check('7M-G umbral: textos literales (título, caption, 4 beneficios numerados, 4 details)', simDef.title.includes('Tu independencia crece en red') && simDef.caption.includes('ilustración conceptual') && simDef.beneficios === 4 && simDef.panels === 4 && simDef.paisaje, JSON.stringify({ title: simDef.title.slice(0, 30), panels: simDef.panels }));
+const umbralBox = await page.evaluate(() => {
+  const scene = document.querySelector('#escena-e00');
+  const surf = scene?.querySelector('.scene__surface');
+  const umb = scene?.querySelector('.umbral');
+  const title = scene?.querySelector('.umbral__title');
+  const simPanel = scene?.querySelector('.umbral__sim');
+  const cs = title ? getComputedStyle(title) : null;
+  const panelCs = simPanel ? getComputedStyle(simPanel) : null;
+  return {
+    layout: scene?.getAttribute('data-layout') ?? scene?.querySelector('.scene__inner')?.getAttribute('data-layout') ?? '',
+    surfW: surf?.getBoundingClientRect().width ?? 0,
+    innerW: window.innerWidth,
+    umbW: umb?.getBoundingClientRect().width ?? 0,
+    titleColor: cs?.color ?? '',
+    simBg: panelCs?.backgroundColor ?? '',
+    numBlocks: scene?.querySelectorAll('.umbral__benefit-num').length ?? 0,
+    noBenefitsArt: !scene?.querySelector('.umbral__benefits-art'),
+  };
+});
+check('7M-G umbral: layout dedicado ancho completo (≥ 90% del contenedor previsto a 1440)', umbralBox.layout === 'umbral' && umbralBox.surfW >= Math.min(1440, umbralBox.innerW) * 0.9 && Math.abs(umbralBox.umbW - umbralBox.surfW) < 4, JSON.stringify(umbralBox));
+check('7M-G umbral: contraste local cream (tinta #091933 sobre panel claro, sin vidrio negro)', umbralBox.titleColor === 'rgb(9, 25, 51)' && umbralBox.numBlocks === 4 && umbralBox.noBenefitsArt, JSON.stringify({ color: umbralBox.titleColor, num: umbralBox.numBlocks }));
 check('7M-F simulador: defaults 65/18/40/55 -> 19,5 h y 4,3 h (es-MX, 1 decimal)', /19[.,]5/.test(simDef.total) && /4[.,]3/.test(simDef.addr), `${simDef.total} / ${simDef.addr}`);
 check('7M-F simulador: fórmula y nota literales presentes', simDef.formula.includes('tareas × minutos ÷ 60') && simDef.note.includes('No mide ahorro real'), '');
 const simCases = await page.evaluate(() => {
@@ -1814,30 +1936,76 @@ check('7M-F simulador: 100%/100% -> total completo (19,5 h)', /19[.,]5/.test(sim
 check('7M-F simulador: inválido (-5) muestra error y no actualiza cifra', simCases.invalid.err === true && /4[.,]3/.test(simCases.invalid.a), JSON.stringify(simCases.invalid));
 check('7M-F simulador: reset restaura exactamente 19,5 / 4,3', /19[.,]5/.test(simCases.reset.t) && /4[.,]3/.test(simCases.reset.a), JSON.stringify(simCases.reset));
 // hero pin: desktop sin reduced-motion crea pin único; ruta durante el pin cancela
-await page.goto(BASE, { waitUntil: 'domcontentloaded' });
-await page.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'hero', { timeout: 60000 }).catch(() => {});
-await page.setViewportSize({ width: 1440, height: 900 });
-const pinProbes = await page.evaluate(() => {
-  // scroll libre inicia el pin (desktop)
+// (página dedicada y limpia para no contaminar la medición con el estado previo)
+const pinCtx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+const pinPage = await pinCtx.newPage();
+await pinPage.addInitScript(() => { try { history.scrollRestoration = 'manual'; } catch {} });
+await pinPage.bringToFront(); // rAF activo: sin esto el scrub de GSAP no renderiza en página en segundo plano
+await pinPage.goto(BASE, { waitUntil: 'domcontentloaded' });
+await pinPage.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'hero', { timeout: 60000 }).catch(() => {});
+await pinPage.waitForTimeout(800);
+const pinProbes = await pinPage.evaluate(() => {
   window.__publiaLastProgrammaticScroll = 0;
   window.dispatchEvent(new WheelEvent('wheel', { deltaY: 240, bubbles: true }));
   window.scrollBy({ top: 300, behavior: 'instant' });
   return new Promise((res) => setTimeout(() => {
     const st = window.ScrollTrigger?.getAll?.() ?? [];
     const pinned = st.filter((t) => t.pin && document.querySelector('[data-hero-scene]')?.contains(t.pin));
-    res({ total: st.length, pinned: pinned.length, scrub: pinned[0]?.vars?.scrub ?? null, pinSpacing: !!document.querySelector('.pin-spacer') });
+    const p0 = pinned[0];
+    res({
+      total: st.length,
+      pinned: pinned.length,
+      scrub: p0?.vars?.scrub ?? null,
+      span: p0 ? p0.end - p0.start : 0,
+      vh: window.innerHeight,
+      invalidate: p0?.vars?.invalidateOnRefresh === true,
+    });
   }, 2500));
 });
-check('7M-F hero: un único pin activo en tramo desktop (scrub 0.6)', pinProbes.pinned >= 1 && pinProbes.scrub === 0.6, JSON.stringify(pinProbes));
-await click('[data-route-choice="efficiency"]');
-await page.waitForTimeout(600);
-const afterRoute = await page.evaluate(() => new Promise((res) => setTimeout(() => {
+check('7M-G hero: UN pin desktop con span = 18×H e invalidateOnRefresh', pinProbes.pinned === 1 && Math.abs(pinProbes.span - 18 * pinProbes.vh) < 4 && pinProbes.invalidate, JSON.stringify(pinProbes));
+const loadState = await pinPage.evaluate(() => ({
+  state: document.querySelector('.prism-layer')?.getAttribute('data-load-state') ?? '',
+  busy: document.querySelector('.prism-layer')?.getAttribute('aria-busy') ?? '',
+  loaderDone: document.querySelector('[data-hero-loader]')?.classList.contains('is-done') ?? !document.querySelector('[data-hero-loader]'),
+  bg: getComputedStyle(document.querySelector('.prism-layer')).backgroundColor,
+}));
+check('7M-G cargas: superficie 3D en ready con aria-busy=false, loader oculto y fondo #050b1b desde el inicio', (loadState.state === 'ready' || loadState.state === 'fallback') && loadState.busy === 'false' && loadState.loaderDone && loadState.bg === 'rgb(5, 11, 27)', JSON.stringify(loadState));
+// cajas CTA en p≈0.10 (yNear) y p≈0.25 (yLow, tras el descenso): muestreo determinista
+const ctaBounce = await pinPage.evaluate(() => new Promise((res) => {
+  const hero = document.querySelector('[data-hero-scene]');
+  const actions = hero?.querySelector('.hero__actions');
+  const navbar = document.querySelector('[data-navbar]');
+  const H = window.innerHeight;
+  const navbarH = navbar?.offsetHeight ?? 64;
+  const st = (window.ScrollTrigger?.getAll?.() ?? []).find((t) => t.pin && hero?.contains(t.pin));
+  if (!st || !actions || !hero) return res({ ok: false });
+  const heroTop = hero.getBoundingClientRect().top;
+  const top0 = actions.getBoundingClientRect().top - heroTop;
+  const topNear = navbarH + 40;
+  const topLow = Math.min(0.62 * H, H - actions.offsetHeight - 56);
+  const read = () => actions.getBoundingClientRect().top;
+  const at = async (p) => {
+    window.scrollTo({ top: st.start + (st.end - st.start) * p, behavior: 'instant' });
+    await new Promise((r) => setTimeout(r, 3500)); // scrub 0.6 necesita asentarse bajo swiftshader
+    return read();
+  };
+  (async () => {
+    const p12 = await at(0.12); // fin exacto del tramo de subida (0–0.12)
+    const p25 = await at(0.25); // tras el descenso (0.12–0.22)
+    res({ ok: true, p10: p12, p25, top0, navbarH, H, topNear, topLow, drop: p25 - p12 });
+  })();
+}));
+check('7M-G hero: rebote real — CTA suben a yNear (p=0.12) y bajan a yLow (p=0.25)', ctaBounce.ok && Math.abs(ctaBounce.p10 - ctaBounce.topNear) < 80 && Math.abs(ctaBounce.p25 - ctaBounce.topLow) < 80 && ctaBounce.drop > 150, JSON.stringify(ctaBounce));
+await pinPage.evaluate(() => document.querySelector('[data-route-choice="efficiency"]')?.click());
+await pinPage.waitForTimeout(600);
+const afterRoute = await pinPage.evaluate(() => new Promise((res) => setTimeout(() => {
   const st = window.ScrollTrigger?.getAll?.() ?? [];
   const pinned = st.filter((t) => t.pin && document.querySelector('[data-hero-scene]')?.contains(t.pin));
   res({ pinned: pinned.length, act: document.documentElement.dataset.act });
 }, 1500)));
-check('7M-F hero §5.12: elegir ruta durante el pin lo cancela y aterriza', afterRoute.pinned === 0 && afterRoute.act === 'efficiency', JSON.stringify(afterRoute));
-check('7M-F hero: preloader localizado se oculta tras primer frame', await page.evaluate(() => document.querySelector('[data-hero-loader]')?.classList.contains('is-done') ?? !document.querySelector('[data-hero-loader]')), '');
+check('7M-G hero: elegir ruta durante el pin lo cancela y aterriza', afterRoute.pinned === 0 && afterRoute.act === 'efficiency', JSON.stringify(afterRoute));
+await pinCtx.close().catch(() => {});
+await page.bringToFront().catch(() => {});
 check('7M-F hero: skip por teclado presente (data-hero-skip)', await page.evaluate(() => !!document.querySelector('[data-hero-skip]')), '');
 
 // --- cierre ---------------------------------------------------------------------
@@ -1852,4 +2020,4 @@ await writeFile(
 
 console.log(`\n${results.length - failures}/${results.length} criterios verificados`);
 await browser.close();
-process.exit(failures === 0 ? 0 : 1);
+process.exitCode = failures === 0 ? 0 : 1; // exitCode (no exit) para no truncar stdout

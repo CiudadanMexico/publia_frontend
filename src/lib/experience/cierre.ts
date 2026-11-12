@@ -5,7 +5,7 @@
  * reiniciar. Nada se envía a servidor sin acción explícita del visitante.
  */
 import { CIERRE_CAPABILITIES, CONTACTO } from '../../data/cierre';
-import { getState, toggleCapability, resetExperience, CAPABILITY_IDS } from './state';
+import { getState, toggleCapability, resetExperience, CAPABILITY_IDS, subscribe as onStateChange } from './state';
 import { track } from './events';
 
 export interface CierreUniverse {
@@ -189,6 +189,11 @@ export function bindCierre(universe: CierreUniverse | null): void {
   renderCards();
   contextLinks();
   root.dataset.bound = '1';
+  // 7M-G §7: el enlace WA/mail con prefijos visibles se recalcula con CADA cambio de estado
+  onStateChange(() => {
+    renderCards();
+    contextLinks();
+  });
   window.addEventListener('publia:state', () => {
     renderCards();
     contextLinks();

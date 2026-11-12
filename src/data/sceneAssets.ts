@@ -53,7 +53,7 @@ export const SCENE_ASSETS: readonly AssetSlot[] = [
   },
   {
     id: 'A04',
-    scenes: ['E03', 'E04', 'E06', 'E21'],
+    scenes: ['E04', 'E06', 'E21'], // 7M-G: E03 ya no usa el póster (stage nativo); primaria pasa a E04
     desktop: '/assets/scenes/A04-infraestructura-2560x1440.webp',
     mobile: '/assets/scenes/A04-infraestructura-1080x1350.webp',
     layers: ['/assets/scenes/A04-rack-1200x1600.png'],
