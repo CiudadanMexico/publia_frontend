@@ -1,0 +1,21 @@
+{
+  "viewport": [
+    1920,
+    1080
+  ],
+  "scene": "E01",
+  "expectedTitle": "EL MUNDO",
+  "found": true,
+  "rect": {
+    "x": 0,
+    "y": 0,
+    "w": 1920,
+    "h": 1080
+  },
+  "opacity": "1",
+  "visibility": "visible",
+  "loadState": "ready",
+  "title": "",
+  "route": "unclassified",
+  "act": "hero"
+}

@@ -1,0 +1,21 @@
+{
+  "viewport": [
+    768,
+    1024
+  ],
+  "scene": "E25",
+  "expectedTitle": "",
+  "found": true,
+  "rect": {
+    "x": 0,
+    "y": 0,
+    "w": 768,
+    "h": 1615
+  },
+  "opacity": "1",
+  "visibility": "visible",
+  "loadState": "ready",
+  "title": "Todo conectado. A tu manera.",
+  "route": "unclassified",
+  "act": "hero"
+}

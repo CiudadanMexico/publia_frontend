@@ -1,0 +1,22 @@
+{
+  "viewport": [
+    1920,
+    1080
+  ],
+  "scene": "E03",
+  "route": "enterprise",
+  "found": true,
+  "rect": {
+    "x": 0,
+    "y": 3847,
+    "w": 1920,
+    "h": 1577
+  },
+  "opacity": "1",
+  "visibility": "visible",
+  "loadState": "ready",
+  "title": "Tu tecnología. Tu operación. Tus decisiones.",
+  "act": "enterprise",
+  "racks": 10,
+  "noPoster": true
+}

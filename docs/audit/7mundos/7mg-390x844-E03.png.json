@@ -1,0 +1,21 @@
+{
+  "viewport": [
+    390,
+    844
+  ],
+  "scene": "E03",
+  "expectedTitle": "inteligencia",
+  "found": true,
+  "rect": {
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0
+  },
+  "opacity": "1",
+  "visibility": "visible",
+  "loadState": "ready",
+  "title": "Tu tecnología. Tu operación. Tus decisiones.",
+  "route": "unclassified",
+  "act": "hero"
+}

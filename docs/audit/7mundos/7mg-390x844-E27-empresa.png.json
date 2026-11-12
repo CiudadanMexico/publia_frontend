@@ -1,0 +1,22 @@
+{
+  "viewport": [
+    390,
+    844
+  ],
+  "scene": "E27",
+  "route": "enterprise",
+  "found": true,
+  "rect": {
+    "x": 0,
+    "y": -129,
+    "w": 390,
+    "h": 2171
+  },
+  "opacity": "1",
+  "visibility": "visible",
+  "loadState": "ready",
+  "title": "Elige tu combinación. Crece a tu ritmo.",
+  "act": "enterprise",
+  "selectors": 5,
+  "diag": true
+}

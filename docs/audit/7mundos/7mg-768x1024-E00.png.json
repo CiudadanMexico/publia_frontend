@@ -1,0 +1,21 @@
+{
+  "viewport": [
+    768,
+    1024
+  ],
+  "scene": "E00",
+  "expectedTitle": "independencia",
+  "found": true,
+  "rect": {
+    "x": 0,
+    "y": 0,
+    "w": 768,
+    "h": 1931
+  },
+  "opacity": "1",
+  "visibility": "visible",
+  "loadState": "ready",
+  "title": "",
+  "route": "unclassified",
+  "act": "hero"
+}

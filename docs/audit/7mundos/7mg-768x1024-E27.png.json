@@ -1,0 +1,21 @@
+{
+  "viewport": [
+    768,
+    1024
+  ],
+  "scene": "E27",
+  "expectedTitle": "",
+  "found": true,
+  "rect": {
+    "x": 0,
+    "y": 0,
+    "w": 768,
+    "h": 1729
+  },
+  "opacity": "1",
+  "visibility": "visible",
+  "loadState": "ready",
+  "title": "Elige tu combinación. Crece a tu ritmo.",
+  "route": "unclassified",
+  "act": "hero"
+}
