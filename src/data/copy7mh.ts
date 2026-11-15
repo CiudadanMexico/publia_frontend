@@ -213,3 +213,32 @@ export const E03_TITLE_7MH = {
   line2Color: '#80E5FF',
   bg: '#020910',
 } as const;
+
+/** 7M-H §8: textos del simulador de reparto E22 (literales). */
+export const E22_7MH = {
+  disclaimer: 'Escenario ilustrativo de reparto; no es una medición de rendimiento.',
+  assumptionsTitle: 'Supuestos del ejemplo',
+  assumptions: 'Las unidades sirven para comparar la distribución de una misma carga. El número real de agentes o llamadas depende del hardware, los modelos y las tareas.',
+  capacityLabel: 'Capacidad total del escenario',
+  capacityValue: '100 unidades ilustrativas',
+  demandLabel: 'Demanda inicial',
+  run: 'Ver cómo se reparte el trabajo',
+  pause: 'Pausa',
+  resume: 'Reanudar',
+  reset: 'Restablecer',
+  colShared: 'Compartido',
+  colPrivate: 'Privado',
+  capClient: 'Capacidad reservada para tu negocio',
+  capNetwork: 'Capacidad destinada a la red',
+  attended: 'Trabajo atendido en este escenario',
+  waiting: 'Trabajo en espera',
+  inProcess: 'En proceso',
+  queued: 'En espera',
+  reservedDest: 'Capacidad reservada',
+  empty: 'Sin tareas en este escenario',
+  sharedPanel: 'Tu negocio conserva una parte definida de los recursos y la otra participa en la red. En este ejemplo, la cuota del negocio atiende primero llamadas y conversaciones; las tareas que no caben esperan su turno.',
+  privatePanel: 'Toda la capacidad contratada se dedica a tu operación. En el mismo ejemplo pueden atenderse más tareas a la vez, sin destinar una cuota a otros participantes. El equipo sigue teniendo un límite.',
+  below: 'Para dimensionar tu servicio revisamos usuarios, concurrencia, modelos, canales y horarios. Las llamadas requieren integrar telefonía y voz; su consumo y contratación se definen por separado.',
+  ctaPrefix: 'Escenario ilustrativo que quiero dimensionar',
+  stations: ['Llamadas', 'WhatsApp', 'Documentos', 'Automatizaciones'],
+} as const;
