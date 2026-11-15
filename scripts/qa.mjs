@@ -2066,7 +2066,13 @@ const ctaBounce = await pinPage.evaluate(() => new Promise((res) => {
   const at = async (p) => {
     const st = livePin() ?? st0; // el pin pudo reconstruirse (medidas frescas): usar el vivo
     window.scrollTo({ top: st.start + (st.end - st.start) * p, behavior: 'instant' });
-    await new Promise((r) => setTimeout(r, 4500)); // scrub 0.6 necesita asentarse bajo swiftshader
+    // esperar convergencia real del scrub (a 2 FPS swiftshader tarda varios segundos)
+    const t0 = performance.now();
+    while (performance.now() - t0 < 30000) {
+      await new Promise((r) => setTimeout(r, 800));
+      const cur = livePin();
+      if (cur && Math.abs((cur.animation?.progress?.() ?? 0) - cur.progress) < 0.02 && Math.abs(cur.progress - p) < 0.02) break;
+    }
     return read();
   };
   (async () => {
