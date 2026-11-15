@@ -154,6 +154,7 @@ export function renderableScenes(): ResolvedScene[] {
   return SCENES.map((scene) =>
     resolveScene(scene, {
       primary: 'unclassified',
+    rememberedRoute: null,
       origin: null,
       traits: [],
       answers: {},

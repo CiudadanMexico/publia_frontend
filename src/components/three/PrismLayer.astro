@@ -11,11 +11,7 @@ import PortalOverlay from './PortalOverlay.astro';
 <div class="prism-layer" data-load-state="loading" aria-busy="true">
   <canvas class="prism-layer__canvas" data-prism-canvas aria-hidden="true"></canvas>
   <div aria-hidden="true"><PortalOverlay /></div>
-  <div class="prism-layer__msg" data-prism-msg hidden role="status">
-    <p data-prism-msg-text></p>
-    <button type="button" class="prism-layer__retry" data-prism-retry>Reintentar escena</button>
-  </div>
-  <div class="prism-layer__fallback" data-prism-fallback aria-hidden="true">
+  <div class="prism-layer__fallback" data-prism-fallback aria-hidden="true"> <!-- 7M-H §3: composición estática limpia; el canvas entra con crossfade 240ms al llegar -->
     <svg viewBox="0 0 200 200" role="presentation" focusable="false">
       <defs>
         <linearGradient id="prism-fallback-gradient" x1="0" y1="0" x2="1" y2="1">
@@ -42,42 +38,14 @@ import PortalOverlay from './PortalOverlay.astro';
     /* 7M-G §6: fondo base inmediato del universo (tabla hero #050b1b) */
     background: #050b1b;
   }
-  .prism-layer__msg {
-    position: absolute;
-    bottom: 24px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: grid;
-    gap: 8px;
-    justify-items: center;
-    padding: 12px 18px;
-    border-radius: 14px;
-    background: rgba(5, 11, 27, 0.82);
-    color: #f4f7ff;
-    font-size: 0.85rem;
-    pointer-events: auto;
-  }
-  .prism-layer__msg[hidden] { display: none; }
-  .prism-layer__retry {
-    min-height: 44px;
-    border-radius: 999px;
-    border: 1px solid rgba(244, 247, 255, 0.4);
-    background: transparent;
-    color: #f4f7ff;
-    padding: 8px 16px;
-    cursor: pointer;
-    font-weight: 700;
-  }
-  .prism-layer__retry:focus-visible { outline: 3px solid #ffca34; outline-offset: 3px; }
-  @media (prefers-reduced-motion: reduce) {
-    .prism-layer__canvas, .prism-layer__fallback { transition: none; }
+.prism-layer__fallback { transition: none; }
   }
 
   .prism-layer__canvas {
     width: 100%;
     height: 100%;
     opacity: 0;
-    transition: opacity 900ms var(--ease-out);
+    transition: opacity 240ms ease; /* 7M-H §3: crossfade al incorporarse el renderer, aun tarde */
   }
 
   .prism-layer.is-ready .prism-layer__canvas {

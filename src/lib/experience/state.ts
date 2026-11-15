@@ -87,8 +87,10 @@ export interface VisitorAnswers {
 }
 
 export interface VisitorState {
-  /** Ruta elegida de forma explícita; `unclassified` mientras no elija. */
+  /** Ruta elegida de forma explícita; `unclassified` mientras no elija. Transitoria por visita (7M-H §1). */
   primary: PrimaryRoute;
+  /** Preferencia recordada de visitas previas (sólo memoria; nunca reaplica la ruta). */
+  rememberedRoute: PrimaryRoute | null;
   /** Cómo se eligió la ruta: por botón o por scroll libre. */
   origin: RouteOrigin;
   /** Rasgos inferidos o declarados, acumulables. */
@@ -144,6 +146,7 @@ const listeners = new Set<Listener>();
 function emptyState(): VisitorState {
   return {
     primary: 'unclassified',
+    rememberedRoute: null,
     origin: null,
     traits: [],
     answers: {},
@@ -200,7 +203,11 @@ function load(): VisitorState {
       return emptyState();
     }
     const candidate = parsed as Partial<VisitorState>;
-    const primary = isRoute(candidate.primary) ? candidate.primary : 'unclassified';
+    // 7M-H §1: la ruta persistida pasa a serSóLO preferencia recordada; el
+    // estado transitorio de la visita arranca siempre en unclassified para
+    // que el hero pueda rearmar su pin en cada recarga.
+    const rememberedRoute = isRoute(candidate.primary) && candidate.primary !== 'unclassified' ? candidate.primary : null;
+    const primary: PrimaryRoute = 'unclassified';
     const traits = Array.isArray(candidate.traits)
       ? candidate.traits.filter(isTrait)
       : [];
@@ -215,6 +222,7 @@ function load(): VisitorState {
         : {};
     return {
       primary,
+      rememberedRoute,
       origin,
       traits,
       answers,
@@ -292,6 +300,7 @@ export function setPrimaryRoute(route: PrimaryRoute, origin: RouteOrigin = 'butt
   commit({
     ...state,
     primary: route,
+    rememberedRoute: route, // 7M-H §1: la preferencia se recuerda aparte del estado transitorio
     origin,
     updatedAt: Date.now(),
   });

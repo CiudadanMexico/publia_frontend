@@ -30,6 +30,7 @@ import type { VisitorState } from '../src/lib/experience/state';
 
 const baseState: VisitorState = {
   primary: 'unclassified',
+    rememberedRoute: null,
   origin: null,
   answers: {},
   transitioning: false,

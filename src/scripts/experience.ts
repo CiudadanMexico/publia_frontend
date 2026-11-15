@@ -239,38 +239,46 @@ async function initUniverse(): Promise<UniverseHandleLike | null> {
  * barra) y nunca durante un desplazamiento programático ni una transición.
  */
 function bindFreeScrollIntent(getNarrative: () => NarrativeHandle | null): void {
-  let armed = true;
-  const tryFreeRoute = (fromRealInput: boolean): void => {
-    if (!armed) return;
+  // 7M-H §2: UN controlador, autoridad única de la ruta libre. Devuelve un
+  // resultado booleano vía narrative.tryEnterFreeRoute(); nada marca explorer
+  // a espaldas de este controlador. Estados del hero: idle → armed → pinned →
+  // completed (manejados dentro de la narrativa; aquí sólo se invoca).
+  let touchStartY: number | null = null;
+  const isEditable = (t: EventTarget | null): boolean => {
+    const el = t as HTMLElement | null;
+    return !!el?.closest?.('input, textarea, select, [contenteditable="true"]');
+  };
+  const downIntent = (deltaY: number, target: EventTarget | null, fromRealInput: boolean): void => {
+    if (deltaY <= 0) return; // rueda/scroll hacia ARRIBA nunca inicia el recorrido
+    if (isEditable(target)) return; // teclear en un input no activa el recorrido
     const root = document.documentElement;
     if (!fromRealInput && root.dataset['scrolling'] === 'programmatic') return;
     if (!fromRealInput) {
-      // Un evento scroll suelto sólo cuenta como intención si pasó tiempo
-      // desde el último desplazamiento programático (evita rezagos).
       const w = window as unknown as { __publiaLastProgrammaticScroll?: number };
-      const last = w.__publiaLastProgrammaticScroll ?? 0;
-      if (performance.now() - last < 500) return;
+      if (performance.now() - (w.__publiaLastProgrammaticScroll ?? 0) < 500) return;
     }
-    const state = getState();
-    if (state.primary !== 'unclassified' || state.transitioning) return;
-    if (getNarrative()?.currentAct() !== 'hero') return;
-    if (window.scrollY > window.innerHeight * 0.8) return;
-    armed = false;
-    getNarrative()?.enterFreeRoute();
+    getNarrative()?.tryEnterFreeRoute(); // autoridad única; devuelve booleano internamente
   };
-  window.addEventListener('wheel', () => tryFreeRoute(true), { passive: true });
-  window.addEventListener('touchmove', () => tryFreeRoute(true), { passive: true });
-  window.addEventListener('keydown', (event) => {
-    const keys = ['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', ' ', 'Home', 'End'];
-    if (keys.includes(event.key)) tryFreeRoute(true);
+  window.addEventListener('wheel', (ev) => downIntent(ev.deltaY, ev.target, true), { passive: true });
+  window.addEventListener('touchstart', (ev) => { touchStartY = ev.touches[0]?.clientY ?? null; }, { passive: true });
+  window.addEventListener('touchmove', (ev) => {
+    if (touchStartY == null) return;
+    const y = ev.touches[0]?.clientY ?? touchStartY;
+    downIntent(touchStartY - y, ev.target, true); // delta positivo = dedo hacia abajo
+    touchStartY = y;
+  }, { passive: true });
+  window.addEventListener('keydown', (ev) => {
+    // sólo teclas de avance hacia ABAJO; Home/End/PageUp/ArrowUp no son intención
+    if (!['ArrowDown', 'PageDown', ' '].includes(ev.key)) return;
+    downIntent(1, ev.target, true);
   });
   let lastSeenY = window.scrollY;
   window.addEventListener('scroll', () => {
     const y = window.scrollY;
-    const delta = Math.abs(y - lastSeenY);
+    const delta = y - lastSeenY;
     lastSeenY = y;
     if (delta < 2) return; // scroll espurio (refresh/pin) sin intención real
-    tryFreeRoute(false);
+    downIntent(delta, null, false); // arrastre real de scrollbar / scroll libre
   }, { passive: true });
 }
 
@@ -664,28 +672,10 @@ function bindRouteControls(
  * (que puede consumirse durante un reflujo de layout) sino del viewport real.
  */
 function updateImplicitRoute(): void {
-  if (document.documentElement.dataset['scrolling'] === 'programmatic') {
-    return;
-  }
-  const hero = document.querySelector<HTMLElement>('#inicio');
-  if (hero) {
-    const heroRect = hero.getBoundingClientRect();
-    if (heroRect.bottom > window.innerHeight * 0.5) {
-      implicitSuppressed = false;
-    }
-  }
-  if (implicitSuppressed || getState().primary !== 'unclassified') {
-    return;
-  }
-  const explorer = document.querySelector<HTMLElement>('[data-scene-route="explorer"]');
-  if (!explorer) {
-    return;
-  }
-  const rect = explorer.getBoundingClientRect();
-  const inView = rect.top < window.innerHeight * 0.6 && rect.bottom > 0;
-  if (inView) {
-    setPrimaryRoute('explorer');
-  }
+  // 7M-H §2: ELIMINADA la ruta implícita que marcaba explorer a espaldas del
+  // controlador. La única autoridad para entrar a la ruta libre es
+  // bindFreeScrollIntent → narrative.tryEnterFreeRoute(). Esta función queda
+  // como no-op para conservar sus puntos de llamada sin efectos.
 }
 
 let scrollTicking = false;
@@ -776,37 +766,28 @@ export async function startExperience(): Promise<void> {
   });
   const layer = document.querySelector<HTMLElement>('.prism-layer');
   const loader = document.querySelector<HTMLElement>('[data-hero-loader]');
-  const loadMsg = document.querySelector<HTMLElement>('[data-prism-msg]');
-  const loadMsgText = document.querySelector<HTMLElement>('[data-prism-msg-text]');
-  const retryBtn = document.querySelector<HTMLButtonElement>('[data-prism-retry]');
   let loadGen = 0;
-  const setLoadState = (st: 'loading' | 'ready' | 'fallback' | 'error'): void => {
+  // 7M-H §3: carga silenciosa. Sin mensajes de demora ni botón de reintento.
+  // loading = spinner discreto sobre la composición estática; a los 8 s el
+  // spinner se retira y la composición queda limpia, PERO el observador sigue
+  // activo: si el renderer llega tarde se incorpora con crossfade de 240 ms.
+  // error = composición estática + controles HTML funcionales; sólo console.
+  const setLoadState = (st: 'loading' | 'ready' | 'silent' | 'error'): void => {
     layer?.setAttribute('data-load-state', st);
     layer?.setAttribute('aria-busy', st === 'loading' ? 'true' : 'false');
     loader?.classList.toggle('is-done', st !== 'loading');
-    layer?.classList.toggle('is-fallback', st === 'fallback' || st === 'error');
+    layer?.classList.toggle('is-fallback', st === 'silent' || st === 'error');
     layer?.classList.toggle('is-ready', st === 'ready');
-    if (loadMsg && loadMsgText) {
-      if (st === 'fallback') {
-        loadMsgText.textContent = 'La escena está tardando. Puedes seguir explorando.';
-        loadMsg.hidden = false;
-        if (retryBtn) retryBtn.hidden = false;
-      } else if (st === 'error') {
-        loadMsgText.textContent = 'No pudimos cargar esta escena. Puedes seguir explorando.';
-        loadMsg.hidden = false;
-        if (retryBtn) retryBtn.hidden = true;
-      } else {
-        loadMsg.hidden = true;
-      }
-    }
   };
   const armWatch = (myGen: number): void => {
     const t0 = Date.now();
+    let silentDone = false;
     const iv = window.setInterval(() => {
       if (myGen !== loadGen) { window.clearInterval(iv); return; } // token de generación
-      if ((universe?.frames() ?? 0) > 0) { window.clearInterval(iv); setLoadState('ready'); return; }
-      if ((universe?.errors().length ?? 0) > 0) { window.clearInterval(iv); setLoadState('error'); return; }
-      if (Date.now() - t0 > 8000) { window.clearInterval(iv); setLoadState('fallback'); }
+      // ready puede llegar en CUALQUIER momento, también después de los 8 s
+      if ((universeBox.current?.frames() ?? 0) > 0) { window.clearInterval(iv); setLoadState('ready'); return; }
+      if ((universeBox.current?.errors().length ?? 0) > 0) { window.clearInterval(iv); setLoadState('error'); return; }
+      if (!silentDone && Date.now() - t0 > 8000) { silentDone = true; setLoadState('silent'); } // sigue observando
     }, 120);
   };
   const bootUniverse = async (myGen: number): Promise<void> => {
@@ -821,34 +802,39 @@ export async function startExperience(): Promise<void> {
       if (myGen === loadGen) setLoadState('error');
     }
   };
+  // 7M-H §1: controles funcionales (simuladores, housing, membresías,
+  // formularios) se inicializan UNA SOLA VEZ, independientes del WebGL.
+  // Los demos que sí usan universo reciben el proxy y se sincronizan cuando
+  // el renderer llegue (bindUniverseDeps aplica el estado vigente).
+  const bindStaticControls = (): void => {
+    lazyBind('[data-simulator]', () => import('../lib/experience/simulator').then((m) => m.bindSimulator()));
+    lazyBind('[data-wa-form]', () => import('../lib/experience/waform').then((m) => m.bindWaForm()));
+    lazyBind('[data-demo="personas"]', () => import('../lib/experience/personas').then((m) => m.bindPersonas()));
+    lazyBind('[data-demo="memberships"]', () => import('../lib/experience/memberships').then((m) => m.bindMemberships()));
+    lazyBind('[data-demo="housing"]', () => import('../lib/experience/housing').then((m) => m.bindHousing()));
+    lazyBind('[data-demo="marketing"]', () => import('../lib/experience/marketing').then((m) => m.bindMarketing()));
+    lazyBind('[data-demo="ecosystem"]', () => import('../lib/experience/ecosystem').then((m) => m.bindEcosystem(universeProxy)));
+    lazyBind('[data-demo="red"]', () => import('../lib/experience/red').then((m) => m.bindRed(universeProxy)));
+    lazyBind('[data-demo="infra2"]', () => import('../lib/experience/infra').then((m) => m.bindInfra(universeProxy)));
+    lazyBind('[data-recommendation]', () => import('../lib/experience/cierre').then((m) => m.bindCierre(universeProxy)));
+    lazyBind('[data-demo="ecosystem"]', () => import('../lib/experience/postHero').then((m) => m.bindPostHero(universeProxy)));
+    lazyBind('[data-recommendation]', () => import('../lib/experience/postHero').then((m) => m.bindPostHero(universeProxy)));
+  };
   const bindUniverseDeps = (u: UniverseHandleLike | null): void => {
-    // bindRouteControls/bindFreeScrollIntent ya están atados con getters;
-    // la narrativa también ya existe (con el proxy del universo)
     bindSceneLooks(u);
     bindDemos(u);
     bindHeroCards(u);
-    lazyBind('[data-demo="ecosystem"]', () => import('../lib/experience/ecosystem').then((m) => m.bindEcosystem(u)));
-    lazyBind('[data-demo="red"]', () => import('../lib/experience/red').then((m) => m.bindRed(u)));
-    lazyBind('[data-simulator]', () => import('../lib/experience/simulator').then((m) => m.bindSimulator()));
-    lazyBind('[data-wa-form]', () => import('../lib/experience/waform').then((m) => m.bindWaForm()));
-    lazyBind('[data-demo="infra2"]', () => import('../lib/experience/infra').then((m) => m.bindInfra(u)));
-    lazyBind('[data-demo="personas"]', () => import('../lib/experience/personas').then((m) => m.bindPersonas()));
-    lazyBind('[data-demo="memberships"]', () => import('../lib/experience/memberships').then((m) => m.bindMemberships()));
-    lazyBind('[data-recommendation]', () => import('../lib/experience/cierre').then((m) => m.bindCierre(u)));
-    lazyBind('[data-demo="ecosystem"]', () => import('../lib/experience/postHero').then((m) => m.bindPostHero(u)));
-    lazyBind('[data-recommendation]', () => import('../lib/experience/postHero').then((m) => m.bindPostHero(u)));
-    lazyBind('[data-demo="housing"]', () => import('../lib/experience/housing').then((m) => m.bindHousing()));
-    lazyBind('[data-demo="marketing"]', () => import('../lib/experience/marketing').then((m) => m.bindMarketing()));
+    // 7M-H §2: si el WebGL llega después, sincronizar de inmediato el mundo y
+    // el progreso vigentes (no se pierden llamadas hechas mientras tanto).
+    const act = document.documentElement.dataset['act'] ?? 'hero';
+    const world = (act === 'cooperative' ? 'cooperative' : act) as 'hero' | 'cooperative' | 'enterprise' | 'efficiency';
+    u?.travelTo?.(world, { duration: 0 });
+    const pin = ScrollTrigger.getAll().find((t) => t.pin && document.querySelector('[data-hero-scene]')?.contains(t.pin as Element));
+    if (pin) u?.setHeroPin?.(pin.progress);
   };
   setLoadState('loading');
   armWatch(++loadGen);
   void bootUniverse(loadGen);
-  retryBtn?.addEventListener('click', () => {
-    loadGen += 1;
-    setLoadState('loading');
-    armWatch(loadGen);
-    void bootUniverse(loadGen);
-  });
   // 7M-G §1: salto por teclado al final del tramo pineado (misma fuente: heroPinEnd)
   document.querySelectorAll<HTMLButtonElement>('[data-hero-skip]').forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -860,6 +846,7 @@ export async function startExperience(): Promise<void> {
   const portal: PortalHandle = createPortal();
   // 7M-G §6: narrativa creada YA, con el universo por proxy (puede ser null al inicio)
   narrative = createNarrative({ universe: universeProxy, reducedMotion: reduced, portal });
+  bindStaticControls(); // 7M-H §1: simuladores/selectores/formularios listos aunque WebGL nunca llegue
   const progressByScene = new Map<string, number>();
 
   const applyActiveScene = (): void => {
@@ -942,10 +929,37 @@ export async function startExperience(): Promise<void> {
   // bindRouteControls/bindFreeScrollIntent se invocan dentro de bindUniverseDeps
   // con getters, de modo que también funcionan si el universo tarda o falla.
   bindSceneTracking();
-  bindImplicitRouteWatcher();
   // Bind inmediato (seguro sin universo): navegación por teclado/rutas vía getters
   bindRouteControls(() => narrative, null);
   bindFreeScrollIntent(() => narrative);
+
+  // 7M-H §2: medidas recalculables — ResizeObserver en navbar y acciones con
+  // refresh agrupado (sin bucles), y document.fonts.ready para refrescar tras
+  // cargar fuentes (sin bloquear la interacción).
+  let refreshQueued = false;
+  const queueHeroRefresh = (): void => {
+    if (refreshQueued) return;
+    refreshQueued = true;
+    window.requestAnimationFrame(() => {
+      refreshQueued = false;
+      narrative?.refreshHeroMeasures();
+    });
+  };
+  const roTargets = ['[data-navbar]', '[data-hero-scene] .hero__actions', '[data-hero-scene]'];
+  if (typeof ResizeObserver !== 'undefined') {
+    const ro = new ResizeObserver(queueHeroRefresh);
+    roTargets.forEach((sel) => document.querySelectorAll(sel).forEach((el) => ro.observe(el)));
+  }
+  window.addEventListener('resize', queueHeroRefresh, { passive: true });
+  void document.fonts?.ready?.then(() => queueHeroRefresh()).catch(() => {});
+  // 7M-H §2.6: pageshow con bfcache — recalcular un ÚNICO pin, sin duplicar listeners
+  window.addEventListener('pageshow', (ev) => {
+    if (ev.persisted) {
+      narrative?.rearmHero();
+      narrative?.refreshHeroMeasures();
+      ScrollTrigger.refresh();
+    }
+  });
 
   // Un refresco de ScrollTrigger recalcula el scroll y cancela los scrolls
   // suaves en curso: sólo se hace cuando cambia la visibilidad (ruta o
@@ -966,7 +980,6 @@ export async function startExperience(): Promise<void> {
       if (visibilityChanged) {
         ScrollTrigger.refresh();
       }
-      updateImplicitRoute();
       applyActiveScene();
     }, 80);
   });
