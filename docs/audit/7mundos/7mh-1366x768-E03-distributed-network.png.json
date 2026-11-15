@@ -1,0 +1,22 @@
+{
+  "viewport": [
+    1366,
+    768
+  ],
+  "scene": "E03-distributed-network",
+  "infraMode": "distributed-network",
+  "expectedTitle": "Soberanía digital.",
+  "found": true,
+  "rect": {
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0
+  },
+  "opacity": "1",
+  "display": "none",
+  "loadState": "ready",
+  "title": "Soberanía digital. Tu tecnología, bajo tus reglas.",
+  "route": "explorer",
+  "act": "cooperative"
+}

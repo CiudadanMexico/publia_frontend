@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Publia 6.0 — frontend narrativo adaptativo (Astro + Three.js + GSAP)",
+  "description": "Publia 6.0 \u2014 frontend narrativo adaptativo (Astro + Three.js + GSAP)",
   "scripts": {
-    "dev": "astro dev --host 127.0.0.1 --port 4321",
-    "build": "astro build",
+    "dev": "node init && astro dev --host 127.0.0.1 --port 4321",
+    "build": "node init && astro build",
     "preview": "astro preview --host 127.0.0.1 --port 4322",
     "serve": "node scripts/serve-dist.mjs",
     "check": "tsc --noEmit",
