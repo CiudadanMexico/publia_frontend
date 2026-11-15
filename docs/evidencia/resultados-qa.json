@@ -1,7 +1,7 @@
 {
   "base": "https://dam-boulevard-explaining-alaska.trycloudflare.com",
-  "total": 242,
-  "fallos": 0,
+  "total": 256,
+  "fallos": 7,
   "resultados": [
     {
       "name": "carga inicial sin errores JS",
@@ -11,12 +11,12 @@
     {
       "name": "rendimiento: JS + CSS inicial (con el 3D del hero) por debajo de 300 kB",
       "ok": true,
-      "detail": "265 kB (JS 244 · CSS 21)"
+      "detail": "263 kB (JS 244 · CSS 20)"
     },
     {
       "name": "rendimiento: la aplicación sin 3D por debajo de 90 kB",
       "ok": true,
-      "detail": "74 kB de JS de aplicación"
+      "detail": "73 kB de JS de aplicación"
     },
     {
       "name": "rendimiento: el escenario 3D se carga sólo bajo demanda",
@@ -36,7 +36,7 @@
     {
       "name": "hero: jerarquía tipográfica y CTA táctil",
       "ok": true,
-      "detail": "título 73.44px · CTA 56px"
+      "detail": "título 73.44px · CTA 79.59375px"
     },
     {
       "name": "prisma: canvas presente y WebGL activo",
@@ -46,12 +46,12 @@
     {
       "name": "prisma: la escena 3D se renderiza y cambia (animación real)",
       "ok": true,
-      "detail": "634702 vs 637327 bytes"
+      "detail": "636145 vs 637760 bytes"
     },
     {
       "name": "prisma: pinta una fracción útil del viewport",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.19159876543209878}"
+      "detail": "{\"paintedRatio\":0.19354938271604938}"
     },
     {
       "name": "hero 3D: lienzo único presente con WebGL activo",
@@ -81,12 +81,12 @@
     {
       "name": "hero 3D: pinta la escena (mascota, prisma, tarjetas)",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.1956875}"
+      "detail": "{\"paintedRatio\":0.2038125}"
     },
     {
       "name": "hero 3D: la animación ambiental cambia entre fotogramas",
       "ok": true,
-      "detail": "639938 vs 643504 bytes"
+      "detail": "643044 vs 649881 bytes"
     },
     {
       "name": "marca: el encabezado usa el logotipo oficial",
@@ -106,17 +106,17 @@
     {
       "name": "composición 7M-F: hero con titular y 2 CTA (tarjetas trasladadas a E30)",
       "ok": true,
-      "detail": "izq 29 · der 42 (referencia antigua ya no aplica)"
+      "detail": "izq 35 · der 42 (referencia antigua ya no aplica)"
     },
     {
       "name": "transición enterprise: la cámara viaja a otro mundo del mismo universo",
       "ok": true,
-      "detail": "mundo hero→enterprise · cámara [0,2.4,11.6]→[2.391044776119403,1.821641791044776,8.305223880597016] · tinte #050b1b→#0a0e18"
+      "detail": "mundo hero→enterprise · cámara [0,2.4,11.6]→[2.4916943521594686,1.8593853820598005,8.387001661129569] · tinte #050b1b→#0a0e18"
     },
     {
       "name": "transición enterprise: el contenido de la escena destino aparece",
       "ok": true,
-      "detail": "scrollY 3756 · act=enterprise"
+      "detail": "scrollY 1761 · act=enterprise"
     },
     {
       "name": "transición enterprise: volver regresa al hero sin recargar",
@@ -126,12 +126,12 @@
     {
       "name": "transición efficiency: la cámara viaja a otro mundo del mismo universo",
       "ok": true,
-      "detail": "mundo hero→efficiency · cámara [0,2.4,11.6]→[-2.5671076642335766,1.890602189781022,8.776505474452556] · tinte #050b1b→#0d0a05"
+      "detail": "mundo hero→efficiency · cámara [0,2.4,11.6]→[-2.338023952095808,1.8251497005988022,8.612874251497006] · tinte #050b1b→#0d0a05"
     },
     {
       "name": "transición efficiency: el contenido de la escena destino aparece",
       "ok": true,
-      "detail": "scrollY 3756 · act=efficiency"
+      "detail": "scrollY 1761 · act=efficiency"
     },
     {
       "name": "transición efficiency: volver regresa al hero sin recargar",
@@ -141,12 +141,12 @@
     {
       "name": "transición cooperative: la cámara viaja a otro mundo del mismo universo",
       "ok": true,
-      "detail": "mundo hero→cooperative · cámara [0,2.4,11.6]→[-0.016666666666666673,1.5083333333333333,8.8] · tinte #050b1b→#060d08"
+      "detail": "mundo hero→cooperative · cámara [0,2.4,11.6]→[-0.016666666666666673,2.7454191104521644,11.89237230269381] · tinte #050b1b→#060d08"
     },
     {
       "name": "transición cooperative: el contenido de la escena destino aparece",
       "ok": true,
-      "detail": "scrollY 16900 · act=cooperative"
+      "detail": "scrollY 700 · act=cooperative"
     },
     {
       "name": "transición cooperative: volver regresa al hero sin recargar",
@@ -176,7 +176,7 @@
     {
       "name": "P0: el scroll conduce la cámara (scrub) hacia el mundo cooperativo",
       "ok": true,
-      "detail": "world=cooperative · cámara=[-0.016666666666666673,1.5083333333333333,8.8] · scrollY=17600"
+      "detail": "world=cooperative · cámara=[-0.016666666666666673,2.486793857487109,11.53395467346999] · scrollY=1400"
     },
     {
       "name": "P0: tras elegir empresa, el scroll NO cambia a exploración",
@@ -271,12 +271,12 @@
     {
       "name": "ruta empresa: escena propia visible",
       "ok": true,
-      "detail": "1515px"
+      "detail": "2192px"
     },
     {
       "name": "ruta empresa: contenido de la escena (7M-F infra)",
       "ok": true,
-      "detail": "Tu tecnología. Tu operación. Tus decisiones."
+      "detail": "Soberanía digital. Tu tecnología, bajo tus reglas."
     },
     {
       "name": "variante compartida: la ruta empresa reescribe la escena común",
@@ -286,7 +286,7 @@
     {
       "name": "ruta eficiencia: escena propia visible",
       "ok": true,
-      "detail": "1696px · route=efficiency act=efficiency world=efficiency scrollY=24"
+      "detail": "1174px · route=efficiency act=efficiency world=efficiency scrollY=10"
     },
     {
       "name": "ruta eficiencia: mensaje propio de la escena",
@@ -336,7 +336,7 @@
     {
       "name": "bifurcación: abre la escena cooperativa",
       "ok": true,
-      "detail": "1603px"
+      "detail": "1212px"
     },
     {
       "name": "variante por rasgo: el rasgo reescribe la escena compartida",
@@ -416,12 +416,12 @@
     {
       "name": "contacto: WhatsApp visible en la página",
       "ok": true,
-      "detail": "7 enlace(s)"
+      "detail": "8 enlace(s)"
     },
     {
       "name": "contacto: número público verificado",
       "ok": true,
-      "detail": "https://wa.me/525573724660?text=Hola%2C%20quiero%20dise%C3%B1ar%20mi%20infraestructura%20con%20Publia.%20Escenario%3A%20IA%20local%20privada."
+      "detail": "https://wa.me/525573724660?text=Quiero%20automatizar%20estas%20tareas%20%E2%80%94%20Categor%C3%ADa%3A%20Consultas%20por%20WhatsApp.%20Tiempo%20actual%3A%208%20h%2Fsemana%3B%20potencialmente%20liberado%3A%203.4%20h%3B%20r"
     },
     {
       "name": "7M-F form: 3 campos (nombre/negocio/necesidad) con etiqueta",
@@ -516,7 +516,7 @@
     {
       "name": "v3: eyebrows con emoji semántico",
       "ok": true,
-      "detail": "6 eyebrows"
+      "detail": "5 eyebrows"
     },
     {
       "name": "v3: escena clara con tinta oscura (contraste real)",
@@ -526,12 +526,12 @@
     {
       "name": "v3 scroll: la cámara se transforma en 30/60/90% (ida)",
       "ok": true,
-      "detail": "30=[0,2.174928481731574,10.792526120381556] 60=[0,2.342139162912054,10.750231904441902] 90=[0,1.5499999969135803,9.019999986419755]"
+      "detail": "30=[-0.02956810631229234,2.1764119385279534,10.42222581855954] 60=[0,2.0591252576327235,10.278542062309686] 90=[0,1.5499999969135803,9.019999986419755]"
     },
     {
       "name": "v3 scroll: recorrido inverso mueve la cámara en sentido inverso (reversible)",
       "ok": true,
-      "detail": "90=[0,1.5499999969135803,9.019999986419755] ida60=[0,2.342139162912054,10.750231904441902] vuelta60=[0,2.3720956596360985,10.800159398981977]"
+      "detail": "90=[0,1.5499999969135803,9.019999986419755] ida60=[0,2.0591252576327235,10.278542062309686] vuelta60=[0,2.0608718929288106,10.281453121136497]"
     },
     {
       "name": "7M-F E03: 4 escenarios con botones aria-pressed",
@@ -539,14 +539,14 @@
       "detail": "4 modos"
     },
     {
-      "name": "7M-G E03: default local-private, stage nativo con racks encendidos, sin póster A04, esquemas colapsados y CTA infraMessage",
+      "name": "7M-H E03: H2 «Soberanía digital.» único, stage 3D con canvas, 4 filas de panel, sin póster, esquemas colapsados, CTA infra",
       "ok": true,
-      "detail": "{\"title\":\"Inteligencia dentro de tu organización.\",\"svgVisible\":[\"local-private\"],\"stageMode\":\"local-private\",\"racks\":10,\"racksOn\":10,\"noPoster\":true,\"schemesCollapsed\":true,\"cta\":\"https://wa.me/52557"
+      "detail": "{\"title\":\"Inteligencia dentro de tu organización.\",\"h2\":\" Soberanía digital. Tu tecnología, bajo tus reglas. \",\"canvas\":true,\"rows\":4,\"hotspotBox\":true,\"runBtn\":true,\"svgVisible\":[\"local-private\"],\"noPoster\":true,\"scheme"
     },
     {
-      "name": "7M-G E03: red distribuida actualiza texto+esquema+stage+CTA en una operación",
+      "name": "7M-H E03: red distribuida cambia panel (4 filas con «rutas alternativas»), muestra botón ruta alternativa, esquema y CTA",
       "ok": true,
-      "detail": "Varios nodos. Más formas de colaborar."
+      "detail": "{\"title\":\"Varios nodos. Más formas de colaborar.\",\"rows\":4,\"rowText\":\"Dónde trabajaEn varios nodos conectados, ubicados en diferentes equipos o lugares.Qué puedes integrarServicios especializados y tareas que pueden diri"
     },
     {
       "name": "7M-F E03: aria-pressed y persistencia state.infra (id nuevo)",
@@ -554,14 +554,19 @@
       "detail": "{\"pressed\":\"true\",\"persisted\":\"distributed-network\"}"
     },
     {
-      "name": "7M-G E03: sin botón «Activar red» ni contador de tráfico",
+      "name": "7M-H E03: sin botón «Activar red» ni contador de tráfico",
       "ok": true,
       "detail": ""
     },
     {
-      "name": "7M-G E03: local colaborativo reutiliza el stage local + etiqueta «Servicio compartido autorizado»",
+      "name": "7M-H E03: local colaborativo muestra filas de colaboración (aislamiento/cuotas) y stage activo",
       "ok": true,
-      "detail": "{\"sharedTag\":true,\"racksOn\":10,\"title\":\"Comparte capacidad. Define los límites.\"}"
+      "detail": "{\"rowText\":\"Dónde trabajaEn tu infraestructura local, con servicios concretos habilitados para colaborar con otros.Qué puedes integrarAsistentes internos y tare"
+    },
+    {
+      "name": "7M-H E03: housing muestra vínculo «Comparar recursos compartidos y privados» → E22 y filas de equipos administrados",
+      "ok": true,
+      "detail": "{\"compareHidden\":false,\"compareHref\":\"#escena-e22\",\"rowText\":\"Dónde trabajaEn equipos administrados por Publia a los que accedes mediante tus aplicaciones e interfaces.Qué puedes integrarAgentes, aten"
     },
     {
       "name": "v3 demo eficiencia: resultado según foco",
@@ -696,7 +701,7 @@
     {
       "name": "7M-B red: demo ilumina flujo y muestra resultado",
       "ok": true,
-      "detail": "3/3 · EL EQUIPO APRENDE"
+      "detail": "1/3 · LA IA ORGANIZA"
     },
     {
       "name": "7M-F E03: comparación compartida/privada ya NO está en E03 (sólo en E22)",
@@ -704,19 +709,39 @@
       "detail": ""
     },
     {
-      "name": "7M-F E22: 2 modalidades con textos del JSON",
+      "name": "7M-H E22: 2 modalidades Compartido/Privado",
       "ok": true,
       "detail": ""
     },
     {
-      "name": "7M-F E22: modalidad persiste (housingMode separado de infra) y texto privado literal",
+      "name": "7M-H E22: caso inicial 85 — compartido 3 activas/4 espera (50 usadas), privado 7 activas/0 espera (85 usadas, 15 disp.)",
       "ok": true,
-      "detail": "{\"persisted\":\"privado\",\"desc\":\"Los recursos contratados se destinan a tu operación, sin aportación de capacidad a la red"
+      "detail": "{\"shared\":{\"active\":\"3 tareas (50 unidades)\",\"waiting\":\"4\",\"used\":\"50 / 50\",\"available\":\"0\"},\"private\":{\"active\":\"7 tareas (85 unidades)\",\"waiting\":\"0\",\"used\":\"85 / 100\",\"available\":\"15\"},\"disclaimer\":\"Escenario ilustrat"
     },
     {
-      "name": "7M-F E22: CTA añade housing.fields sólo al elegir modalidad",
+      "name": "7M-H E22: disclaimer ilustrativo + 4 filas editables + demanda 85 + H2 literal + sin métricas vacías ni tráfico decorativo",
       "ok": true,
-      "detail": "https://wa.me/525573724660?text=Hola%2C%20quiero%20cotizar%20una%20configuraci%C3%B3n%20de"
+      "detail": "{\"d\":\"Escenario ilustrativo de reparto; no es \",\"rows\":4,\"demand\":\"85\"}"
+    },
+    {
+      "name": "7M-H E22: CTA WhatsApp con prefijo «Escenario ilustrativo que quiero dimensionar» + modalidad y cantidades",
+      "ok": true,
+      "detail": "https://wa.me/525573724660?text=Escenario%20ilustrativo%20que%20quiero%20dimensionar%20%E2%80%94%20M"
+    },
+    {
+      "name": "7M-H E22: privado persiste, stage 100/0 sin reservas visibles, inputs conservados",
+      "ok": true,
+      "detail": "{\"persisted\":\"privado\",\"stageMode\":\"privado\",\"rackClient\":\"100%\",\"rackNet\":\"0%\",\"reservedVisible\":false,\"inputsKept\":\"2\"}"
+    },
+    {
+      "name": "7M-H E22: volver a compartido restaura 50/50 con reservas visibles y chips 3 en proceso / 4 en espera",
+      "ok": true,
+      "detail": "{\"rackClient\":\"50%\",\"reservedVisible\":true,\"chipsOn\":3,\"chipsWait\":4}"
+    },
+    {
+      "name": "7M-H E22: editar cantidad (auto→0) recalcula demanda 75 y ambas columnas (compartido 3 activas, privado 5 activas)",
+      "ok": true,
+      "detail": "{\"demand\":\"75\",\"sActive\":\"3 tareas (50 unidades)\",\"pActive\":\"5 tareas (75 unidades)\"}"
     },
     {
       "name": "7M-B personas: 3 casos + 4 controles",
@@ -766,7 +791,7 @@
     {
       "name": "7M-F cierre: meta refleja ruta + membresía + capacidad",
       "ok": true,
-      "detail": "Ruta: ruta Empresa · Housing: privado 100% · Red: sitios · Membresía orientativa: COBERTURA · Capacidades (1/6): Web + chatbot de WhatsApp"
+      "detail": "Ruta: ruta Empresa · Housing: compartido 50/25/25 · Red: sitios · Membresía orientativa: COBERTURA · Capacidades (1/6): Web + chatbot de WhatsApp"
     },
     {
       "name": "7M-F cierre: titular del resumen literal (closing.summaryTitle)",
@@ -781,12 +806,12 @@
     {
       "name": "7M-B cierre: demo de tarjeta recorre 3 pasos",
       "ok": true,
-      "detail": "2/3 · Organizar tareas y borradores"
+      "detail": "1/3 · Identificar la necesidad"
     },
     {
       "name": "7M-G empresa: E03 con stage infra nativo SIN póster A04 + capítulo mundo",
       "ok": true,
-      "detail": "{\"demo\":true,\"art\":null,\"chapter\":\"mundo\",\"tone\":\"petrol\",\"title\":\"Tu tecnología. Tu operación. Tus decisiones.\"}"
+      "detail": "{\"demo\":true,\"art\":null,\"chapter\":\"mundo\",\"tone\":\"petrol\",\"title\":\" Soberanía digital. Tu tecnología, bajo tus reglas. \"}"
     },
     {
       "name": "v4-A eficiencia: llegada con demo flujo + arte A03",
@@ -811,7 +836,7 @@
     {
       "name": "v4-A transición botón: cámara cambia en 3 momentos (inicio/medio/fin)",
       "ok": true,
-      "detail": "0=[0,2.4,11.6] mid=[1.9,1.952654867256637,8.6 fin=[2.391044776119403,1.82164"
+      "detail": "0=[0,2.4,11.6] mid=[2.8046511627906976,1.9767 fin=[2.4916943521594686,1.8593"
     },
     {
       "name": "v4-A transición botón: portal visible a mitad del viaje",
@@ -859,9 +884,9 @@
       "detail": "{\"progress\":\"0\",\"maxOp\":0,\"visible\":false}"
     },
     {
-      "name": "7M-G E03: stage nativo visible con 10 racks en posiciones distintas",
+      "name": "7M-H E03: stage 3D con canvas visible (≥520px alto desktop) y panel con 4 filas",
       "ok": true,
-      "detail": "{\"n\":10,\"distinct\":10,\"transform\":\"340px\",\"display\":\"block\"}"
+      "detail": "{\"hasCanvas\":true,\"w\":400.5,\"h\":520,\"rows\":4}"
     },
     {
       "name": "7M-C infra: sin auto-selección persistida (null hasta que el visitante elige)",
@@ -874,34 +899,29 @@
       "detail": "null"
     },
     {
-      "name": "7M-C housing: default compartido 50/25/25",
+      "name": "7M-H housing: default compartido con rack 50/50",
       "ok": true,
-      "detail": "[\"50%\",\"25%\",\"25%\"]"
+      "detail": "{\"c\":\"50%\",\"n\":\"50%\",\"mode\":\"compartido\"}"
     },
     {
-      "name": "7M-C housing: privado = 100% y persiste en state.housingMode",
-      "ok": true,
-      "detail": "[\"100%\"]"
-    },
-    {
-      "name": "7M-C housing: stage transforma los racks (data-mode=privado)",
+      "name": "7M-H housing: privado = rack 100/0 y persiste en state.housingMode",
       "ok": true,
       "detail": ""
     },
     {
-      "name": "7M-C housing: demo ilumina el stage (data-demo-state=on)",
+      "name": "7M-H housing: «Ver cómo se reparte el trabajo» inicia la secuencia y revela chips en proceso",
       "ok": true,
-      "detail": ""
+      "detail": "{\"status\":\"Repartiendo el trabajo…\",\"on\":7}"
     },
     {
-      "name": "7M-C housing: recarga restaura privado (botón + estado)",
+      "name": "7M-H housing: recarga restaura privado (botón + estado)",
       "ok": true,
       "detail": ""
     },
     {
       "name": "7M-C cierre: la meta incluye la modalidad Housing elegida",
       "ok": true,
-      "detail": "Ruta: ruta Empresa · Housing: privado 100% · Aún no añades capacidades: toca «＋ Añadir a mi Publia» en las tarjetas"
+      "detail": "Ruta: exploración sin ruta fija · Housing: privado 100% · Aún no añades capacidades: toca «＋ Añadir a mi Publia» en las tarjetas"
     },
     {
       "name": "7M-C A06: 5 áreas + 3 demos seleccionables presentes",
@@ -949,9 +969,9 @@
       "detail": ""
     },
     {
-      "name": "7M-C reduced-motion: housing presente y anillos sin animación",
+      "name": "7M-H reduced-motion: housing 7M-H enlazado con modelo estático (chips visibles sin secuencia)",
       "ok": true,
-      "detail": "bound=1 anim=none"
+      "detail": "bound=undefined chips=7 anim=1e-06s"
     },
     {
       "name": "7M-D P0-01: nodo 3 elegido persiste",
@@ -1025,23 +1045,23 @@
     },
     {
       "name": "7M-D axe ruta efficiency tras abrir controles: sin violaciones graves/moderadas",
-      "ok": true,
-      "detail": "0"
+      "ok": false,
+      "detail": "list×2"
     },
     {
       "name": "7M-D axe ruta explorer tras abrir controles: sin violaciones graves/moderadas",
-      "ok": true,
-      "detail": "0"
+      "ok": false,
+      "detail": "list×2"
     },
     {
-      "name": "7M-E recorrido esencial ruta enterprise: 6-9 capítulos (8)",
+      "name": "7M-E recorrido esencial ruta enterprise: 6-9 capítulos (7)",
       "ok": true,
-      "detail": "E00,E02,E03,E22,E25,E27,E29,E30"
+      "detail": "E02,E03,E22,E25,E27,E29,E30"
     },
     {
-      "name": "7M-E «Explorar todo» ruta enterprise: muestra todas las escenas de la ruta (21/21)",
+      "name": "7M-E «Explorar todo» ruta enterprise: muestra todas las escenas de la ruta (20/20)",
       "ok": true,
-      "detail": "21/21"
+      "detail": "20/20"
     },
     {
       "name": "7M-E exploreAll persiste en estado (ruta enterprise)",
@@ -1049,14 +1069,14 @@
       "detail": ""
     },
     {
-      "name": "7M-E recorrido esencial ruta efficiency: 6-9 capítulos (9)",
+      "name": "7M-E recorrido esencial ruta efficiency: 6-9 capítulos (8)",
       "ok": true,
-      "detail": "E00,E02,E07,E11,E22,E25,E27,E29,E30"
+      "detail": "E02,E07,E11,E22,E25,E27,E29,E30"
     },
     {
-      "name": "7M-E «Explorar todo» ruta efficiency: muestra todas las escenas de la ruta (25/25)",
+      "name": "7M-E «Explorar todo» ruta efficiency: muestra todas las escenas de la ruta (24/24)",
       "ok": true,
-      "detail": "25/25"
+      "detail": "24/24"
     },
     {
       "name": "7M-E exploreAll persiste en estado (ruta efficiency)",
@@ -1139,49 +1159,69 @@
       "detail": ""
     },
     {
-      "name": "7M-G umbral: textos literales (título, caption, 4 beneficios numerados, 4 details)",
+      "name": "7M-H umbral: copy literal (A TU MANERA / Se nota que prefieres abrir tu propio camino / Bien. Aquí tú marcas el ritmo.)",
       "ok": true,
-      "detail": "{\"title\":\"Tu independencia crece en red.\",\"panels\":4}"
+      "detail": "{\"e\":\"A TU MANERA\",\"t\":\" Se nota que prefieres abrir tu propio camino. \"}"
     },
     {
-      "name": "7M-G umbral: layout dedicado ancho completo (≥ 90% del contenedor previsto a 1440)",
+      "name": "7M-H umbral: E00 es exclusivo de la exploración libre (route explorer)",
       "ok": true,
-      "detail": "{\"layout\":\"umbral\",\"surfW\":1324.796875,\"innerW\":1440,\"umbW\":1324.796875,\"titleColor\":\"rgb(9, 25, 51)\",\"simBg\":\"rgb(255, 253, 246)\",\"numBlocks\":4,\"noBenefitsArt\":true}"
+      "detail": "explorer"
     },
     {
-      "name": "7M-G umbral: contraste local cream (tinta #091933 sobre panel claro, sin vidrio negro)",
+      "name": "7M-H umbral: banda roja con 4 herramientas (WhatsApp conectado, agente, automatizaciones, tareas)",
       "ok": true,
-      "detail": "{\"color\":\"rgb(9, 25, 51)\",\"num\":4}"
+      "detail": "[\"WhatsApp conectado\",\"Un agente a tu lado\",\"Automatizaciones que conectan\",\"Tareas con seguimiento\"]"
     },
     {
-      "name": "7M-F simulador: defaults 65/18/40/55 -> 19,5 h y 4,3 h (es-MX, 1 decimal)",
+      "name": "7M-H umbral: 4 summaries + imagen limpia conservada",
       "ok": true,
-      "detail": "19.5 h / 4.3 h"
+      "detail": "panels=4 img=true"
     },
     {
-      "name": "7M-F simulador: fórmula y nota literales presentes",
+      "name": "7M-H simulador: preset WhatsApp default → 8 h / 3,4 h / 4,6 h (es-MX, 1 decimal)",
       "ok": true,
-      "detail": ""
+      "detail": "8 h / 3.4 h / 4.6 h"
     },
     {
-      "name": "7M-F simulador: tareas 0 -> 0 h sin división por cero",
+      "name": "7M-H simulador: 5 presets incl. «Mi propio escenario», badge «Ejemplo editable», barra apilada 42%/58%",
       "ok": true,
-      "detail": "{\"t\":\"0 h\",\"a\":\"0 h\",\"err\":false}"
+      "detail": "{\"p\":5,\"pot\":\"42%\",\"rem\":\"58%\"}"
     },
     {
-      "name": "7M-F simulador: 100%/100% -> total completo (19,5 h)",
+      "name": "7M-H simulador: nota literal y CTA WhatsApp con categoría+estimaciones (no autoenvío)",
       "ok": true,
-      "detail": "{\"t\":\"19.5 h\",\"a\":\"19.5 h\",\"err\":false}"
+      "detail": "https://wa.me/525573724660?text=Quiero automatizar estas tareas — Categoría: Consultas por WhatsApp. Tiempo actual: 8 h/semana; potencialmen"
     },
     {
-      "name": "7M-F simulador: inválido (-5) muestra error y no actualiza cifra",
+      "name": "7M-H simulador: 0 tareas → 0 h sin división por cero (barra 0/100)",
       "ok": true,
-      "detail": "{\"t\":\"19.5 h\",\"a\":\"4.3 h\",\"err\":true}"
+      "detail": "{\"t\":\"0 h\",\"p\":\"0 h\",\"r\":\"0 h\",\"err\":false,\"badge\":\"Mi propio escenario\"}"
     },
     {
-      "name": "7M-F simulador: reset restaura exactamente 19,5 / 4,3",
+      "name": "7M-H simulador: 100%/100% → potencial = total, restante 0",
       "ok": true,
-      "detail": "{\"t\":\"19.5 h\",\"a\":\"4.3 h\",\"err\":false}"
+      "detail": "{\"t\":\"8 h\",\"p\":\"8 h\",\"r\":\"0 h\",\"err\":false,\"badge\":\"Mi propio escenario\"}"
+    },
+    {
+      "name": "7M-H simulador: inválido (-5) muestra error y conserva cifras; editar activa «Mi propio escenario»",
+      "ok": true,
+      "detail": "{\"err\":true,\"badge\":\"Mi propio escenario\"}"
+    },
+    {
+      "name": "7M-H simulador: preset Documentos (12×35, 45%, 60%) → 7 h / 1,9 h / 5,1 h",
+      "ok": true,
+      "detail": "{\"t\":\"7 h\",\"p\":\"1.9 h\",\"r\":\"5.1 h\",\"err\":false,\"badge\":\"Ejemplo editable\"}"
+    },
+    {
+      "name": "7M-H umbral: contenedor único — a 1440 el borde derecho del contenido ≤ 1360",
+      "ok": false,
+      "detail": "{\"surfW\":1440,\"surfRight\":1440,\"innerW\":1440,\"umbW\":1280,\"titleColor\":\"rgb(38, 20, 26)\",\"titleSize\":\"64px\",\"bandBg\":\"rgb(169, 30, 56)\",\"h2count\":2}"
+    },
+    {
+      "name": "7M-H umbral: paleta 7M-H (tinta #26141A, banda #A91E38, un solo H2)",
+      "ok": false,
+      "detail": "{\"c\":\"rgb(38, 20, 26)\",\"band\":\"rgb(169, 30, 56)\",\"h2\":2}"
     },
     {
       "name": "7M-G hero: UN pin desktop con span = 18×H e invalidateOnRefresh",
@@ -1189,14 +1229,14 @@
       "detail": "{\"total\":108,\"pinned\":1,\"scrub\":0.6,\"span\":16200.001,\"vh\":900,\"invalidate\":true}"
     },
     {
-      "name": "7M-G cargas: superficie 3D en ready con aria-busy=false, loader oculto y fondo #050b1b desde el inicio",
+      "name": "7M-H cargas: estado ready o silent (sin fallback con mensaje), aria-busy=false, loader oculto, fondo #050b1b, SIN mensaje ni botón de reintento en el DOM",
       "ok": true,
-      "detail": "{\"state\":\"fallback\",\"busy\":\"false\",\"loaderDone\":true,\"bg\":\"rgb(5, 11, 27)\"}"
+      "detail": "{\"state\":\"ready\",\"busy\":\"false\",\"loaderDone\":true,\"bg\":\"rgb(5, 11, 27)\",\"noMsg\":true,\"noRetry\":true}"
     },
     {
       "name": "7M-G hero: rebote real — CTA suben a yNear (p=0.12) y bajan a yLow (p=0.25)",
-      "ok": true,
-      "detail": "{\"ok\":true,\"p10\":104.00177001953125,\"p25\":558,\"top0\":557.9990234375,\"navbarH\":64,\"H\":900,\"topNear\":104,\"topLow\":558,\"drop\":453.99822998046875}"
+      "ok": false,
+      "detail": "{\"ok\":true,\"p10\":558,\"p25\":558,\"top0\":557.9990234375,\"navbarH\":64,\"H\":900,\"topNear\":104,\"topLow\":558,\"drop\":0}"
     },
     {
       "name": "7M-G hero: elegir ruta durante el pin lo cancela y aterriza",
@@ -1209,9 +1249,39 @@
       "detail": ""
     },
     {
-      "name": "sin errores JS al final del recorrido",
+      "name": "7M-H hero: botón amarillo literal «SOY UNA GRAN EMPRESA, O ESTOY EN CAMINO DE SERLO» (2 líneas desktop + aria-label)",
       "ok": true,
-      "detail": ""
+      "detail": "{\"text\":\"SOY UNA GRAN EMPRESA, O ESTOY EN CAMINO DE SERLO ↗\",\"label\":\"SOY UNA GRAN EMPRESA, O ESTOY EN CAMINO DE SERLO\",\"lines\":[\"SOY UNA GRAN EMPRESA,\",\"O ESTOY EN CAMINO DE SERLO\"]}"
+    },
+    {
+      "name": "7M-H hero: estilos del CTA (16px/1.3, 750, max 440px, padding 18px 26px, min-height 76px, sin nowrap)",
+      "ok": true,
+      "detail": "{\"fs\":\"16px\",\"fw\":\"750\",\"lh\":\"20.8px\",\"maxW\":\"440px\",\"pad\":\"18px 26px\",\"minH\":\"76px\",\"nowrap\":\"normal\"}"
+    },
+    {
+      "name": "7M-H hero: 20 ciclos entrada libre→ruta→volver→reentrada con 1 pin y 0 tras reset (cero omisiones)",
+      "ok": false,
+      "detail": "{\"fails\":20,\"pins\":[{\"i\":0,\"actFree\":\"cooperative\",\"pins\":1,\"actRoute\":\"cooperative\",\"actBack\":\"hero\",\"pinsAfterReset\":0},{\"i\":1,\"actFree\":\"cooperative\",\"pins\":1,\"actRoute\":\"cooperative\",\"actBack\":\"hero\",\"pinsAfterReset\""
+    },
+    {
+      "name": "7M-H hero: rueda hacia ARRIBA no inicia el recorrido libre",
+      "ok": true,
+      "detail": "hero"
+    },
+    {
+      "name": "7M-H estado: recarga con ruta previa → primary transitoria unclassified (pin rearmable) y rememberedRoute aparte",
+      "ok": true,
+      "detail": "{\"route\":\"unclassified\",\"remembered\":\"efficiency\"}"
+    },
+    {
+      "name": "7M-H umbral: E00 oculto tras elegir empresa y visible de nuevo en exploración libre",
+      "ok": true,
+      "detail": "{\"afterRoute\":false,\"afterReset\":true}"
+    },
+    {
+      "name": "sin errores JS al final del recorrido",
+      "ok": false,
+      "detail": "TypeError: A?.cardPulse is not a function | TypeError: r?.cardPulse is not a function"
     }
   ]
 }

@@ -390,13 +390,19 @@ export function createNarrative({ universe, reducedMotion, portal }: NarrativeOp
   };
 
   /** 7M-H §2: medidas recalculables — reconstruye el pin conservando el progreso. */
+  let refreshingPin = false;
   const refreshHeroMeasures = (): void => {
     if (!heroPin || heroCycleState !== 'pinned') { ScrollTrigger.refresh(); return; }
+    if (refreshingPin) return;
     const prog = heroPin.progress;
     const m = measureHero();
     if (!m.heroElement || reducedMotion || window.innerWidth < 1024) { ScrollTrigger.refresh(); return; }
-    heroPinTl?.kill(); heroPin.kill();
+    refreshingPin = true;
+    const oldSt = heroPin;
+    const oldTl = heroPinTl;
     heroPin = null; heroPinTl = null;
+    oldSt.kill(); // ST primero: así el timeline viejo no puede reaparecer
+    oldTl?.kill();
     const { actions, copy, inner, umbral, yNear, yLow, canBounce } = m;
     heroPinEls = { actions, copy, umbral };
     heroPinTl = gsap.timeline({
@@ -419,7 +425,7 @@ export function createNarrative({ universe, reducedMotion, portal }: NarrativeOp
     if (umbral) heroPinTl.fromTo(umbral, { opacity: 0 }, { opacity: 1, duration: 0.18, ease: 'none' }, 0.70);
     if (inner) heroPinTl.to(inner, { opacity: 0, duration: 0.12, ease: 'power1.in' }, 0.88);
     if (heroPinTl) heroPinTl.progress(prog, false);
-    if (heroPin) heroPin.update(true, true, true);
+    refreshingPin = false;
     ScrollTrigger.refresh();
   };
 

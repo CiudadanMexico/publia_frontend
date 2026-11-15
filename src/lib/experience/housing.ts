@@ -70,11 +70,6 @@ export function bindHousing(): void {
 
   const demand = (): number => types.reduce((a, t) => a + t.qty * t.cost, 0);
 
-  const fmtCounts = (r: AssignmentResult): string =>
-    r.results
-      .map((x) => `${x.type.label}: ${x.active} ${E22_7MH.inProcess.toLowerCase()}, ${x.waiting} ${E22_7MH.queued.toLowerCase()}`)
-      .join(' · ');
-
   const renderColumn = (key: 'compartido' | 'privado', r: AssignmentResult): void => {
     const col = cols[key];
     if (!col) return;
@@ -87,7 +82,7 @@ export function bindHousing(): void {
     set('used', `${r.used} / ${r.cap}`);
     set('available', String(r.available));
     const counts = col.querySelector<HTMLElement>('[data-hs-counts]');
-    if (counts) counts.textContent = fmtCounts(r);
+    if (counts) counts.innerHTML = r.results.map((x) => `<li>${x.type.label}: ${x.active} ${E22_7MH.inProcess.toLowerCase()}, ${x.waiting} ${E22_7MH.queued.toLowerCase()}</li>`).join('');
   };
 
   const renderChips = (r: AssignmentResult): void => {

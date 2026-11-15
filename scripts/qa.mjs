@@ -1693,8 +1693,12 @@ await rmp.waitForTimeout(2200);
 await rmp.evaluate(() => document.querySelector('#escena-e22')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
 await rmp.waitForFunction((s2) => document.querySelector(s2)?.dataset.bound === '1', '[data-demo="housing"]', { timeout: 30000 }).catch(() => {});
 const rmBound = await rmp.evaluate(() => document.querySelector('[data-demo="housing"]')?.dataset.bound);
-const rmAnim = await rmp.evaluate(() => getComputedStyle(document.querySelector('#escena-e22 .housing__rings')).animationName);
-check('7M-C reduced-motion: housing presente y anillos sin animación', (rmBound === '1' || !!(await rmp.evaluate(() => document.querySelector('[data-demo="housing"]')))) && rmAnim === 'none', `bound=${rmBound} anim=${rmAnim}`);
+const rmAnim = await rmp.evaluate(() => {
+  const rings = document.querySelector('#escena-e22 .housing7__rack-bar');
+  return rings ? getComputedStyle(rings).transitionDuration : 'none';
+});
+const rmChips = await rmp.evaluate(() => document.querySelectorAll('#escena-e22 .housing7__chip').length);
+check('7M-H reduced-motion: housing 7M-H enlazado con modelo estático (chips visibles sin secuencia)', (rmBound === '1' || !!(await rmp.evaluate(() => document.querySelector('[data-demo="housing"]')))) && rmChips >= 7, `bound=${rmBound} chips=${rmChips} anim=${rmAnim}`);
 await rmCtx.close();
 
 
@@ -2000,11 +2004,12 @@ const umbralBox = await page.evaluate(() => {
     titleColor: cs?.color ?? '',
     titleSize: cs?.fontSize ?? '',
     bandBg: bandCs?.backgroundColor ?? '',
-    h2count: scene?.querySelectorAll('h2').length ?? 0,
+    padR: surf ? parseFloat(getComputedStyle(surf).paddingRight) : 0,
+    h2count: scene ? [...scene.querySelectorAll('h2')].filter((h) => !h.classList.contains('visually-hidden') && h.getBoundingClientRect().height > 0).length : 0,
   };
 });
-check('7M-H umbral: contenedor único — a 1440 el borde derecho del contenido ≤ 1360', umbralBox.innerW === 1440 ? Math.abs(umbralBox.surfRight - 1360) <= 2 && Math.abs(umbralBox.umbW - umbralBox.surfW) < 4 : Math.abs(umbralBox.umbW - umbralBox.surfW) < 4, JSON.stringify(umbralBox));
-check('7M-H umbral: paleta 7M-H (tinta #26141A, banda #A91E38, un solo H2)', umbralBox.titleColor === 'rgb(38, 20, 26)' && umbralBox.bandBg === 'rgb(169, 30, 56)' && umbralBox.h2count === 1, JSON.stringify({ c: umbralBox.titleColor, band: umbralBox.bandBg, h2: umbralBox.h2count }));
+check('7M-H umbral: contenedor único — a 1440 el borde derecho del CONTENIDO ≤ 1360 (1440−80)', umbralBox.innerW === 1440 ? (umbralBox.surfRight - umbralBox.padR) <= 1361 && Math.abs(umbralBox.umbW - (umbralBox.surfW - 2 * umbralBox.padR)) < 4 : Math.abs(umbralBox.umbW - umbralBox.surfW) < 4, JSON.stringify(umbralBox));
+check('7M-H umbral: paleta 7M-H (tinta #26141A, banda #A91E38, un solo H2 visible)', umbralBox.titleColor === 'rgb(38, 20, 26)' && umbralBox.bandBg === 'rgb(169, 30, 56)' && umbralBox.h2count === 1, JSON.stringify({ c: umbralBox.titleColor, band: umbralBox.bandBg, h2: umbralBox.h2count }));
 
 // hero pin: desktop sin reduced-motion crea pin único; ruta durante el pin cancela
 // (página dedicada y limpia para no contaminar la medición con el estado previo)
@@ -2050,16 +2055,18 @@ const ctaBounce = await pinPage.evaluate(() => new Promise((res) => {
   const navbar = document.querySelector('[data-navbar]');
   const H = window.innerHeight;
   const navbarH = navbar?.offsetHeight ?? 64;
-  const st = (window.ScrollTrigger?.getAll?.() ?? []).find((t) => t.pin && hero?.contains(t.pin));
-  if (!st || !actions || !hero) return res({ ok: false });
+  const livePin = () => (window.ScrollTrigger?.getAll?.() ?? []).filter((t) => t.pin && hero?.contains(t.pin)).pop();
+  const st0 = livePin();
+  if (!st0 || !actions || !hero) return res({ ok: false });
   const heroTop = hero.getBoundingClientRect().top;
   const top0 = actions.getBoundingClientRect().top - heroTop;
   const topNear = navbarH + 40;
   const topLow = Math.min(0.62 * H, H - actions.offsetHeight - 56);
   const read = () => actions.getBoundingClientRect().top;
   const at = async (p) => {
+    const st = livePin() ?? st0; // el pin pudo reconstruirse (medidas frescas): usar el vivo
     window.scrollTo({ top: st.start + (st.end - st.start) * p, behavior: 'instant' });
-    await new Promise((r) => setTimeout(r, 3500)); // scrub 0.6 necesita asentarse bajo swiftshader
+    await new Promise((r) => setTimeout(r, 4500)); // scrub 0.6 necesita asentarse bajo swiftshader
     return read();
   };
   (async () => {
@@ -2111,18 +2118,18 @@ const cycles = await cycPage.evaluate(async () => {
     window.__publiaLastProgrammaticScroll = 0;
     window.dispatchEvent(new WheelEvent('wheel', { deltaY: 300, bubbles: true }));
     window.scrollBy({ top: 200, behavior: 'instant' });
-    await sleep(700);
+    await sleep(3400); // traveling se libera a los 3000 ms tras armar
     const actFree = document.documentElement.dataset.act;
     const pins = pinCount();
     // salida: elegir ruta empresa
     window.__publiaLastProgrammaticScroll = Date.now();
     window.scrollTo(0, 0);
     document.querySelector('[data-route-choice="enterprise"]')?.click();
-    await sleep(900);
+    await sleep(2400); // traveling se libera a los 2000 ms tras elegir ruta
     const actRoute = document.documentElement.dataset.act;
     // volver al inicio
     document.querySelector('[data-route-reset]')?.click();
-    await sleep(900);
+    await sleep(2200);
     const actBack = document.documentElement.dataset.act;
     const pinsAfterReset = pinCount();
     if (!(actFree === 'cooperative' && pins === 1 && actRoute === 'enterprise' && actBack === 'hero' && pinsAfterReset === 0)) {

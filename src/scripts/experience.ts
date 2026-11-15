@@ -761,8 +761,19 @@ export async function startExperience(): Promise<void> {
   // 7M-G §6: el universo entra por proxy — la narrativa y las rutas existen
   // desde el primer frame aunque el WebGL aún no haya terminado de cargar.
   const universeBox: { current: UniverseHandleLike | null } = { current: null };
+  // 7M-H: el proxy reenvía cada método al universe real cuando exista; antes de
+  // eso devuelve un noop seguro (los binders estáticos llaman cardPulse/gesture
+  // antes de que el WebGL esté listo).
   const universeProxy = new Proxy({} as UniverseHandleLike, {
-    get: (_t, key) => (universeBox.current as unknown as Record<PropertyKey, unknown>)?.[key],
+    get: (_t, key) => {
+      const real = (universeBox.current as unknown as Record<PropertyKey, unknown> | null)?.[key];
+      if (typeof real === 'function') return real.bind(universeBox.current);
+      return (...args: unknown[]) => {
+        const fn = (universeBox.current as unknown as Record<PropertyKey, unknown> | null)?.[key];
+        if (typeof fn === 'function') return (fn as (...a: unknown[]) => unknown)(...args);
+        return undefined;
+      };
+    },
   });
   const layer = document.querySelector<HTMLElement>('.prism-layer');
   const loader = document.querySelector<HTMLElement>('[data-hero-loader]');
@@ -846,6 +857,11 @@ export async function startExperience(): Promise<void> {
   const portal: PortalHandle = createPortal();
   // 7M-G §6: narrativa creada YA, con el universo por proxy (puede ser null al inicio)
   narrative = createNarrative({ universe: universeProxy, reducedMotion: reduced, portal });
+  // handle de depuración/QA (sólo lectura): estado del ciclo del hero
+  (window as unknown as { __publiaHero?: unknown }).__publiaHero = {
+    cycle: () => narrative?.heroCycle(),
+    pinProgress: () => { const st = (window as unknown as { ScrollTrigger?: { getAll(): { progress: number; pin: unknown; animation: { progress(): number } | null }[] } }).ScrollTrigger?.getAll?.().find((t) => t.pin && document.querySelector('[data-hero-scene]')?.contains(t.pin as Node)); return st ? { st: st.progress, tl: st.animation?.progress() ?? null } : null; },
+  };
   bindStaticControls(); // 7M-H §1: simuladores/selectores/formularios listos aunque WebGL nunca llegue
   const progressByScene = new Map<string, number>();
 
