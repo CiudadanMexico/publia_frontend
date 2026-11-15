@@ -56,9 +56,27 @@ html[data-segments~='advanced'] .scene__inner[data-scene-segments~='advanced'] {
   padding-block: clamp(4rem, 10vh, 8rem);
 }
 
+/* 7M-H §4: UN solo contenedor propietario del padding lateral.
+   width 100% + max-width 1536 + padding por viewport; safe-area se suma sólo
+   si es mayor que el mínimo. Ningún módulo suma márgenes sobre este contenedor. */
 .scene__surface {
-  width: min(100% - 2.5rem, 76rem);
+  width: 100%;
+  max-width: 1536px;
   margin-inline: auto;
+  box-sizing: border-box;
+  --pad-x: 20px;
+  --gap-x: 20px;
+  --panel-pad: 20px;
+  padding-inline: max(var(--pad-x), env(safe-area-inset-left, 0px)) max(var(--pad-x), env(safe-area-inset-right, 0px));
+}
+@media (min-width: 768px) {
+  .scene__surface { --pad-x: 32px; --gap-x: 24px; --panel-pad: 24px; }
+}
+@media (min-width: 1024px) {
+  .scene__surface { --pad-x: 56px; --gap-x: 32px; --panel-pad: 28px; }
+}
+@media (min-width: 1440px) {
+  .scene__surface { --pad-x: 80px; --gap-x: 40px; --panel-pad: 32px; }
 }
 
 .visually-hidden {
@@ -741,9 +759,7 @@ html[data-segments~='advanced'] .scene__inner[data-scene-segments~='advanced'] {
     padding-block: clamp(3rem, 8vh, 5rem);
   }
 
-  .scene__surface {
-    width: min(100% - 1.75rem, 76rem);
-  }
+
 
   .statement__title {
     font-size: var(--step-3);

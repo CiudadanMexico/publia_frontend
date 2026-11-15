@@ -167,12 +167,13 @@ const SCENES_RAW: SceneDefinition[] = [
   },
   {
     id: 'E03',
-    eyebrow: 'SOBERANÍA DIGITAL',
-    title: 'Tu tecnología. Tu operación. Tus decisiones.',
-    lead: 'Integra inteligencia, sistemas y datos en la operación que ya conoces. Elige una arquitectura.',
-    body: 'Elige dónde opera tu inteligencia y cómo se conectan tus recursos.',
+    // 7M-H §6: un solo H2, propiedad de InfraDemo: «Soberanía digital.» en
+    // blanco + «Tu tecnología, bajo tus reglas.» en cian (el wrapper no repite).
+    title: 'Soberanía digital. Tu tecnología, bajo tus reglas.',
+    lead: 'Tu tecnología. Tu operación. Tus decisiones.',
+    body: 'Integra inteligencia, sistemas y datos en la operación que ya conoces. Elige dónde se procesa tu información, quién puede utilizarla y qué conexiones necesita tu negocio.',
     purpose: 'Validar que la ruta empresarial habla de su realidad antes de proponer nada.',
-    modules: ['statement', 'infraDemo'],
+    modules: ['infraDemo'],
     segments: ['enterprise', 'established', 'advanced'],
     route: 'enterprise',
     duration: 2,
@@ -490,7 +491,7 @@ const SCENES_RAW: SceneDefinition[] = [
     lead: 'Personas, agentes de IA y herramientas trabajando juntos: la tecnología funciona mejor cuando se conecta con personas.',
     body: 'Explora las seis capacidades de la red, elige una y observa cómo colaboran entre sí.',
     purpose: 'Presentar la Red Colaborativa de Publia como ruta central de exploración.',
-    modules: ['statement', 'redDemo'],
+    modules: ['redDemo'], // 7M-H §6: un solo encabezado (redDemo lo posee)
     segments: ['cooperative', 'values', 'explorer'],
     route: 'explorer',
     duration: 2,
@@ -655,11 +656,11 @@ const SCENES_RAW: SceneDefinition[] = [
   {
     id: 'E22',
     eyebrow: 'Ecosistema · Housing',
-    title: "Un nodo para lo que quieres construir.",
-    lead: "Define la capacidad de tu equipo y cómo quieres utilizarla. Publia acompaña su administración.",
-    body: "La cotización detalla equipo, administración, capacidad asignada y condiciones del servicio.",
+    title: '¿Cómo quieres repartir tu capacidad?',
+    lead: 'Compara un servidor compartido con uno dedicado a tu operación.',
+    body: 'Un mismo equipo puede atender conversaciones, apoyar llamadas y ejecutar tareas internas. La diferencia está en cuánta capacidad reservas para tu negocio y cómo organizas el trabajo cuando coinciden varias solicitudes.',
     purpose: 'Explicar Housing con el reparto real, sin inventar cifras financieras.',
-    modules: ['housingCompare'],
+    modules: ['housingCompare'], // HousingCompare posee el único encabezado visible (7M-H §6)
     segments: [],
     route: 'shared',
     duration: 2,
@@ -741,7 +742,7 @@ const SCENES_RAW: SceneDefinition[] = [
     lead: 'También hay un mundo fuera de la pantalla.',
     body: 'Eventos y activaciones, producción audiovisual, casting, influencers, imprenta y maquila, publicidad tradicional y el programa experimental de Ciudadan.',
     purpose: 'Mostrar la amplitud real del oferta sin mezclarlo con las membresías.',
-    modules: ['marketingDemo'],
+    modules: ['statement', 'marketingDemo'], // 7M-H §6: statement posee el único H2
     segments: [],
     route: 'shared',
     duration: 2,
@@ -761,7 +762,7 @@ const SCENES_RAW: SceneDefinition[] = [
   {
     id: 'E27',
     eyebrow: 'MEMBRESÍAS PUBLIA',
-    title: "Elige tu combinación. Crece a tu ritmo.",
+    title: 'Una membresía para tu siguiente paso.', // 7M-H §6
     lead: "Empieza con una base para tu negocio. Suma inteligencia, contenidos y acompañamiento conforme los necesites.",
     body: "El soporte humano se comparte entre clientes. La disponibilidad del equipo no equivale a horas de atención exclusiva.",
     variants: [
@@ -816,7 +817,7 @@ const SCENES_RAW: SceneDefinition[] = [
     lead: "Revisa lo que elegiste y cuéntanos qué quieres resolver.",
     body: 'Tecnología, personas, infraestructura y economía compartida. El prisma vuelve a ser uno, con la forma que le dio tu recorrido.',
     purpose: 'Cerrar el relato con una convergencia visual y narrativa.',
-    modules: ['statement', 'recommendation'],
+    modules: ['recommendation'], // 7M-H §6: un solo encabezado (recommendation lo posee)
     segments: [],
     route: 'shared',
     duration: 1,

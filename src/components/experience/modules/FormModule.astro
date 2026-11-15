@@ -49,7 +49,7 @@ const waBase = `https://wa.me/${COPY_7MF.contact.number}?text=`;
 </section>
 
 <style>
-  .waf { display: grid; gap: 14px; margin-top: 24px; padding: 28px; border: 1px solid var(--scene-border, rgba(128,229,255,.25)); border-radius: 24px; max-width: 46rem; background: rgba(5,11,27,.45); }
+  .waf { display: grid; gap: 14px; margin-top: 24px; padding: var(--panel-pad, 28px); border: 1px solid var(--scene-border, rgba(128,229,255,.25)); border-radius: 24px; max-width: 46rem; background: rgba(5,11,27,.45); }
   .waf__title { margin: 0; font-size: clamp(22px, 2vw, 30px); }
   .waf__lead { margin: 0; max-width: 58ch; line-height: 1.55; opacity: .9; }
   .waf__form { display: grid; gap: 14px; }
@@ -63,5 +63,5 @@ const waBase = `https://wa.me/${COPY_7MF.contact.number}?text=`;
   .waf__submit { min-height: 48px; padding: 14px 22px; font-size: 16px; border-radius: 999px; text-decoration: none; display: inline-flex; align-items: center; }
   .waf__submit:focus-visible { outline: 3px solid var(--scene-accent, #ffca34); outline-offset: 3px; }
   .waf__privacy { margin: 0; font-size: .8rem; opacity: .7; max-width: 52ch; }
-  @media (max-width: 639px) { .waf { padding: 20px; } }
+  @media (max-width: 639px) { .waf { padding: var(--panel-pad, 20px); } }
 </style>

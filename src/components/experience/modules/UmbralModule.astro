@@ -127,7 +127,7 @@ const addr0 = (total0 * d.fraction * d.adoption) / 10000;
   .umbral__title { font-size: clamp(30px, 3.2vw, 56px); line-height: 1.08; margin: 0 0 16px; max-width: 22ch; }
   .umbral__lead { max-width: 58ch; font-size: 18px; line-height: 1.55; margin: 0; }
   .umbral__benefits { grid-column: 1 / 8; }
-  .umbral__sim { grid-column: 8 / 13; border: 1px solid var(--u-border); border-radius: 24px; padding: 28px; background: var(--u-card); color: var(--u-ink); }
+  .umbral__sim { grid-column: 8 / 13; border: 1px solid var(--u-border); border-radius: 24px; padding: var(--panel-pad, 28px); background: var(--u-card); color: var(--u-ink); }
   .umbral__benefits-title, .umbral__sim-title { font-size: clamp(24px, 2.4vw, 34px); line-height: 1.12; margin: 0 0 14px; }
   .umbral__benefits-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; counter-reset: umbral-benefit; }
   .umbral__benefit-num { display: block; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.12em; color: var(--u-accent); margin-bottom: 6px; }
@@ -168,7 +168,7 @@ const addr0 = (total0 * d.fraction * d.adoption) / 10000;
     .umbral__row { grid-template-columns: 1fr; gap: 20px; }
     .umbral__lead { font-size: 16px; }
     .umbral__benefits-grid { grid-template-columns: 1fr; }
-    .umbral__sim { padding: 20px; }
+    .umbral__sim { padding: var(--panel-pad, 20px); }
     .umbral__panels { grid-template-columns: 1fr; }
     .umbral__panel { padding: 16px 20px; }
   }

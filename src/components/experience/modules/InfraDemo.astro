@@ -149,7 +149,7 @@ const waBase = `https://wa.me/${COPY_7MF.contact.number}?text=`;
   .infra7__shared-tag[hidden] { display: none; }
   .infra7__caption { position: absolute; left: 16px; bottom: 12px; margin: 0; font-size: 0.78rem; color: #aebadd; background: rgba(6, 12, 28, 0.72); padding: 4px 10px; border-radius: 999px; }
   /* Panel de explicación */
-  .infra7__panel { grid-column: 9 / 13; border: 1px solid var(--scene-border, rgba(128, 229, 255, 0.22)); border-radius: 24px; padding: 28px; display: grid; gap: 12px; align-content: start; }
+  .infra7__panel { grid-column: 9 / 13; border: 1px solid var(--scene-border, rgba(128, 229, 255, 0.22)); border-radius: 24px; padding: var(--panel-pad, 28px); display: grid; gap: 12px; align-content: start; }
   .infra7__panel h3 { margin: 0; font-size: clamp(22px, 2vw, 30px); line-height: 1.15; }
   .infra7__panel p { margin: 0; line-height: 1.55; }
   .infra7__detail { font-size: 0.9rem; opacity: 0.85; border-left: 3px solid var(--scene-accent, #80e5ff); padding-left: 12px; }
@@ -186,7 +186,7 @@ const waBase = `https://wa.me/${COPY_7MF.contact.number}?text=`;
     .infra7__modes { grid-template-columns: 1fr 1fr; gap: 12px; }
     .infra7__body { grid-template-columns: 1fr; gap: 24px; }
     .infra7__stage, .infra7__panel { grid-column: auto; }
-    .infra7__panel { padding: 20px; }
+    .infra7__panel { padding: var(--panel-pad, 20px); }
     .infra7__city { height: 260px; }
   }
   @media (max-width: 639px) {
