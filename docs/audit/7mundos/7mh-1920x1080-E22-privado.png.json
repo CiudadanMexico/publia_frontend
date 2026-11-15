@@ -1,0 +1,21 @@
+{
+  "viewport": [
+    1920,
+    1080
+  ],
+  "scene": "E22-privado",
+  "housing": "privado",
+  "found": true,
+  "rect": {
+    "x": 0,
+    "y": 0,
+    "w": 1920,
+    "h": 2340
+  },
+  "opacity": "1",
+  "display": "block",
+  "loadState": "ready",
+  "title": "¿Cómo quieres repartir tu capacidad?",
+  "route": "explorer",
+  "act": "cooperative"
+}

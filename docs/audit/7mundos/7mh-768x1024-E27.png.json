@@ -1,0 +1,21 @@
+{
+  "viewport": [
+    768,
+    1024
+  ],
+  "scene": "E27",
+  "expectedTitle": "Una membresía para tu siguiente paso.",
+  "found": true,
+  "rect": {
+    "x": 0,
+    "y": -67,
+    "w": 768,
+    "h": 1783
+  },
+  "opacity": "1",
+  "display": "block",
+  "loadState": "ready",
+  "title": "Una membresía para tu siguiente paso.",
+  "route": "explorer",
+  "act": "cooperative"
+}

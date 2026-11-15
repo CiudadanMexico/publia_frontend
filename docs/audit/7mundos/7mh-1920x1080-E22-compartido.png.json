@@ -1,0 +1,22 @@
+{
+  "viewport": [
+    1920,
+    1080
+  ],
+  "scene": "E22-compartido",
+  "housing": "compartido",
+  "expectedTitle": "¿Cómo quieres repartir tu capacidad?",
+  "found": true,
+  "rect": {
+    "x": 0,
+    "y": 0,
+    "w": 1920,
+    "h": 2375
+  },
+  "opacity": "1",
+  "display": "block",
+  "loadState": "ready",
+  "title": "¿Cómo quieres repartir tu capacidad?",
+  "route": "explorer",
+  "act": "cooperative"
+}

@@ -112,10 +112,10 @@ const legacyServices = PUBLISHABLE_SERVICES.map((service) => {
 const SCENES_RAW: SceneDefinition[] = [
   {
     id: 'E00',
-    eyebrow: 'MÁS ALLÁ DE TU NEGOCIO',
-    title: 'Tu independencia crece en red.',
-    lead: 'Umbral de entrada al recorrido (7M-F): textos servidos literalmente desde copy.es-MX.json en UmbralModule.',
-    purpose: 'Umbral conceptual con paisaje, beneficios, simulador y paneles (7M-F §6).',
+    eyebrow: 'A TU MANERA',
+    title: 'Se nota que prefieres abrir tu propio camino.',
+    lead: 'Bien. Aquí tú marcas el ritmo.',
+    purpose: 'Umbral 7M-H: copy literal servido desde copy7mh.ts en UmbralModule (exclusivo de exploración libre).',
     modules: ['umbral'],
     segments: [],
     route: 'explorer', // 7M-H §4: el umbral es exclusivo de la exploración libre
