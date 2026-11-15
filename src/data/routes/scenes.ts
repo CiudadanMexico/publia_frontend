@@ -118,7 +118,7 @@ const SCENES_RAW: SceneDefinition[] = [
     purpose: 'Umbral conceptual con paisaje, beneficios, simulador y paneles (7M-F §6).',
     modules: ['umbral'],
     segments: [],
-    route: 'shared',
+    route: 'explorer', // 7M-H §4: el umbral es exclusivo de la exploración libre
     duration: 1,
     transition: 'fade',
     stage: 'abstract',

@@ -1,102 +1,136 @@
 ---
 /**
- * Umbral (E00) — bloque 7M-F §6.
- * Textos literales desde copy.es-MX.json (COPY_7MF). Layout cerrado §4:
- * fila 1 texto 1–5 + paisaje 6–12; fila 2 beneficios 1–6 + simulador 7–12;
- * cuatro <details> debajo. Sin alturas fijas ni object-fit.
+ * Umbral (E00) — 7M-H §4/§5. Exclusivo de la exploración libre (route explorer).
+ * Textos literales desde src/data/copy7mh.ts (orden 7M-H); paleta propia
+ * #FFFCFA / #26141A / #B51F3A / #EE725F / #FBE9E7 / banda #A91E38.
+ * Composición: fila editorial (texto 7/12 + imagen 5/12) → banda roja con 4
+ * herramientas → simulador contiguo → 4 summaries. Sin alturas fijas que
+ * recorten títulos ni reserven huecos invisibles.
  */
-import { COPY_7MF } from '../../../data/copy7mf';
 import type { ResolvedScene } from '../../../lib/experience/graph';
-import { accentify } from '../../../lib/experience/accent';
+import { UMBRAL_7MH, UMBRAL_TOOLS, UMBRAL_PANELS, SIM_7MH, UMBRAL_PALETTE } from '../../../data/copy7mh';
 
 interface Props {
   scene: ResolvedScene;
 }
 
 const { scene } = Astro.props;
-const u = COPY_7MF.umbral;
-const sim = COPY_7MF.simulator;
-const fmt = new Intl.NumberFormat('es-MX', { maximumFractionDigits: 1 });
-const d = sim.defaults;
-const total0 = (d.tasks * d.minutes) / 60;
-const addr0 = (total0 * d.fraction * d.adoption) / 10000;
+const sim = SIM_7MH;
+
+const TOOL_ICONS: Record<string, string> = {
+  // WhatsApp oficial (verde sólo dentro de su marca)
+  whatsapp:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-12.4 7.5L3 21l2-5.4A8.5 8.5 0 1 1 21 11.5z" fill="currentColor" stroke="none"/><path d="M8.8 8.2c.3-.6.8-.6 1.1-.1l.9 1.4c.2.4.1.8-.2 1.1l-.5.5c.5 1.1 1.4 2 2.5 2.5l.5-.5c.3-.3.7-.4 1.1-.2l1.4.9c.5.3.5.8-.1 1.1-.9.6-2 .8-3.1.4a8 8 0 0 1-3.9-3.9c-.4-1.1-.2-2.2.4-3.1z" fill="#A91E38" stroke="none"/></svg>',
+  robot:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="8" width="14" height="11" rx="3"/><path d="M12 8V4M9 4h6"/><circle cx="9.5" cy="13" r="1" fill="currentColor" stroke="none"/><circle cx="14.5" cy="13" r="1" fill="currentColor" stroke="none"/><path d="M9.5 16.5h5"/></svg>',
+  workflow:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="6" height="6" rx="1.5"/><rect x="15" y="15" width="6" height="6" rx="1.5"/><path d="M9 6h6a3 3 0 0 1 3 3v6M6 9v6a3 3 0 0 0 3 3h0"/></svg>',
+  checklist:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6.5 6 8.5 10 4.5"/><path d="M4 12.5 6 14.5 10 10.5"/><path d="M4 18.5 6 20.5 10 16.5"/><path d="M13 6.5h8M13 12.5h8M13 18.5h8"/></svg>',
+};
 ---
 
-<section class="umbral" data-module="umbral" data-umbral-fade id={scene.id === 'E00' ? 'umbral' : undefined}>
-  <div class="umbral__row umbral__row--hero">
-    <div class="umbral__text">
-      {u.eyebrow && <p class="umbral__eyebrow" data-reveal set:html={accentify(u.eyebrow)} />}
-      <h2 class="umbral__title" data-reveal="lines" set:html={accentify(u.title)} />
-      <p class="umbral__lead" data-reveal>{u.lead}</p>
+<section
+  class="umbral7"
+  data-module="umbral"
+  data-umbral-fade
+  id={scene.id === 'E00' ? 'umbral' : undefined}
+  style={`--u-bg:${UMBRAL_PALETTE.bg};--u-ink:${UMBRAL_PALETTE.ink};--u-red:${UMBRAL_PALETTE.red};--u-coral:${UMBRAL_PALETTE.coral};--u-surface:${UMBRAL_PALETTE.surface};--u-band:${UMBRAL_PALETTE.band};--u-band-ink:${UMBRAL_PALETTE.bandInk};`}
+>
+  <div class="umbral7__row umbral7__row--hero">
+    <div class="umbral7__text">
+      <p class="umbral7__eyebrow" data-reveal>{UMBRAL_7MH.eyebrow}</p>
+      <h2 class="umbral7__title" data-reveal>
+        {UMBRAL_7MH.titleA} <em>{UMBRAL_7MH.titleRed}</em>{UMBRAL_7MH.titleB}
+      </h2>
+      <p class="umbral7__lead" data-reveal>{UMBRAL_7MH.lead}</p>
+      <p class="umbral7__body" data-reveal>{UMBRAL_7MH.body}</p>
     </div>
-    <figure class="umbral__paisaje">
-      <img src="/assets/publia-7mf/ecoaldea_red_productiva.png" alt={u.alt} width="1600" height="900" loading="eager" />
-      <figcaption class="umbral__caption">{u.caption}</figcaption>
+    <figure class="umbral7__paisaje">
+      <img src="/assets/publia-7mf/ecoaldea_red_productiva.png" alt={UMBRAL_7MH.alt} width="1600" height="900" loading="eager" />
+      <figcaption class="umbral7__caption">{UMBRAL_7MH.caption}</figcaption>
     </figure>
   </div>
 
-  <div class="umbral__row umbral__row--second">
-    <div class="umbral__benefits">
-      <h3 class="umbral__benefits-title" data-reveal>{u.benefitsTitle}</h3>
-      <ol class="umbral__benefits-grid">
-        {
-          u.benefits.map((b, i) => (
-            <li>
-              <span class="umbral__benefit-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-              <strong>{b.title}</strong>
-              <p>{b.body}</p>
-            </li>
-          ))
-        }
-      </ol>
-    </div>
+  <div class="umbral7__band">
+    <h3 class="umbral7__band-title" data-reveal>Menos pendientes. Más espacio para lo que quieres hacer.</h3>
+    <p class="umbral7__band-sub" data-reveal>Atiende, organiza y conecta tu trabajo con herramientas que responden a tu manera de operar.</p>
+    <ul class="umbral7__tools">
+      {
+        UMBRAL_TOOLS.map((t) => (
+          <li class="umbral7__tool">
+            <span class={`umbral7__tool-icon umbral7__tool-icon--${t.icon}`} set:html={TOOL_ICONS[t.icon]} />
+            <div>
+              <strong>{t.title}</strong>
+              <p>{t.body}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
 
-    <div class="umbral__sim" data-simulator>
-      <h3 class="umbral__sim-title" data-reveal>{sim.title}</h3>
-      <p class="umbral__sim-lead" data-reveal>{sim.lead}</p>
-      <div class="umbral__sim-fields">
-        <label class="umbral__field">
-          <span>{sim.tasks}</span>
-          <input type="number" inputmode="numeric" data-sim-input="tasks" min={sim.limits.tasks[0]} max={sim.limits.tasks[1]} step={sim.limits.tasks[2]} value={d.tasks} />
-          <input type="range" data-sim-range="tasks" min={sim.limits.tasks[0]} max={sim.limits.tasks[1]} step={sim.limits.tasks[2]} value={d.tasks} aria-hidden="true" tabindex="-1" />
+  <div class="umbral7__simwrap">
+    <div class="umbral7__sim" data-simulator>
+      <h3 class="umbral7__sim-title" data-reveal>{sim.title}</h3>
+      <p class="umbral7__sim-lead" data-reveal>{sim.lead}</p>
+      <div class="umbral7__preset-row">
+        <label class="umbral7__preset">
+          <span>Escenario</span>
+          <select data-sim-preset>
+            {sim.presets.map((p) => <option value={p.id}>{p.label}</option>)}
+            <option value="custom">{sim.customPresetLabel}</option>
+          </select>
         </label>
-        <label class="umbral__field">
-          <span>{sim.minutes}</span>
-          <input type="number" inputmode="numeric" data-sim-input="minutes" min={sim.limits.minutes[0]} max={sim.limits.minutes[1]} step={sim.limits.minutes[2]} value={d.minutes} />
-          <input type="range" data-sim-range="minutes" min={sim.limits.minutes[0]} max={sim.limits.minutes[1]} step={sim.limits.minutes[2]} value={d.minutes} aria-hidden="true" tabindex="-1" />
+        <span class="umbral7__badge" data-sim-badge>{sim.editableBadge}</span>
+      </div>
+      <div class="umbral7__fields">
+        <label class="umbral7__field">
+          <span>{sim.fields.tasks}</span>
+          <input type="number" inputmode="numeric" data-sim-input="tasks" min={sim.limits.tasks[0]} max={sim.limits.tasks[1]} step={sim.limits.tasks[2]} value={sim.presets[0].tasks} />
         </label>
-        <label class="umbral__field">
-          <span>{sim.fraction} (%)</span>
-          <input type="number" inputmode="numeric" data-sim-input="fraction" min={sim.limits.fraction[0]} max={sim.limits.fraction[1]} step={sim.limits.fraction[2]} value={d.fraction} />
-          <input type="range" data-sim-range="fraction" min={sim.limits.fraction[0]} max={sim.limits.fraction[1]} step={sim.limits.fraction[2]} value={d.fraction} aria-hidden="true" tabindex="-1" />
+        <label class="umbral7__field">
+          <span>{sim.fields.minutes}</span>
+          <input type="number" inputmode="numeric" data-sim-input="minutes" min={sim.limits.minutes[0]} max={sim.limits.minutes[1]} step={sim.limits.minutes[2]} value={sim.presets[0].minutes} />
         </label>
-        <label class="umbral__field">
-          <span>{sim.adoption} (%)</span>
-          <input type="number" inputmode="numeric" data-sim-input="adoption" min={sim.limits.adoption[0]} max={sim.limits.adoption[1]} step={sim.limits.adoption[2]} value={d.adoption} />
-          <input type="range" data-sim-range="adoption" min={sim.limits.adoption[0]} max={sim.limits.adoption[1]} step={sim.limits.adoption[2]} value={d.adoption} aria-hidden="true" tabindex="-1" />
+        <label class="umbral7__field">
+          <span>{sim.fields.fraction}</span>
+          <input type="number" inputmode="numeric" data-sim-input="fraction" min={sim.limits.fraction[0]} max={sim.limits.fraction[1]} step={sim.limits.fraction[2]} value={sim.presets[0].fraction} />
+        </label>
+        <label class="umbral7__field">
+          <span>{sim.fields.adoption}</span>
+          <input type="number" inputmode="numeric" data-sim-input="adoption" min={sim.limits.adoption[0]} max={sim.limits.adoption[1]} step={sim.limits.adoption[2]} value={sim.presets[0].adoption} />
         </label>
       </div>
-      <p class="umbral__sim-error" data-sim-error hidden role="alert">{sim.error}</p>
-      <dl class="umbral__sim-results">
-        <div><dt>{sim.baseline}</dt><dd data-sim-result="total">{fmt.format(total0)} h</dd></div>
-        <div><dt>{sim.result}</dt><dd data-sim-result="addressable">{fmt.format(addr0)} h</dd></div>
+      <p class="umbral7__sim-error" data-sim-error hidden role="alert">{sim.error}</p>
+      <dl class="umbral7__results">
+        <div><dt>{sim.results.total}</dt><dd data-sim-result="total">8 h</dd></div>
+        <div><dt>{sim.results.potential}</dt><dd data-sim-result="potential">3.4 h</dd></div>
+        <div><dt>{sim.results.remaining}</dt><dd data-sim-result="remaining">4.6 h</dd></div>
       </dl>
-      <details class="umbral__sim-formula">
-        <summary>Cómo se calcula</summary>
+      <div class="umbral7__bar" role="img" aria-label={sim.barLabel}>
+        <span class="umbral7__bar-rest" data-sim-bar="remaining"></span>
+        <span class="umbral7__bar-pot" data-sim-bar="potential"></span>
+      </div>
+      <details class="umbral7__formula">
+        <summary>{sim.formulaTitle}</summary>
         <p>{sim.formula}</p>
       </details>
-      <p class="umbral__sim-note">{sim.note}</p>
-      <button type="button" class="button button--ghost" data-sim-reset>{sim.reset}</button>
-      <p class="umbral__sim-live" data-sim-live aria-live="polite"></p>
+      <p class="umbral7__note">{sim.note}</p>
+      <a class="umbral7__cta" data-sim-cta href="#" target="_blank" rel="noopener">{sim.cta}</a>
+      <p class="umbral7__sim-live" data-sim-live aria-live="polite"></p>
     </div>
   </div>
 
-  <div class="umbral__panels">
+  <div class="umbral7__panels">
     {
-      u.panels.map((panel) => (
-        <details class="umbral__panel">
-          <summary>{panel.title}</summary>
-          <p>{panel.body}</p>
+      UMBRAL_PANELS.map((panel) => (
+        <details class="umbral7__panel">
+          <summary>
+            <strong>{panel.title}</strong>
+            <span class="umbral7__teaser">{panel.teaser}</span>
+          </summary>
+          {panel.body.map((p) => <p>{p}</p>)}
         </details>
       ))
     }
@@ -104,72 +138,95 @@ const addr0 = (total0 * d.fraction * d.adoption) / 10000;
 </section>
 
 <style>
-  .umbral {
-    /* 7M-G: paleta local del tono cream, independiente de la ruta */
-    --u-ink: #091933;
-    --u-muted: #3d5878;
-    --u-accent: #e8a400;
-    --u-focus: #1655bc;
-    --u-border: rgba(9, 25, 51, 0.16);
-    --u-card: #fffdf6;
+  .umbral7 {
     width: 100%;
     display: grid;
-    gap: 64px;
+    gap: 56px;
     padding-block: 64px;
+    background: var(--u-bg);
     color: var(--u-ink);
   }
-  .umbral__row { display: grid; grid-template-columns: repeat(12, 1fr); gap: 32px; align-items: start; }
-  .umbral__text { grid-column: 1 / 6; }
-  .umbral__paisaje { grid-column: 6 / 13; margin: 0; }
-  .umbral__paisaje img { display: block; width: 100%; height: auto; border-radius: 24px; }
-  .umbral__caption { margin-top: 8px; font-size: 0.8rem; color: var(--u-muted); }
-  .umbral__eyebrow { letter-spacing: 0.14em; text-transform: uppercase; font-size: 0.78rem; color: var(--u-accent); margin: 0 0 12px; }
-  .umbral__title { font-size: clamp(30px, 3.2vw, 56px); line-height: 1.08; margin: 0 0 16px; max-width: 22ch; }
-  .umbral__lead { max-width: 58ch; font-size: 18px; line-height: 1.55; margin: 0; }
-  .umbral__benefits { grid-column: 1 / 8; }
-  .umbral__sim { grid-column: 8 / 13; border: 1px solid var(--u-border); border-radius: 24px; padding: var(--panel-pad, 28px); background: var(--u-card); color: var(--u-ink); }
-  .umbral__benefits-title, .umbral__sim-title { font-size: clamp(24px, 2.4vw, 34px); line-height: 1.12; margin: 0 0 14px; }
-  .umbral__benefits-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; counter-reset: umbral-benefit; }
-  .umbral__benefit-num { display: block; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.12em; color: var(--u-accent); margin-bottom: 6px; }
-  .umbral__benefits-grid strong { display: block; margin-bottom: 4px; }
-  .umbral__benefits-grid p { margin: 0; font-size: 0.92rem; line-height: 1.5; color: var(--u-muted); }
-  .umbral__sim-lead { margin: 0 0 16px; color: var(--u-muted); }
-  .umbral__sim-fields { display: grid; gap: 12px; margin-bottom: 14px; }
-  .umbral__field { display: grid; gap: 4px; font-size: 0.86rem; }
-  .umbral__field { color: var(--u-muted); }
-  .umbral__field input[type='number'] { min-height: 48px; padding: 10px 14px; border-radius: 12px; border: 1px solid var(--u-border); background: #ffffff; color: var(--u-ink); font-size: 16px; width: 100%; }
-  .umbral__field input[type='number']:focus-visible { outline: 3px solid var(--u-focus); outline-offset: 2px; }
-  .umbral__field input[type='range'] { width: 100%; accent-color: var(--u-focus); }
-  .umbral__sim-error { color: #b3261e; font-size: 0.9rem; margin: 0 0 8px; }
-  .umbral__sim-results { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0 0 12px; }
-  .umbral__sim-results div { border: 1px solid var(--u-border); background: #ffffff; border-radius: 16px; padding: 12px 14px; }
-  .umbral__sim-results dt { font-size: 0.78rem; color: var(--u-muted); margin-bottom: 4px; }
-  .umbral__sim-results dd { margin: 0; font-size: 1.5rem; font-variant-numeric: tabular-nums; }
-  .umbral__sim-formula { font-size: 0.82rem; margin: 0 0 6px; }
-  .umbral__sim-formula summary { cursor: pointer; font-weight: 600; color: var(--u-focus); min-height: 28px; }
-  .umbral__sim-formula summary:focus-visible { outline: 3px solid var(--u-focus); outline-offset: 3px; }
-  .umbral__sim-formula p { margin: 8px 0 0; color: var(--u-muted); line-height: 1.5; }
-  .umbral__sim-note { font-size: 0.8rem; color: var(--u-muted); margin: 0 0 14px; }
-  .umbral__sim-live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
-  .umbral__panels { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  .umbral__panel { border: 1px solid var(--u-border); background: var(--u-card); border-radius: 24px; padding: 20px 28px; }
-  .umbral__panel summary { cursor: pointer; font-weight: 600; min-height: 28px; }
-  .umbral__panel summary:focus-visible { outline: 3px solid var(--u-focus); outline-offset: 3px; }
-  .umbral__panel p { margin: 10px 0 0; line-height: 1.55; font-size: 0.94rem; color: var(--u-muted); }
-  .button { min-height: 48px; padding: 14px 22px; font-size: 16px; border-radius: 999px; cursor: pointer; }
-  .button--ghost { border: 1px solid var(--u-border); background: transparent; color: var(--u-ink); }
-  .button--ghost:focus-visible { outline: 3px solid var(--u-focus); outline-offset: 3px; }
+  .umbral7__row { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--gap-x, 32px); align-items: start; }
+  .umbral7__text { grid-column: 1 / span 7; min-width: 0; }
+  .umbral7__paisaje { grid-column: 8 / -1; margin: 0; min-width: 0; }
+  .umbral7__paisaje img { display: block; width: 100%; height: auto; border-radius: 24px; }
+  .umbral7__caption { margin-top: 8px; font-size: 0.8rem; color: color-mix(in srgb, var(--u-ink) 62%, transparent); }
+  .umbral7__eyebrow { letter-spacing: 0.14em; text-transform: uppercase; font-size: 0.8rem; font-weight: 700; color: var(--u-red); margin: 0 0 14px; }
+  /* 7M-H §4: H2 64px ≥1440, 52px 1024–1439, 36px móvil; lh 1.06, peso 800, máx 20ch.
+     Sin máscara de línea fija (reveal simple) para no recortar acentos. */
+  .umbral7__title { font-size: 36px; line-height: 1.06; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 16px; max-width: 20ch; }
+  .umbral7__title em { font-style: normal; color: var(--u-red); }
+  @media (min-width: 1024px) { .umbral7__title { font-size: 52px; } }
+  @media (min-width: 1440px) { .umbral7__title { font-size: 64px; } }
+  .umbral7__lead { font-size: 20px; line-height: 1.35; font-weight: 600; margin: 0 0 14px; }
+  .umbral7__body { font-size: 18px; line-height: 1.6; max-width: 58ch; margin: 0; }
+  @media (min-width: 1024px) { .umbral7__lead { font-size: 24px; } }
+
+  /* Banda roja profunda con las 4 herramientas (2×2 desktop, 1 col móvil) */
+  .umbral7__band { background: var(--u-band); color: var(--u-band-ink); border-radius: 24px; padding: var(--panel-pad, 32px); display: grid; gap: 18px; }
+  .umbral7__band-title { font-size: clamp(24px, 2.6vw, 34px); line-height: 1.12; font-weight: 800; margin: 0; max-width: 24ch; }
+  .umbral7__band-sub { margin: 0; font-size: 17px; line-height: 1.5; max-width: 62ch; opacity: 0.94; }
+  .umbral7__tools { list-style: none; margin: 8px 0 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 18px 24px; }
+  .umbral7__tool { display: grid; grid-template-columns: 48px 1fr; gap: 14px; align-items: start; }
+  .umbral7__tool-icon { width: 48px; height: 48px; border-radius: 12px; border: 2px solid currentColor; display: grid; place-items: center; color: var(--u-band-ink); }
+  .umbral7__tool-icon :global(svg) { width: 26px; height: 26px; }
+  .umbral7__tool-icon--whatsapp { color: #25D366; border-color: #25D366; } /* verde sólo dentro de la marca WhatsApp */
+  .umbral7__tool strong { display: block; font-size: 16px; margin-bottom: 4px; }
+  .umbral7__tool p { margin: 0; font-size: 14px; line-height: 1.5; opacity: 0.92; }
+
+  /* Simulador contiguo a las categorías */
+  .umbral7__simwrap { display: block; }
+  .umbral7__sim { border: 1px solid color-mix(in srgb, var(--u-ink) 14%, transparent); border-radius: 24px; padding: var(--panel-pad, 32px); background: var(--u-surface); color: var(--u-ink); display: grid; gap: 14px; }
+  .umbral7__sim-title { font-size: clamp(24px, 2.4vw, 34px); line-height: 1.12; font-weight: 800; margin: 0; }
+  .umbral7__sim-lead { margin: 0; font-size: 16px; line-height: 1.5; color: color-mix(in srgb, var(--u-ink) 72%, transparent); }
+  .umbral7__preset-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .umbral7__preset { display: grid; gap: 4px; font-size: 0.86rem; color: color-mix(in srgb, var(--u-ink) 72%, transparent); flex: 1; min-width: 220px; }
+  .umbral7__preset select { min-height: 48px; padding: 10px 14px; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--u-ink) 22%, transparent); background: #ffffff; color: var(--u-ink); font-size: 16px; width: 100%; box-sizing: border-box; }
+  .umbral7__badge { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--u-red); border: 1px solid color-mix(in srgb, var(--u-red) 45%, transparent); border-radius: 999px; padding: 6px 12px; white-space: nowrap; }
+  .umbral7__fields { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  .umbral7__field { display: grid; gap: 4px; font-size: 0.84rem; color: color-mix(in srgb, var(--u-ink) 72%, transparent); min-width: 0; }
+  .umbral7__field input { min-height: 48px; padding: 10px 14px; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--u-ink) 22%, transparent); background: #ffffff; color: var(--u-ink); font-size: 16px; width: 100%; box-sizing: border-box; }
+  .umbral7__field input:focus-visible, .umbral7__preset select:focus-visible { outline: 3px solid var(--u-red); outline-offset: 2px; }
+  .umbral7__sim-error { color: var(--u-red); font-size: 0.9rem; margin: 0; }
+  .umbral7__results { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0; }
+  .umbral7__results div { border: 1px solid color-mix(in srgb, var(--u-ink) 14%, transparent); background: #ffffff; border-radius: 16px; padding: 12px 14px; min-width: 0; }
+  .umbral7__results dt { font-size: 0.76rem; color: color-mix(in srgb, var(--u-ink) 66%, transparent); margin-bottom: 4px; }
+  .umbral7__results dd { margin: 0; font-size: 1.45rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .umbral7__results dd[data-sim-result='potential'] { color: var(--u-red); }
+  /* Barra apilada del mismo total: restante oscuro + potencial rojo/coral */
+  .umbral7__bar { display: flex; height: 14px; border-radius: 999px; overflow: hidden; background: var(--u-ink); }
+  .umbral7__bar-rest { background: var(--u-ink); display: block; }
+  .umbral7__bar-pot { background: linear-gradient(90deg, var(--u-red), var(--u-coral)); display: block; }
+  .umbral7__formula { font-size: 0.82rem; }
+  .umbral7__formula summary { cursor: pointer; font-weight: 600; color: var(--u-red); min-height: 28px; padding-inline-end: 32px; }
+  .umbral7__formula summary:focus-visible { outline: 3px solid var(--u-red); outline-offset: 3px; }
+  .umbral7__formula p { margin: 8px 0 0; color: color-mix(in srgb, var(--u-ink) 70%, transparent); line-height: 1.5; }
+  .umbral7__note { font-size: 0.8rem; color: color-mix(in srgb, var(--u-ink) 64%, transparent); margin: 0; }
+  .umbral7__cta { min-height: 48px; padding: 14px 22px; font-size: 16px; font-weight: 700; border-radius: 999px; background: var(--u-red); color: #fff; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; justify-self: start; }
+  .umbral7__cta:focus-visible { outline: 3px solid var(--u-ink); outline-offset: 3px; }
+  .umbral7__sim-live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+  .umbral7__panels { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .umbral7__panel { border: 1px solid color-mix(in srgb, var(--u-ink) 14%, transparent); background: #ffffff; border-radius: 24px; padding: 20px 28px; }
+  .umbral7__panel summary { cursor: pointer; display: grid; gap: 4px; padding-inline-end: 32px; min-height: 28px; }
+  .umbral7__panel summary strong { font-size: 17px; }
+  .umbral7__teaser { font-size: 0.88rem; color: color-mix(in srgb, var(--u-ink) 66%, transparent); }
+  .umbral7__panel summary:focus-visible { outline: 3px solid var(--u-red); outline-offset: 3px; }
+  .umbral7__panel p { margin: 10px 0 0; line-height: 1.6; font-size: 0.94rem; color: color-mix(in srgb, var(--u-ink) 78%, transparent); }
+
   @media (max-width: 1023px) {
-    .umbral__row { grid-template-columns: 1fr 1fr; gap: 24px; }
-    .umbral__text, .umbral__paisaje, .umbral__benefits, .umbral__sim { grid-column: auto; }
+    .umbral7__row { grid-template-columns: 1fr; }
+    .umbral7__text, .umbral7__paisaje { grid-column: 1 / -1; }
+    .umbral7__fields { grid-template-columns: 1fr 1fr; }
   }
   @media (max-width: 639px) {
-    .umbral { gap: 40px; padding-block: 40px; }
-    .umbral__row { grid-template-columns: 1fr; gap: 20px; }
-    .umbral__lead { font-size: 16px; }
-    .umbral__benefits-grid { grid-template-columns: 1fr; }
-    .umbral__sim { padding: var(--panel-pad, 20px); }
-    .umbral__panels { grid-template-columns: 1fr; }
-    .umbral__panel { padding: 16px 20px; }
+    .umbral7 { gap: 40px; padding-block: 40px; }
+    /* móvil: texto → imagen → herramientas → simulador (orden del DOM) */
+    .umbral7__tools { grid-template-columns: 1fr; }
+    .umbral7__fields { grid-template-columns: 1fr; }
+    .umbral7__results { grid-template-columns: 1fr; }
+    .umbral7__panels { grid-template-columns: 1fr; }
+    .umbral7__lead { font-size: 20px; }
+    .umbral7__body { font-size: 16px; }
   }
 </style>
