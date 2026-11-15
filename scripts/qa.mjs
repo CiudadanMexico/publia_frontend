@@ -1109,39 +1109,49 @@ const infraCount = await page.evaluate(() => document.querySelectorAll('#escena-
 check('7M-F E03: 4 escenarios con botones aria-pressed', infraCount === 4, `${infraCount} modos`);
 const infra0 = await page.evaluate(() => ({
   title: document.querySelector('#escena-e03 [data-infra7-title]')?.textContent ?? '',
+  h2: document.querySelector('#escena-e03 .infra7__title')?.textContent ?? '',
+  canvas: !!document.querySelector('#escena-e03 [data-infra7-canvas]'),
+  rows: document.querySelectorAll('#escena-e03 [data-infra7-rows] .infra7__row').length,
+  hotspotBox: !!document.querySelector('#escena-e03 [data-infra7-hotspots]'),
+  runBtn: !!document.querySelector('#escena-e03 [data-infra7-run]'),
   svgVisible: [...document.querySelectorAll('#escena-e03 [data-infra7-scheme-stage] [data-infra7-svg]')].filter((e) => !e.hidden).map((e) => e.dataset.infra7Svg),
-  stageMode: document.querySelector('#escena-e03 [data-infra7-stage]')?.dataset.mode ?? '',
-  racks: document.querySelectorAll('#escena-e03 [data-infra7-rack]').length,
-  racksOn: document.querySelectorAll('#escena-e03 [data-infra7-rack].is-on').length,
   noPoster: !document.querySelector('#escena-e03 .scene__art[data-asset-ready="true"]'),
   schemesCollapsed: !document.querySelector('#escena-e03 [data-infra7-schemes]')?.open,
   cta: document.querySelector('#escena-e03 [data-infra7-cta]')?.href ?? '',
+  compareHidden: document.querySelector('#escena-e03 [data-infra7-compare]')?.hidden,
 }));
-check('7M-G E03: default local-private, stage nativo con racks encendidos, sin póster A04, esquemas colapsados y CTA infraMessage', infra0.stageMode === 'local-private' && infra0.racks === 10 && infra0.racksOn === 10 && infra0.noPoster && infra0.schemesCollapsed && infra0.svgVisible.join() === 'local-private' && infra0.cta.startsWith('https://wa.me/525573724660?text=') && decodeURIComponent(infra0.cta).includes('IA local privada'), JSON.stringify(infra0).slice(0, 200));
+check('7M-H E03: H2 «Soberanía digital.» único, stage 3D con canvas, 4 filas de panel, sin póster, esquemas colapsados, CTA infra', infra0.h2.includes('Soberanía digital.') && infra0.h2.includes('Tu tecnología, bajo tus reglas.') && infra0.canvas && infra0.rows === 4 && infra0.hotspotBox && infra0.runBtn && infra0.noPoster && infra0.schemesCollapsed && infra0.svgVisible.join() === 'local-private' && infra0.cta.startsWith('https://wa.me/525573724660?text=') && infra0.compareHidden === true, JSON.stringify(infra0).slice(0, 240));
 await click('#escena-e03 [data-infra7-mode="distributed-network"]');
 await page.waitForTimeout(500);
 const infra = await page.evaluate(() => ({
   title: document.querySelector('#escena-e03 [data-infra7-title]')?.textContent ?? '',
-  detail: document.querySelector('#escena-e03 [data-infra7-detail]')?.textContent ?? '',
+  rows: document.querySelectorAll('#escena-e03 [data-infra7-rows] .infra7__row').length,
+  rowText: document.querySelector('#escena-e03 [data-infra7-rows]')?.textContent ?? '',
   pressed: document.querySelector('#escena-e03 [data-infra7-mode="distributed-network"]')?.getAttribute('aria-pressed'),
   svgVisible: [...document.querySelectorAll('#escena-e03 [data-infra7-scheme-stage] [data-infra7-svg]')].filter((e) => !e.hidden).map((e) => e.dataset.infra7Svg),
-  stageMode: document.querySelector('#escena-e03 [data-infra7-stage]')?.dataset.mode ?? '',
-  sharedTag: !document.querySelector('#escena-e03 [data-infra7-shared]')?.hidden,
-  racksOn: document.querySelectorAll('#escena-e03 [data-infra7-rack].is-on').length,
+  altBtn: !document.querySelector('#escena-e03 [data-infra7-altroute]')?.hidden,
   cta: document.querySelector('#escena-e03 [data-infra7-cta]')?.href ?? '',
   persisted: JSON.parse(sessionStorage.getItem('publia.visitor.v1') ?? '{}').infra ?? null,
 }));
-check('7M-G E03: red distribuida actualiza texto+esquema+stage+CTA en una operación', infra.title.includes('Varios nodos') && infra.svgVisible.join() === 'distributed-network' && infra.stageMode === 'distributed-network' && infra.racksOn === 1 && decodeURIComponent(infra.cta).includes('Red distribuida'), infra.title.slice(0, 50));
+check('7M-H E03: red distribuida cambia panel (4 filas con «rutas alternativas»), muestra botón ruta alternativa, esquema y CTA', infra.pressed === 'true' && infra.rows === 4 && infra.rowText.includes('rutas alternativas') && infra.svgVisible.join() === 'distributed-network' && infra.altBtn && decodeURIComponent(infra.cta).includes('Red distribuida'), JSON.stringify(infra).slice(0, 220));
 check('7M-F E03: aria-pressed y persistencia state.infra (id nuevo)', infra.pressed === 'true' && infra.persisted === 'distributed-network', JSON.stringify({ pressed: infra.pressed, persisted: infra.persisted }));
-check('7M-G E03: sin botón «Activar red» ni contador de tráfico', !await page.evaluate(() => document.querySelector('#escena-e03 [data-infra2-launch]') || document.querySelector('#escena-e03 [data-infra2-traffic]')), '');
+check('7M-H E03: sin botón «Activar red» ni contador de tráfico', !await page.evaluate(() => document.querySelector('#escena-e03 [data-infra2-launch]') || document.querySelector('#escena-e03 [data-infra2-traffic]')), '');
 await click('#escena-e03 [data-infra7-mode="local-collaborative"]');
 await page.waitForTimeout(400);
 const infraCol = await page.evaluate(() => ({
-  sharedTag: !document.querySelector('#escena-e03 [data-infra7-shared]')?.hidden,
-  racksOn: document.querySelectorAll('#escena-e03 [data-infra7-rack].is-on').length,
+  rowText: document.querySelector('#escena-e03 [data-infra7-rows]')?.textContent ?? '',
   title: document.querySelector('#escena-e03 [data-infra7-title]')?.textContent ?? '',
+  canvas: !!document.querySelector('#escena-e03 [data-infra7-canvas]'),
 }));
-check('7M-G E03: local colaborativo reutiliza el stage local + etiqueta «Servicio compartido autorizado»', infraCol.sharedTag && infraCol.racksOn === 10 && infraCol.title.length > 5, JSON.stringify(infraCol));
+check('7M-H E03: local colaborativo muestra filas de colaboración (aislamiento/cuotas) y stage activo', infraCol.rowText.includes('Aislamiento, cuotas') && infraCol.title.length > 5 && infraCol.canvas, JSON.stringify(infraCol).slice(0, 160));
+await click('#escena-e03 [data-infra7-mode="managed-housing"]');
+await page.waitForTimeout(400);
+const infraH = await page.evaluate(() => ({
+  compareHidden: document.querySelector('#escena-e03 [data-infra7-compare]')?.hidden,
+  compareHref: document.querySelector('#escena-e03 [data-infra7-compare]')?.getAttribute('href') ?? '',
+  rowText: document.querySelector('#escena-e03 [data-infra7-rows]')?.textContent ?? '',
+}));
+check('7M-H E03: housing muestra vínculo «Comparar recursos compartidos y privados» → E22 y filas de equipos administrados', infraH.compareHidden === false && infraH.compareHref === '#escena-e22' && infraH.rowText.includes('equipos administrados por Publia'), JSON.stringify(infraH).slice(0, 200));
 
 // Demo eficiencia: foco responde y guarda respuesta.
 await click('[data-route-reset]');
@@ -1353,19 +1363,65 @@ await page.evaluate(() => document.querySelector('#escena-e03')?.scrollIntoView(
 await page.waitForTimeout(700);
 await waitBound('[data-demo="infra2"]');
 check('7M-F E03: comparación compartida/privada ya NO está en E03 (sólo en E22)', !await page.evaluate(() => document.querySelector('#escena-e03 [data-housing-mode]')), '');
-// E22 housing (única comparación de la ruta)
+// E22 housing 7M-H: modelo determinista visible en ambas columnas
 await page.evaluate(() => document.querySelector('#escena-e22')?.scrollIntoView({ behavior: 'instant' }));
 await page.waitForTimeout(800);
-check('7M-F E22: 2 modalidades con textos del JSON', (await page.evaluate(() => [...document.querySelectorAll('#escena-e22 [data-housing-mode]')].map((b) => b.textContent.trim()))).join() === 'Compartido,Privado', '');
+check('7M-H E22: 2 modalidades Compartido/Privado', (await page.evaluate(() => [...document.querySelectorAll('#escena-e22 [data-housing-mode]')].map((b) => b.textContent.trim()))).join() === 'Compartido,Privado', '');
+const h22 = await page.evaluate(() => ({
+  shared: {
+    active: document.querySelector('[data-housing-col="compartido"] [data-hs="active"]')?.textContent ?? '',
+    waiting: document.querySelector('[data-housing-col="compartido"] [data-hs="waiting"]')?.textContent ?? '',
+    used: document.querySelector('[data-housing-col="compartido"] [data-hs="used"]')?.textContent ?? '',
+    available: document.querySelector('[data-housing-col="compartido"] [data-hs="available"]')?.textContent ?? '',
+  },
+  private: {
+    active: document.querySelector('[data-housing-col="privado"] [data-hs="active"]')?.textContent ?? '',
+    waiting: document.querySelector('[data-housing-col="privado"] [data-hs="waiting"]')?.textContent ?? '',
+    used: document.querySelector('[data-housing-col="privado"] [data-hs="used"]')?.textContent ?? '',
+    available: document.querySelector('[data-housing-col="privado"] [data-hs="available"]')?.textContent ?? '',
+  },
+  disclaimer: document.querySelector('#escena-e22 .housing7__disclaimer')?.textContent ?? '',
+  rows: document.querySelectorAll('#escena-e22 [data-housing-type]').length,
+  demand: document.querySelector('#escena-e22 [data-housing-demand]')?.textContent ?? '',
+  cta: document.querySelector('#escena-e22 [data-housing-cta]')?.href ?? '',
+  noMetrics: !document.querySelector('#escena-e22 [data-housing-metrics]'),
+  noTraffic: !document.querySelector('#escena-e22 [data-housing-play]'),
+  h2: document.querySelector('#escena-e22 h2')?.textContent ?? '',
+}));
+check('7M-H E22: caso inicial 85 — compartido 3 activas/4 espera (50 usadas), privado 7 activas/0 espera (85 usadas, 15 disp.)', h22.shared.active.startsWith('3') && h22.shared.waiting === '4' && h22.shared.used === '50 / 50' && h22.private.active.startsWith('7') && h22.private.waiting === '0' && h22.private.used === '85 / 100' && h22.private.available === '15', JSON.stringify(h22));
+check('7M-H E22: disclaimer ilustrativo + 4 filas editables + demanda 85 + H2 literal + sin métricas vacías ni tráfico decorativo', h22.disclaimer.includes('no es una medición de rendimiento') && h22.rows === 4 && h22.demand === '85' && h22.h2.includes('¿Cómo quieres repartir tu capacidad?') && h22.noMetrics && h22.noTraffic, JSON.stringify({ d: h22.disclaimer.slice(0, 40), rows: h22.rows, demand: h22.demand }));
+check('7M-H E22: CTA WhatsApp con prefijo «Escenario ilustrativo que quiero dimensionar» + modalidad y cantidades', h22.cta.startsWith('https://wa.me/525573724660') && decodeURIComponent(h22.cta).includes('Escenario ilustrativo que quiero dimensionar') && decodeURIComponent(h22.cta).includes('85 unidades'), h22.cta.slice(0, 100));
 await clickJs('#escena-e22 [data-housing-mode="privado"]');
 await page.waitForTimeout(400);
-const h22 = await page.evaluate(() => ({
+const h22b = await page.evaluate(() => ({
   persisted: JSON.parse(sessionStorage.getItem('publia.visitor.v1') ?? '{}').housingMode ?? null,
-  desc: document.querySelector('#escena-e22 [data-housing-desc]')?.textContent ?? '',
-  cta: document.querySelector('#escena-e22 [data-housing-cta]')?.href ?? '',
+  stageMode: document.querySelector('#escena-e22 [data-housing-stage]')?.dataset.mode ?? '',
+  rackClient: document.querySelector('#escena-e22 [data-hrack-client]')?.style.width ?? '',
+  rackNet: document.querySelector('#escena-e22 [data-hrack-net]')?.style.width ?? '',
+  reservedVisible: getComputedStyle(document.querySelector('#escena-e22 [data-hreserved]')).display !== 'none',
+  inputsKept: document.querySelector('#escena-e22 [data-housing-qty="calls"]')?.value ?? '',
 }));
-check('7M-F E22: modalidad persiste (housingMode separado de infra) y texto privado literal', h22.persisted === 'privado' && h22.desc.includes('sin aportación de capacidad a la red'), JSON.stringify(h22).slice(0, 120));
-check('7M-F E22: CTA añade housing.fields sólo al elegir modalidad', decodeURIComponent(h22.cta).includes('Equipo propio o por adquirir') && h22.cta.startsWith('https://wa.me/525573724660'), h22.cta.slice(0, 90));
+check('7M-H E22: privado persiste, stage 100/0 sin reservas visibles, inputs conservados', h22b.persisted === 'privado' && h22b.stageMode === 'privado' && h22b.rackClient === '100%' && h22b.rackNet === '0%' && !h22b.reservedVisible && h22b.inputsKept === '2', JSON.stringify(h22b));
+await clickJs('#escena-e22 [data-housing-mode="compartido"]');
+await page.waitForTimeout(300);
+const h22c = await page.evaluate(() => ({
+  rackClient: document.querySelector('#escena-e22 [data-hrack-client]')?.style.width ?? '',
+  reservedVisible: getComputedStyle(document.querySelector('#escena-e22 [data-hreserved]')).display !== 'none',
+  chipsOn: document.querySelectorAll('#escena-e22 .housing7__chip--on').length,
+  chipsWait: document.querySelectorAll('#escena-e22 .housing7__chip--wait').length,
+}));
+check('7M-H E22: volver a compartido restaura 50/50 con reservas visibles y chips 3 en proceso / 4 en espera', h22c.rackClient === '50%' && h22c.reservedVisible && h22c.chipsOn === 3 && h22c.chipsWait === 4, JSON.stringify(h22c));
+// edición de cantidad recalcula sin cambiar modalidad
+const h22d = await page.evaluate(() => {
+  const i = document.querySelector('#escena-e22 [data-housing-qty="auto"]');
+  i.value = '0'; i.dispatchEvent(new Event('input', { bubbles: true }));
+  return {
+    demand: document.querySelector('#escena-e22 [data-housing-demand]')?.textContent ?? '',
+    sActive: document.querySelector('[data-housing-col="compartido"] [data-hs="active"]')?.textContent ?? '',
+    pActive: document.querySelector('[data-housing-col="privado"] [data-hs="active"]')?.textContent ?? '',
+  };
+});
+check('7M-H E22: editar cantidad (auto→0) recalcula demanda 75 y ambas columnas (compartido 3 activas, privado 5 activas)', h22d.demand === '75' && h22d.sActive.startsWith('3') && h22d.pActive.startsWith('5'), JSON.stringify(h22d));
 
 // Bloque C: personas + IA (E11)
 await page.evaluate(() => document.querySelector('#escena-e11')?.scrollIntoView({ behavior: 'instant' }));
@@ -1537,14 +1593,11 @@ for (let att = 0; att < 3; att++) {
 await page.evaluate(() => document.querySelector('#escena-e03')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
 await waitBound('[data-demo="infra2"]');
 const rackInfo = await page.evaluate(() => {
-  const city = document.querySelector('#escena-e03 [data-infra7-city]');
-  if (!city) return { n: 0, distinct: 0, transform: '', display: '' };
-  const cs = getComputedStyle(city);
-  const racks = document.querySelectorAll('#escena-e03 [data-infra7-rack]');
-  const rects = [...racks].map((r) => { const b = r.getBoundingClientRect(); return `${Math.round(b.x)},${Math.round(b.y)}`; });
-  return { n: racks.length, distinct: new Set(rects).size, transform: cs.height, display: cs.display };
+  const canvas = document.querySelector('#escena-e03 [data-infra7-canvas]');
+  const r = canvas?.getBoundingClientRect();
+  return { hasCanvas: !!canvas, w: r?.width ?? 0, h: r?.height ?? 0, rows: document.querySelectorAll('#escena-e03 [data-infra7-rows] .infra7__row').length };
 });
-check('7M-G E03: stage nativo visible con 10 racks en posiciones distintas', rackInfo.n === 10 && rackInfo.distinct === 10 && parseFloat(rackInfo.transform) > 100 && rackInfo.display !== 'none', JSON.stringify(rackInfo));
+check('7M-H E03: stage 3D con canvas visible (≥520px alto desktop) y panel con 4 filas', rackInfo.hasCanvas && rackInfo.h >= 500 && rackInfo.rows === 4, JSON.stringify(rackInfo));
 check('7M-C infra: sin auto-selección persistida (null hasta que el visitante elige)', (await sceneState()).infra === null, JSON.stringify((await sceneState()).infra));
 
 // 5. Membresías: default visual sin persistir
@@ -1553,23 +1606,23 @@ await waitBound('[data-demo="memberships"]');
 await page.waitForTimeout(400);
 check('7M-F E27: antes del CTA no hay membresía persistida (selección vacía)', (await sceneState()).membership === null || (await sceneState()).membership === 'cobertura', JSON.stringify((await sceneState()).membership));
 
-// A08 Housing en E22 (escena compartida, visible en cualquier ruta)
+// 7M-H Housing en E22: default compartido, rack 50/50, secuencia disponible
 await page.evaluate(() => document.querySelector('#escena-e22')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
 await waitBound('[data-demo="housing"]');
-const segW = () => page.evaluate(() => [...document.querySelectorAll('#escena-e22 [data-housing-segments] .housing__seg')].map((x) => x.style.width));
-check('7M-C housing: default compartido 50/25/25', JSON.stringify(await segW()) === JSON.stringify(['50%', '25%', '25%']), JSON.stringify(await segW()));
+const hRack0 = await page.evaluate(() => ({ c: document.querySelector('#escena-e22 [data-hrack-client]')?.style.width, n: document.querySelector('#escena-e22 [data-hrack-net]')?.style.width, mode: document.querySelector('#escena-e22 [data-housing-stage]')?.dataset.mode }));
+check('7M-H housing: default compartido con rack 50/50', hRack0.c === '50%' && hRack0.n === '50%' && hRack0.mode === 'compartido', JSON.stringify(hRack0));
 await clickJs('#escena-e22 [data-housing-mode="privado"]');
 await page.waitForTimeout(700);
-check('7M-C housing: privado = 100% y persiste en state.housingMode', JSON.stringify(await segW()) === JSON.stringify(['100%']) && (await sceneState()).housingMode === 'privado', JSON.stringify(await segW()));
-check('7M-C housing: stage transforma los racks (data-mode=privado)', await page.evaluate(() => document.querySelector('#escena-e22 [data-housing-stage]')?.dataset.mode) === 'privado');
-await clickJs('#escena-e22 [data-housing-play]');
-await page.waitForTimeout(500);
-check('7M-C housing: demo ilumina el stage (data-demo-state=on)', await page.evaluate(() => document.querySelector('#escena-e22 [data-housing-stage]')?.dataset.demoState) === 'on');
+check('7M-H housing: privado = rack 100/0 y persiste en state.housingMode', (await page.evaluate(() => document.querySelector('#escena-e22 [data-hrack-client]')?.style.width)) === '100%' && (await sceneState()).housingMode === 'privado', '');
+await clickJs('#escena-e22 [data-housing-run]');
+await page.waitForTimeout(1200);
+const hSeq = await page.evaluate(() => ({ status: document.querySelector('#escena-e22 [data-housing-status]')?.textContent ?? '', on: document.querySelectorAll('#escena-e22 .housing7__chip--on').length }));
+check('7M-H housing: «Ver cómo se reparte el trabajo» inicia la secuencia y revela chips en proceso', hSeq.status.length > 3 && hSeq.on >= 3, JSON.stringify(hSeq));
 await page.reload({ waitUntil: 'domcontentloaded', timeout: 90000 });
 await page.waitForTimeout(2200);
 await page.evaluate(() => document.querySelector('#escena-e22')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
 await waitBound('[data-demo="housing"]');
-check('7M-C housing: recarga restaura privado (botón + estado)', (await sceneState()).housingMode === 'privado' && (await page.evaluate(() => document.querySelector('#escena-e22 [data-housing-mode="privado"]')?.getAttribute('aria-pressed'))) === 'true');
+check('7M-H housing: recarga restaura privado (botón + estado)', (await sceneState()).housingMode === 'privado' && (await page.evaluate(() => document.querySelector('#escena-e22 [data-housing-mode="privado"]')?.getAttribute('aria-pressed'))) === 'true');
 
 // Cierre incluye housingMode en la meta
 await page.evaluate(() => document.querySelector('#escena-e29')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
@@ -1877,7 +1930,7 @@ check('7M-E: sin etiquetas de placeholder/rutas internas visibles', await page.e
 await clickJs('[data-explore-toggle]');
 await page.waitForTimeout(600);
 
-// --- 7M-G: umbral (ancho/contraste) + simulador + hero pin 18×H + cargas ------
+// --- 7M-H: umbral E00 (copy nuevo, banda, simulador presets) + hero pin + cargas ------
 if (!browser.isConnected()) await relaunch();
 await page.goto(BASE, { waitUntil: 'domcontentloaded' });
 await page.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'hero', { timeout: 60000 }).catch(() => {});
@@ -1887,54 +1940,72 @@ await page.waitForTimeout(900);
 await waitBound('[data-simulator]');
 const simDef = await page.evaluate(() => ({
   total: document.querySelector('[data-sim-result="total"]')?.textContent ?? '',
-  addr: document.querySelector('[data-sim-result="addressable"]')?.textContent ?? '',
-  formula: document.querySelector('.umbral__sim-formula')?.textContent ?? '',
-  note: document.querySelector('.umbral__sim-note')?.textContent ?? '',
-  title: document.querySelector('.umbral__title')?.textContent ?? '',
-  caption: document.querySelector('.umbral__caption')?.textContent ?? '',
-  panels: document.querySelectorAll('#escena-e00 details.umbral__panel').length,
-  beneficios: document.querySelectorAll('#escena-e00 .umbral__benefits-grid li').length,
-  paisaje: !!document.querySelector('#escena-e00 .umbral__paisaje img'),
+  pot: document.querySelector('[data-sim-result="potential"]')?.textContent ?? '',
+  rem: document.querySelector('[data-sim-result="remaining"]')?.textContent ?? '',
+  title: document.querySelector('.umbral7__title')?.textContent ?? '',
+  eyebrow: document.querySelector('.umbral7__eyebrow')?.textContent ?? '',
+  lead: document.querySelector('.umbral7__lead')?.textContent ?? '',
+  bandTitle: document.querySelector('.umbral7__band-title')?.textContent ?? '',
+  tools: [...document.querySelectorAll('.umbral7__tool strong')].map((e) => e.textContent ?? ''),
+  presets: [...document.querySelectorAll('[data-sim-preset] option')].map((o) => o.textContent ?? ''),
+  badge: document.querySelector('[data-sim-badge]')?.textContent ?? '',
+  formula: document.querySelector('.umbral7__formula')?.textContent ?? '',
+  note: document.querySelector('.umbral7__note')?.textContent ?? '',
+  cta: document.querySelector('[data-sim-cta]')?.getAttribute('href') ?? '',
+  panels: document.querySelectorAll('#escena-e00 details.umbral7__panel').length,
+  paisaje: !!document.querySelector('#escena-e00 .umbral7__paisaje img'),
+  e00route: document.querySelector('#escena-e00')?.dataset.sceneRoute ?? '',
+  barPot: document.querySelector('[data-sim-bar="potential"]')?.style.width ?? '',
+  barRem: document.querySelector('[data-sim-bar="remaining"]')?.style.width ?? '',
 }));
-check('7M-G umbral: textos literales (título, caption, 4 beneficios numerados, 4 details)', simDef.title.includes('Tu independencia crece en red') && simDef.caption.includes('ilustración conceptual') && simDef.beneficios === 4 && simDef.panels === 4 && simDef.paisaje, JSON.stringify({ title: simDef.title.slice(0, 30), panels: simDef.panels }));
+check('7M-H umbral: copy literal (A TU MANERA / Se nota que prefieres abrir tu propio camino / Bien. Aquí tú marcas el ritmo.)', simDef.eyebrow.trim() === 'A TU MANERA' && simDef.title.includes('Se nota que prefieres abrir') && simDef.title.includes('tu propio camino') && simDef.lead.includes('Bien. Aquí tú marcas el ritmo.'), JSON.stringify({ e: simDef.eyebrow, t: simDef.title.slice(0, 60) }));
+check('7M-H umbral: E00 es exclusivo de la exploración libre (route explorer)', simDef.e00route === 'explorer', simDef.e00route);
+check('7M-H umbral: banda roja con 4 herramientas (WhatsApp conectado, agente, automatizaciones, tareas)', simDef.bandTitle.includes('Menos pendientes') && simDef.tools.length === 4 && simDef.tools[0] === 'WhatsApp conectado' && simDef.tools[1] === 'Un agente a tu lado', JSON.stringify(simDef.tools));
+check('7M-H umbral: 4 summaries + imagen limpia conservada', simDef.panels === 4 && simDef.paisaje, `panels=${simDef.panels} img=${simDef.paisaje}`);
+check('7M-H simulador: preset WhatsApp default → 8 h / 3,4 h / 4,6 h (es-MX, 1 decimal)', /8([.,]0)?\s*h/.test(simDef.total) && /3[.,]4/.test(simDef.pot) && /4[.,]6/.test(simDef.rem), `${simDef.total} / ${simDef.pot} / ${simDef.rem}`);
+check('7M-H simulador: 5 presets incl. «Mi propio escenario», badge «Ejemplo editable», barra apilada 42%/58%', simDef.presets.length === 5 && simDef.presets.includes('Mi propio escenario') && simDef.badge.includes('Ejemplo editable') && Math.abs(parseFloat(simDef.barPot) - 42) < 1 && Math.abs(parseFloat(simDef.barRem) - 58) < 1, JSON.stringify({ p: simDef.presets.length, pot: simDef.barPot, rem: simDef.barRem }));
+check('7M-H simulador: nota literal y CTA WhatsApp con categoría+estimaciones (no autoenvío)', simDef.note.includes('Estimación basada en tus datos') && simDef.cta.includes('wa.me/525573724660') && decodeURIComponent(simDef.cta).includes('Consultas por WhatsApp') && decodeURIComponent(simDef.cta).includes('8 h'), decodeURIComponent(simDef.cta).slice(0, 140));
+const simCases = await page.evaluate(() => {
+  const set = (k, v) => { const i = document.querySelector(`[data-sim-input="${k}"]`); i.value = String(v); i.dispatchEvent(new Event('input', { bubbles: true })); };
+  const read = () => ({ t: document.querySelector('[data-sim-result="total"]').textContent, p: document.querySelector('[data-sim-result="potential"]').textContent, r: document.querySelector('[data-sim-result="remaining"]').textContent, err: !document.querySelector('[data-sim-error]').hidden, badge: document.querySelector('[data-sim-badge]').textContent });
+  const out = {};
+  set('tasks', 0); out.zero = read();
+  set('tasks', 80); set('fraction', 100); set('adoption', 100); out.full = read(); // 80×6/60=8h → potencial 8h, restante 0
+  set('fraction', 60); set('adoption', 70); set('tasks', -5); out.invalid = read();
+  set('tasks', 80); out.custom = read(); // editar activa «Mi propio escenario»
+  document.querySelector('[data-sim-preset]').value = 'docs';
+  document.querySelector('[data-sim-preset]').dispatchEvent(new Event('change', { bubbles: true }));
+  out.docs = read(); // 12×35/60 = 7h; potencial 7×.45×.6 = 1.89 → 1,9 ; restante 5,1
+  return out;
+});
+check('7M-H simulador: 0 tareas → 0 h sin división por cero (barra 0/100)', /0/.test(simCases.zero.t) && /0/.test(simCases.zero.p) && /0/.test(simCases.zero.r), JSON.stringify(simCases.zero));
+check('7M-H simulador: 100%/100% → potencial = total, restante 0', /8/.test(simCases.full.p) && /0/.test(simCases.full.r), JSON.stringify(simCases.full));
+check('7M-H simulador: inválido (-5) muestra error y conserva cifras; editar activa «Mi propio escenario»', simCases.invalid.err === true && simCases.custom.badge.includes('Mi propio escenario'), JSON.stringify({ err: simCases.invalid.err, badge: simCases.custom.badge }));
+check('7M-H simulador: preset Documentos (12×35, 45%, 60%) → 7 h / 1,9 h / 5,1 h', /7([.,]0)?\s*h/.test(simCases.docs.t) && /1[.,]9/.test(simCases.docs.p) && /5[.,]1/.test(simCases.docs.r), JSON.stringify(simCases.docs));
+
 const umbralBox = await page.evaluate(() => {
   const scene = document.querySelector('#escena-e00');
   const surf = scene?.querySelector('.scene__surface');
-  const umb = scene?.querySelector('.umbral');
-  const title = scene?.querySelector('.umbral__title');
-  const simPanel = scene?.querySelector('.umbral__sim');
+  const umb = scene?.querySelector('.umbral7');
+  const title = scene?.querySelector('.umbral7__title');
+  const band = scene?.querySelector('.umbral7__band');
   const cs = title ? getComputedStyle(title) : null;
-  const panelCs = simPanel ? getComputedStyle(simPanel) : null;
+  const bandCs = band ? getComputedStyle(band) : null;
+  const surfRect = surf?.getBoundingClientRect();
   return {
-    layout: scene?.getAttribute('data-layout') ?? scene?.querySelector('.scene__inner')?.getAttribute('data-layout') ?? '',
-    surfW: surf?.getBoundingClientRect().width ?? 0,
+    surfW: surfRect?.width ?? 0,
+    surfRight: surfRect ? surfRect.right : 0,
     innerW: window.innerWidth,
     umbW: umb?.getBoundingClientRect().width ?? 0,
     titleColor: cs?.color ?? '',
-    simBg: panelCs?.backgroundColor ?? '',
-    numBlocks: scene?.querySelectorAll('.umbral__benefit-num').length ?? 0,
-    noBenefitsArt: !scene?.querySelector('.umbral__benefits-art'),
+    titleSize: cs?.fontSize ?? '',
+    bandBg: bandCs?.backgroundColor ?? '',
+    h2count: scene?.querySelectorAll('h2').length ?? 0,
   };
 });
-check('7M-G umbral: layout dedicado ancho completo (≥ 90% del contenedor previsto a 1440)', umbralBox.layout === 'umbral' && umbralBox.surfW >= Math.min(1440, umbralBox.innerW) * 0.9 && Math.abs(umbralBox.umbW - umbralBox.surfW) < 4, JSON.stringify(umbralBox));
-check('7M-G umbral: contraste local cream (tinta #091933 sobre panel claro, sin vidrio negro)', umbralBox.titleColor === 'rgb(9, 25, 51)' && umbralBox.numBlocks === 4 && umbralBox.noBenefitsArt, JSON.stringify({ color: umbralBox.titleColor, num: umbralBox.numBlocks }));
-check('7M-F simulador: defaults 65/18/40/55 -> 19,5 h y 4,3 h (es-MX, 1 decimal)', /19[.,]5/.test(simDef.total) && /4[.,]3/.test(simDef.addr), `${simDef.total} / ${simDef.addr}`);
-check('7M-F simulador: fórmula y nota literales presentes', simDef.formula.includes('tareas × minutos ÷ 60') && simDef.note.includes('No mide ahorro real'), '');
-const simCases = await page.evaluate(() => {
-  const set = (k, v) => { const i = document.querySelector(`[data-sim-input="${k}"]`); i.value = String(v); i.dispatchEvent(new Event('input', { bubbles: true })); };
-  const read = () => ({ t: document.querySelector('[data-sim-result="total"]').textContent, a: document.querySelector('[data-sim-result="addressable"]').textContent, err: !document.querySelector('[data-sim-error]').hidden });
-  const out = {};
-  set('tasks', 0); out.zero = read();
-  set('tasks', 65); set('fraction', 100); set('adoption', 100); out.full = read();
-  set('fraction', 40); set('adoption', 55); set('tasks', -5); out.invalid = read();
-  set('tasks', 65); out.fixed = read();
-  set('tasks', 65); set('minutes', 18); document.querySelector('[data-sim-reset]').click(); out.reset = read();
-  return out;
-});
-check('7M-F simulador: tareas 0 -> 0 h sin división por cero', /0/.test(simCases.zero.t) && /0/.test(simCases.zero.a), JSON.stringify(simCases.zero));
-check('7M-F simulador: 100%/100% -> total completo (19,5 h)', /19[.,]5/.test(simCases.full.a), JSON.stringify(simCases.full));
-check('7M-F simulador: inválido (-5) muestra error y no actualiza cifra', simCases.invalid.err === true && /4[.,]3/.test(simCases.invalid.a), JSON.stringify(simCases.invalid));
-check('7M-F simulador: reset restaura exactamente 19,5 / 4,3', /19[.,]5/.test(simCases.reset.t) && /4[.,]3/.test(simCases.reset.a), JSON.stringify(simCases.reset));
+check('7M-H umbral: contenedor único — a 1440 el borde derecho del contenido ≤ 1360', umbralBox.innerW === 1440 ? Math.abs(umbralBox.surfRight - 1360) <= 2 && Math.abs(umbralBox.umbW - umbralBox.surfW) < 4 : Math.abs(umbralBox.umbW - umbralBox.surfW) < 4, JSON.stringify(umbralBox));
+check('7M-H umbral: paleta 7M-H (tinta #26141A, banda #A91E38, un solo H2)', umbralBox.titleColor === 'rgb(38, 20, 26)' && umbralBox.bandBg === 'rgb(169, 30, 56)' && umbralBox.h2count === 1, JSON.stringify({ c: umbralBox.titleColor, band: umbralBox.bandBg, h2: umbralBox.h2count }));
+
 // hero pin: desktop sin reduced-motion crea pin único; ruta durante el pin cancela
 // (página dedicada y limpia para no contaminar la medición con el estado previo)
 const pinCtx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
@@ -1968,8 +2039,10 @@ const loadState = await pinPage.evaluate(() => ({
   busy: document.querySelector('.prism-layer')?.getAttribute('aria-busy') ?? '',
   loaderDone: document.querySelector('[data-hero-loader]')?.classList.contains('is-done') ?? !document.querySelector('[data-hero-loader]'),
   bg: getComputedStyle(document.querySelector('.prism-layer')).backgroundColor,
+  noMsg: !document.querySelector('[data-prism-msg]'),
+  noRetry: !document.querySelector('[data-prism-retry]'),
 }));
-check('7M-G cargas: superficie 3D en ready con aria-busy=false, loader oculto y fondo #050b1b desde el inicio', (loadState.state === 'ready' || loadState.state === 'fallback') && loadState.busy === 'false' && loadState.loaderDone && loadState.bg === 'rgb(5, 11, 27)', JSON.stringify(loadState));
+check('7M-H cargas: estado ready o silent (sin fallback con mensaje), aria-busy=false, loader oculto, fondo #050b1b, SIN mensaje ni botón de reintento en el DOM', (loadState.state === 'ready' || loadState.state === 'silent') && loadState.busy === 'false' && loadState.loaderDone && loadState.bg === 'rgb(5, 11, 27)' && loadState.noMsg && loadState.noRetry, JSON.stringify(loadState));
 // cajas CTA en p≈0.10 (yNear) y p≈0.25 (yLow, tras el descenso): muestreo determinista
 const ctaBounce = await pinPage.evaluate(() => new Promise((res) => {
   const hero = document.querySelector('[data-hero-scene]');
@@ -2007,6 +2080,102 @@ check('7M-G hero: elegir ruta durante el pin lo cancela y aterriza', afterRoute.
 await pinCtx.close().catch(() => {});
 await page.bringToFront().catch(() => {});
 check('7M-F hero: skip por teclado presente (data-hero-skip)', await page.evaluate(() => !!document.querySelector('[data-hero-skip]')), '');
+
+// --- 7M-H: ciclo del hero, CTA literal, ruta transitoria, E00 exclusivo -------
+const heroCta = await page.evaluate(() => {
+  const b = document.querySelector('[data-route-choice="enterprise"]');
+  return { text: b?.textContent?.replace(/\s+/g, ' ').trim() ?? '', label: b?.querySelector('span')?.getAttribute('aria-label') ?? '', lines: [...document.querySelectorAll('[data-route-choice="enterprise"] .hero__cta-line')].map((e) => e.textContent ?? '') };
+});
+check('7M-H hero: botón amarillo literal «SOY UNA GRAN EMPRESA, O ESTOY EN CAMINO DE SERLO» (2 líneas desktop + aria-label)', heroCta.lines[0] === 'SOY UNA GRAN EMPRESA,' && heroCta.lines[1] === 'O ESTOY EN CAMINO DE SERLO' && heroCta.label === 'SOY UNA GRAN EMPRESA, O ESTOY EN CAMINO DE SERLO', JSON.stringify(heroCta));
+const heroCtaStyle = await page.evaluate(() => {
+  const b = document.querySelector('[data-route-choice="enterprise"]');
+  const cs = b ? getComputedStyle(b) : null;
+  return { fs: cs?.fontSize, fw: cs?.fontWeight, lh: cs?.lineHeight, maxW: cs?.maxWidth, pad: cs?.padding, minH: cs?.minHeight, nowrap: cs?.whiteSpace };
+});
+check('7M-H hero: estilos del CTA (16px/1.3, 750, max 440px, padding 18px 26px, min-height 76px, sin nowrap)', heroCtaStyle.fs === '16px' && heroCtaStyle.fw === '750' && heroCtaStyle.lh === '20.8px' && heroCtaStyle.maxW === '440px' && heroCtaStyle.pad === '18px 26px' && heroCtaStyle.minH === '76px' && heroCtaStyle.nowrap === 'normal', JSON.stringify(heroCtaStyle));
+
+// 20 ciclos entrada libre → salida → volver al inicio → entrada libre (página dedicada)
+const cycCtx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+const cycPage = await cycCtx.newPage();
+await cycPage.addInitScript(() => { try { history.scrollRestoration = 'manual'; } catch {} });
+await cycPage.bringToFront();
+await cycPage.goto(BASE, { waitUntil: 'domcontentloaded' });
+await cycPage.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'hero', { timeout: 60000 }).catch(() => {});
+await cycPage.waitForTimeout(800);
+const cycles = await cycPage.evaluate(async () => {
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const pinCount = () => window.ScrollTrigger?.getAll?.().filter((t) => t.pin && document.querySelector('[data-hero-scene]')?.contains(t.pin)).length ?? 0;
+  const out = { fails: 0, pins: [] };
+  for (let i = 0; i < 20; i++) {
+    // entrada libre (rueda abajo real)
+    window.__publiaLastProgrammaticScroll = 0;
+    window.dispatchEvent(new WheelEvent('wheel', { deltaY: 300, bubbles: true }));
+    window.scrollBy({ top: 200, behavior: 'instant' });
+    await sleep(700);
+    const actFree = document.documentElement.dataset.act;
+    const pins = pinCount();
+    // salida: elegir ruta empresa
+    window.__publiaLastProgrammaticScroll = Date.now();
+    window.scrollTo(0, 0);
+    document.querySelector('[data-route-choice="enterprise"]')?.click();
+    await sleep(900);
+    const actRoute = document.documentElement.dataset.act;
+    // volver al inicio
+    document.querySelector('[data-route-reset]')?.click();
+    await sleep(900);
+    const actBack = document.documentElement.dataset.act;
+    const pinsAfterReset = pinCount();
+    if (!(actFree === 'cooperative' && pins === 1 && actRoute === 'enterprise' && actBack === 'hero' && pinsAfterReset === 0)) {
+      out.fails++;
+      out.pins.push({ i, actFree, pins, actRoute, actBack, pinsAfterReset });
+    }
+  }
+  out.finalPins = pinCount();
+  return out;
+});
+check('7M-H hero: 20 ciclos entrada libre→ruta→volver→reentrada con 1 pin y 0 tras reset (cero omisiones)', cycles.fails === 0 && cycles.finalPins <= 1, JSON.stringify(cycles).slice(0, 300));
+// rueda hacia ARRIBA no arma la ruta libre
+const wheelUp = await cycPage.evaluate(async () => {
+  window.__publiaLastProgrammaticScroll = Date.now();
+  window.scrollTo(0, 0);
+  document.querySelector('[data-route-reset]')?.click();
+  await new Promise((r) => setTimeout(r, 900));
+  window.dispatchEvent(new WheelEvent('wheel', { deltaY: -400, bubbles: true }));
+  await new Promise((r) => setTimeout(r, 700));
+  return document.documentElement.dataset.act;
+});
+check('7M-H hero: rueda hacia ARRIBA no inicia el recorrido libre', wheelUp === 'hero', wheelUp);
+// recarga con estado previo: ruta transitoria (unclassified) + rememberedRoute aparte
+const trans = await cycPage.evaluate(async () => {
+  window.__publiaLastProgrammaticScroll = Date.now();
+  window.scrollTo(0, 0);
+  document.querySelector('[data-route-choice="efficiency"]')?.click();
+  await new Promise((r) => setTimeout(r, 800));
+  return JSON.parse(sessionStorage.getItem('publia.visitor.v1') ?? '{}');
+});
+await cycPage.reload({ waitUntil: 'domcontentloaded' });
+await cycPage.waitForTimeout(1500);
+const transAfter = await cycPage.evaluate(() => ({
+  route: document.documentElement.dataset.route ?? '',
+  saved: JSON.parse(sessionStorage.getItem('publia.visitor.v1') ?? '{}'),
+}));
+check('7M-H estado: recarga con ruta previa → primary transitoria unclassified (pin rearmable) y rememberedRoute aparte', transAfter.route === 'unclassified' && transAfter.saved.rememberedRoute === 'efficiency' && (trans.primary === 'efficiency'), JSON.stringify({ route: transAfter.route, remembered: transAfter.saved.rememberedRoute }));
+// E00 oculto tras elegir ruta; visible en exploración libre
+const e00vis = await cycPage.evaluate(async () => {
+  const vis = () => { const el = document.querySelector('#escena-e00'); return !!el && getComputedStyle(el).display !== 'none'; };
+  window.__publiaLastProgrammaticScroll = Date.now();
+  window.scrollTo(0, 0);
+  document.querySelector('[data-route-choice="enterprise"]')?.click();
+  await new Promise((r) => setTimeout(r, 900));
+  const afterRoute = vis();
+  document.querySelector('[data-route-reset]')?.click();
+  await new Promise((r) => setTimeout(r, 900));
+  const afterReset = vis();
+  return { afterRoute, afterReset };
+});
+check('7M-H umbral: E00 oculto tras elegir empresa y visible de nuevo en exploración libre', e00vis.afterRoute === false && e00vis.afterReset === true, JSON.stringify(e00vis));
+await cycCtx.close().catch(() => {});
+await page.bringToFront().catch(() => {});
 
 // --- cierre ---------------------------------------------------------------------
 await page.screenshot({ path: `${OUT}/13-cierre.png` });
