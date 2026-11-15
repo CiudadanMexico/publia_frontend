@@ -11,6 +11,7 @@
  */
 import { HERO } from '../../data/copy';
 import { COPY_7MF } from '../../data/copy7mf';
+import { HERO_ENTERPRISE_CTA_7MH } from '../../data/copy7mh';
 ---
 
 <section class="hero" id="inicio" data-scene-id="E01" data-hero-scene aria-labelledby="hero-titulo">
@@ -32,7 +33,14 @@ import { COPY_7MF } from '../../data/copy7mf';
             data-route-choice={cta.id}
             data-target={cta.target}
           >
-            <span>{cta.id === 'enterprise' ? COPY_7MF.hero.routeEnterprise : COPY_7MF.hero.routeEfficiency}</span>
+            {cta.id === 'enterprise' ? (
+              <span aria-label={HERO_ENTERPRISE_CTA_7MH.label}>
+                <span class="hero__cta-line" aria-hidden="true">{HERO_ENTERPRISE_CTA_7MH.line1}</span>
+                <span class="hero__cta-line" aria-hidden="true">{HERO_ENTERPRISE_CTA_7MH.line2}</span>
+              </span>
+            ) : (
+              <span>{COPY_7MF.hero.routeEfficiency}</span>
+            )}
             <b aria-hidden="true">↗</b>
           </button>
         ))
@@ -173,6 +181,7 @@ import { COPY_7MF } from '../../data/copy7mf';
     text-align: left;
     text-transform: uppercase;
     cursor: pointer;
+    white-space: normal; /* 7M-H §2: sin nowrap */
     transition:
       transform var(--dur-fast) var(--ease-out),
       filter var(--dur-fast) var(--ease-out);
@@ -188,7 +197,15 @@ import { COPY_7MF } from '../../data/copy7mf';
     border-color: #ffd044;
     color: #0a1730;
     box-shadow: 0 8px 30px #ffc73930;
+    /* 7M-H §2: texto 16px/1.3 peso 750, ancho máx 440, padding 18px 26px, altura mín 76 */
+    max-width: 440px;
+    padding: 18px 26px;
+    min-height: 76px;
+    font-size: 16px;
+    line-height: 1.3;
+    font-weight: 750;
   }
+  .hero__cta-line { display: block; }
 
   .hero__cta--ghost {
     background: #09284c66;
@@ -437,6 +454,15 @@ import { COPY_7MF } from '../../data/copy7mf';
       width: 100%;
       max-width: 330px;
       padding: 14px;
+    }
+    /* 7M-H §2 móvil: 15px, ancho disponible, altura automática */
+    .hero__cta--primary {
+      max-width: none;
+      width: 100%;
+      min-height: 0;
+      height: auto;
+      padding: 16px 20px;
+      font-size: 15px;
     }
 
     .hero__hint span {

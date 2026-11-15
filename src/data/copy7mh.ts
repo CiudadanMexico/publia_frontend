@@ -150,3 +150,10 @@ export const UMBRAL_PALETTE = {
   band: '#A91E38',
   bandInk: '#FFFFFF',
 } as const;
+
+/** 7M-H §2: texto exacto del botón amarillo (frase recuperada de los acuerdos). */
+export const HERO_ENTERPRISE_CTA_7MH = {
+  line1: 'SOY UNA GRAN EMPRESA,',
+  line2: 'O ESTOY EN CAMINO DE SERLO',
+  label: 'SOY UNA GRAN EMPRESA, O ESTOY EN CAMINO DE SERLO',
+} as const;
