@@ -1,18 +1,16 @@
 ---
 /**
- * E03 Infraestructura — 7M-G §4: se restaura el stage nativo previo (racks,
- * núcleo y mapa de conexiones) como vista protagonista; los cuatro SVG de
- * 7M-F quedan como detalle opcional colapsado «Ver esquema de conexiones».
- * Se conservan de 7M-F: 4 escenarios con textos literales de copy.es-MX.json,
- * selector aria-pressed, migración/ids de estado, CTA comercial y ausencia de
- * falsa telemetría (sin «Activar red» ni contador). art:'A04' retirado sólo
- * del wrapper de E03 (ver scenes.ts). Modo local colaborativo reutiliza el
- * stage local + etiqueta HTML «Servicio compartido autorizado».
+ * E03 Infraestructura — 7M-H §6/§7. Un solo H2 (este módulo lo posee):
+ * «Soberanía digital.» blanco + «Tu tecnología, bajo tus reglas.» cian sobre
+ * #020910. Stage 3D low-poly con 4 topologías distintas (infra3d.ts),
+ * etiquetas HTML superpuestas, hotspots con copys literales, «Ver recorrido
+ * de una tarea» + pausa, ruta alternativa en red distribuida. Panel 5/12 con
+ * las 4 filas por modo (siempre visibles) + CTA + vínculo a E22 en Housing.
+ * Los SVG quedan como detalle opcional «Ver esquema de conexiones».
  */
 import type { ResolvedScene } from '../../../lib/experience/graph';
-import { accentify } from '../../../lib/experience/accent';
 import { COPY_7MF } from '../../../data/copy7mf';
-import { RACK_POSITIONS, MAP_NODES, MAP_LINES } from '../../../data/infra';
+import { INFRA_ROWS_7MH, INFRA_STAGE_7MH, E03_TITLE_7MH } from '../../../data/copy7mh';
 import svgPrivada from '../../../assets/7mf/infra_local_privada.svg?raw';
 import svgColaborativa from '../../../assets/7mf/infra_local_colaborativa.svg?raw';
 import svgHousing from '../../../assets/7mf/infra_housing.svg?raw';
@@ -25,21 +23,31 @@ interface Props {
 const { scene } = Astro.props;
 const infra = COPY_7MF.infra;
 const modes = infra.modes;
+const first = modes[0]!;
+const rows = INFRA_ROWS_7MH[first.id] ?? [];
 const svgById: Record<string, string> = {
   'local-private': svgPrivada,
   'local-collaborative': svgColaborativa,
   'managed-housing': svgHousing,
   'distributed-network': svgDistribuida,
 };
-const first = modes[0]!;
 const waBase = `https://wa.me/${COPY_7MF.contact.number}?text=`;
 ---
 
-<section class="infra7" data-module="infraDemo" data-demo="infra2" data-infra7>
+<section
+  class="infra7"
+  data-module="infraDemo"
+  data-demo="infra2"
+  data-infra7
+  style={`--e03-bg:${E03_TITLE_7MH.bg};--e03-a:${E03_TITLE_7MH.line1Color};--e03-b:${E03_TITLE_7MH.line2Color};`}
+>
   <div class="infra7__head">
-    {scene.eyebrow && <p class="infra7__eyebrow" data-reveal set:html={accentify(scene.eyebrow)} />}
-    <h2 class="infra7__title" data-role="title" data-reveal="lines" set:html={accentify(scene.title)} />
-    <p class="infra7__lead" data-reveal>{infra.lead}</p>
+    <h2 class="infra7__title" data-role="title" data-reveal>
+      <span class="infra7__title-a">{E03_TITLE_7MH.line1}</span>
+      <span class="infra7__title-b">{E03_TITLE_7MH.line2}</span>
+    </h2>
+    <p class="infra7__lead" data-role="lead" data-reveal>{scene.lead}</p>
+    <p class="infra7__body" data-reveal>{scene.body}</p>
   </div>
 
   <p class="infra7__label" id="infra7-label">{infra.label}</p>
@@ -58,140 +66,201 @@ const waBase = `https://wa.me/${COPY_7MF.contact.number}?text=`;
     }
   </div>
 
-  <div class="infra7__body">
-    <div class="infra7__stage" data-infra7-stage data-mode={first.id} role="img" aria-label={first.alt}>
-      <div class="infra7__city" data-infra7-city>
-        <svg class="infra7__map" viewBox="0 0 340 115" aria-hidden="true">
-          {MAP_LINES.map((d) => <path class="infra7__mapline" d={d} />)}
-          <path class="infra7__mapflow" data-infra7-flow d={MAP_LINES[0]} />
-          {MAP_NODES.map((n, i) => <circle class="infra7__mapnode" cx={n[0]} cy={n[1]} r={i === 3 ? 5 : 3.5} />)}
-        </svg>
-        <div class="infra7__racks" data-infra7-racks>
-          {
-            RACK_POSITIONS.map((pos, i) => (
-              <div class="infra7__rack" data-infra7-rack={String(i)} style={`--rx:${pos[0]}%;--ry:${pos[1]}%`}>
-                <span class="infra7__racknum">N-{String(i + 1).padStart(2, '0')}</span>
-                <div class="infra7__slots">
-                  {Array.from({ length: 9 }, (_, j) => <i style={`--d:${(i * 0.2 + j * 0.1).toFixed(2)}s`} />)}
-                </div>
-              </div>
-            ))
-          }
-        </div>
-        <div class="infra7__core"><span>P</span></div>
-        <p class="infra7__shared-tag" data-infra7-shared hidden>Servicio compartido autorizado</p>
+  <div class="infra7__grid">
+    <div class="infra7__stage" data-infra7-stage>
+      <canvas
+        class="infra7__canvas"
+        data-infra7-canvas
+        role="img"
+        aria-label={INFRA_STAGE_7MH.stageLabel}
+      ></canvas>
+      <div class="infra7__hotspots" data-infra7-hotspots></div>
+      <div class="infra7__tags" data-infra7-tags aria-hidden="true"></div>
+      <p class="infra7__tip" data-infra7-tip role="status"></p>
+      <div class="infra7__stage-controls">
+        <button type="button" class="infra7__ctl" data-infra7-run>{INFRA_STAGE_7MH.taskRun}</button>
+        <button type="button" class="infra7__ctl" data-infra7-pause aria-pressed="false">{INFRA_STAGE_7MH.pause}</button>
+        <button type="button" class="infra7__ctl" data-infra7-altroute hidden>{INFRA_STAGE_7MH.altRoute}</button>
       </div>
-      <p class="infra7__caption" data-infra7-caption>{infra.caption}</p>
     </div>
 
-    <div class="infra7__panel" data-infra7-panel aria-live="polite">
-      <h3 data-infra7-title>{first.title}</h3>
-      <p data-infra7-body>{first.body}</p>
-      <p class="infra7__detail" data-infra7-detail>{first.detail}</p>
+    <div class="infra7__panel">
+      <h3 class="infra7__panel-title" data-infra7-title>{first.title}</h3>
+      <p class="infra7__panel-body" data-infra7-body>{first.body}</p>
+      <dl class="infra7__rows" data-infra7-rows>
+        {rows.map((r) => (
+          <div class="infra7__row">
+            <dt>{r.label}</dt>
+            <dd>{r.text}</dd>
+          </div>
+        ))}
+      </dl>
+      <a class="infra7__compare" data-infra7-compare href="#escena-e22" hidden>
+        {INFRA_STAGE_7MH.compareLink}
+      </a>
       <a
-        class="button button--primary infra7__cta"
+        class="infra7__cta"
         data-infra7-cta
-        href={`${waBase}${encodeURIComponent(COPY_7MF.contact.infraMessage.replace('{label}', first.label))}`}
+        href={`${waBase}${encodeURIComponent(`${infra.cta} — Infraestructura: ${first.label}`)}`}
         target="_blank"
-        rel="noopener noreferrer"
+        rel="noopener"
       >
         {infra.cta}
       </a>
+      <details class="infra7__schemes" data-infra7-schemes>
+        <summary>Ver esquema de conexiones</summary>
+        <div class="infra7__scheme-stage" data-infra7-scheme-stage>
+          {modes.map((m) => (
+            <div class="infra7__svg" data-infra7-svg={m.id} set:html={svgById[m.id] ?? ''} />
+          ))}
+        </div>
+      </details>
     </div>
   </div>
-
-  <details class="infra7__schemes" data-infra7-schemes>
-    <summary>Ver esquema de conexiones</summary>
-    <div class="infra7__scheme-stage" data-infra7-scheme-stage data-mode={first.id}>
-      {
-        modes.map((m, i) => (
-          <div class="infra7__svg" data-infra7-svg={m.id} hidden={i !== 0} aria-hidden="true" set:html={svgById[m.id]} />
-        ))
-      }
-    </div>
-  </details>
 </section>
 
 <style>
-  .infra7 { display: grid; gap: 32px; }
-  .infra7__eyebrow { letter-spacing: 0.14em; text-transform: uppercase; font-size: 0.78rem; color: var(--scene-accent, #80e5ff); margin: 0 0 12px; }
-  .infra7__title { font-size: clamp(30px, 3.2vw, 56px); line-height: 1.08; margin: 0 0 16px; max-width: 22ch; }
-  .infra7__lead { max-width: 58ch; font-size: 18px; line-height: 1.55; margin: 0; }
-  .infra7__label { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.8; margin: 8px 0 0; }
-  .infra7__modes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .infra7 {
+    --ink: #f4f7ff;
+    --muted: #aebadd;
+    --accent: #80e5ff;
+    --border: rgba(128, 229, 255, 0.22);
+    width: 100%;
+    display: grid;
+    gap: 24px;
+    color: var(--ink);
+  }
+  .infra7__head { display: grid; max-width: 60ch; }
+  /* 7M-H §6: H2 clamp(48px,5vw,80px), lh 1.04, peso 800, máx 22ch; línea 1 blanca, línea 2 cian */
+  .infra7__title {
+    font-size: clamp(48px, 5vw, 80px);
+    line-height: 1.04;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 0;
+    max-width: 22ch;
+  }
+  .infra7__title-a { display: block; color: var(--e03-a); }
+  .infra7__title-b { display: block; color: var(--e03-b); }
+  .infra7__lead { margin: 24px 0 0; font-size: 20px; line-height: 1.45; color: var(--ink); font-weight: 600; }
+  .infra7__body { margin: 16px 0 0; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 62ch; }
+
+  .infra7__label { font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin: 32px 0 8px; font-weight: 700; }
+  .infra7__modes { display: flex; flex-wrap: wrap; gap: 8px; }
   .infra7__mode {
-    min-height: 48px; padding: 14px 18px; font-size: 16px; cursor: pointer; text-align: left;
-    border: 1px solid var(--scene-border, rgba(128, 229, 255, 0.3)); border-radius: 16px;
-    background: rgba(5, 11, 27, 0.5); color: inherit;
+    min-height: 44px;
+    padding: 10px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
   }
-  .infra7__mode[aria-pressed='true'] { background: var(--scene-accent, #80e5ff); color: #06121f; font-weight: 600; }
-  .infra7__mode:focus-visible { outline: 3px solid var(--scene-accent, #ffca34); outline-offset: 3px; }
-  .infra7__body { display: grid; grid-template-columns: repeat(12, 1fr); gap: 32px; align-items: start; }
-  /* Stage nativo restaurado (racks + núcleo + mapa) */
-  .infra7__stage { grid-column: 1 / 9; position: relative; border: 1px solid rgba(41, 149, 233, 0.35); border-radius: 24px; overflow: hidden; background: radial-gradient(circle at 50% 45%, rgba(23, 72, 145, 0.35), rgba(3, 6, 23, 0.6) 75%); }
-  .infra7__city { position: relative; height: 340px; }
-  .infra7__racks { position: absolute; inset: 0; }
-  .infra7__rack { position: absolute; left: calc(50% + var(--rx) * 0.1); top: calc(50% + var(--ry) * 0.085); width: 34px; height: 62px; transform: translate(-50%, -50%); border: 1px solid rgba(41,149,233,.6); border-radius: 4px; background: linear-gradient(180deg, #07152a, #143c62 55%, #061222); padding: 3px 2px; transition: filter .3s; }
-  .infra7__rack.is-on { filter: drop-shadow(0 0 23px #42f4ff); }
-  .infra7__racknum { position: absolute; top: 1px; left: 3px; font-size: 6px; color: #ffdf52; letter-spacing: .05em; }
-  .infra7__slots { display: grid; gap: 2px; margin-top: 8px; }
-  .infra7__slots i { display: block; height: 3px; border-radius: 1px; background: repeating-linear-gradient(90deg, #3af3ff 0 3px, transparent 3px 6px); animation: infra7led 1.8s steps(3) infinite; animation-delay: var(--d); }
-  .infra7__slots i::before { content: ''; display: block; width: 3px; height: 3px; border-radius: 50%; background: #ffce39; margin-bottom: 1px; }
-  @keyframes infra7led { 0% { opacity: 1; } 33% { opacity: .55; } 66% { opacity: .85; } 100% { opacity: 1; } }
-  .infra7__core { position: absolute; left: 50%; top: 50%; translate: -50% -50%; width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle at 35% 30%, #ffe9a3, #ffcf31 55%, #b8860b); box-shadow: 0 0 26px rgba(255, 207, 49, .55); }
-  .infra7__core span { font-weight: 1000; font-size: 1.6rem; color: #06132e; }
-  .infra7__map { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 34%; opacity: .9; }
-  .infra7__mapline { fill: none; stroke: #33cafa; stroke-width: 2.2; stroke-dasharray: 4 5; opacity: .45; }
-  .infra7__mapflow { fill: none; stroke: #ffe360; stroke-width: 3; stroke-dasharray: 22 60; animation: infra7flow 3s linear infinite; }
-  @keyframes infra7flow { to { stroke-dashoffset: -82; } }
-  .infra7__mapnode { fill: #ffd13c; stroke: #a9f6ff; stroke-width: 1; }
-  .infra7__shared-tag { position: absolute; top: 12px; left: 12px; margin: 0; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #06121f; background: #ffd12e; border-radius: 999px; padding: 6px 12px; }
-  .infra7__shared-tag[hidden] { display: none; }
-  .infra7__caption { position: absolute; left: 16px; bottom: 12px; margin: 0; font-size: 0.78rem; color: #aebadd; background: rgba(6, 12, 28, 0.72); padding: 4px 10px; border-radius: 999px; }
-  /* Panel de explicación */
-  .infra7__panel { grid-column: 9 / 13; border: 1px solid var(--scene-border, rgba(128, 229, 255, 0.22)); border-radius: 24px; padding: var(--panel-pad, 28px); display: grid; gap: 12px; align-content: start; }
-  .infra7__panel h3 { margin: 0; font-size: clamp(22px, 2vw, 30px); line-height: 1.15; }
-  .infra7__panel p { margin: 0; line-height: 1.55; }
-  .infra7__detail { font-size: 0.9rem; opacity: 0.85; border-left: 3px solid var(--scene-accent, #80e5ff); padding-left: 12px; }
-  .infra7__cta { min-height: 48px; padding: 14px 22px; font-size: 16px; border-radius: 999px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
-  .infra7__cta:focus-visible { outline: 3px solid var(--scene-accent, #ffca34); outline-offset: 3px; }
-  /* Esquemas SVG como detalle opcional colapsado */
-  .infra7__schemes { border: 1px solid var(--scene-border, rgba(128,229,255,.22)); border-radius: 16px; padding: 12px 18px; }
-  .infra7__schemes summary { cursor: pointer; min-height: 44px; display: inline-flex; align-items: center; font-weight: 600; color: var(--scene-accent, #80e5ff); }
-  .infra7__schemes summary:focus-visible { outline: 3px solid var(--scene-accent, #ffca34); outline-offset: 3px; }
-  .infra7__scheme-stage { position: relative; aspect-ratio: 16 / 9; border-radius: 16px; overflow: hidden; background: #101a35; margin-top: 12px; }
-  .infra7__svg { position: absolute; inset: 0; transition: opacity 180ms ease; }
-  .infra7__svg[hidden] { display: block; opacity: 0; pointer-events: none; }
-  .infra7__svg:not([hidden]) { opacity: 1; }
-  .infra7__svg :global(svg) { display: block; width: 100%; height: 100%; }
-  .infra7__scheme-stage[data-mode='local-private'] #private-flow-0,
-  .infra7__scheme-stage[data-mode='local-private'] #private-flow-1,
-  .infra7__scheme-stage[data-mode='local-private'] #private-flow-2 { stroke-dasharray: 12 10; animation: infra7-flow 2.8s linear infinite; }
-  .infra7__scheme-stage[data-mode='local-collaborative'] #private-flow-0,
-  .infra7__scheme-stage[data-mode='local-collaborative'] #private-flow-1 { stroke-dasharray: 12 10; animation: infra7-flow 2.8s linear infinite; }
-  .infra7__scheme-stage[data-mode='local-collaborative'] #shared-service-flow,
-  .infra7__scheme-stage[data-mode='local-collaborative'] #external-flow { stroke-dasharray: 12 10; animation: infra7-flow 3.6s linear infinite; }
-  .infra7__scheme-stage[data-mode='managed-housing'] #business-flow { stroke-dasharray: 12 10; animation: infra7-flow 3s linear infinite; }
-  .infra7__scheme-stage[data-mode='distributed-network'] #route-primary { animation: infra7-flow 4s linear infinite, infra7-route-primary 8s linear infinite; }
-  .infra7__scheme-stage[data-mode='distributed-network'] #route-alternative { animation: infra7-route-alt 8s linear infinite; }
-  @keyframes infra7-flow { to { stroke-dashoffset: -44; } }
-  @keyframes infra7-route-primary { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0.45; } }
-  @keyframes infra7-route-alt { 0%, 49.9% { opacity: 0.45; } 50%, 100% { opacity: 1; } }
-  .infra7.is-paused [data-infra7-svg] *, .infra7.is-paused .infra7__slots i, .infra7.is-paused .infra7__mapflow { animation-play-state: paused !important; }
-  @media (prefers-reduced-motion: reduce) {
-    .infra7 [data-infra7-svg] *, .infra7__slots i, .infra7__mapflow { animation: none !important; }
-    .infra7__svg { transition: none; }
+  .infra7__mode[aria-pressed='true'] { background: var(--accent); color: #06121f; border-color: var(--accent); }
+  .infra7__mode:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+  .infra7__grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--gap-x, 32px); align-items: start; }
+  .infra7__stage {
+    position: relative;
+    min-height: 520px;
+    border-radius: 24px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: #0a1626; /* fondo petróleo */
   }
+  .infra7__canvas { display: block; width: 100%; height: 100%; min-height: 520px; }
+  .infra7__hotspots, .infra7__tags { position: absolute; inset: 0; pointer-events: none; }
+  .infra7__hotspot {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    background: rgba(128, 229, 255, 0.25);
+    cursor: pointer;
+    pointer-events: auto;
+    padding: 0;
+  }
+  .infra7__hotspot:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+  .infra7__tag {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #06121f;
+    background: #ffd12e;
+    border-radius: 999px;
+    padding: 4px 10px;
+    white-space: nowrap;
+  }
+  .infra7__tip {
+    position: absolute;
+    left: 12px; bottom: 12px; right: 12px;
+    margin: 0;
+    font-size: 0.8rem;
+    color: #eaf6ff;
+    background: rgba(6, 12, 28, 0.82);
+    padding: 8px 12px;
+    border-radius: 10px;
+    pointer-events: none;
+  }
+  .infra7__tip:empty { display: none; }
+  .infra7__stage-controls { position: absolute; top: 12px; right: 12px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+  .infra7__ctl {
+    min-height: 40px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: rgba(6, 12, 28, 0.8);
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .infra7__ctl[aria-pressed='true'] { background: var(--accent); color: #06121f; }
+  .infra7__ctl:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+
+  .infra7__panel { border: 1px solid var(--border); border-radius: 24px; padding: var(--panel-pad, 28px); display: grid; gap: 14px; align-content: start; background: rgba(6, 12, 28, 0.45); }
+  .infra7__panel-title { margin: 0; font-size: clamp(22px, 2.2vw, 30px); line-height: 1.15; font-weight: 800; }
+  .infra7__panel-body { margin: 0; color: var(--muted); line-height: 1.55; font-size: 0.95rem; }
+  .infra7__rows { margin: 0; display: grid; gap: 10px; }
+  .infra7__row { display: grid; gap: 2px; border-top: 1px solid var(--border); padding-top: 10px; }
+  .infra7__row dt { font-size: 0.76rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+  .infra7__row dd { margin: 0; font-size: 0.92rem; line-height: 1.55; color: var(--ink); }
+  .infra7__compare { color: var(--accent); font-size: 0.9rem; font-weight: 600; }
+  .infra7__cta {
+    min-height: 48px;
+    padding: 14px 22px;
+    font-size: 16px;
+    font-weight: 700;
+    border-radius: 999px;
+    background: #ffd12e;
+    color: #0a1730;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .infra7__cta:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+  .infra7__schemes { font-size: 0.85rem; }
+  .infra7__schemes summary { cursor: pointer; font-weight: 600; color: var(--accent); min-height: 28px; padding-inline-end: 32px; }
+  .infra7__schemes summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+  .infra7__scheme-stage { margin-top: 10px; display: grid; }
+  .infra7__svg[hidden] { display: none; }
+  .infra7__svg :global(svg) { width: 100%; height: auto; }
+
   @media (max-width: 1023px) {
-    .infra7__modes { grid-template-columns: 1fr 1fr; gap: 12px; }
-    .infra7__body { grid-template-columns: 1fr; gap: 24px; }
-    .infra7__stage, .infra7__panel { grid-column: auto; }
-    .infra7__panel { padding: var(--panel-pad, 20px); }
-    .infra7__city { height: 260px; }
+    .infra7__grid { grid-template-columns: 1fr; }
+    .infra7__stage { min-height: 420px; }
+    .infra7__canvas { min-height: 420px; }
   }
   @media (max-width: 639px) {
-    .infra7 { gap: 24px; }
-    .infra7__modes { grid-template-columns: 1fr 1fr; gap: 10px; }
-    .infra7__lead { font-size: 16px; }
+    .infra7__stage { min-height: 320px; }
+    .infra7__canvas { min-height: 320px; }
+    .infra7__title { font-size: clamp(34px, 9vw, 44px); }
   }
 </style>

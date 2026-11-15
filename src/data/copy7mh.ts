@@ -157,3 +157,59 @@ export const HERO_ENTERPRISE_CTA_7MH = {
   line2: 'O ESTOY EN CAMINO DE SERLO',
   label: 'SOY UNA GRAN EMPRESA, O ESTOY EN CAMINO DE SERLO',
 } as const;
+
+/** 7M-H §7: filas del panel de E03 por modalidad (siempre visibles). */
+export interface InfraRow { label: string; text: string }
+export const INFRA_ROWS_7MH: Record<string, InfraRow[]> = {
+  'local-private': [
+    { label: 'Dónde trabaja', text: 'En equipos de tu organización, conectados con tus puestos de trabajo.' },
+    { label: 'Qué puedes integrar', text: 'Consulta de documentos internos, asistentes para tu equipo y automatizaciones conectadas a tus sistemas.' },
+    { label: 'Qué controlas', text: 'Usuarios, fuentes de información, permisos y conexiones externas autorizadas.' },
+    { label: 'Qué hay que preparar', text: 'Equipo, modelos, respaldos y mantenimiento. La capacidad se dimensiona según las tareas y la cantidad de usuarios.' },
+  ],
+  'local-collaborative': [
+    { label: 'Dónde trabaja', text: 'En tu infraestructura local, con servicios concretos habilitados para colaborar con otros.' },
+    { label: 'Qué puedes integrar', text: 'Asistentes internos y tareas autorizadas de otros equipos o participantes de la red.' },
+    { label: 'Qué controlas', text: 'Qué servicio compartes, a quién se lo ofreces y qué recursos puede utilizar. Compartir capacidad no significa abrir todos tus documentos.' },
+    { label: 'Qué hay que preparar', text: 'Aislamiento, cuotas y prioridades para que la colaboración respete los recursos reservados a tu operación.' },
+  ],
+  'managed-housing': [
+    { label: 'Dónde trabaja', text: 'En equipos administrados por Publia a los que accedes mediante tus aplicaciones e interfaces.' },
+    { label: 'Qué puedes integrar', text: 'Agentes, atención por mensajería, automatizaciones y servicios del negocio, según la configuración contratada.' },
+    { label: 'Qué controlas', text: 'El alcance de tus herramientas, los usuarios autorizados y la modalidad de recursos compartidos o privados.' },
+    { label: 'Qué hay que preparar', text: 'Dimensionar hardware, conectividad, respaldos y acompañamiento. La siguiente comparación explica cómo se reparte la capacidad.' },
+  ],
+  'distributed-network': [
+    { label: 'Dónde trabaja', text: 'En varios nodos conectados, ubicados en diferentes equipos o lugares.' },
+    { label: 'Qué puedes integrar', text: 'Servicios especializados y tareas que pueden dirigirse a distintos nodos según permisos y disponibilidad.' },
+    { label: 'Qué controlas', text: 'Qué tareas salen de cada entorno, qué información necesitan y qué nodo está autorizado para procesarlas.' },
+    { label: 'Qué hay que preparar', text: 'Coordinación, conectividad y rutas alternativas. Conectar nodos no suma automáticamente su memoria ni garantiza continuidad.' },
+  ],
+};
+
+/** 7M-H §7: hotspots del stage E03. */
+export const INFRA_HOTSPOTS_7MH: Record<string, string> = {
+  desk: 'Puesto de trabajo: aquí tu equipo consulta y utiliza las herramientas.',
+  server: 'Servidor: aquí se ejecutan los servicios de este escenario.',
+  doc: 'Datos del negocio: el acceso depende de los permisos configurados.',
+  link: 'Conexión autorizada: transporta las solicitudes de este servicio.',
+};
+
+export const INFRA_STAGE_7MH = {
+  taskRun: 'Ver recorrido de una tarea',
+  pause: 'Pausa',
+  resume: 'Reanudar',
+  altRoute: 'Ver ruta alternativa',
+  altRouteOn: 'Ruta alternativa configurada',
+  compareLink: 'Comparar recursos compartidos y privados',
+  stageLabel: 'Escenario 3D ilustrativo de dónde trabaja tu información',
+} as const;
+
+/** 7M-H §6: H2 de E03 en dos líneas con color. */
+export const E03_TITLE_7MH = {
+  line1: 'Soberanía digital.',
+  line2: 'Tu tecnología, bajo tus reglas.',
+  line1Color: '#F4F7FF',
+  line2Color: '#80E5FF',
+  bg: '#020910',
+} as const;
