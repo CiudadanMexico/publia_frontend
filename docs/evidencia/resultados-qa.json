@@ -111,32 +111,32 @@
     {
       "name": "transición enterprise: la cámara viaja a otro mundo del mismo universo",
       "ok": true,
-      "detail": "mundo hero→enterprise · cámara [0,2.4,11.6]→[2.493687707641196,1.8601328903654484,8.388621262458472] · tinte #050b1b→#0a0e18"
+      "detail": "mundo hero→enterprise · cámara [0,2.4,11.6]→[2.7561461794019935,1.9585548172757474,8.60186877076412] · tinte #050b1b→#0a0e18"
     },
     {
       "name": "transición enterprise: el contenido de la escena destino aparece",
       "ok": true,
-      "detail": "scrollY 1760 · act=enterprise"
+      "detail": "scrollY 1485 · act=enterprise"
     },
     {
       "name": "transición enterprise: volver regresa al hero sin recargar",
       "ok": true,
-      "detail": "world=hero · act=hero · scrollY 7"
+      "detail": "world=hero · act=hero · scrollY 40"
     },
     {
       "name": "transición efficiency: la cámara viaja a otro mundo del mismo universo",
       "ok": true,
-      "detail": "mundo hero→efficiency · cámara [0,2.4,11.6]→[-2.3333935018050544,1.823826714801444,8.609566787003612] · tinte #050b1b→#0d0a05"
+      "detail": "mundo hero→efficiency · cámara [0,2.4,11.6]→[-2.412996389891697,1.8465703971119132,8.666425992779784] · tinte #050b1b→#0d0a05"
     },
     {
       "name": "transición efficiency: el contenido de la escena destino aparece",
       "ok": true,
-      "detail": "scrollY 1761 · act=efficiency"
+      "detail": "scrollY 1716 · act=efficiency"
     },
     {
       "name": "transición efficiency: volver regresa al hero sin recargar",
       "ok": true,
-      "detail": "world=hero · act=hero · scrollY 12"
+      "detail": "world=hero · act=hero · scrollY 45"
     },
     {
       "name": "transición cooperative: la cámara viaja a otro mundo del mismo universo",
@@ -151,7 +151,7 @@
     {
       "name": "transición cooperative: volver regresa al hero sin recargar",
       "ok": true,
-      "detail": "world=hero · act=hero · scrollY 16"
+      "detail": "world=hero · act=hero · scrollY 68"
     },
     {
       "name": "P0: sólo dos botones principales en el hero (la tercera ruta es por scroll)",
@@ -176,7 +176,7 @@
     {
       "name": "P0: el scroll conduce la cámara (scrub) hacia el mundo cooperativo",
       "ok": true,
-      "detail": "world=cooperative · cámara=[0,1.5,8.8] · scrollY=18300"
+      "detail": "world=cooperative · cámara=[0,2.5306399118776732,11.449819296860142] · scrollY=2800"
     },
     {
       "name": "P0: tras elegir empresa, el scroll NO cambia a exploración",
@@ -286,7 +286,7 @@
     {
       "name": "ruta eficiencia: escena propia visible",
       "ok": true,
-      "detail": "1167px · route=efficiency act=efficiency world=efficiency scrollY=96"
+      "detail": "1167px · route=efficiency act=efficiency world=hero scrollY=50"
     },
     {
       "name": "ruta eficiencia: mensaje propio de la escena",
@@ -306,7 +306,7 @@
     {
       "name": "cambio de ruta: regresa al hero",
       "ok": true,
-      "detail": "scrollY 22"
+      "detail": "scrollY 41"
     },
     {
       "name": "ruta exploración: se activa por scroll natural",
@@ -541,7 +541,7 @@
     {
       "name": "v3 scroll: la cámara se transforma en 30/60/90% (ida)",
       "ok": true,
-      "detail": "30=[-0.02956810631229234,2.1764119385279534,10.42222581855954] 60=[0,2.0380952257495597,10.24349200917108] 90=[0,1.5499999969135803,9.019999986419755]"
+      "detail": "30=[-0.4946843853820597,1.980388396938824,9.9492571192883] 60=[0,2.0380952257495597,10.24349200917108] 90=[0,1.5499999969135803,9.019999986419755]"
     },
     {
       "name": "v3 scroll: recorrido inverso mueve la cámara en sentido inverso (reversible)",
@@ -691,12 +691,12 @@
     {
       "name": "7M-I E07: arranque automático sin clic — etapa activa y contador avanzando (4 etapas cíclicas)",
       "ok": true,
-      "detail": "{\"a\":{\"count\":\"03\",\"active\":1},\"b\":{\"count\":\"04\",\"feed\":\"Queda registro y seguimiento visible.\"}}"
+      "detail": "{\"a\":{\"count\":\"04\",\"active\":1},\"b\":{\"count\":\"01\",\"feed\":\"Llega la consulta al canal elegido.\"}}"
     },
     {
       "name": "7M-I E07: 4 ciclos consecutivos completos (3→0 contado ≥3 en ~32 s con etapa siempre activa; ciclo ≈6 s)",
       "ok": true,
-      "detail": "seq=3001123001122330122330112233001123 wraps=5 alive=34"
+      "detail": "seq=1123012330012301123301122330123301 wraps=6 alive=34"
     },
     {
       "name": "V4-B E11 personas+IA en marfil (cream)",
@@ -705,8 +705,8 @@
     },
     {
       "name": "V4-B cierre: recomendación con >=3 items",
-      "ok": false,
-      "detail": "items=0 status=Preparando tu resumen…"
+      "ok": true,
+      "detail": "items=4 status=Tu recorrido: ruta Empresa. Estos son los siguientes pasos q"
     },
     {
       "name": "cierre V2: botón copiar resumen presente",
@@ -881,7 +881,7 @@
     {
       "name": "v4-A transición botón: cámara cambia en 3 momentos (inicio/medio/fin)",
       "ok": true,
-      "detail": "0=[] mid=[2.893687707641196,2.01013 fin=[2.4916943521594686,1.8593"
+      "detail": "0=[] mid=[2.8883720930232557,2.0081 fin=[2.4916943521594686,1.8593"
     },
     {
       "name": "v4-A transición botón: portal visible a mitad del viaje",
@@ -926,7 +926,7 @@
     {
       "name": "portal: oculto tras aterrizar (ruta botón)",
       "ok": true,
-      "detail": "{\"progress\":\"0\",\"maxOp\":0.0009,\"visible\":false}"
+      "detail": "{\"progress\":\"0\",\"maxOp\":0,\"visible\":false}"
     },
     {
       "name": "7M-H E03: stage 3D con canvas visible (≥520px alto desktop) y panel con 4 filas",
@@ -1285,8 +1285,8 @@
     },
     {
       "name": "7M-G hero: rebote real — CTA suben a yNear (p=0.12) y bajan a yLow (p=0.25)",
-      "ok": true,
-      "detail": "{\"ok\":true,\"p10\":104.00180053710938,\"p25\":558,\"top0\":533.3931884765625,\"navbarH\":64,\"H\":900,\"topNear\":104,\"topLow\":558,\"drop\":453.9981994628906}"
+      "ok": false,
+      "detail": "{\"ok\":true,\"p10\":198.16650390625,\"p25\":557.9993896484375,\"top0\":533.3914794921875,\"navbarH\":64,\"H\":900,\"topNear\":104,\"topLow\":558,\"drop\":359.8328857421875}"
     },
     {
       "name": "7M-G hero: elegir ruta durante el pin lo cancela y aterriza",
