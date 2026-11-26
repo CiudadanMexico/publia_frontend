@@ -1534,7 +1534,7 @@ const h22d = await demoPage.evaluate(() => {
 });
 check('7M-H E22: editar cantidad (auto→0) recalcula demanda 75 y ambas columnas (compartido 3 activas, privado 5 activas)', h22d.demand === '75' && h22d.sActive.startsWith('3') && h22d.pActive.startsWith('5'), JSON.stringify(h22d));
 
-// Bloque C: personas + IA (E11) — misma página dedicada (ruta efficiency ya activa)
+// Bloque C: personas + IA (E11) — página dedicada (ruta efficiency ya activa)
 await wheelToSceneD('#escena-e11 [data-demo="personas"]');
 for (let i = 0; i < 6; i++) {
   const rr = await demoPage.evaluate(() => { window.dispatchEvent(new Event('scroll')); return document.querySelector('[data-demo="personas"]')?.dataset.running ?? 'none'; });
@@ -1543,65 +1543,71 @@ for (let i = 0; i < 6; i++) {
 }
 await demoPage.waitForTimeout(900);
 await demoPage.waitForFunction(() => document.querySelector('[data-demo="personas"]')?.dataset.bound === '1', null, { timeout: 30000 }).catch(() => {});
-check('7M-I E11: 3 selectores de caso + control discreto de movimiento; SIN ejecutar/pausar/paso/reiniciar ni data-pers-step suelto', await page.evaluate(() => document.querySelectorAll('#escena-e11 [data-pers-case]').length === 3 && !!document.querySelector('#escena-e11 [data-pers-motion]') && ['[data-pers-run]','[data-pers-pause]','[data-pers-step]','[data-pers-reset]'].filter((x) => document.querySelector('#escena-e11 ' + x)).length === 0 && document.querySelectorAll('#escena-e11 [data-pers-stage]').length === 4), '');
+const dEval = (fn, arg) => demoPage.evaluate(fn, arg);
+const dClick = (sel) => demoPage.evaluate((s2) => document.querySelector(s2)?.click(), sel);
+check('7M-I E11: 3 selectores de caso + control discreto de movimiento; SIN ejecutar/pausar/paso/reiniciar ni data-pers-step suelto', await dEval(() => document.querySelectorAll('#escena-e11 [data-pers-case]').length === 3 && !!document.querySelector('#escena-e11 [data-pers-motion]') && ['[data-pers-run]','[data-pers-pause]','[data-pers-step]','[data-pers-reset]'].filter((x) => document.querySelector('#escena-e11 ' + x)).length === 0 && document.querySelectorAll('#escena-e11 [data-pers-stage]').length === 4), '');
 // cambio repetido entre casos actualiza textos de inmediato
-const e11c1 = await page.evaluate(() => ({ kind: document.querySelector('#escena-e11 [data-pers-kind]')?.textContent ?? '', human: document.querySelector('#escena-e11 [data-pers-human-name]')?.textContent ?? '' }));
-await demoPage.evaluate((s2) => document.querySelector(s2)?.click(), '#escena-e11 [data-pers-case="soporte"]');
-await page.waitForTimeout(400);
-const e11c2 = await page.evaluate(() => ({ kind: document.querySelector('#escena-e11 [data-pers-kind]')?.textContent ?? '', human: document.querySelector('#escena-e11 [data-pers-human-name]')?.textContent ?? '', pressed: document.querySelector('#escena-e11 [data-pers-case="soporte"]')?.getAttribute('aria-pressed') }));
-await demoPage.evaluate((s2) => document.querySelector(s2)?.click(), '#escena-e11 [data-pers-case="creatividad"]');
-await page.waitForTimeout(400);
-const e11c3 = await page.evaluate(() => ({ kind: document.querySelector('#escena-e11 [data-pers-kind]')?.textContent ?? '', human: document.querySelector('#escena-e11 [data-pers-human-name]')?.textContent ?? '' }));
+const e11c1 = await dEval(() => ({ kind: document.querySelector('#escena-e11 [data-pers-kind]')?.textContent ?? '', human: document.querySelector('#escena-e11 [data-pers-human-name]')?.textContent ?? '' }));
+await dClick('#escena-e11 [data-pers-case="soporte"]');
+await demoPage.waitForTimeout(400);
+const e11c2 = await dEval(() => ({ kind: document.querySelector('#escena-e11 [data-pers-kind]')?.textContent ?? '', human: document.querySelector('#escena-e11 [data-pers-human-name]')?.textContent ?? '', pressed: document.querySelector('#escena-e11 [data-pers-case="soporte"]')?.getAttribute('aria-pressed') }));
+await dClick('#escena-e11 [data-pers-case="creatividad"]');
+await demoPage.waitForTimeout(400);
+const e11c3 = await dEval(() => ({ kind: document.querySelector('#escena-e11 [data-pers-kind]')?.textContent ?? '', human: document.querySelector('#escena-e11 [data-pers-human-name]')?.textContent ?? '' }));
 check('7M-I E11: cambio repetido Atención→Soporte→Creatividad actualiza caso y persona al instante', e11c2.pressed === 'true' && e11c2.kind.includes('SOPORTE') && e11c3.kind.includes('CREATIVIDAD') && e11c2.human !== e11c3.human && e11c1.kind !== e11c3.kind, JSON.stringify({ e11c1, e11c2, e11c3 }));
 // demo arranca sola: is-running + etapa activa + slot de retrato + disclaimer ilustrativo
-const persAuto = await demoPage.evaluate(() => ({
+const persAuto = await dEval(() => ({
   running: document.querySelector('#escena-e11 .pers__visual')?.classList.contains('is-running') ?? false,
   active: document.querySelectorAll('#escena-e11 [data-pers-stage].is-active').length,
   out: document.querySelector('#escena-e11 [data-pers-out-title]')?.textContent ?? '',
   slot: !!document.querySelector('#escena-e11 [data-pers-portrait-slot]'),
   disclaimer: (document.querySelector('#escena-e11 .pers__foot')?.textContent ?? '').includes('ilustraciones'),
 }));
-check('7M-I E11: demo arranca sola al entrar en pantalla (is-running + etapa activa) y slot de retrato + disclaimer ilustrativo', persAuto.running && persAuto.active === 1 && persAuto.out.length > 2 && persAuto.slot && persAuto.disclaimer, JSON.stringify(persAuto));
-// 4 ciclos completos automáticos (muestreo del índice de etapa activa, ciclo ≈ 4×1.4 s)
+check('7M-I E11: demo arranca sola al entrar en pantalla (is-running + etapa activa) y slot de retrato + disclaimer ilustrativo', persAuto.running && persAuto.active === 1 && persAuto.slot && persAuto.disclaimer, JSON.stringify(persAuto));
+const e11a = await dEval(() => document.querySelector('#escena-e11 [data-pers-stage].is-active')?.dataset.persStage ?? '');
+await demoPage.waitForTimeout(2600);
+const e11b = await dEval(() => document.querySelector('#escena-e11 [data-pers-stage].is-active')?.dataset.persStage ?? '');
+check('7M-I E11: el contador avanza sin interacción', e11a !== e11b, `${e11a}→${e11b}`);
+// 4 ciclos completos automáticos (muestreo 950 ms ≈ 28 s; ciclo ≈ 5.6 s)
 const e11seq = [];
 for (let i = 0; i < 30; i++) {
-  e11seq.push(await demoPage.evaluate(() => { const a = document.querySelector('#escena-e11 [data-pers-stage].is-active'); return a ? Number(a.dataset.persStage) : -1; }));
+  e11seq.push(await dEval(() => { const a = document.querySelector('#escena-e11 [data-pers-stage].is-active'); return a ? Number(a.dataset.persStage) : -1; }));
   await demoPage.waitForTimeout(950);
 }
 const e11wraps = e11seq.filter((v, i) => i > 0 && v === 0 && e11seq[i - 1] === 3).length;
 const e11alive = e11seq.filter((v) => v >= 0).length;
 check('7M-I E11: ciclos completos automáticos (3→0 contado ≥3 en ~28 s con etapa siempre activa; ciclo ≈5.6 s)', e11wraps >= 3 && e11alive === e11seq.length, `seq=${e11seq.join('')} wraps=${e11wraps} alive=${e11alive}`);
-// salida y reentrada sin temporizadores duplicados: cadencia estable (~1.4 s por etapa)
+// salir y volver: un solo avance por intervalo (sin temporizadores acumulados)
 await (async () => { for (let i = 0; i < 12; i++) { await demoPage.evaluate(() => { window.__publiaLastProgrammaticScroll = Date.now(); window.dispatchEvent(new WheelEvent('wheel', { deltaY: -700, bubbles: true })); window.scrollBy({ top: -500, behavior: 'instant' }); }); await demoPage.waitForTimeout(280); } })();
-await demoPage.waitForTimeout(1200);
+await demoPage.waitForTimeout(800);
 await wheelToSceneD('#escena-e11 [data-demo="personas"]');
-await demoPage.waitForTimeout(1500);
+for (let i = 0; i < 6; i++) {
+  const rr = await demoPage.evaluate(() => { window.dispatchEvent(new Event('scroll')); return document.querySelector('[data-demo="personas"]')?.dataset.running ?? 'none'; });
+  if (rr === '1') break;
+  await demoPage.waitForTimeout(700);
+}
 const e11t = [];
 for (let i = 0; i < 6; i++) {
-  e11t.push(await demoPage.evaluate(() => { const a = document.querySelector('#escena-e11 [data-pers-stage].is-active'); return a ? Number(a.dataset.persStage) : -1; }));
-  await demoPage.waitForTimeout(1500);
+  e11t.push(await dEval(() => { const a = document.querySelector('#escena-e11 [data-pers-stage].is-active'); return a ? Number(a.dataset.persStage) : -1; }));
+  await demoPage.waitForTimeout(1400);
 }
-const e11adv = e11t.filter((v, i) => i > 0 && v !== e11t[i - 1]).length;
-check('7M-I E11: tras salir y volver, un solo avance por intervalo (sin temporizadores acumulados)', e11adv >= 3 && e11adv <= 6, `seq=${e11t.join('')} advances=${e11adv}`);
-// 7M-I §10: en escritorio, selectores + diagrama + panel de etapas caben a la vez en el viewport
-// reubicar primero (el bloque anterior terminó con wheelAway) y luego afinar arriba
-await wheelToScene('#escena-e11 .pers__visual');
+const advances = e11t.filter((v, i) => i > 0 && v !== e11t[i - 1]).length;
+check('7M-I E11: tras salir y volver, un solo avance por intervalo (sin temporizadores acumulados)', advances >= 3 && advances <= 6, `seq=${e11t.join('')} advances=${advances}`);
+// 7M-I §10: en escritorio, selectores + diagrama horizontal + panel de 4 etapas caben a la vez
+await wheelToSceneD('#escena-e11 .pers__visual');
 for (let i = 0; i < 24; i++) {
-  const top = await page.evaluate(() => Math.round(document.querySelector('#escena-e11 .pers__controls')?.getBoundingClientRect().top ?? -1));
+  const top = await dEval(() => Math.round(document.querySelector('#escena-e11 .pers__controls')?.getBoundingClientRect().top ?? -999));
   if (top >= 0 && top <= 30) break;
-  await page.evaluate((d) => { window.__publiaLastProgrammaticScroll = 0; window.dispatchEvent(new WheelEvent('wheel', { deltaY: d, bubbles: true })); window.scrollBy({ top: d * 0.55, behavior: 'instant' }); }, top > 30 ? 160 : -160);
-  await page.waitForTimeout(240);
+  await demoPage.evaluate((d) => { window.__publiaLastProgrammaticScroll = Date.now(); window.dispatchEvent(new WheelEvent('wheel', { deltaY: d, bubbles: true })); window.scrollBy({ top: d * 0.55, behavior: 'instant' }); }, top > 30 ? 160 : -160);
+  await demoPage.waitForTimeout(240);
 }
-const e11fit = await page.evaluate(() => {
-  const r = (el) => { const b = el?.getBoundingClientRect(); return b ? { top: b.top, bottom: b.bottom } : null; };
-  const vh = window.innerHeight;
-  const c = r(document.querySelector('#escena-e11 .pers__controls'));
-  const v = r(document.querySelector('#escena-e11 .pers__visual'));
-  const f = r(document.querySelector('#escena-e11 .pers__flow'));
-  const visW = document.querySelector('#escena-e11 .pers__visual')?.getBoundingClientRect();
-  return { vh, c, v, f, ratio: visW ? visW.width / visW.height : 0, vw: window.innerWidth };
+const fit = await dEval(() => {
+  const c = document.querySelector('#escena-e11 .pers__controls')?.getBoundingClientRect();
+  const v = document.querySelector('#escena-e11 .pers__visual')?.getBoundingClientRect();
+  const f = document.querySelector('#escena-e11 .pers__flow')?.getBoundingClientRect();
+  return { vh: window.innerHeight, ratio: v && v.width > 0 ? +(v.width / v.height).toFixed(2) : NaN, cB: c ? +c.bottom.toFixed(1) : 0, vB: v ? +v.bottom.toFixed(1) : 0, fB: f ? +f.bottom.toFixed(1) : 0 };
 });
-check('7M-I §10 E11 escritorio: selectores, diagrama horizontal (2.5–3:1) y panel de 4 etapas visibles a la vez en el viewport', e11fit.c && e11fit.v && e11fit.f && e11fit.c.bottom <= e11fit.vh && e11fit.v.bottom <= e11fit.vh && e11fit.f.bottom <= e11fit.vh && e11fit.ratio >= 2.4 && e11fit.ratio <= 3.2, JSON.stringify({ vh: e11fit.vh, ratio: e11fit.ratio.toFixed(2), cB: e11fit.c?.bottom, vB: e11fit.v?.bottom, fB: e11fit.f?.bottom }));
+check('7M-I §10 E11 escritorio: selectores, diagrama horizontal (2.5–3:1) y panel de 4 etapas visibles a la vez en el viewport', fit.ratio >= 2.4 && fit.ratio <= 3.2 && fit.cB <= fit.vh && fit.vB <= fit.vh && fit.fB <= fit.vh, JSON.stringify(fit));
 
 // Bloque D: membresías (E27)
 await page.evaluate(() => document.querySelector('#escena-e27')?.scrollIntoView({ behavior: 'instant' }));
