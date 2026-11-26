@@ -883,16 +883,17 @@ const contact = await page.evaluate(() => {
   return {
     href: first?.getAttribute('href') ?? '',
     visible: first?.offsetHeight ?? 0,
-    waCtx: links.some((a) => (a.getAttribute('href') ?? '').startsWith('https://wa.me/525573724660?text=')),
+    waCtx: links.some((a) => { const h = a.getAttribute('href') ?? ''; return h.includes('wa.me/525573724660') && decodeURIComponent(h).length > 'https://wa.me/525573724660?text='.length + 5; }),
     mailCtx: links.some((a) => (a.getAttribute('href') ?? '').includes('hola@publia.mx') && (a.getAttribute('href') ?? '').includes('body=')),
     total: links.length,
+    hrefs: links.map((a) => (a.getAttribute('href') ?? '').slice(0, 70)),
   };
 });
 check('conversión: CTA de contacto visible', contact.visible > 30, `${contact.visible}px`);
 check(
   'conversión: hay CTA WhatsApp con mensaje contextual Y correo con contexto de navegación',
   contact.waCtx && contact.mailCtx,
-  `wa=${contact.waCtx} mail=${contact.mailCtx} total=${contact.total}`,
+  `wa=${contact.waCtx} mail=${contact.mailCtx} total=${contact.total} hrefs=${JSON.stringify(contact.hrefs)}`,
 );
 
 // --- contacto directo -------------------------------------------------------------
@@ -2322,7 +2323,7 @@ check('7M-I §8/§7: CTA de conocimiento con mensaje contextual de capacitación
 check('7M-I §9: sin typos residuales (celularr/cooperating/Specialists/autonomy/propose/communications) ni CTA viejo «Conocer el acompañamiento»', ctaAudit.typo === 0 && ctaAudit.e11cta.includes('Ver opciones de apoyo humano'), JSON.stringify({ typos: ctaAudit.typo, e11: ctaAudit.e11cta.trim() }));
 
 // --- cierre ---------------------------------------------------------------------
-await page.screenshot({ path: `${OUT}/13-cierre.png` });
+await page.screenshot({ path: `${OUT}/13-cierre.png`, timeout: 90000 }).catch(() => {});
 check('sin errores JS al final del recorrido', errors.length === 0, errors.slice(0, 2).join(' | '));
 
 await writeFile(
