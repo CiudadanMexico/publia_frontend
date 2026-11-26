@@ -460,7 +460,7 @@ async function transitionProbe(act) {
     await page.evaluate(() => {
       try { sessionStorage.clear(); } catch {}
     });
-    await page.reload({ waitUntil: 'domcontentloaded', timeout: 90000 });
+    await page.reload({ waitUntil: 'load', timeout: 90000 }).catch(() => {}); await page.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'hero', null, { timeout: 60000 }).catch(() => {}); await page.waitForTimeout(2500);;
     await waitUniverse(); await page.waitForTimeout(1200);
     await pscroll(0);
     await page.mouse.move(680, 400);
@@ -680,7 +680,7 @@ const waitBound = (sel) => page.waitForFunction((s2) => document.querySelector(s
 await page.evaluate(() => {
   try { sessionStorage.clear(); } catch {}
 });
-await page.reload({ waitUntil: 'domcontentloaded', timeout: 90000 });
+await page.reload({ waitUntil: 'load', timeout: 90000 }).catch(() => {}); await page.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'hero', null, { timeout: 60000 }).catch(() => {}); await page.waitForTimeout(2500);;
 await page.waitForTimeout(3000);
 const perspectiveNeutral = await page.evaluate(
   () => document.querySelector('#escena-e02 [data-role="title"]')?.textContent?.trim() ?? '',
@@ -756,7 +756,7 @@ for (let i = 0; i < 5 && resetRoute !== 'unclassified'; i++) {
 if (resetRoute !== 'unclassified') {
   // fallback: estado fresco garantizado
   await page.evaluate(() => { try { sessionStorage.clear(); } catch {} });
-  await page.reload({ waitUntil: 'domcontentloaded', timeout: 90000 });
+  await page.reload({ waitUntil: 'load', timeout: 90000 }).catch(() => {}); await page.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'hero', null, { timeout: 60000 }).catch(() => {}); await page.waitForTimeout(2500);;
   await waitUniverse();
   await page.waitForTimeout(1000);
   resetRoute = await page.evaluate(() => document.documentElement.dataset.route);
@@ -781,7 +781,7 @@ await page.evaluate(() => {
   try { sessionStorage.clear(); } catch {}
   window.scrollTo({ top: 0, behavior: 'instant' });
 });
-await page.reload({ waitUntil: 'domcontentloaded', timeout: 90000 });
+await page.reload({ waitUntil: 'load', timeout: 90000 }).catch(() => {}); await page.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'hero', null, { timeout: 60000 }).catch(() => {}); await page.waitForTimeout(2500);;
 await page.waitForTimeout(3000);
 await page.mouse.move(680, 400);
 for (let i = 0; i < 6; i += 1) {
@@ -1124,7 +1124,7 @@ check(
 
 // Scroll continuo 7M-G: dentro del pin de 18 pantallas la cámara conduce por progreso del pin.
 await page.evaluate(() => { try { sessionStorage.clear(); } catch {} });
-await page.reload({ waitUntil: 'domcontentloaded', timeout: 90000 }).catch(() => {});
+await page.reload({ waitUntil: 'load', timeout: 90000 }).catch(() => {}); await page.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'hero', null, { timeout: 60000 }).catch(() => {}); await page.waitForTimeout(2500);
 await page.waitForTimeout(2600);
 await wheelUntilExplorer();
 const pinSpan = await page.evaluate(() => {
@@ -1367,6 +1367,7 @@ check('7M-G E25: Ecología (nodo 6) operativa con textos definitivos y CTA wa', 
 // página dedicada (visible) + ruta eficiencia (E07 es exclusiva de esa ruta)
 const demoPage = await browser.newPage({ viewport: { width: 1440, height: 900 } });
 demoPage.setDefaultTimeout(90000);
+demoPage.on('pageerror', (e) => console.log('DEMOPAGE-ERROR', String(e).slice(0, 200)));
 const dgoto = async () => {
   await demoPage.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 90000 }).catch(() => {});
   await demoPage.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'hero', null, { timeout: 60000 }).catch(() => {});
@@ -1783,7 +1784,7 @@ await clickJs('#escena-e22 [data-housing-run]');
 await page.waitForTimeout(1200);
 const hSeq = await page.evaluate(() => ({ status: document.querySelector('#escena-e22 [data-housing-status]')?.textContent ?? '', on: document.querySelectorAll('#escena-e22 .housing7__chip--on').length }));
 check('7M-H housing: «Ver cómo se reparte el trabajo» inicia la secuencia y revela chips en proceso', hSeq.status.length > 3 && hSeq.on >= 3, JSON.stringify(hSeq));
-await page.reload({ waitUntil: 'domcontentloaded', timeout: 90000 });
+await page.reload({ waitUntil: 'load', timeout: 90000 }).catch(() => {}); await page.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'hero', null, { timeout: 60000 }).catch(() => {}); await page.waitForTimeout(2500);;
 await page.waitForTimeout(2200);
 await page.evaluate(() => document.querySelector('#escena-e22')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
 await waitBound('[data-demo="housing"]');
@@ -1813,7 +1814,7 @@ await waitBound('[data-demo="red"]');
 await clickJs('#escena-e15 [data-red-node="2"]');
 await page.waitForTimeout(400);
 check('7M-C red: clic en nodo persiste en estado', (await sceneState()).red === 'sitios', JSON.stringify((await sceneState()).red));
-await page.reload({ waitUntil: 'domcontentloaded', timeout: 90000 });
+await page.reload({ waitUntil: 'load', timeout: 90000 }).catch(() => {}); await page.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'hero', null, { timeout: 60000 }).catch(() => {}); await page.waitForTimeout(2500);;
 await page.waitForTimeout(2200);
 await page.evaluate(() => document.querySelector('#escena-e15')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
 await waitBound('[data-demo="red"]');
@@ -1893,7 +1894,7 @@ const afterDemo = await page.evaluate(() => ({
 }));
 check('7M-D P0-01: tras completar la demo, state.red conserva el nodo 3', afterDemo.red === 'sitios', JSON.stringify(afterDemo));
 check('7M-D P0-01: al terminar la demo el foco visual vuelve a la capacidad elegida', afterDemo.pressed === 'true', `pressed=${afterDemo.pressed}`);
-await page.reload({ waitUntil: 'domcontentloaded', timeout: 90000 });
+await page.reload({ waitUntil: 'load', timeout: 90000 }).catch(() => {}); await page.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'hero', null, { timeout: 60000 }).catch(() => {}); await page.waitForTimeout(2500);;
 await page.waitForTimeout(2200);
 await page.evaluate(() => document.querySelector('#escena-e15')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
 await waitBound('[data-demo="red"]');
@@ -2024,7 +2025,7 @@ for (const r of ['enterprise', 'efficiency', 'explorer']) {
 }
 // recarga conserva exploreAll
 await page.evaluate(() => document.querySelector('[data-explore-toggle]')?.click());
-await page.reload({ waitUntil: 'domcontentloaded', timeout: 90000 });
+await page.reload({ waitUntil: 'load', timeout: 90000 }).catch(() => {}); await page.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'hero', null, { timeout: 60000 }).catch(() => {}); await page.waitForTimeout(2500);;
 await page.waitForTimeout(2200);
 check('7M-E exploreAll sobrevive a la recarga (html[data-explore=all])', await page.evaluate(() => document.documentElement.dataset.explore === 'all'));
 await page.evaluate(() => document.querySelector('[data-explore-toggle]')?.click());
@@ -2044,7 +2045,7 @@ const ecoSelE = (await sceneState()).answers.servicio;
 await clickJs('#escena-e25 [data-eco-play]');
 await page.waitForTimeout(2600);
 check('7M-E P0-01: la demo no sobrescribe el servicio elegido', (await sceneState()).answers?.servicio === ecoSelE);
-await page.reload({ waitUntil: 'domcontentloaded', timeout: 90000 });
+await page.reload({ waitUntil: 'load', timeout: 90000 }).catch(() => {}); await page.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'hero', null, { timeout: 60000 }).catch(() => {}); await page.waitForTimeout(2500);;
 await page.waitForTimeout(2200);
 await page.evaluate(() => document.querySelector('#escena-e25')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
 await waitBound('[data-demo="ecosystem"]');
