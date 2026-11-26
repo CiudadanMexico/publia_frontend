@@ -71,11 +71,13 @@ export function bindFlow(universe?: UniverseLike | null): void {
     const start = (): void => {
       if (userStopped) return; // con reduced-motion el arranque es manual vía el control discreto
       running = true;
+      wrap.dataset.running = '1'; // debug/QA
       wrap.classList.add('is-running');
       schedule();
     };
     const halt = (): void => {
       running = false;
+      wrap.dataset.running = '0';
       window.clearTimeout(timer);
       timer = undefined;
       wrap.classList.remove('is-running');

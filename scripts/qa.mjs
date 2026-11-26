@@ -1515,6 +1515,12 @@ check('7M-H E22: editar cantidad (auto→0) recalcula demanda 75 y ambas columna
 // Bloque C: personas + IA (E11)
 await page.bringToFront().catch(() => {});
 await wheelToScene('#escena-e11 [data-demo="personas"]');
+// empujón determinista: re-disparar scroll hasta que el controlador confirme running
+for (let i = 0; i < 6; i++) {
+  const rr = await page.evaluate(() => { window.dispatchEvent(new Event('scroll')); return document.querySelector('[data-demo="personas"]')?.dataset.running ?? 'none'; });
+  if (rr === '1') break;
+  await page.waitForTimeout(700);
+}
 await page.waitForTimeout(900);
 await waitBound('[data-demo="personas"]');
 check('7M-I E11: 3 selectores de caso + control discreto de movimiento; SIN ejecutar/pausar/paso/reiniciar ni data-pers-step suelto', await page.evaluate(() => document.querySelectorAll('#escena-e11 [data-pers-case]').length === 3 && !!document.querySelector('#escena-e11 [data-pers-motion]') && ['[data-pers-run]','[data-pers-pause]','[data-pers-step]','[data-pers-reset]'].filter((x) => document.querySelector('#escena-e11 ' + x)).length === 0 && document.querySelectorAll('#escena-e11 [data-pers-stage]').length === 4), '');

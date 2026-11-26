@@ -96,6 +96,7 @@ export function bindPersonas(): void {
 
   const setRunning = (on: boolean): void => {
     running = on;
+    wrap.dataset.running = String(on); // debug/QA
     visual?.classList.toggle('is-running', on);
     void on;
     schedule();
