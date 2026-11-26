@@ -1324,6 +1324,7 @@ const ecoEco = await page.evaluate(() => ({
 }));
 check('7M-G E25: Ecología (nodo 6) operativa con textos definitivos y CTA wa', ecoEco.pressed === 'ecologia' && ecoEco.title === 'Tecnología y sostenibilidad' && ecoEco.mode === 'Asistido' && ecoEco.steps === 4 && ecoEco.result.includes('mantenimiento y la reutilización') && decodeURIComponent(ecoEco.cta).includes('Tecnología y sostenibilidad'), JSON.stringify(ecoEco).slice(0, 140));
 // 7M-I §5: E07 arranca solo al entrar en pantalla y recorre las 4 etapas en continuo
+await page.bringToFront().catch(() => {});
 await page.evaluate(() => document.querySelector('#escena-e07')?.scrollIntoView({ behavior: 'instant' }));
 await page.waitForTimeout(1600);
 check('7M-I E07: sin botones «Ejecutar demostración»/«Reiniciar»; queda el control discreto de movimiento', await page.evaluate(() => !document.querySelector('#escena-e07 [data-flow-run]') && !document.querySelector('#escena-e07 [data-flow-reset]') && !!document.querySelector('#escena-e07 [data-flow-motion]')), '');
@@ -1463,10 +1464,11 @@ const h22d = await page.evaluate(() => {
 check('7M-H E22: editar cantidad (auto→0) recalcula demanda 75 y ambas columnas (compartido 3 activas, privado 5 activas)', h22d.demand === '75' && h22d.sActive.startsWith('3') && h22d.pActive.startsWith('5'), JSON.stringify(h22d));
 
 // Bloque C: personas + IA (E11)
+await page.bringToFront().catch(() => {});
 await page.evaluate(() => document.querySelector('#escena-e11')?.scrollIntoView({ behavior: 'instant' }));
 await page.waitForTimeout(700);
 await waitBound('[data-demo="personas"]');
-check('7M-I E11: 3 selectores de caso + control discreto de movimiento; SIN ejecutar/pausar/paso/reiniciar ni data-pers-step suelto', (await page.evaluate(() => document.querySelectorAll('#escena-e11 [data-pers-case]').length)) === 3 && !!document.querySelector('#escena-e11 [data-pers-motion]') && (await page.evaluate(() => ['[data-pers-run]','[data-pers-pause]','[data-pers-step]','[data-pers-reset]'].filter((x) => document.querySelector('#escena-e11 ' + x)).length)) === 0 && (await page.evaluate(() => document.querySelectorAll('#escena-e11 [data-pers-stage]').length)) === 4, '');
+check('7M-I E11: 3 selectores de caso + control discreto de movimiento; SIN ejecutar/pausar/paso/reiniciar ni data-pers-step suelto', await page.evaluate(() => document.querySelectorAll('#escena-e11 [data-pers-case]').length === 3 && !!document.querySelector('#escena-e11 [data-pers-motion]') && ['[data-pers-run]','[data-pers-pause]','[data-pers-step]','[data-pers-reset]'].filter((x) => document.querySelector('#escena-e11 ' + x)).length === 0 && document.querySelectorAll('#escena-e11 [data-pers-stage]').length === 4), '');
 // cambio repetido entre casos actualiza textos de inmediato
 const e11c1 = await page.evaluate(() => ({ kind: document.querySelector('#escena-e11 [data-pers-kind]')?.textContent ?? '', human: document.querySelector('#escena-e11 [data-pers-human-name]')?.textContent ?? '' }));
 await clickJs('#escena-e11 [data-pers-case="soporte"]');

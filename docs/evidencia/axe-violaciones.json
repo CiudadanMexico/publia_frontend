@@ -1,5 +1,25 @@
 {
   "base": "https://dam-boulevard-explaining-alaska.trycloudflare.com",
-  "violaciones": [],
-  "rutaEmpresa": []
+  "violaciones": [
+    {
+      "id": "role-img-alt",
+      "impact": "serious",
+      "nodes": 1,
+      "help": "[role=\"img\"] and [role=\"image\"] elements must have alternative text",
+      "targets": [
+        ".housing7__stage"
+      ]
+    }
+  ],
+  "rutaEmpresa": [
+    {
+      "id": "role-img-alt",
+      "impact": "serious",
+      "nodes": 1,
+      "help": "[role=\"img\"] and [role=\"image\"] elements must have alternative text",
+      "targets": [
+        ".housing7__stage"
+      ]
+    }
+  ]
 }
