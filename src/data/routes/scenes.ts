@@ -679,7 +679,7 @@ const SCENES_RAW: SceneDefinition[] = [
     id: 'E23',
     optional: true,
     eyebrow: 'Productos · Capacitación',
-    title: "Conocimiento para llevarlo a la práctica.",
+    title: "Capacitación para llevarlo a la práctica.",
     lead: "Capacitación: Aprende a utilizar las herramientas de tu operación con sesiones orientadas a tareas concretas.",
     body: 'No es una academia: es la documentación viva de tu operación, para que tu equipo pueda sostenerla.',
     purpose: 'Mostrar la capacitación como adopción, no como curso.',
@@ -696,7 +696,7 @@ const SCENES_RAW: SceneDefinition[] = [
     id: 'E24',
     optional: true,
     eyebrow: 'Productos · Asesoría',
-    title: "Conocimiento para llevarlo a la práctica.",
+    title: "Asesoría para elegir bien antes de contratar.",
     lead: "Asesoría: Revisa una necesidad con acompañamiento para definir opciones y próximos pasos.",
     body: 'Sin tarifas publicadas: cada proyecto se cotiza según complejidad, sistemas, integraciones y entregables.',
     variants: [

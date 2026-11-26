@@ -8,25 +8,28 @@ import { COPY_7MF } from '../../../data/copy7mf';
 import { TRAINING, ADVISORY } from '../../../data/catalog';
 
 const k = COPY_7MF.knowledge;
-const waBase = `https://wa.me/${COPY_7MF.contact.number}?text=${encodeURIComponent(COPY_7MF.contact.baseMessage)}`;
+const waBase = `https://wa.me/${COPY_7MF.contact.number}?text=${encodeURIComponent("Hola, quiero consultar las opciones de capacitación y asesoría de Publia para mi negocio.")}`;
 ---
 
 <div class="know7" data-module="knowledge">
   <h3 class="know7__title">{k.title}</h3>
+    <!-- 7M-I §8: estructura preparada para incorporar los contenidos reales del campus;
+         hoy lista el material existente de capacitación (E23) y asesoría (E24). -->
+    <p class="visually-hidden" id="know7-note">Los listados de abajo son el espacio reservado para los contenidos reales de capacitación y asesoría.</p>
   <div class="know7__grid">
-    <article class="know7__panel">
+    <article class="know7__panel" data-know-panel="capacitacion" aria-describedby="know7-note">
       <h4>{k.trainingLabel}</h4>
       <p>{k.trainingBody}</p>
       {/* 7M-G §7: materiales del catálogo de capacitación (E23), compacto */}
-      <ul class="know7__links">
+      <ul class="know7__links" data-know-list="capacitacion">
         {TRAINING.map((t) => <li><strong>{t.name}</strong> <span>· {t.audience}</span></li>)}
       </ul>
     </article>
-    <article class="know7__panel">
+    <article class="know7__panel" data-know-panel="asesoria" aria-describedby="know7-note">
       <h4>{k.adviceLabel}</h4>
       <p>{k.adviceBody}</p>
       {/* 7M-G §7: materiales del catálogo de asesoría (E24), compacto */}
-      <ul class="know7__links">
+      <ul class="know7__links" data-know-list="asesoria">
         {ADVISORY.map((a) => <li><strong>{a.name}</strong> <span>· {a.description}</span></li>)}
       </ul>
     </article>
