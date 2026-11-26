@@ -161,11 +161,9 @@ export function bindPersonas(): void {
   const syncView = (): void => {
     const r = wrap.getBoundingClientRect();
     const vis = r.top < window.innerHeight * 0.75 && r.bottom > window.innerHeight * 0.15 && r.width > 0;
-    if (vis !== inView) {
-      inView = vis;
-      if (inView) { if (!reduced) start(); }
-      else halt();
-    }
+    inView = vis;
+    if (vis && !running && !userStopped && !document.hidden && !reduced) start();
+    else if ((!vis || document.hidden) && running) halt();
   };
   window.addEventListener('scroll', syncView, { passive: true });
   window.addEventListener('resize', syncView);

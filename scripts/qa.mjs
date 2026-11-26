@@ -1364,50 +1364,72 @@ const ecoEco = await page.evaluate(() => ({
 }));
 check('7M-G E25: Ecología (nodo 6) operativa con textos definitivos y CTA wa', ecoEco.pressed === 'ecologia' && ecoEco.title === 'Tecnología y sostenibilidad' && ecoEco.mode === 'Asistido' && ecoEco.steps === 4 && ecoEco.result.includes('mantenimiento y la reutilización') && decodeURIComponent(ecoEco.cta).includes('Tecnología y sostenibilidad'), JSON.stringify(ecoEco).slice(0, 140));
 // 7M-I §5: E07 arranca solo al entrar en pantalla y recorre las 4 etapas en continuo
-// (E07 es exclusiva de la ruta eficiencia: re-elegirla primero)
-await page.evaluate(() => { try { sessionStorage.clear(); } catch {} });
-await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 90000 }).catch(() => {});
-await page.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'hero', null, { timeout: 60000 }).catch(() => {});
-await page.waitForTimeout(1200);
-await click('[data-route-choice="efficiency"]');
-await page.waitForFunction(() => document.documentElement.dataset.act === 'efficiency', null, { timeout: 30000 }).catch(() => {});
-await page.waitForTimeout(3400);
-await page.bringToFront().catch(() => {});
-await wheelToScene('[data-demo="flow"]');
-await page.waitForTimeout(1600);
-check('7M-I E07: sin botones «Ejecutar demostración»/«Reiniciar»; queda el control discreto de movimiento', await page.evaluate(() => !document.querySelector('#escena-e07 [data-flow-run]') && !document.querySelector('#escena-e07 [data-flow-reset]') && !!document.querySelector('#escena-e07 [data-flow-motion]')), '');
-const e07a = await page.evaluate(() => ({ count: document.querySelector('#escena-e07 [data-flow-count]')?.textContent ?? '', active: document.querySelectorAll('#escena-e07 [data-flow-stage].is-active').length }));
-await page.waitForTimeout(3400);
-const e07b = await page.evaluate(() => ({ count: document.querySelector('#escena-e07 [data-flow-count]')?.textContent ?? '', feed: (document.querySelector('#escena-e07 [data-flow-feed]')?.textContent ?? '').slice(0, 60) }));
+// página dedicada (visible) + ruta eficiencia (E07 es exclusiva de esa ruta)
+const demoPage = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+demoPage.setDefaultTimeout(90000);
+const dgoto = async () => {
+  await demoPage.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 90000 }).catch(() => {});
+  await demoPage.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'hero', null, { timeout: 60000 }).catch(() => {});
+  await demoPage.waitForTimeout(1200);
+};
+await dgoto();
+await demoPage.evaluate(() => { window.__publiaLastProgrammaticScroll = Date.now(); window.scrollTo(0, 0); document.querySelector('[data-route-choice="efficiency"]')?.click(); });
+await demoPage.waitForFunction(() => document.documentElement.dataset.act === 'efficiency', null, { timeout: 30000 }).catch(() => {});
+await demoPage.waitForTimeout(3400);
+const wheelToSceneD = async (sel, max = 60) => {
+  for (let i = 0; i < max; i++) {
+    const st = await demoPage.evaluate((s2) => {
+      const el = document.querySelector(s2);
+      if (!el) return { vis: false, dir: 1 };
+      const b = el.getBoundingClientRect();
+      return { vis: b.top < window.innerHeight * 0.72 && b.bottom > window.innerHeight * 0.15 && b.width > 0, dir: b.bottom <= window.innerHeight * 0.15 ? -1 : 1 };
+    }, sel);
+    if (st.vis) return true;
+    await demoPage.evaluate((d) => { window.__publiaLastProgrammaticScroll = Date.now(); window.dispatchEvent(new WheelEvent('wheel', { deltaY: d * 700, bubbles: true })); window.scrollBy({ top: d * 500, behavior: 'instant' }); }, st.dir);
+    await demoPage.waitForTimeout(320);
+  }
+  return false;
+};
+await wheelToSceneD('[data-demo="flow"]');
+for (let i = 0; i < 6; i++) {
+  const rr = await demoPage.evaluate(() => { window.dispatchEvent(new Event('scroll')); return document.querySelector('[data-demo="flow"]')?.dataset.running ?? 'none'; });
+  if (rr === '1') break;
+  await demoPage.waitForTimeout(700);
+}
+await demoPage.waitForTimeout(1600);
+check('7M-I E07: sin botones «Ejecutar demostración»/«Reiniciar»; queda el control discreto de movimiento', await demoPage.evaluate(() => !document.querySelector('#escena-e07 [data-flow-run]') && !document.querySelector('#escena-e07 [data-flow-reset]') && !!document.querySelector('#escena-e07 [data-flow-motion]')), '');
+const e07a = await demoPage.evaluate(() => ({ count: document.querySelector('#escena-e07 [data-flow-count]')?.textContent ?? '', active: document.querySelectorAll('#escena-e07 [data-flow-stage].is-active').length }));
+await demoPage.waitForTimeout(3400);
+const e07b = await demoPage.evaluate(() => ({ count: document.querySelector('#escena-e07 [data-flow-count]')?.textContent ?? '', feed: (document.querySelector('#escena-e07 [data-flow-feed]')?.textContent ?? '').slice(0, 60) }));
 check('7M-I E07: arranque automático sin clic — etapa activa y contador avanzando (4 etapas cíclicas)', e07a.active === 1 && e07b.count !== e07a.count && e07b.feed.length > 5, JSON.stringify({ a: e07a, b: e07b }));
 // 4 ciclos completos: muestreamos el índice de etapa activa ~28 s (ciclo ≈ 4×1.5 s)
 const e07seq = [];
 for (let i = 0; i < 34; i++) {
-  e07seq.push(await page.evaluate(() => { const a = document.querySelector('#escena-e07 [data-flow-stage].is-active'); return a ? Number(a.dataset.flowStage) : -1; }));
-  await page.waitForTimeout(950);
+  e07seq.push(await demoPage.evaluate(() => { const a = document.querySelector('#escena-e07 [data-flow-stage].is-active'); return a ? Number(a.dataset.flowStage) : -1; }));
+  await demoPage.waitForTimeout(950);
 }
 const e07wraps = e07seq.filter((v, i) => i > 0 && v === 0 && e07seq[i - 1] === 3).length;
 const e07alive = e07seq.filter((v) => v >= 0).length;
 check('7M-I E07: 4 ciclos consecutivos completos (3→0 contado ≥3 en ~32 s con etapa siempre activa; ciclo ≈6 s)', e07wraps >= 3 && e07alive === e07seq.length, `seq=${e07seq.join('')} wraps=${e07wraps} alive=${e07alive}`);
 // E11 marfil
-const e11tone = await page.evaluate(() => document.querySelector('#escena-e11')?.dataset.tone);
+const e11tone = await demoPage.evaluate(() => document.querySelector('#escena-e11')?.dataset.tone);
 check('V4-B E11 personas+IA en marfil (cream)', e11tone === 'cream', `tone=${e11tone}`);
 // recomendación en E29 según ruta empresa
-await page.evaluate(() => { try { sessionStorage.clear(); } catch {} });
+await demoPage.evaluate(() => { try { sessionStorage.clear(); } catch {} });
 await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 90000 }).catch(() => {});
-await page.waitForTimeout(2600);
+await demoPage.waitForTimeout(2600);
 await click('[data-route-choice="enterprise"]');
-await page.waitForTimeout(3400);
-await page.evaluate(() => document.querySelector('#escena-e29')?.scrollIntoView({ behavior: 'instant' }));
-await page.waitForTimeout(900);
+await demoPage.waitForTimeout(3400);
+await demoPage.evaluate(() => document.querySelector('#escena-e29')?.scrollIntoView({ behavior: 'instant' }));
+await demoPage.waitForTimeout(900);
 await waitBound('[data-recommendation]');
-const rec = await page.evaluate(() => ({
+const rec = await demoPage.evaluate(() => ({
   items: document.querySelectorAll('[data-recommendation-list] .recommendation__item').length,
   text: document.querySelector('[data-recommendation-list]')?.textContent ?? '',
   status: document.querySelector('[data-recommendation-status]')?.textContent ?? '',
 }));
 check('V4-B cierre: recomendación con >=3 items', rec.items >= 3, `items=${rec.items} status=${rec.status.slice(0, 60)}`);
-check('cierre V2: botón copiar resumen presente', await page.evaluate(() => !!document.querySelector('[data-rec-copy]')));
+check('cierre V2: botón copiar resumen presente', await demoPage.evaluate(() => !!document.querySelector('[data-rec-copy]')));
 
 // --- 7M-B: bloques A/B/C/D/E ------------------------------------------------------
 const q = (sel) => page.evaluate((s2) => !!document.querySelector(s2), sel);
@@ -1415,36 +1437,36 @@ const clickJs = (sel) => page.evaluate((s2) => { const el = document.querySelect
 const sceneState = () => page.evaluate(() => { try { return JSON.parse(sessionStorage.getItem('publia.visitor.v1') ?? '{}'); } catch { return {}; } });
 
 // Bloque B: red colaborativa (E15) — boot limpio en ruta unclassified (escenas explorer visibles)
-await page.evaluate(() => { try { sessionStorage.clear(); } catch {} });
+await demoPage.evaluate(() => { try { sessionStorage.clear(); } catch {} });
 await page.goto(BASE, { waitUntil: 'domcontentloaded' });
 await page.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'hero', { timeout: 60000 }).catch(() => {});
-await page.waitForTimeout(1500);
-await page.evaluate(() => document.querySelector('#escena-e15')?.scrollIntoView({ behavior: 'instant' }));
-await page.waitForTimeout(700);
+await demoPage.waitForTimeout(1500);
+await demoPage.evaluate(() => document.querySelector('#escena-e15')?.scrollIntoView({ behavior: 'instant' }));
+await demoPage.waitForTimeout(700);
 await waitBound('[data-demo="red"]');
-check('7M-B red: 6 nodos de capacidad', await page.evaluate(() => document.querySelectorAll('#escena-e15 [data-red-node]').length) === 6);
+check('7M-B red: 6 nodos de capacidad', await demoPage.evaluate(() => document.querySelectorAll('#escena-e15 [data-red-node]').length) === 6);
 await clickJs('#escena-e15 [data-red-node="2"]');
-await page.waitForTimeout(300);
-check('7M-B red: click nodo 3 selecciona y persiste en estado', await page.evaluate(() => document.querySelector('#escena-e15 [data-red-node="2"]')?.getAttribute('aria-pressed') === 'true') && (await sceneState()).red === 'sitios', JSON.stringify((await sceneState()).red));
+await demoPage.waitForTimeout(300);
+check('7M-B red: click nodo 3 selecciona y persiste en estado', await demoPage.evaluate(() => document.querySelector('#escena-e15 [data-red-node="2"]')?.getAttribute('aria-pressed') === 'true') && (await sceneState()).red === 'sitios', JSON.stringify((await sceneState()).red));
 await clickJs('#escena-e15 [data-red-run]');
 await page.waitForFunction(() => (document.querySelector('#escena-e15 [data-red-result]')?.textContent ?? '').length > 3, { timeout: 8000 }).catch(() => {});
-check('7M-B red: demo ilumina flujo y muestra resultado', (await page.evaluate(() => document.querySelector('#escena-e15 [data-red-result]')?.textContent ?? '')).length > 3, await page.evaluate(() => document.querySelector('#escena-e15 [data-red-result]')?.textContent ?? ''));
+check('7M-B red: demo ilumina flujo y muestra resultado', (await demoPage.evaluate(() => document.querySelector('#escena-e15 [data-red-result]')?.textContent ?? '')).length > 3, await demoPage.evaluate(() => document.querySelector('#escena-e15 [data-red-result]')?.textContent ?? ''));
 
 // Bloque A: infraestructura soberana (E03) — requiere ruta enterprise
 await page.goto(BASE, { waitUntil: 'domcontentloaded' });
 await page.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'hero', { timeout: 60000 }).catch(() => {});
 await click('[data-route-choice="enterprise"]');
 await page.waitForFunction(() => document.documentElement.dataset.act === 'enterprise', { timeout: 30000 }).catch(() => {});
-await page.waitForTimeout(1500);
-await page.evaluate(() => document.querySelector('#escena-e03')?.scrollIntoView({ behavior: 'instant' }));
-await page.waitForTimeout(700);
+await demoPage.waitForTimeout(1500);
+await demoPage.evaluate(() => document.querySelector('#escena-e03')?.scrollIntoView({ behavior: 'instant' }));
+await demoPage.waitForTimeout(700);
 await waitBound('[data-demo="infra2"]');
-check('7M-F E03: comparación compartida/privada ya NO está en E03 (sólo en E22)', !await page.evaluate(() => document.querySelector('#escena-e03 [data-housing-mode]')), '');
+check('7M-F E03: comparación compartida/privada ya NO está en E03 (sólo en E22)', !await demoPage.evaluate(() => document.querySelector('#escena-e03 [data-housing-mode]')), '');
 // E22 housing 7M-H: modelo determinista visible en ambas columnas
-await page.evaluate(() => document.querySelector('#escena-e22')?.scrollIntoView({ behavior: 'instant' }));
-await page.waitForTimeout(800);
-check('7M-H E22: 2 modalidades Compartido/Privado', (await page.evaluate(() => [...document.querySelectorAll('#escena-e22 [data-housing-mode]')].map((b) => b.textContent.trim()))).join() === 'Compartido,Privado', '');
-const h22 = await page.evaluate(() => ({
+await demoPage.evaluate(() => document.querySelector('#escena-e22')?.scrollIntoView({ behavior: 'instant' }));
+await demoPage.waitForTimeout(800);
+check('7M-H E22: 2 modalidades Compartido/Privado', (await demoPage.evaluate(() => [...document.querySelectorAll('#escena-e22 [data-housing-mode]')].map((b) => b.textContent.trim()))).join() === 'Compartido,Privado', '');
+const h22 = await demoPage.evaluate(() => ({
   shared: {
     active: document.querySelector('[data-housing-col="compartido"] [data-hs="active"]')?.textContent ?? '',
     waiting: document.querySelector('[data-housing-col="compartido"] [data-hs="waiting"]')?.textContent ?? '',
@@ -1469,7 +1491,7 @@ check('7M-H E22: caso inicial 85 — compartido 3 activas/4 espera (50 usadas), 
 check('7M-H E22: disclaimer ilustrativo + 4 filas editables + demanda 85 + H2 literal + sin métricas vacías ni tráfico decorativo', h22.disclaimer.includes('no es una medición de rendimiento') && h22.rows === 4 && h22.demand === '85' && h22.h2.includes('¿Cómo quieres repartir tu capacidad?') && h22.noMetrics && h22.noTraffic, JSON.stringify({ d: h22.disclaimer.slice(0, 40), rows: h22.rows, demand: h22.demand }));
 check('7M-H E22: CTA WhatsApp con prefijo «Escenario ilustrativo que quiero dimensionar» + modalidad y cantidades', h22.cta.startsWith('https://wa.me/525573724660') && decodeURIComponent(h22.cta).includes('Escenario ilustrativo que quiero dimensionar') && decodeURIComponent(h22.cta).includes('85 unidades'), h22.cta.slice(0, 100));
 // 7M-I §3: stage de racks recuperado — 3 racks, slots del rack 0 = unidades usadas del modelo
-const h22racks = await page.evaluate(() => ({
+const h22racks = await demoPage.evaluate(() => ({
   racks: document.querySelectorAll('#escena-e22 [data-housing-rack]').length,
   titles: [...document.querySelectorAll('#escena-e22 [data-housing-rack] .housing7__rack-title')].map((t) => t.textContent ?? ''),
   lit0: document.querySelectorAll('#escena-e22 [data-hslot="0"].is-on').length,
@@ -1480,8 +1502,8 @@ const h22racks = await page.evaluate(() => ({
 }));
 check('7M-I E22: 3 racks (negocio/socios+becarios/miembros) en 2 columnas desktop; compartido: 10 slots encendidos (50/5) + 20 reservados', h22racks.racks === 3 && h22racks.titles[0] === 'TU NEGOCIO' && h22racks.lit0 === 10 && h22racks.reserved === 20 && h22racks.stageMode === 'compartido' && h22racks.caption.includes('50/25/25') && h22racks.gridCols === 2, JSON.stringify(h22racks));
 await clickJs('#escena-e22 [data-housing-mode="privado"]');
-await page.waitForTimeout(400);
-const h22b = await page.evaluate(() => ({
+await demoPage.waitForTimeout(400);
+const h22b = await demoPage.evaluate(() => ({
   persisted: JSON.parse(sessionStorage.getItem('publia.visitor.v1') ?? '{}').housingMode ?? null,
   stageMode: document.querySelector('#escena-e22 [data-housing-stage]')?.dataset.mode ?? '',
   lit0: document.querySelectorAll('#escena-e22 [data-hslot="0"].is-on').length,
@@ -1492,8 +1514,8 @@ const h22b = await page.evaluate(() => ({
 }));
 check('7M-I E22: privado persiste, stage privado — 9 slots encendidos (85/10 redondeado), 0 reservados, pie 100/100, inputs conservados', h22b.persisted === 'privado' && h22b.stageMode === 'privado' && h22b.lit0 === 9 && h22b.reserved === 0 && h22b.foot0.includes('100 / 100') && h22b.caption.includes('100%') && h22b.inputsKept === '2', JSON.stringify(h22b));
 await clickJs('#escena-e22 [data-housing-mode="compartido"]');
-await page.waitForTimeout(300);
-const h22c = await page.evaluate(() => ({
+await demoPage.waitForTimeout(300);
+const h22c = await demoPage.evaluate(() => ({
   lit0: document.querySelectorAll('#escena-e22 [data-hslot="0"].is-on').length,
   reserved: document.querySelectorAll('#escena-e22 [data-hslot="1"].is-reserved, #escena-e22 [data-hslot="2"].is-reserved').length,
   chipsOn: document.querySelectorAll('#escena-e22 .housing7__chip--on').length,
@@ -1501,7 +1523,7 @@ const h22c = await page.evaluate(() => ({
 }));
 check('7M-I E22: volver a compartido restaura 10 slots + 20 reservados y chips 3 en proceso / 4 en espera', h22c.lit0 === 10 && h22c.reserved === 20 && h22c.chipsOn === 3 && h22c.chipsWait === 4, JSON.stringify(h22c));
 // edición de cantidad recalcula sin cambiar modalidad
-const h22d = await page.evaluate(() => {
+const h22d = await demoPage.evaluate(() => {
   const i = document.querySelector('#escena-e22 [data-housing-qty="auto"]');
   i.value = '0'; i.dispatchEvent(new Event('input', { bubbles: true }));
   return {
@@ -1512,31 +1534,22 @@ const h22d = await page.evaluate(() => {
 });
 check('7M-H E22: editar cantidad (auto→0) recalcula demanda 75 y ambas columnas (compartido 3 activas, privado 5 activas)', h22d.demand === '75' && h22d.sActive.startsWith('3') && h22d.pActive.startsWith('5'), JSON.stringify(h22d));
 
-// Bloque C: personas + IA (E11) — E11 es exclusiva de ruta eficiencia: re-elegirla en página fresca
-await page.evaluate(() => { try { sessionStorage.clear(); } catch {} });
-await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 90000 }).catch(() => {});
-await page.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'hero', null, { timeout: 60000 }).catch(() => {});
-await page.waitForTimeout(1200);
-await click('[data-route-choice="efficiency"]');
-await page.waitForFunction(() => document.documentElement.dataset.act === 'efficiency', null, { timeout: 30000 }).catch(() => {});
-await page.waitForTimeout(3400);
-await page.bringToFront().catch(() => {});
-await wheelToScene('#escena-e11 [data-demo="personas"]');
-// empujón determinista: re-disparar scroll hasta que el controlador confirme running
+// Bloque C: personas + IA (E11) — misma página dedicada (ruta efficiency ya activa)
+await wheelToSceneD('#escena-e11 [data-demo="personas"]');
 for (let i = 0; i < 6; i++) {
-  const rr = await page.evaluate(() => { window.dispatchEvent(new Event('scroll')); return document.querySelector('[data-demo="personas"]')?.dataset.running ?? 'none'; });
+  const rr = await demoPage.evaluate(() => { window.dispatchEvent(new Event('scroll')); return document.querySelector('[data-demo="personas"]')?.dataset.running ?? 'none'; });
   if (rr === '1') break;
-  await page.waitForTimeout(700);
+  await demoPage.waitForTimeout(700);
 }
-await page.waitForTimeout(900);
-await waitBound('[data-demo="personas"]');
+await demoPage.waitForTimeout(900);
+await demoPage.waitForFunction(() => document.querySelector('[data-demo="personas"]')?.dataset.bound === '1', null, { timeout: 30000 }).catch(() => {});
 check('7M-I E11: 3 selectores de caso + control discreto de movimiento; SIN ejecutar/pausar/paso/reiniciar ni data-pers-step suelto', await page.evaluate(() => document.querySelectorAll('#escena-e11 [data-pers-case]').length === 3 && !!document.querySelector('#escena-e11 [data-pers-motion]') && ['[data-pers-run]','[data-pers-pause]','[data-pers-step]','[data-pers-reset]'].filter((x) => document.querySelector('#escena-e11 ' + x)).length === 0 && document.querySelectorAll('#escena-e11 [data-pers-stage]').length === 4), '');
 // cambio repetido entre casos actualiza textos de inmediato
 const e11c1 = await page.evaluate(() => ({ kind: document.querySelector('#escena-e11 [data-pers-kind]')?.textContent ?? '', human: document.querySelector('#escena-e11 [data-pers-human-name]')?.textContent ?? '' }));
-await clickJs('#escena-e11 [data-pers-case="soporte"]');
+await demoPage.evaluate((s2) => document.querySelector(s2)?.click(), '#escena-e11 [data-pers-case="soporte"]');
 await page.waitForTimeout(400);
 const e11c2 = await page.evaluate(() => ({ kind: document.querySelector('#escena-e11 [data-pers-kind]')?.textContent ?? '', human: document.querySelector('#escena-e11 [data-pers-human-name]')?.textContent ?? '', pressed: document.querySelector('#escena-e11 [data-pers-case="soporte"]')?.getAttribute('aria-pressed') }));
-await clickJs('#escena-e11 [data-pers-case="creatividad"]');
+await demoPage.evaluate((s2) => document.querySelector(s2)?.click(), '#escena-e11 [data-pers-case="creatividad"]');
 await page.waitForTimeout(400);
 const e11c3 = await page.evaluate(() => ({ kind: document.querySelector('#escena-e11 [data-pers-kind]')?.textContent ?? '', human: document.querySelector('#escena-e11 [data-pers-human-name]')?.textContent ?? '' }));
 check('7M-I E11: cambio repetido Atención→Soporte→Creatividad actualiza caso y persona al instante', e11c2.pressed === 'true' && e11c2.kind.includes('SOPORTE') && e11c3.kind.includes('CREATIVIDAD') && e11c2.human !== e11c3.human && e11c1.kind !== e11c3.kind, JSON.stringify({ e11c1, e11c2, e11c3 }));
@@ -1559,9 +1572,9 @@ const e11wraps = e11seq.filter((v, i) => i > 0 && v === 0 && e11seq[i - 1] === 3
 const e11alive = e11seq.filter((v) => v >= 0).length;
 check('7M-I E11: ciclos completos automáticos (3→0 contado ≥3 en ~28 s con etapa siempre activa; ciclo ≈5.6 s)', e11wraps >= 3 && e11alive === e11seq.length, `seq=${e11seq.join('')} wraps=${e11wraps} alive=${e11alive}`);
 // salida y reentrada sin temporizadores duplicados: cadencia estable (~1.4 s por etapa)
-await wheelAway(12);
+await (async () => { for (let i = 0; i < 12; i++) { await demoPage.evaluate(() => { window.__publiaLastProgrammaticScroll = Date.now(); window.dispatchEvent(new WheelEvent('wheel', { deltaY: -700, bubbles: true })); window.scrollBy({ top: -500, behavior: 'instant' }); }); await demoPage.waitForTimeout(280); } })();
 await page.waitForTimeout(1200);
-await wheelToScene('#escena-e11 [data-demo="personas"]');
+await wheelToSceneD('#escena-e11 [data-demo="personas"]');
 await page.waitForTimeout(1500);
 const e11t = [];
 for (let i = 0; i < 6; i++) {
