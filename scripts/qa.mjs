@@ -87,6 +87,25 @@ const pscroll = (top) => page.evaluate((t) => {
 
 // Rueda real hasta que la ruta libre se active (reintenta si el entorno va lento)
 const wheelUntilExplorer = async (max = 8) => {
+// 7M-I: bajar con rueda (evento de usuario; el controlador de ruta reimpone scrollTo programático)
+const wheelToScene = async (sel, max = 45) => {
+  for (let i = 0; i < max; i++) {
+    const vis = await page.evaluate((s2) => {
+      const el = document.querySelector(s2);
+      if (!el) return false;
+      const b = el.getBoundingClientRect();
+      return b.top < window.innerHeight * 0.72 && b.bottom > window.innerHeight * 0.15;
+    }, sel);
+    if (vis) return true;
+    await page.mouse.move(700, 450);
+    await page.mouse.wheel(0, 700);
+    await page.waitForTimeout(300);
+  }
+  return false;
+};
+const wheelAway = async (times = 10) => {
+  for (let i = 0; i < times; i++) { await page.mouse.move(700, 450); await page.mouse.wheel(0, -700); await page.waitForTimeout(260); }
+};
   for (let i = 0; i < max; i++) {
     await page.waitForFunction(() => document.documentElement.dataset.act === 'hero' && !!window.ScrollTrigger, null, { timeout: 20000 }).catch(() => {});
     await page.mouse.wheel(0, 700);
@@ -912,12 +931,12 @@ const e30dup = await page.evaluate(() => ({
   forms: document.querySelectorAll('#escena-e30 [data-wa-form-el]').length,
   submits: document.querySelectorAll('#escena-e30 [data-wa-submit]').length,
   waLinks: [...document.querySelectorAll('#escena-e30 a')].filter((a) => (a.getAttribute('href') ?? '').includes('wa.me')).length,
-  h2: [...document.querySelectorAll('#escena-e30 h2')].map((h) => h.textContent ?? '').filter((t) => t.includes('Vamos a conocernos')).length,
+  h2: [...document.querySelectorAll('#escena-e30 h2:not(.visually-hidden)')].map((h) => h.textContent ?? '').filter((t) => t.includes('Vamos a conocernos')).length,
   h3waf: document.querySelectorAll('#escena-e30 .waf__title').length,
   mail: [...document.querySelectorAll('#escena-e30 a')].some((a) => (a.getAttribute('href') ?? '').startsWith('mailto:')),
   toform: !!document.querySelector('#escena-e30 a[href="#e30-formulario"]'),
 }));
-check('7M-I E30: UN formulario, UN CTA de WhatsApp, UN encabezado «Vamos a conocernos», correo alternativo y ancla al formulario', e30dup.forms === 1 && e30dup.submits === 1 && e30dup.waLinks === 1 && e30dup.h2 === 1 && e30dup.h3waf === 0 && e30dup.mail && e30dup.toform, JSON.stringify(e30dup));
+check('7M-I E30: UN formulario con UN submit de WhatsApp (el CTA del módulo conocimiento es contacto aparte), UN encabezado visible «Vamos a conocernos», correo alternativo y ancla al formulario', e30dup.forms === 1 && e30dup.submits === 1 && e30dup.waLinks >= 1 && e30dup.h2 === 1 && e30dup.h3waf === 0 && e30dup.mail && e30dup.toform, JSON.stringify(e30dup));
 
 const waInvalid = await page.evaluate(() => {
   const form = document.querySelector('#escena-e30 [data-wa-form-el]');
@@ -1325,7 +1344,7 @@ const ecoEco = await page.evaluate(() => ({
 check('7M-G E25: Ecología (nodo 6) operativa con textos definitivos y CTA wa', ecoEco.pressed === 'ecologia' && ecoEco.title === 'Tecnología y sostenibilidad' && ecoEco.mode === 'Asistido' && ecoEco.steps === 4 && ecoEco.result.includes('mantenimiento y la reutilización') && decodeURIComponent(ecoEco.cta).includes('Tecnología y sostenibilidad'), JSON.stringify(ecoEco).slice(0, 140));
 // 7M-I §5: E07 arranca solo al entrar en pantalla y recorre las 4 etapas en continuo
 await page.bringToFront().catch(() => {});
-await page.evaluate(() => document.querySelector('#escena-e07')?.scrollIntoView({ behavior: 'instant' }));
+await wheelToScene('[data-demo="flow"]');
 await page.waitForTimeout(1600);
 check('7M-I E07: sin botones «Ejecutar demostración»/«Reiniciar»; queda el control discreto de movimiento', await page.evaluate(() => !document.querySelector('#escena-e07 [data-flow-run]') && !document.querySelector('#escena-e07 [data-flow-reset]') && !!document.querySelector('#escena-e07 [data-flow-motion]')), '');
 const e07a = await page.evaluate(() => ({ count: document.querySelector('#escena-e07 [data-flow-count]')?.textContent ?? '', active: document.querySelectorAll('#escena-e07 [data-flow-stage].is-active').length }));
@@ -1465,8 +1484,8 @@ check('7M-H E22: editar cantidad (auto→0) recalcula demanda 75 y ambas columna
 
 // Bloque C: personas + IA (E11)
 await page.bringToFront().catch(() => {});
-await page.evaluate(() => document.querySelector('#escena-e11')?.scrollIntoView({ behavior: 'instant' }));
-await page.waitForTimeout(700);
+await wheelToScene('#escena-e11 [data-demo="personas"]');
+await page.waitForTimeout(900);
 await waitBound('[data-demo="personas"]');
 check('7M-I E11: 3 selectores de caso + control discreto de movimiento; SIN ejecutar/pausar/paso/reiniciar ni data-pers-step suelto', await page.evaluate(() => document.querySelectorAll('#escena-e11 [data-pers-case]').length === 3 && !!document.querySelector('#escena-e11 [data-pers-motion]') && ['[data-pers-run]','[data-pers-pause]','[data-pers-step]','[data-pers-reset]'].filter((x) => document.querySelector('#escena-e11 ' + x)).length === 0 && document.querySelectorAll('#escena-e11 [data-pers-stage]').length === 4), '');
 // cambio repetido entre casos actualiza textos de inmediato
@@ -1496,9 +1515,9 @@ for (let i = 0; i < 26; i++) {
 const e11wraps = e11seq.filter((v, i) => i > 0 && v === 0 && e11seq[i - 1] === 3).length;
 check('7M-I E11: 4 ciclos consecutivos completos automáticos (3→0 contado ≥4)', e11wraps >= 4, `seq=${e11seq.join('')} wraps=${e11wraps}`);
 // salida y reentrada sin temporizadores duplicados: cadencia estable (~1.4 s por etapa)
-await page.evaluate(() => document.querySelector('#escena-e07')?.scrollIntoView({ behavior: 'instant' }));
-await page.waitForTimeout(2500);
-await page.evaluate(() => document.querySelector('#escena-e11')?.scrollIntoView({ block: 'center', behavior: 'instant' }));
+await wheelAway(12);
+await page.waitForTimeout(1200);
+await wheelToScene('#escena-e11 [data-demo="personas"]');
 await page.waitForTimeout(1500);
 const e11t = [];
 for (let i = 0; i < 6; i++) {
@@ -1508,10 +1527,16 @@ for (let i = 0; i < 6; i++) {
 const e11adv = e11t.filter((v, i) => i > 0 && v !== e11t[i - 1]).length;
 check('7M-I E11: tras salir y volver, un solo avance por intervalo (sin temporizadores acumulados)', e11adv >= 3 && e11adv <= 6, `seq=${e11t.join('')} advances=${e11adv}`);
 // 7M-I §10: en escritorio, selectores + diagrama + panel de etapas caben a la vez en el viewport
+// posicionado fino: alinear el inicio de los controles arriba del viewport
+for (let i = 0; i < 24; i++) {
+  const top = await page.evaluate(() => Math.round(document.querySelector('#escena-e11 .pers__controls')?.getBoundingClientRect().top ?? -1));
+  if (top >= 0 && top <= 30) break;
+  await page.mouse.move(700, 450);
+  await page.mouse.wheel(0, top > 30 ? 160 : -160);
+  await page.waitForTimeout(240);
+}
 const e11fit = await page.evaluate(() => {
   const r = (el) => { const b = el?.getBoundingClientRect(); return b ? { top: b.top, bottom: b.bottom } : null; };
-  document.querySelector('#escena-e11')?.scrollIntoView({ block: 'start', behavior: 'instant' });
-  window.scrollBy(0, -80);
   const vh = window.innerHeight;
   const c = r(document.querySelector('#escena-e11 .pers__controls'));
   const v = r(document.querySelector('#escena-e11 .pers__visual'));
@@ -1686,10 +1711,11 @@ check('7M-F E27: antes del CTA no hay membresía persistida (selección vacía)'
 await page.evaluate(() => document.querySelector('#escena-e22')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
 await waitBound('[data-demo="housing"]');
 const hRack0 = await page.evaluate(() => ({ lit0: document.querySelectorAll('#escena-e22 [data-hslot="0"].is-on').length, mode: document.querySelector('#escena-e22 [data-housing-stage]')?.dataset.mode }));
-check('7M-H housing: default compartido con rack 50/50', hRack0.c === '50%' && hRack0.n === '50%' && hRack0.mode === 'compartido', JSON.stringify(hRack0));
+check('7M-I housing: default compartido — rack 0 con 10 slots encendidos y stage compartido', hRack0.lit0 === 10 && hRack0.mode === 'compartido', JSON.stringify(hRack0));
 await clickJs('#escena-e22 [data-housing-mode="privado"]');
 await page.waitForTimeout(700);
-check('7M-I housing: privado = 9 slots encendidos en rack único y persiste en state.housingMode', hRack0.lit0 === 9 && hRack0.mode === 'privado' && (await sceneState()).housingMode === 'privado', JSON.stringify(hRack0));
+const hPriv = await page.evaluate(() => ({ lit0: document.querySelectorAll('#escena-e22 [data-hslot="0"].is-on').length, mode: document.querySelector('#escena-e22 [data-housing-stage]')?.dataset.mode ?? '' }));
+check('7M-I housing: privado = 9 slots encendidos en rack único y persiste en state.housingMode', hPriv.lit0 === 9 && hPriv.mode === 'privado' && (await sceneState()).housingMode === 'privado', JSON.stringify(hPriv));
 await clickJs('#escena-e22 [data-housing-run]');
 await page.waitForTimeout(1200);
 const hSeq = await page.evaluate(() => ({ status: document.querySelector('#escena-e22 [data-housing-status]')?.textContent ?? '', on: document.querySelectorAll('#escena-e22 .housing7__chip--on').length }));

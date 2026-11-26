@@ -42,8 +42,24 @@ const waitReady = (page) => page.waitForFunction(
   { timeout: 60000 },
 ).catch(() => {});
 
+const wheelTo = async (page, sel) => {
+  for (let i = 0; i < 45; i++) {
+    const vis = await page.evaluate((s2) => {
+      const el = document.querySelector(s2);
+      if (!el) return false;
+      const b = el.getBoundingClientRect();
+      return b.top < window.innerHeight * 0.72 && b.bottom > window.innerHeight * 0.15;
+    }, sel);
+    if (vis) return true;
+    await page.mouse.move(Math.round(w / 2), Math.round(h / 2));
+    await page.mouse.wheel(0, 700);
+    await page.waitForTimeout(280);
+  }
+  return false;
+};
+
 const shoot = async (page, w, h, id, sel, extraMeta = {}) => {
-  await page.evaluate((s) => document.querySelector(s)?.scrollIntoView({ behavior: 'instant', block: 'start' }), sel);
+  await wheelTo(page, sel); // rueda real: el controlador de ruta no reimpone scrollTo
   await page.waitForTimeout(2600); // demos auto-cíclicas: dejar que avancen
   const meta = await page.evaluate((s) => {
     const el = document.querySelector(s);
@@ -103,7 +119,7 @@ const recordDemo = async (name, sceneSel, w, h) => {
   await waitReady(page);
   await page.evaluate(() => { window.__publiaLastProgrammaticScroll = Date.now(); window.scrollTo(0, 0); document.querySelector('[data-route-choice="efficiency"]')?.click(); });
   await page.waitForFunction(() => document.documentElement.dataset.act === 'efficiency', null, { timeout: 30000 }).catch(() => {});
-  await page.evaluate((s) => document.querySelector(s)?.scrollIntoView({ behavior: 'instant', block: 'center' }), sceneSel);
+  await wheelTo(page, sceneSel);
   await page.waitForTimeout(26000); // ≈ 4+ ciclos de 4 etapas a 1.4–1.5 s
   await ctx.close();
   console.log('video', name);
