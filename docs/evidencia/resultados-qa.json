@@ -1,7 +1,7 @@
 {
   "base": "https://dam-boulevard-explaining-alaska.trycloudflare.com",
   "total": 270,
-  "fallos": 4,
+  "fallos": 6,
   "resultados": [
     {
       "name": "carga inicial sin errores JS",
@@ -111,22 +111,22 @@
     {
       "name": "transición enterprise: la cámara viaja a otro mundo del mismo universo",
       "ok": true,
-      "detail": "mundo hero→enterprise · cámara [0,2.4,11.6]→[2.4956810631229236,1.8608803986710962,8.390240863787376] · tinte #050b1b→#0a0e18"
+      "detail": "mundo hero→enterprise · cámara [0,2.4,11.6]→[2.493687707641196,1.8601328903654484,8.388621262458472] · tinte #050b1b→#0a0e18"
     },
     {
       "name": "transición enterprise: el contenido de la escena destino aparece",
       "ok": true,
-      "detail": "scrollY 1758 · act=enterprise"
+      "detail": "scrollY 1760 · act=enterprise"
     },
     {
       "name": "transición enterprise: volver regresa al hero sin recargar",
       "ok": true,
-      "detail": "world=hero · act=hero · scrollY 12"
+      "detail": "world=hero · act=hero · scrollY 7"
     },
     {
       "name": "transición efficiency: la cámara viaja a otro mundo del mismo universo",
       "ok": true,
-      "detail": "mundo hero→efficiency · cámara [0,2.4,11.6]→[-2.334657039711191,1.824187725631769,8.610469314079424] · tinte #050b1b→#0d0a05"
+      "detail": "mundo hero→efficiency · cámara [0,2.4,11.6]→[-2.3333935018050544,1.823826714801444,8.609566787003612] · tinte #050b1b→#0d0a05"
     },
     {
       "name": "transición efficiency: el contenido de la escena destino aparece",
@@ -136,7 +136,7 @@
     {
       "name": "transición efficiency: volver regresa al hero sin recargar",
       "ok": true,
-      "detail": "world=hero · act=hero · scrollY 7"
+      "detail": "world=hero · act=hero · scrollY 12"
     },
     {
       "name": "transición cooperative: la cámara viaja a otro mundo del mismo universo",
@@ -151,7 +151,7 @@
     {
       "name": "transición cooperative: volver regresa al hero sin recargar",
       "ok": true,
-      "detail": "world=hero · act=hero · scrollY 10"
+      "detail": "world=hero · act=hero · scrollY 16"
     },
     {
       "name": "P0: sólo dos botones principales en el hero (la tercera ruta es por scroll)",
@@ -176,7 +176,7 @@
     {
       "name": "P0: el scroll conduce la cámara (scrub) hacia el mundo cooperativo",
       "ok": true,
-      "detail": "world=cooperative · cámara=[0,2.3351851583219037,11.314814696616377] · scrollY=2100"
+      "detail": "world=cooperative · cámara=[0,1.5,8.8] · scrollY=18300"
     },
     {
       "name": "P0: tras elegir empresa, el scroll NO cambia a exploración",
@@ -286,7 +286,7 @@
     {
       "name": "ruta eficiencia: escena propia visible",
       "ok": true,
-      "detail": "1167px · route=efficiency act=efficiency world=efficiency scrollY=69"
+      "detail": "1167px · route=efficiency act=efficiency world=efficiency scrollY=96"
     },
     {
       "name": "ruta eficiencia: mensaje propio de la escena",
@@ -306,7 +306,7 @@
     {
       "name": "cambio de ruta: regresa al hero",
       "ok": true,
-      "detail": "scrollY 16"
+      "detail": "scrollY 22"
     },
     {
       "name": "ruta exploración: se activa por scroll natural",
@@ -691,12 +691,12 @@
     {
       "name": "7M-I E07: arranque automático sin clic — etapa activa y contador avanzando (4 etapas cíclicas)",
       "ok": true,
-      "detail": "{\"a\":{\"count\":\"04\",\"active\":1},\"b\":{\"count\":\"01\",\"feed\":\"Llega la consulta al canal elegido.\"}}"
+      "detail": "{\"a\":{\"count\":\"03\",\"active\":1},\"b\":{\"count\":\"04\",\"feed\":\"Queda registro y seguimiento visible.\"}}"
     },
     {
       "name": "7M-I E07: 4 ciclos consecutivos completos (3→0 contado ≥3 en ~32 s con etapa siempre activa; ciclo ≈6 s)",
       "ok": true,
-      "detail": "seq=1122301230123011233001123001122301 wraps=6 alive=34"
+      "detail": "seq=3001123001122330122330112233001123 wraps=5 alive=34"
     },
     {
       "name": "V4-B E11 personas+IA en marfil (cream)",
@@ -705,8 +705,8 @@
     },
     {
       "name": "V4-B cierre: recomendación con >=3 items",
-      "ok": true,
-      "detail": "items=4 status=Tu recorrido: ruta Empresa. Estos son los siguientes pasos q"
+      "ok": false,
+      "detail": "items=0 status=Preparando tu resumen…"
     },
     {
       "name": "cierre V2: botón copiar resumen presente",
@@ -881,7 +881,7 @@
     {
       "name": "v4-A transición botón: cámara cambia en 3 momentos (inicio/medio/fin)",
       "ok": true,
-      "detail": "0=[] mid=[2.7647840531561463,1.9617 fin=[2.4916943521594686,1.8593"
+      "detail": "0=[] mid=[2.893687707641196,2.01013 fin=[2.4916943521594686,1.8593"
     },
     {
       "name": "v4-A transición botón: portal visible a mitad del viaje",
@@ -1095,8 +1095,8 @@
     },
     {
       "name": "7M-D axe ruta explorer tras abrir controles: sin violaciones graves/moderadas",
-      "ok": true,
-      "detail": "0"
+      "ok": false,
+      "detail": "color-contrast×1"
     },
     {
       "name": "7M-E recorrido esencial ruta enterprise: 6-9 capítulos (7)",

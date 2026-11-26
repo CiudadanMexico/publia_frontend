@@ -1554,7 +1554,7 @@ await page.waitForTimeout(400);
 const e11c3 = await page.evaluate(() => ({ kind: document.querySelector('#escena-e11 [data-pers-kind]')?.textContent ?? '', human: document.querySelector('#escena-e11 [data-pers-human-name]')?.textContent ?? '' }));
 check('7M-I E11: cambio repetido Atención→Soporte→Creatividad actualiza caso y persona al instante', e11c2.pressed === 'true' && e11c2.kind.includes('SOPORTE') && e11c3.kind.includes('CREATIVIDAD') && e11c2.human !== e11c3.human && e11c1.kind !== e11c3.kind, JSON.stringify({ e11c1, e11c2, e11c3 }));
 // demo arranca sola: is-running + etapa activa + slot de retrato + disclaimer ilustrativo
-const persAuto = await page.evaluate(() => ({
+const persAuto = await demoPage.evaluate(() => ({
   running: document.querySelector('#escena-e11 .pers__visual')?.classList.contains('is-running') ?? false,
   active: document.querySelectorAll('#escena-e11 [data-pers-stage].is-active').length,
   out: document.querySelector('#escena-e11 [data-pers-out-title]')?.textContent ?? '',
@@ -1565,21 +1565,21 @@ check('7M-I E11: demo arranca sola al entrar en pantalla (is-running + etapa act
 // 4 ciclos completos automáticos (muestreo del índice de etapa activa, ciclo ≈ 4×1.4 s)
 const e11seq = [];
 for (let i = 0; i < 30; i++) {
-  e11seq.push(await page.evaluate(() => { const a = document.querySelector('#escena-e11 [data-pers-stage].is-active'); return a ? Number(a.dataset.persStage) : -1; }));
-  await page.waitForTimeout(950);
+  e11seq.push(await demoPage.evaluate(() => { const a = document.querySelector('#escena-e11 [data-pers-stage].is-active'); return a ? Number(a.dataset.persStage) : -1; }));
+  await demoPage.waitForTimeout(950);
 }
 const e11wraps = e11seq.filter((v, i) => i > 0 && v === 0 && e11seq[i - 1] === 3).length;
 const e11alive = e11seq.filter((v) => v >= 0).length;
 check('7M-I E11: ciclos completos automáticos (3→0 contado ≥3 en ~28 s con etapa siempre activa; ciclo ≈5.6 s)', e11wraps >= 3 && e11alive === e11seq.length, `seq=${e11seq.join('')} wraps=${e11wraps} alive=${e11alive}`);
 // salida y reentrada sin temporizadores duplicados: cadencia estable (~1.4 s por etapa)
 await (async () => { for (let i = 0; i < 12; i++) { await demoPage.evaluate(() => { window.__publiaLastProgrammaticScroll = Date.now(); window.dispatchEvent(new WheelEvent('wheel', { deltaY: -700, bubbles: true })); window.scrollBy({ top: -500, behavior: 'instant' }); }); await demoPage.waitForTimeout(280); } })();
-await page.waitForTimeout(1200);
+await demoPage.waitForTimeout(1200);
 await wheelToSceneD('#escena-e11 [data-demo="personas"]');
-await page.waitForTimeout(1500);
+await demoPage.waitForTimeout(1500);
 const e11t = [];
 for (let i = 0; i < 6; i++) {
-  e11t.push(await page.evaluate(() => { const a = document.querySelector('#escena-e11 [data-pers-stage].is-active'); return a ? Number(a.dataset.persStage) : -1; }));
-  await page.waitForTimeout(1500);
+  e11t.push(await demoPage.evaluate(() => { const a = document.querySelector('#escena-e11 [data-pers-stage].is-active'); return a ? Number(a.dataset.persStage) : -1; }));
+  await demoPage.waitForTimeout(1500);
 }
 const e11adv = e11t.filter((v, i) => i > 0 && v !== e11t[i - 1]).length;
 check('7M-I E11: tras salir y volver, un solo avance por intervalo (sin temporizadores acumulados)', e11adv >= 3 && e11adv <= 6, `seq=${e11t.join('')} advances=${e11adv}`);
@@ -1978,6 +1978,8 @@ for (const r of ['efficiency', 'explorer']) {
   await ap.waitForFunction((s2) => document.querySelector(s2)?.dataset.bound === '1', '[data-demo="marketing"]', { timeout: 30000 }).catch(() => {});
   await ap.evaluate(() => document.querySelector('#escena-e26 [data-mkt-area="redes"]')?.click());
   await ap.waitForTimeout(600);
+  await ap.addStyleTag({ content: '*{animation:none!important;transition:none!important}[data-reveal]{opacity:1!important;translate:none!important;rotate:none!important;scale:none!important}' });
+  await ap.waitForTimeout(400);
   await ap.addScriptTag({ content: axeSource });
   const axeR = await ap.evaluate(async () => {
     const run = await window.axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'best-practice'] } });
