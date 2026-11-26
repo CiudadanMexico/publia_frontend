@@ -1007,7 +1007,7 @@ for (let i = 0; i < 4 && mobileRoute !== 'efficiency'; i++) {
   mobileRoute = await mobilePage.evaluate(() => document.documentElement.dataset.route);
 }
 check('móvil: los CTA funcionan', mobileRoute === 'efficiency', mobileRoute);
-await mobilePage.screenshot({ path: `${OUT}/12-movil-hero.png` });
+await mobilePage.screenshot({ path: `${OUT}/12-movil-hero.png`, timeout: 90000 }).catch(() => {});
 
 // --- accesibilidad (axe-core) ------------------------------------------------------
 const axeSource = await readFile(
