@@ -356,86 +356,8 @@ function bindDemos(universe: UniverseHandleLike | null): void {
     });
   });
 
-  // Eficiencia — flujo consulta → agente → persona → seguimiento
-  document.querySelectorAll<HTMLButtonElement>('[data-flow-focus]').forEach((chip) => {
-    chip.addEventListener('click', () => {
-      const wrap = chip.closest('[data-demo="flow"]');
-      wrap?.querySelectorAll('[data-flow-focus]').forEach((c) => c.setAttribute('aria-pressed', 'false'));
-      chip.setAttribute('aria-pressed', 'true');
-      const result = wrap?.querySelector('[data-flow-result]');
-      if (result) result.textContent = chip.dataset['flowResult'] ?? '';
-      setAnswer('foco', chip.dataset['flowFocus'] ?? '');
-      // el punto viaja por las etapas
-      const stages = [...(wrap?.querySelectorAll('[data-flow-stage]') ?? [])] as HTMLElement[];
-      const dot = wrap?.querySelector('[data-flow-dot]') as HTMLElement | null;
-      stages.forEach((st) => st.classList.remove('is-active'));
-      if (dot) {
-        const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        gsap.killTweensOf(dot);
-        gsap.set(dot, { opacity: 1, left: 0 });
-        const tl = gsap.timeline({ defaults: { duration: reduced ? 0 : 0.55, ease: 'power1.inOut' } });
-        stages.forEach((st, i) => {
-          const target = st.offsetLeft + st.offsetWidth / 2;
-          tl.to(dot, { left: target }, i * 0.55);
-          tl.add(() => st.classList.add('is-active'), i * 0.55);
-        });
-        tl.to(dot, { opacity: 0 });
-      }
-      universe?.setSceneLook({ network: 0.85, spread: 0.5, lightBoost: 1.1, tintMix: 0.45, camX: -0.5, camY: 0.25, camZ: -0.5 } as Record<string, unknown>);
-      universe?.cardPulse(2);
-      track('demo_flujo_foco', { foco: chip.dataset['flowFocus'] ?? '' });
-    });
-  });
-
-  // Eficiencia — ejecutar la demostración por las 4 etapas (P0-02, paquete 7 mundos)
-  document.querySelectorAll<HTMLElement>('[data-demo="flow"]').forEach((wrap) => {
-    const runBtn = wrap.querySelector<HTMLButtonElement>('[data-flow-run]');
-    const resetBtn = wrap.querySelector<HTMLButtonElement>('[data-flow-reset]');
-    const feed = wrap.querySelector<HTMLElement>('[data-flow-feed]');
-    const count = wrap.querySelector<HTMLElement>('[data-flow-count]');
-    const stages = [...wrap.querySelectorAll<HTMLElement>('[data-flow-stage]')];
-    const chip = () => wrap.querySelector<HTMLButtonElement>('[data-flow-focus][aria-pressed="true"]');
-    let running = false;
-    let timers: number[] = [];
-    const clear = (): void => { timers.forEach(window.clearTimeout); timers = []; };
-    const stageLines = ['Llega la consulta al canal elegido.', 'El agente la clasifica y prepara una propuesta.', 'Una persona revisa y decide.', 'Queda registro y seguimiento visible.'];
-    const reset = (): void => {
-      clear();
-      running = false;
-      if (runBtn) runBtn.disabled = false;
-      stages.forEach((st) => st.classList.remove('is-active'));
-      if (count) count.textContent = '00';
-      if (feed) feed.textContent = 'Listo para otra simulación. Elige un caso y ejecuta.';
-    };
-    runBtn?.addEventListener('click', () => {
-      if (running) return;
-      running = true;
-      if (runBtn) runBtn.disabled = true;
-      clear();
-      stages.forEach((st) => st.classList.remove('is-active'));
-      const c = chip();
-      const foco = c?.dataset['flowFocus'] ?? '';
-      if (feed) feed.textContent = 'Iniciando simulación…';
-      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      stages.forEach((st, i) => {
-        timers.push(window.setTimeout(() => {
-          stages.forEach((x) => x.classList.remove('is-active'));
-          st.classList.add('is-active');
-          if (feed) feed.textContent = stageLines[i] ?? '';
-          if (count) count.textContent = String(i + 1).padStart(2, '0');
-          universe?.cardPulse(i);
-        }, reduced ? 0 : i * 900));
-      });
-      timers.push(window.setTimeout(() => {
-        running = false;
-        if (runBtn) runBtn.disabled = false;
-        if (feed) feed.textContent = 'Simulación completada: consulta atendida con revisión humana y seguimiento registrado.';
-        track('demo_flujo_run', { foco });
-      }, reduced ? 0 : stages.length * 900));
-      track('demo_flujo_run', { foco });
-    });
-    resetBtn?.addEventListener('click', reset);
-  });
+  // Eficiencia — flujo consulta → agente → persona → seguimiento (7M-I §5: un solo mecanismo local, auto-cíclico)
+  lazyBind('[data-demo="flow"]', () => import('../lib/experience/flow').then((m) => m.bindFlow({ cardPulse: (i) => universe?.cardPulse(i), setSceneLook: (l) => universe?.setSceneLook(l) })));
 
   // Cooperativa — GeoNodos: el scroll enciende conexiones, el clic explica
   document.querySelectorAll<HTMLElement>('[data-demo="geo"]').forEach((wrap) => {
