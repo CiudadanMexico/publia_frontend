@@ -85,8 +85,6 @@ const pscroll = (top) => page.evaluate((t) => {
   window.scrollTo({ top: t, behavior: 'instant' });
 }, top);
 
-// Rueda real hasta que la ruta libre se active (reintenta si el entorno va lento)
-const wheelUntilExplorer = async (max = 8) => {
 // 7M-I: bajar con rueda (evento de usuario; el controlador de ruta reimpone scrollTo programático)
 const wheelToScene = async (sel, max = 45) => {
   for (let i = 0; i < max; i++) {
@@ -106,6 +104,9 @@ const wheelToScene = async (sel, max = 45) => {
 const wheelAway = async (times = 10) => {
   for (let i = 0; i < times; i++) { await page.mouse.move(700, 450); await page.mouse.wheel(0, -700); await page.waitForTimeout(260); }
 };
+
+// Rueda real hasta que la ruta libre se active (reintenta si el entorno va lento)
+const wheelUntilExplorer = async (max = 8) => {
   for (let i = 0; i < max; i++) {
     await page.waitForFunction(() => document.documentElement.dataset.act === 'hero' && !!window.ScrollTrigger, null, { timeout: 20000 }).catch(() => {});
     await page.mouse.wheel(0, 700);
