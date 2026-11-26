@@ -1075,8 +1075,8 @@ const reduced = await browser.newContext({
 });
 const reducedPage = await reduced.newPage();
 await reducedPage.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 90000 });
-await reducedPage.waitForFunction(() => document.querySelector('.prism-layer')?.classList.contains('is-ready'), null, { timeout: 45000 }).catch(() => {});
-await reducedPage.waitForTimeout(1500);
+await reducedPage.waitForFunction(() => document.querySelector('.prism-layer')?.classList.contains('is-ready') || ['ready','silent','error'].includes(document.querySelector('.prism-layer')?.getAttribute('data-load-state') ?? ''), null, { timeout: 90000 }).catch(() => {});
+await reducedPage.waitForTimeout(2500);
 const reducedInfo = await reducedPage.evaluate(() => ({
   layerReady: document.querySelector('.prism-layer')?.classList.contains('is-ready') ?? false,
   reveals: [...document.querySelectorAll('[data-reveal]')].every(
