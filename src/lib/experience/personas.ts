@@ -156,6 +156,18 @@ export function bindPersonas(): void {
     inView = true;
     if (!reduced) start();
   }
+  // respaldo determinista además del IO: recalcular visibilidad en cada scroll
+  const syncView = (): void => {
+    const r = wrap.getBoundingClientRect();
+    const vis = r.top < window.innerHeight * 0.75 && r.bottom > window.innerHeight * 0.15 && r.width > 0;
+    if (vis !== inView) {
+      inView = vis;
+      if (inView) { if (!reduced) start(); }
+      else halt();
+    }
+  };
+  window.addEventListener('scroll', syncView, { passive: true });
+  window.addEventListener('resize', syncView);
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) halt();
     else if (inView && !reduced) start();
