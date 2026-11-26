@@ -12,6 +12,7 @@ import type { ResolvedScene } from '../../../lib/experience/graph';
 import { accentify } from '../../../lib/experience/accent';
 import { PERSONAS_CASES } from '../../../data/personas';
 import { COPY_7MF } from '../../../data/copy7mf';
+import { E27_SUPPORT_CTA_7MI } from '../../../data/copy7mi';
 
 interface Props {
   scene: ResolvedScene;
@@ -29,7 +30,7 @@ const c0 = cases[0]!;
     {scene.lead && <p class="catalog__lead" data-reveal>{scene.lead}</p>}
     {scene.body && <p class="catalog__body" data-reveal>{scene.body}</p>}
     <p class="pers__cta-row" data-reveal>
-      <a class="button button--ghost pers__cta" href="#escena-e27" data-open-alcance>{COPY_7MF.personas.cta} ↗</a>
+      <a class="button button--ghost pers__cta" href="#escena-e27" data-open-alcance>{E27_SUPPORT_CTA_7MI} ↗</a>
     </p>
   </div>
 

@@ -9,6 +9,7 @@
 import type { ResolvedScene } from '../../../lib/experience/graph';
 import { accentify } from '../../../lib/experience/accent';
 import { COPY_7MF } from '../../../data/copy7mf';
+import { E27_LEAD_7MI, E27_LEGEND_7MI, E27_DETAIL_LABEL_7MI, E27_EXTRAS_TITLE_7MI, E27_PLAN_CTA_7MI, E27_PLANS_7MI } from '../../../data/copy7mi';
 
 interface Props {
   scene: ResolvedScene;
@@ -37,8 +38,9 @@ const teams = [
   <div class="catalog__intro">
     <p class="catalog__eyebrow" data-reveal>MEMBRESÍAS PUBLIA</p>
     <h2 class="catalog__title" data-role="title" data-reveal="lines" set:html={accentify(m.title)} />
-    <p class="catalog__lead" data-reveal>{m.lead}</p>
+    <p class="catalog__lead" data-reveal>{E27_LEAD_7MI}</p>
     <p class="memb__shared">{m.sharedNote}</p>
+    <p class="memb__legend">{E27_LEGEND_7MI}</p>
   </div>
 
   <div class="memb__grid">
@@ -63,7 +65,7 @@ const teams = [
               <span class="memb__badge" data-memb-badge={p.id} hidden>Sugerencia</span>
             </button>
             <details class="memb__scope" data-memb-scope={p.id}>
-              <summary>{m.detailLabel}</summary>
+              <summary>{E27_DETAIL_LABEL_7MI}</summary>
               <p>{p.detail}</p>
             </details>
           </div>
@@ -73,6 +75,8 @@ const teams = [
         <h3 data-memb-name>{first.label}</h3>
         <p class="memb__price" data-memb-price>{fmt(first.priceMXN)} {m.currency}</p>
         <p data-memb-summary>{first.tagline}</p>
+        <p class="memb__forwho" data-memb-forwho>{E27_PLANS_7MI['base']?.forWho}</p>
+        <p class="memb__problem" data-memb-problem>{E27_PLANS_7MI['base']?.problem}</p>
         <ul data-memb-includes>{first.features.map((f) => <li>{f}</li>)}</ul>
       </article>
       <a
@@ -82,7 +86,7 @@ const teams = [
         target="_blank"
         rel="noopener noreferrer"
       >
-        Conversar sobre este plan
+        {E27_PLAN_CTA_7MI}
       </a>
     </div>
   </div>
@@ -115,7 +119,7 @@ const teams = [
   </div>
 
   <div class="memb__extras">
-    <h3>{m.extrasTitle}</h3>
+    <h3>{E27_EXTRAS_TITLE_7MI}</h3>
     <p>{m.extrasBody}</p>
   </div>
 </section>
@@ -123,6 +127,7 @@ const teams = [
 <style>
   .memb { display: grid; gap: 1.2rem; color: #091b34; }
   .memb .catalog__eyebrow, .memb .catalog__title, .memb .catalog__lead { color: #091b34; }
+  .memb__legend { max-width: 62ch; font-size: 0.85rem; margin: 6px 0 0; opacity: 0.8; }
   .memb__shared { max-width: 58ch; font-size: 0.9rem; color: #5c4a12; margin: 8px 0 0; }
   .memb__chosen { margin: 0 0 8px; font-size: 12px; font-weight: 800; color: #7a5b00; letter-spacing: 0.04em; }
   .memb__plan-wrap { display: grid; gap: 4px; }
@@ -154,6 +159,8 @@ const teams = [
   .memb__scope { font-size: 0.72rem; color: #576678; }
   .memb__scope summary { cursor: pointer; min-height: 28px; font-weight: 700; color: #1655bc; }
   .memb__scope p { margin: 6px 0 0; line-height: 1.45; }
+  .memb__forwho, .memb__problem { margin: 0; font-size: 0.85rem; line-height: 1.45; }
+  .memb__forwho { font-weight: 700; }
   .memb__detail { border-top: 1px solid #f0dcae; padding-top: 0.6rem; }
   .memb__detail h3 { margin: 0; font-size: 1.15rem; color: #071a31; }
   .memb__detail > p { margin: 0.2rem 0; font-size: 0.88rem; color: #576678; line-height: 1.45; }

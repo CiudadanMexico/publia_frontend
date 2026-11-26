@@ -9,6 +9,7 @@
 import { getState, setMembership, type MembershipSlug } from './state';
 import { track } from './events';
 import { COPY_7MF } from '../../data/copy7mf';
+import { E27_PLANS_7MI } from '../../data/copy7mi';
 
 const PLANS = COPY_7MF.memberships.plans;
 const ORDER: readonly string[] = PLANS.map((p) => p.id);
@@ -38,6 +39,8 @@ export function bindMemberships(): void {
   const elSummary = wrap.querySelector<HTMLElement>('[data-memb-summary]');
   const elPrice = wrap.querySelector<HTMLElement>('[data-memb-price]');
   const elIncludes = wrap.querySelector<HTMLElement>('[data-memb-includes]');
+  const elForWho = wrap.querySelector<HTMLElement>('[data-memb-forwho]');
+  const elProblem = wrap.querySelector<HTMLElement>('[data-memb-problem]');
   const elChosen = wrap.querySelector<HTMLElement>('[data-memb-chosen]');
   const core = wrap.querySelector<HTMLElement>('[data-memb-core]');
   const cta = wrap.querySelector<HTMLAnchorElement>('[data-memb7-cta]');
@@ -64,6 +67,9 @@ export function bindMemberships(): void {
     if (elPrice) elPrice.textContent = `${fmt(plan.priceMXN)} ${COPY_7MF.memberships.currency}`;
     if (elSummary) elSummary.textContent = plan.tagline;
     if (elIncludes) elIncludes.innerHTML = plan.features.map((f) => `<li>${f}</li>`).join('');
+    const extra = E27_PLANS_7MI[plan.id];
+    if (elForWho) elForWho.textContent = extra?.forWho ?? '';
+    if (elProblem) elProblem.textContent = extra?.problem ?? '';
     if (core) core.style.boxShadow = `0 10px 34px rgba(7,26,49,.25), 0 0 ${18 + upto.length * 8}px rgba(255, 209, 46, .55)`;
     if (cta) {
       cta.dataset.memb7Cta = id;
