@@ -48,9 +48,14 @@ export function bindHousing(): void {
     compartido: wrap.querySelector<HTMLElement>('[data-housing-col="compartido"]'),
     privado: wrap.querySelector<HTMLElement>('[data-housing-col="privado"]'),
   };
-  const rackClient = wrap.querySelector<HTMLElement>('[data-hrack-client]');
-  const rackNet = wrap.querySelector<HTMLElement>('[data-hrack-net]');
-  const rackLabel = wrap.querySelector<HTMLElement>('[data-hrack-label]');
+  const rackFoots = new Map<string, HTMLElement>();
+  wrap.querySelectorAll<HTMLElement>('[data-hrack-foot]').forEach((el) => {
+    const id = el.dataset['hrackFoot'];
+    if (id) rackFoots.set(id, el);
+  });
+  const slotEls = [...wrap.querySelectorAll<HTMLElement>('[data-hslot]')];
+  slotEls.forEach((el, i) => { el.dataset['idx'] = String(i % 10); });
+  const caption = wrap.querySelector<HTMLElement>('[data-housing-caption]');
 
   let types: TaskType[] = TASK_TYPES.map((t) => ({ ...t }));
   let mode: HousingMode = (getState().housingMode ?? 'compartido') as HousingMode;
@@ -101,13 +106,25 @@ export function bindHousing(): void {
     });
   };
 
-  const renderStage = (): void => {
+  /** 7M-I §3: los racks se pintan desde el MISMO modelo (rs/rp), sin segunda fuente. */
+  const renderStage = (r?: AssignmentResult): void => {
     if (!stage) return;
     stage.dataset['mode'] = mode;
     const shared = mode === 'compartido';
-    if (rackClient) rackClient.style.width = shared ? '50%' : '100%';
-    if (rackNet) rackNet.style.width = shared ? '50%' : '0%';
-    if (rackLabel) rackLabel.textContent = shared ? '50% negocio · 50% red' : '100% negocio';
+    if (caption) caption.textContent = shared ? 'COMPARTIDO · 50/25/25' : 'PRIVADO · 100% TU OPERACIÓN';
+    if (rackFoots.get('0')) rackFoots.get('0')!.textContent = shared ? '50 / 100' : '100 / 100';
+    if (rackFoots.get('1')) rackFoots.get('1')!.textContent = shared ? '25 / 100 · RESERVADO' : '';
+    if (rackFoots.get('2')) rackFoots.get('2')!.textContent = shared ? '25 / 100 · RESERVADO' : '';
+    // slots del rack del cliente: 10 slots; compartido 5 unidades/slot (cap 50), privado 10 (cap 100)
+    const slotUnits = shared ? 5 : 10;
+    const used = r ? r.used : (shared ? assignShared(types).used : assignPrivate(types).used);
+    const lit = Math.min(10, Math.round(used / slotUnits));
+    slotEls.forEach((el) => {
+      const rack = el.dataset['hslot'] ?? '';
+      el.classList.remove('is-on', 'is-reserved');
+      if (rack === '0') { if (Number(el.dataset['idx'] ?? '') < lit) el.classList.add('is-on'); }
+      else if (shared) el.classList.add('is-reserved');
+    });
     modeBtns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset['housingMode'] === mode)));
     cols.compartido?.setAttribute('data-active', String(shared));
     cols.privado?.setAttribute('data-active', String(!shared));
@@ -120,7 +137,7 @@ export function bindHousing(): void {
     const rp = assignPrivate(types);
     renderColumn('compartido', rs);
     renderColumn('privado', rp);
-    renderStage();
+    renderStage(mode === 'compartido' ? rs : rp);
     if (!seqOn) {
       renderChips(mode === 'compartido' ? rs : rp);
     }
@@ -183,7 +200,7 @@ export function bindHousing(): void {
     mode = m;
     setHousingMode(m);
     track('scene_viewed', { scene: 'E22', mode: m });
-    renderStage();
+    renderStage(m === 'compartido' ? assignShared(readTypes()) : assignPrivate(readTypes()));
     const typesNow = readTypes();
     renderChips(m === 'compartido' ? assignShared(typesNow) : assignPrivate(typesNow));
     renderAll();

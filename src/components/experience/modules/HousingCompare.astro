@@ -1,16 +1,17 @@
 ---
 /**
- * E22 Housing — 7M-H §6/§8. Este módulo posee el único H2 visible.
- * Modelo determinista de reparto (housingModel.ts): 100 unidades
- * ilustrativas, compartido 50/25/25 vs privado 100, caso inicial 85.
- * Entradas editables (cantidad 0–10, coste 1–100); dos columnas de salida
- * visibles a la vez; visual de 4 estaciones + rack segmentado; secuencia de
- * 6 s «Ver cómo se reparte el trabajo» con pausa/restablecer.
+ * E22 Housing — 7M-H §8 + 7M-I §3. Este módulo posee el único H2 visible.
+ * Modelo determinista (housingModel.ts): 100 unidades ilustrativas,
+ * compartido 50/25/25 vs privado 100, caso inicial 85.
+ * Escritorio: dos columnas — izquierda, configuración de tareas, demanda y
+ * resultados; derecha, stage de servidores recuperado del historial (racks
+ * 3D) que representa la capacidad asignada. Todo graphics Se alimenta del
+ * mismo modelo (housing.ts), sin segunda fuente de datos. Móvil: apilado.
  */
 import type { ResolvedScene } from '../../../lib/experience/graph';
 import { COPY_7MF } from '../../../data/copy7mf';
 import { E22_7MH } from '../../../data/copy7mh';
-import { TASK_TYPES, SHARED_RESERVED } from '../../../lib/experience/housingModel';
+import { TASK_TYPES } from '../../../lib/experience/housingModel';
 
 interface Props {
   scene: ResolvedScene;
@@ -19,6 +20,11 @@ interface Props {
 const { scene } = Astro.props;
 const waBase = `https://wa.me/${COPY_7MF.contact.number}?text=`;
 const e = E22_7MH;
+const rackDefs = [
+  { i: 0, title: 'TU NEGOCIO', foot: '50 / 100', footPriv: '100 / 100' },
+  { i: 1, title: 'SOCIOS Y BECARIOS', foot: '25 / 100', footPriv: '' },
+  { i: 2, title: 'MIEMBROS DE LA RED', foot: '25 / 100', footPriv: '' },
+];
 ---
 
 <section class="housing7" data-demo="housing" data-housing>
@@ -31,87 +37,105 @@ const e = E22_7MH;
 
   <p class="housing7__disclaimer" data-reveal>{e.disclaimer}</p>
 
-  <div class="housing7__model" data-housing-model>
-    <div class="housing7__inputs" role="group" aria-label="Entradas del escenario">
-      <p class="housing7__inputs-cap">{e.capacityLabel}: <b>{e.capacityValue}</b> · {e.demandLabel}: <b data-housing-demand>85</b> unidades</p>
-      <table class="housing7__table">
-        <thead>
-          <tr><th>Tipo de trabajo</th><th>Cantidad (0–10)</th><th>Unidades por tarea (1–100)</th><th>Prioridad</th></tr>
-        </thead>
-        <tbody>
-          {TASK_TYPES.map((t) => (
-            <tr data-housing-type={t.id}>
-              <th scope="row">{t.label}</th>
-              <td><input type="number" min="0" max="10" step="1" value={t.qty} data-housing-qty={t.id} inputmode="numeric" aria-label={`Cantidad de ${t.label}`} /></td>
-              <td><input type="number" min="1" max="100" step="1" value={t.cost} data-housing-cost={t.id} inputmode="numeric" aria-label={`Unidades por tarea de ${t.label}`} /></td>
-              <td>{t.priority}</td>
-            </tr>
+  <div class="housing7__grid">
+    <!-- Columna izquierda: configuración, demanda y resultados -->
+    <div class="housing7__left">
+      <div class="housing7__inputs" role="group" aria-label="Entradas del escenario">
+        <p class="housing7__inputs-cap">{e.capacityLabel}: <b>{e.capacityValue}</b> · {e.demandLabel}: <b data-housing-demand>85</b> unidades</p>
+        <table class="housing7__table">
+          <thead>
+            <tr><th>Tipo de trabajo</th><th>Cantidad (0–10)</th><th>Unidades por tarea (1–100)</th><th>Prioridad</th></tr>
+          </thead>
+          <tbody>
+            {TASK_TYPES.map((t) => (
+              <tr data-housing-type={t.id}>
+                <th scope="row">{t.label}</th>
+                <td><input type="number" min="0" max="10" step="1" value={t.qty} data-housing-qty={t.id} inputmode="numeric" aria-label={`Cantidad de ${t.label}`} /></td>
+                <td><input type="number" min="1" max="100" step="1" value={t.cost} data-housing-cost={t.id} inputmode="numeric" aria-label={`Unidades por tarea de ${t.label}`} /></td>
+                <td>{t.priority}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <details class="housing7__assumptions">
+          <summary>{e.assumptionsTitle}</summary>
+          <p>{e.assumptions}</p>
+        </details>
+      </div>
+
+      <div class="housing7__cols">
+        <div class="housing7__col" data-housing-col="compartido">
+          <h3>{e.colShared} <span class="housing7__cap">50 / 100</span></h3>
+          <dl class="housing7__stats">
+            <div><dt>{e.capClient}</dt><dd>50</dd></div>
+            <div><dt>{e.capNetwork}</dt><dd>50 (25 socios y becarios · 25 miembros)</dd></div>
+            <div><dt>{e.attended}</dt><dd data-hs="active">—</dd></div>
+            <div><dt>{e.waiting}</dt><dd data-hs="waiting">—</dd></div>
+            <div><dt>Unidades usadas</dt><dd data-hs="used">—</dd></div>
+            <div><dt>Disponibles</dt><dd data-hs="available">—</dd></div>
+          </dl>
+          <ul class="housing7__counts" data-hs-counts></ul>
+        </div>
+        <div class="housing7__col" data-housing-col="privado">
+          <h3>{e.colPrivate} <span class="housing7__cap">100 / 100</span></h3>
+          <dl class="housing7__stats">
+            <div><dt>{e.capClient}</dt><dd>100</dd></div>
+            <div><dt>{e.capNetwork}</dt><dd>0</dd></div>
+            <div><dt>{e.attended}</dt><dd data-hs="active">—</dd></div>
+            <div><dt>{e.waiting}</dt><dd data-hs="waiting">—</dd></div>
+            <div><dt>Unidades usadas</dt><dd data-hs="used">—</dd></div>
+            <div><dt>Disponibles</dt><dd data-hs="available">—</dd></div>
+          </dl>
+          <ul class="housing7__counts" data-hs-counts></ul>
+        </div>
+      </div>
+
+      <div class="housing7__controls">
+        <div class="housing7__selector" role="group" aria-label="Elegir modalidad de Housing">
+          <button class="housing7__mode" type="button" data-housing-mode="compartido" aria-pressed="true">Compartido</button>
+          <button class="housing7__mode" type="button" data-housing-mode="privado" aria-pressed="false">Privado</button>
+        </div>
+        <button class="housing7__btn housing7__btn--primary" type="button" data-housing-run>{e.run}</button>
+        <button class="housing7__btn" type="button" data-housing-pause aria-pressed="false" disabled>{e.pause}</button>
+        <button class="housing7__btn" type="button" data-housing-reset>{e.reset}</button>
+        <a class="housing7__btn housing7__btn--wa" data-housing-cta href={waBase} target="_blank" rel="noopener">Consultar mi Housing ↗</a>
+      </div>
+      <p class="housing7__status" data-housing-status role="status" aria-live="polite"></p>
+    </div>
+
+    <!-- Columna derecha: stage de servidores recuperado (mismo modelo) -->
+    <div class="housing7__right">
+      <p class="visually-hidden" id="housing7-stage-desc">Escena de servidores ilustrativa: en modalidad compartida hay un rack para tu negocio y dos para la red (socios y becarios, miembros); en privada, un solo rack al 100% para tu operación. Los slots encendidos muestran las unidades usadas.</p>
+      <div class="housing7__stage" data-housing-stage data-mode="compartido" role="img" aria-describedby="housing7-stage-desc">
+        <span class="housing7__service-light">SISTEMA ILUSTRATIVO</span>
+        <img class="housing7__rings" src="/assets/a08/A08_anillos.svg" alt="" aria-hidden="true" />
+        <div class="housing7__platform" aria-hidden="true" />
+        <div class="housing7__shield" aria-hidden="true" />
+        <svg class="housing7__links" viewBox="0 0 800 590" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M350 410 C 355 320, 375 285, 465 250" />
+          <path class="housing7__links-yellow" d="M335 415 Q 470 410, 515 460" />
+          <path d="M468 250 Q 540 270, 515 460" />
+        </svg>
+        <div class="housing7__hardware" data-housing-hardware>
+          {rackDefs.map((r) => (
+            <div class="housing7__rack" data-housing-rack={String(r.i)}>
+              <span class="housing7__rack-title">{r.title}</span>
+              {Array.from({ length: 10 }).map(() => <span class="housing7__slot" data-hslot={String(r.i)} />)}
+              <span class="housing7__rack-foot" data-hrack-foot={String(r.i)}>{r.foot}</span>
+            </div>
           ))}
-        </tbody>
-      </table>
-      <details class="housing7__assumptions">
-        <summary>{e.assumptionsTitle}</summary>
-        <p>{e.assumptions}</p>
-      </details>
-    </div>
-
-    <div class="housing7__cols">
-      <div class="housing7__col" data-housing-col="compartido">
-        <h3>{e.colShared} <span class="housing7__cap">50 / 100</span></h3>
-        <dl class="housing7__stats">
-          <div><dt>{e.capClient}</dt><dd>50</dd></div>
-          <div><dt>{e.capNetwork}</dt><dd>50 (25 socios y becarios · 25 miembros)</dd></div>
-          <div><dt>{e.attended}</dt><dd data-hs="active">—</dd></div>
-          <div><dt>{e.waiting}</dt><dd data-hs="waiting">—</dd></div>
-          <div><dt>Unidades usadas</dt><dd data-hs="used">—</dd></div>
-          <div><dt>Disponibles</dt><dd data-hs="available">—</dd></div>
-        </dl>
-        <ul class="housing7__counts" data-hs-counts></ul>
-      </div>
-      <div class="housing7__col" data-housing-col="privado">
-        <h3>{e.colPrivate} <span class="housing7__cap">100 / 100</span></h3>
-        <dl class="housing7__stats">
-          <div><dt>{e.capClient}</dt><dd>100</dd></div>
-          <div><dt>{e.capNetwork}</dt><dd>0</dd></div>
-          <div><dt>{e.attended}</dt><dd data-hs="active">—</dd></div>
-          <div><dt>{e.waiting}</dt><dd data-hs="waiting">—</dd></div>
-          <div><dt>Unidades usadas</dt><dd data-hs="used">—</dd></div>
-          <div><dt>Disponibles</dt><dd data-hs="available">—</dd></div>
-        </dl>
-        <ul class="housing7__counts" data-hs-counts></ul>
-      </div>
-    </div>
-
-    <div class="housing7__controls">
-      <div class="housing7__selector" role="group" aria-label="Elegir modalidad de Housing">
-        <button class="housing7__mode" type="button" data-housing-mode="compartido" aria-pressed="true">Compartido</button>
-        <button class="housing7__mode" type="button" data-housing-mode="privado" aria-pressed="false">Privado</button>
-      </div>
-      <button class="housing7__btn housing7__btn--primary" type="button" data-housing-run>{e.run}</button>
-      <button class="housing7__btn" type="button" data-housing-pause aria-pressed="false" disabled>{e.pause}</button>
-      <button class="housing7__btn" type="button" data-housing-reset>{e.reset}</button>
-      <a class="housing7__btn housing7__btn--wa" data-housing-cta href={waBase} target="_blank" rel="noopener">Consultar mi Housing ↗</a>
-    </div>
-    <p class="housing7__status" data-housing-status role="status" aria-live="polite"></p>
-  </div>
-
-  <div class="housing7__stage" data-housing-stage data-mode="compartido">
-    <div class="housing7__office">
-      {e.stations.map((s, i) => (
-        <div class="housing7__station" data-hstation={['calls', 'wa', 'docs', 'auto'][i]}>
-          <span class="housing7__station-label">{s}</span>
-          <div class="housing7__chips" data-hchips={['calls', 'wa', 'docs', 'auto'][i]}></div>
         </div>
-      ))}
-      <div class="housing7__rack" aria-hidden="true">
-        <div class="housing7__rack-bar" data-hrack>
-          <span class="housing7__rack-client" data-hrack-client style="width:50%"></span>
-          <span class="housing7__rack-net" data-hrack-net style="width:50%"></span>
-        </div>
-        <p class="housing7__rack-label"><span data-hrack-label>50% negocio · 50% red</span></p>
-        <div class="housing7__reserved" data-hreserved>
-          {SHARED_RESERVED.map((r) => <span>{e.reservedDest}: {r.actor} {r.porcentaje}%</span>)}
-        </div>
+        <img src="/assets/a08/A08_nucleo.svg" alt="" class="housing7__centerbrand" aria-hidden="true" />
+        <span class="housing7__caption" data-housing-caption>COMPARTIDO · 50/25/25</span>
+      </div>
+
+      <div class="housing7__office" aria-label="Estado de las tareas">
+        {e.stations.map((s, i) => (
+          <div class="housing7__station" data-hstation={['calls', 'wa', 'docs', 'auto'][i]}>
+            <span class="housing7__station-label">{s}</span>
+            <div class="housing7__chips" data-hchips={['calls', 'wa', 'docs', 'auto'][i]}></div>
+          </div>
+        ))}
       </div>
     </div>
   </div>
@@ -132,7 +156,10 @@ const e = E22_7MH;
   .housing7__body { margin: 12px 0 0; font-size: 16px; line-height: 1.6; max-width: 66ch; opacity: 0.85; }
   .housing7__disclaimer { margin: 0; font-size: 0.8rem; opacity: 0.7; font-style: italic; }
 
-  .housing7__model { border: 1px solid var(--scene-border, rgba(255,255,255,0.14)); border-radius: 24px; padding: var(--panel-pad, 28px); display: grid; gap: 20px; background: rgba(255,255,255,0.03); }
+  /* 7M-I §3: dos columnas en escritorio — izquierda modelo, derecha servidores */
+  .housing7__grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--gap-x, 32px); align-items: start; }
+  .housing7__left { display: grid; gap: 20px; border: 1px solid var(--scene-border, rgba(255,255,255,0.14)); border-radius: 24px; padding: var(--panel-pad, 28px); background: rgba(255,255,255,0.03); }
+
   .housing7__inputs-cap { margin: 0 0 10px; font-size: 0.9rem; opacity: 0.85; }
   .housing7__table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
   .housing7__table th, .housing7__table td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--scene-border, rgba(255,255,255,0.12)); }
@@ -166,29 +193,81 @@ const e = E22_7MH;
   .housing7__btn[disabled] { opacity: 0.5; cursor: default; }
   .housing7__status { margin: 0; font-size: 0.85rem; opacity: 0.8; min-height: 1.2em; }
 
-  .housing7__stage { border: 1px solid var(--scene-border, rgba(255,255,255,0.14)); border-radius: 24px; padding: var(--panel-pad, 28px); background: rgba(3, 13, 33, 0.55); }
-  .housing7__office { display: grid; gap: 14px; }
+  /* ---- stage de servidores recuperado (7M-I §3) ---- */
+  .housing7__right { display: grid; gap: 14px; border: 1px solid rgba(112, 233, 239, 0.16); border-radius: 24px; padding: var(--panel-pad, 24px); background: radial-gradient(ellipse 75% 80% at 78% 47%, #0d3d6722 0%, transparent 67%), #020919; }
+  .housing7__stage { position: relative; height: 460px; perspective: 1050px; isolation: isolate; }
+  .housing7__stage::before { content: ''; position: absolute; inset: 10% 2% 0; pointer-events: none; background: radial-gradient(ellipse 58% 39% at 48% 65%, #19affb38, transparent 85%); }
+  .housing7__rings { position: absolute; inset: 0; margin: auto; width: 96%; height: 96%; object-fit: contain; opacity: 0.75; animation: housing7-spin 48s linear infinite; pointer-events: none; }
+  .housing7__platform { position: absolute; left: 50%; bottom: 6%; width: 62%; height: 90px; transform: translateX(-50%); border: 1px solid #43cfff76; border-radius: 50%; transform: translateX(-50%) rotateX(65deg); pointer-events: none; }
+  .housing7__shield { position: absolute; inset: 10% 13% 4%; border: 2px solid #ffe8a370; border-radius: 48%; box-shadow: 0 0 50px #ffd44b2a, inset 0 0 50px #ffd44b18; opacity: 0; transform: scale(0.7); transition: 0.65s; pointer-events: none; }
+  .housing7__stage[data-mode='privado'] .housing7__shield { opacity: 1; transform: scale(0.95); }
+  .housing7__links { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .housing7__links path { fill: none; stroke-width: 2; stroke-dasharray: 7 12; stroke: #62edfa; opacity: 0.6; animation: housing7-dash 9s linear infinite; }
+  .housing7__links-yellow { stroke: #ffd44b; }
+  .housing7__stage[data-mode='privado'] .housing7__links { opacity: 0.06; }
+  .housing7__hardware { position: absolute; inset: 14% 0 3%; transform-style: preserve-3d; transform: rotateX(-2deg); }
+  .housing7__rack { position: absolute; left: 50%; top: 50%; width: 168px; height: 300px; padding: 12px 14px; border: 1px solid #2c5f86; border-radius: 10px; background: linear-gradient(160deg, #0d2c4d, #071a30 70%); box-shadow: 0 18px 40px #00000088; transform: translate(-50%, -50%) var(--placement); transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s, opacity 0.5s; }
+  .housing7__rack::before { content: ''; position: absolute; inset: 0 auto 0 0; width: 9px; background: linear-gradient(#4bfaff, #123047, #4bfaff); opacity: 0.55; }
+  .housing7__rack::after { content: ''; position: absolute; inset: 0 0 auto; height: 5px; background: linear-gradient(90deg, transparent, #ffdb4d, #45ddff, transparent); }
+  .housing7__rack-title { display: block; font-size: 10px; letter-spacing: 0.2em; font-weight: 900; color: #ffc94d; margin-bottom: 16px; }
+  .housing7__slot { display: block; height: 17px; border: 1px solid #3697ba88; background: linear-gradient(90deg, #07182c 0%, #133757 75%, #07182c); border-radius: 3px; margin-bottom: 7px; position: relative; }
+  .housing7__slot::before { content: ''; position: absolute; left: 8px; top: 5px; background: #5cfde2; width: 6px; height: 6px; border-radius: 50%; box-shadow: 0 0 8px #55eafa; opacity: 0.25; }
+  .housing7__slot::after { content: ''; position: absolute; right: 12px; top: 6px; width: 52%; height: 4px; background: repeating-linear-gradient(90deg, #4bc3ed 0 4px, transparent 4px 9px); opacity: 0.75; }
+  .housing7__slot.is-on::before { opacity: 1; animation: housing7-led 2.6s infinite alternate; }
+  .housing7__slot.is-on { border-color: #ffd34a; background: linear-gradient(90deg, #3d2f07 0%, #6b5312 75%, #3d2f07); }
+  .housing7__slot.is-reserved { border-color: #3697ba55; }
+  .housing7__slot.is-reserved::before { background: #62edfa; opacity: 0.5; box-shadow: 0 0 6px #62edfa; }
+  .housing7__rack-foot { display: block; color: #beeefa; opacity: 0.85; font-size: 9px; letter-spacing: 0.11em; margin-top: 6px; font-weight: 700; }
+  .housing7__rack[data-housing-rack='0'] { z-index: 3; }
+  .housing7__rack[data-housing-rack='1'], .housing7__rack[data-housing-rack='2'] { z-index: 2; }
+  .housing7__stage[data-mode='compartido'] .housing7__rack[data-housing-rack='0'] { --placement: translate3d(-136px, -2px, 110px) rotateY(-11deg); }
+  .housing7__stage[data-mode='compartido'] .housing7__rack[data-housing-rack='1'] { --placement: translate3d(31px, -58px, -60px) rotateY(13deg) scale(0.83); }
+  .housing7__stage[data-mode='compartido'] .housing7__rack[data-housing-rack='2'] { --placement: translate3d(120px, 38px, -110px) rotateY(22deg) scale(0.73); }
+  .housing7__stage[data-mode='privado'] .housing7__rack[data-housing-rack='0'] { --placement: translate3d(0px, -26px, 135px) rotateY(-3deg) scale(1.18); }
+  .housing7__stage[data-mode='privado'] .housing7__rack[data-housing-rack='1'] { --placement: translate3d(-265px, 60px, -150px) scale(0.52); opacity: 0.16; }
+  .housing7__stage[data-mode='privado'] .housing7__rack[data-housing-rack='2'] { --placement: translate3d(265px, 60px, -150px) scale(0.52); opacity: 0.16; }
+  .housing7__centerbrand { position: absolute; top: 13%; left: 50%; width: 106px; transform: translateX(-50%); filter: drop-shadow(0 0 28px #ffc34f96); pointer-events: none; }
+  .housing7__caption { position: absolute; bottom: 0; left: 0; right: 0; text-align: center; letter-spacing: 0.16em; font-size: 10px; color: #90e2ff; font-weight: 900; }
+  .housing7__service-light { position: absolute; right: 3%; top: 8%; font-size: 11px; color: #6df2df; letter-spacing: 0.14em; font-weight: 800; }
+  .housing7__service-light::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 7px; background: #6df2df; box-shadow: 0 0 13px #6df2df; }
+
+  .housing7__office { display: grid; gap: 8px; border-top: 1px dashed var(--scene-border, rgba(255,255,255,0.2)); padding-top: 12px; }
   .housing7__station { display: grid; grid-template-columns: 130px 1fr; gap: 10px; align-items: center; }
   .housing7__station-label { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.85; }
   .housing7__chips { display: flex; flex-wrap: wrap; gap: 6px; min-height: 28px; }
   .housing7__chip { font-size: 0.76rem; font-weight: 700; border-radius: 999px; padding: 4px 10px; border: 1px solid var(--scene-border, rgba(255,255,255,0.2)); }
   .housing7__chip--on { background: rgba(37, 211, 102, 0.18); border-color: #25d366; color: #b9f4d4; }
   .housing7__chip--wait { opacity: 0.65; }
-  .housing7__rack { border-top: 1px dashed var(--scene-border, rgba(255,255,255,0.2)); padding-top: 14px; display: grid; gap: 8px; }
-  .housing7__rack-bar { display: flex; height: 16px; border-radius: 999px; overflow: hidden; background: rgba(255,255,255,0.08); }
-  .housing7__rack-client { background: var(--scene-accent, #ffca34); display: block; transition: width 0.6s ease; }
-  .housing7__rack-net { background: rgba(128, 229, 255, 0.55); display: block; transition: width 0.6s ease; }
-  .housing7__rack-label { margin: 0; font-size: 0.8rem; opacity: 0.8; }
-  .housing7__reserved { display: flex; gap: 8px; flex-wrap: wrap; font-size: 0.74rem; }
-  .housing7__reserved span { border: 1px dashed rgba(128,229,255,0.6); color: #bfe9ff; border-radius: 999px; padding: 3px 9px; }
-  .housing7__stage[data-mode='privado'] .housing7__reserved { display: none; }
 
   .housing7__panels { display: grid; gap: 10px; max-width: 75ch; }
   .housing7__panels p { margin: 0; line-height: 1.6; font-size: 0.95rem; opacity: 0.88; }
   .housing7__below { font-size: 0.85rem !important; opacity: 0.7 !important; }
 
+  @keyframes housing7-led { to { opacity: 0.2; } }
+  @keyframes housing7-dash { to { stroke-dashoffset: -105; } }
+  @keyframes housing7-spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 1023px) {
+    .housing7__grid { grid-template-columns: 1fr; }
+    .housing7__stage { height: 420px; max-width: 640px; width: 100%; margin: auto; }
+  }
   @media (max-width: 900px) {
     .housing7__cols { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 639px) {
+    .housing7__stage { height: 360px; }
+    .housing7__hardware { transform: scale(0.78) rotateX(-2deg); }
+    .housing7__stage[data-mode='compartido'] .housing7__rack[data-housing-rack='0'] { --placement: translate3d(-112px, 9px, 110px) rotateY(-11deg) scale(0.86); }
+    .housing7__stage[data-mode='compartido'] .housing7__rack[data-housing-rack='1'] { --placement: translate3d(32px, -40px, -60px) rotateY(13deg) scale(0.73); }
+    .housing7__stage[data-mode='compartido'] .housing7__rack[data-housing-rack='2'] { --placement: translate3d(110px, 42px, -110px) rotateY(22deg) scale(0.64); }
+    .housing7__stage[data-mode='privado'] .housing7__rack[data-housing-rack='0'] { --placement: translate3d(0px, -22px, 135px) scale(0.9); }
+    .housing7__rack { height: 275px; width: 142px; }
+    .housing7__slot { height: 15px; margin-bottom: 5px; }
+    .housing7__centerbrand { width: 72px; top: 12%; }
     .housing7__station { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .housing7__rings, .housing7__links path, .housing7__slot.is-on::before { animation: none !important; }
+    .housing7__rack { transition: none; }
   }
 </style>
