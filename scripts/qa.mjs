@@ -96,7 +96,7 @@ const wheelToScene = async (sel, max = 60) => {
     }, sel);
     if (st.vis) return true;
     await page.evaluate((d) => {
-      window.__publiaLastProgrammaticScroll = 0;
+      window.__publiaLastProgrammaticScroll = Date.now();
       window.dispatchEvent(new WheelEvent('wheel', { deltaY: d * 700, bubbles: true }));
       window.scrollBy({ top: d * 500, behavior: 'instant' });
     }, st.dir);
@@ -107,7 +107,7 @@ const wheelToScene = async (sel, max = 60) => {
 const wheelAway = async (times = 10) => {
   for (let i = 0; i < times; i++) {
     await page.evaluate(() => {
-      window.__publiaLastProgrammaticScroll = 0;
+      window.__publiaLastProgrammaticScroll = Date.now();
       window.dispatchEvent(new WheelEvent('wheel', { deltaY: -700, bubbles: true }));
       window.scrollBy({ top: -500, behavior: 'instant' });
     });

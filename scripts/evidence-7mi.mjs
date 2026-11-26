@@ -53,7 +53,7 @@ const wheelTo = async (page, sel) => {
     const vis = st.vis;
     if (vis) return true;
     await page.evaluate((d) => {
-      window.__publiaLastProgrammaticScroll = 0;
+      window.__publiaLastProgrammaticScroll = Date.now();
       window.dispatchEvent(new WheelEvent('wheel', { deltaY: d * 700, bubbles: true }));
       window.scrollBy({ top: d * 500, behavior: 'instant' });
     }, st.dir ?? 1);
