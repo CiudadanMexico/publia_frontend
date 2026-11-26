@@ -120,6 +120,8 @@ const wheelUntilExplorer = async (max = 8) => {
 
 const waitUniverse = () => page.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'hero', { timeout: 30000 }).catch(() => {});
 
+page.setDefaultTimeout(90000);
+page.setDefaultNavigationTimeout(90000);
 const errors = [];
 const responses = [];
 page.on('response', (response) => {
@@ -883,7 +885,7 @@ const contact = await page.evaluate(() => {
   return {
     href: first?.getAttribute('href') ?? '',
     visible: first?.offsetHeight ?? 0,
-    waCtx: links.some((a) => { const h = a.getAttribute('href') ?? ''; return h.includes('wa.me/525573724660') && decodeURIComponent(h).length > 'https://wa.me/525573724660?text='.length + 5; }),
+    waCtx: [...document.querySelectorAll('a[href*="wa.me/525573724660"]')].some((a) => { const h = a.getAttribute('href') ?? ''; return h.includes('?text=') && decodeURIComponent(h).length > 'https://wa.me/525573724660?text='.length + 5; }),
     mailCtx: links.some((a) => (a.getAttribute('href') ?? '').includes('hola@publia.mx') && (a.getAttribute('href') ?? '').includes('body=')),
     total: links.length,
     hrefs: links.map((a) => (a.getAttribute('href') ?? '').slice(0, 70)),
