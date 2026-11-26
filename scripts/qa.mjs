@@ -460,7 +460,7 @@ async function transitionProbe(act) {
     await page.evaluate(() => {
       try { sessionStorage.clear(); } catch {}
     });
-    await page.reload({ waitUntil: 'networkidle' });
+    await page.reload({ waitUntil: 'domcontentloaded', timeout: 90000 });
     await waitUniverse(); await page.waitForTimeout(1200);
     await pscroll(0);
     await page.mouse.move(680, 400);
@@ -680,7 +680,7 @@ const waitBound = (sel) => page.waitForFunction((s2) => document.querySelector(s
 await page.evaluate(() => {
   try { sessionStorage.clear(); } catch {}
 });
-await page.reload({ waitUntil: 'networkidle' });
+await page.reload({ waitUntil: 'domcontentloaded', timeout: 90000 });
 await page.waitForTimeout(3000);
 const perspectiveNeutral = await page.evaluate(
   () => document.querySelector('#escena-e02 [data-role="title"]')?.textContent?.trim() ?? '',
@@ -756,7 +756,7 @@ for (let i = 0; i < 5 && resetRoute !== 'unclassified'; i++) {
 if (resetRoute !== 'unclassified') {
   // fallback: estado fresco garantizado
   await page.evaluate(() => { try { sessionStorage.clear(); } catch {} });
-  await page.reload({ waitUntil: 'networkidle' });
+  await page.reload({ waitUntil: 'domcontentloaded', timeout: 90000 });
   await waitUniverse();
   await page.waitForTimeout(1000);
   resetRoute = await page.evaluate(() => document.documentElement.dataset.route);
@@ -781,7 +781,7 @@ await page.evaluate(() => {
   try { sessionStorage.clear(); } catch {}
   window.scrollTo({ top: 0, behavior: 'instant' });
 });
-await page.reload({ waitUntil: 'networkidle' });
+await page.reload({ waitUntil: 'domcontentloaded', timeout: 90000 });
 await page.waitForTimeout(3000);
 await page.mouse.move(680, 400);
 for (let i = 0; i < 6; i += 1) {
