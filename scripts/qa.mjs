@@ -86,17 +86,18 @@ const pscroll = (top) => page.evaluate((t) => {
 }, top);
 
 // 7M-I: bajar con rueda (evento de usuario; el controlador de ruta reimpone scrollTo programático)
-const wheelToScene = async (sel, max = 45) => {
+const wheelToScene = async (sel, max = 60) => {
   for (let i = 0; i < max; i++) {
-    const vis = await page.evaluate((s2) => {
+    const st = await page.evaluate((s2) => {
       const el = document.querySelector(s2);
-      if (!el) return false;
+      if (!el) return { vis: false, dir: 1 };
       const b = el.getBoundingClientRect();
-      return b.top < window.innerHeight * 0.72 && b.bottom > window.innerHeight * 0.15;
+      const vis = b.top < window.innerHeight * 0.72 && b.bottom > window.innerHeight * 0.15;
+      return { vis, dir: b.bottom <= window.innerHeight * 0.15 ? -1 : 1 }; // elemento arriba → subir
     }, sel);
-    if (vis) return true;
+    if (st.vis) return true;
     await page.mouse.move(700, 450);
-    await page.mouse.wheel(0, 700);
+    await page.mouse.wheel(0, st.dir * 700);
     await page.waitForTimeout(300);
   }
   return false;
@@ -877,14 +878,21 @@ check(
 );
 
 const contact = await page.evaluate(() => {
-  const link = document.querySelector('[data-contact-cta="true"]');
-  return { href: link?.getAttribute('href') ?? '', visible: link?.offsetHeight ?? 0 };
+  const links = [...document.querySelectorAll('[data-contact-cta="true"]')];
+  const first = links[0];
+  return {
+    href: first?.getAttribute('href') ?? '',
+    visible: first?.offsetHeight ?? 0,
+    waCtx: links.some((a) => (a.getAttribute('href') ?? '').startsWith('https://wa.me/525573724660?text=')),
+    mailCtx: links.some((a) => (a.getAttribute('href') ?? '').includes('hola@publia.mx') && (a.getAttribute('href') ?? '').includes('body=')),
+    total: links.length,
+  };
 });
 check('conversión: CTA de contacto visible', contact.visible > 30, `${contact.visible}px`);
 check(
-  'conversión: correo con contexto de navegación',
-  contact.href.includes('hola@publia.mx') && contact.href.includes('body='),
-  contact.href.slice(0, 80),
+  'conversión: hay CTA WhatsApp con mensaje contextual Y correo con contexto de navegación',
+  contact.waCtx && contact.mailCtx,
+  `wa=${contact.waCtx} mail=${contact.mailCtx} total=${contact.total}`,
 );
 
 // --- contacto directo -------------------------------------------------------------
