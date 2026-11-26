@@ -1,7 +1,7 @@
 {
   "base": "https://dam-boulevard-explaining-alaska.trycloudflare.com",
   "total": 270,
-  "fallos": 7,
+  "fallos": 5,
   "resultados": [
     {
       "name": "carga inicial sin errores JS",
@@ -46,7 +46,7 @@
     {
       "name": "prisma: la escena 3D se renderiza y cambia (animación real)",
       "ok": true,
-      "detail": "405165 vs 634908 bytes"
+      "detail": "399675 vs 635012 bytes"
     },
     {
       "name": "prisma: pinta una fracción útil del viewport",
@@ -86,7 +86,7 @@
     {
       "name": "hero 3D: la animación ambiental cambia entre fotogramas",
       "ok": true,
-      "detail": "637870 vs 638277 bytes"
+      "detail": "637603 vs 638254 bytes"
     },
     {
       "name": "marca: el encabezado usa el logotipo oficial",
@@ -111,17 +111,17 @@
     {
       "name": "transición enterprise: la cámara viaja a otro mundo del mismo universo",
       "ok": true,
-      "detail": "mundo hero→enterprise · cámara [0,2.4,11.6]→[2.4916943521594686,1.8593853820598005,8.387001661129569] · tinte #050b1b→#0a0e18"
+      "detail": "mundo hero→enterprise · cámara [0,2.4,11.6]→[2.4996677740863786,1.862375415282392,8.393480066445184] · tinte #050b1b→#0a0e18"
     },
     {
       "name": "transición enterprise: el contenido de la escena destino aparece",
       "ok": true,
-      "detail": "scrollY 1761 · act=enterprise"
+      "detail": "scrollY 1758 · act=enterprise"
     },
     {
       "name": "transición enterprise: volver regresa al hero sin recargar",
       "ok": true,
-      "detail": "world=hero · act=hero · scrollY 0"
+      "detail": "world=hero · act=hero · scrollY 12"
     },
     {
       "name": "transición efficiency: la cámara viaja a otro mundo del mismo universo",
@@ -136,7 +136,7 @@
     {
       "name": "transición efficiency: volver regresa al hero sin recargar",
       "ok": true,
-      "detail": "world=hero · act=hero · scrollY 0"
+      "detail": "world=hero · act=hero · scrollY 7"
     },
     {
       "name": "transición cooperative: la cámara viaja a otro mundo del mismo universo",
@@ -286,7 +286,7 @@
     {
       "name": "ruta eficiencia: escena propia visible",
       "ok": true,
-      "detail": "1167px · route=efficiency act=efficiency world=efficiency scrollY=34"
+      "detail": "1167px · route=efficiency act=efficiency world=efficiency scrollY=481"
     },
     {
       "name": "ruta eficiencia: mensaje propio de la escena",
@@ -306,7 +306,7 @@
     {
       "name": "cambio de ruta: regresa al hero",
       "ok": true,
-      "detail": "scrollY 1"
+      "detail": "scrollY 0"
     },
     {
       "name": "ruta exploración: se activa por scroll natural",
@@ -426,12 +426,12 @@
     {
       "name": "contacto: WhatsApp visible en la página",
       "ok": true,
-      "detail": "6 enlace(s)"
+      "detail": "5 enlace(s)"
     },
     {
       "name": "contacto: número público verificado",
       "ok": true,
-      "detail": "https://wa.me/525573724660?text=Hola%2C%20quiero%20dise%C3%B1ar%20mi%20infraestructura%20con%20Publia.%20Escenario%3A%20IA%20local%20privada."
+      "detail": "https://wa.me/525573724660?text=Dise%C3%B1ar%20mi%20infraestructura%20%E2%80%94%20Infraestructura%3A%20IA%20local%20privada"
     },
     {
       "name": "7M-F form: 3 campos (nombre/negocio/necesidad) con etiqueta",
@@ -690,13 +690,13 @@
     },
     {
       "name": "7M-I E07: arranque automático sin clic — etapa activa y contador avanzando (4 etapas cíclicas)",
-      "ok": false,
-      "detail": "{\"a\":{\"count\":\"01\",\"active\":1},\"b\":{\"count\":\"01\",\"feed\":\"Llega la consulta al canal elegido.\"}}"
+      "ok": true,
+      "detail": "{\"a\":{\"count\":\"04\",\"active\":1},\"b\":{\"count\":\"02\",\"feed\":\"El agente la clasifica y prepara una propuesta.\"}}"
     },
     {
       "name": "7M-I E07: 4 ciclos consecutivos completos (etapa 3→0 contado ≥4 veces)",
       "ok": false,
-      "detail": "seq=000000000000000000000000 wraps=0"
+      "detail": "seq=123300112233001122330011 wraps=3"
     },
     {
       "name": "V4-B E11 personas+IA en marfil (cream)",
@@ -881,7 +881,7 @@
     {
       "name": "v4-A transición botón: cámara cambia en 3 momentos (inicio/medio/fin)",
       "ok": true,
-      "detail": "0=[0,2.4,11.6] mid=[2.918272425249169,2.01935 fin=[2.4916943521594686,1.8593"
+      "detail": "0=[] mid=[2.8976744186046512,2.0116 fin=[2.4916943521594686,1.8593"
     },
     {
       "name": "v4-A transición botón: portal visible a mitad del viaje",
@@ -1276,17 +1276,17 @@
     {
       "name": "7M-G hero: UN pin desktop con span = 18×H e invalidateOnRefresh",
       "ok": true,
-      "detail": "{\"total\":76,\"pinned\":1,\"scrub\":0.6,\"span\":16200.001,\"vh\":900,\"invalidate\":true}"
+      "detail": "{\"total\":158,\"pinned\":1,\"scrub\":0.6,\"span\":16200.001,\"vh\":900,\"invalidate\":true}"
     },
     {
       "name": "7M-H cargas: estado ready o silent (sin fallback con mensaje), aria-busy=false, loader oculto, fondo #050b1b, SIN mensaje ni botón de reintento en el DOM",
       "ok": true,
-      "detail": "{\"state\":\"silent\",\"busy\":\"false\",\"loaderDone\":true,\"bg\":\"rgb(5, 11, 27)\",\"noMsg\":true,\"noRetry\":true}"
+      "detail": "{\"state\":\"ready\",\"busy\":\"false\",\"loaderDone\":true,\"bg\":\"rgb(5, 11, 27)\",\"noMsg\":true,\"noRetry\":true}"
     },
     {
       "name": "7M-G hero: rebote real — CTA suben a yNear (p=0.12) y bajan a yLow (p=0.25)",
-      "ok": false,
-      "detail": "{\"ok\":true,\"p10\":558,\"p25\":558,\"top0\":557.9990234375,\"navbarH\":64,\"H\":900,\"topNear\":104,\"topLow\":558,\"drop\":0}"
+      "ok": true,
+      "detail": "{\"ok\":true,\"p10\":104.00180053710938,\"p25\":558,\"top0\":533.3931884765625,\"navbarH\":64,\"H\":900,\"topNear\":104,\"topLow\":558,\"drop\":453.9981994628906}"
     },
     {
       "name": "7M-G hero: elegir ruta durante el pin lo cancela y aterriza",

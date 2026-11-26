@@ -1564,7 +1564,8 @@ for (let i = 0; i < 6; i++) {
 const e11adv = e11t.filter((v, i) => i > 0 && v !== e11t[i - 1]).length;
 check('7M-I E11: tras salir y volver, un solo avance por intervalo (sin temporizadores acumulados)', e11adv >= 3 && e11adv <= 6, `seq=${e11t.join('')} advances=${e11adv}`);
 // 7M-I §10: en escritorio, selectores + diagrama + panel de etapas caben a la vez en el viewport
-// posicionado fino: alinear el inicio de los controles arriba del viewport
+// reubicar primero (el bloque anterior terminó con wheelAway) y luego afinar arriba
+await wheelToScene('#escena-e11 .pers__visual');
 for (let i = 0; i < 24; i++) {
   const top = await page.evaluate(() => Math.round(document.querySelector('#escena-e11 .pers__controls')?.getBoundingClientRect().top ?? -1));
   if (top >= 0 && top <= 30) break;
