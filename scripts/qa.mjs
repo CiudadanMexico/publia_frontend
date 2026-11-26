@@ -1512,7 +1512,14 @@ const h22d = await page.evaluate(() => {
 });
 check('7M-H E22: editar cantidad (auto→0) recalcula demanda 75 y ambas columnas (compartido 3 activas, privado 5 activas)', h22d.demand === '75' && h22d.sActive.startsWith('3') && h22d.pActive.startsWith('5'), JSON.stringify(h22d));
 
-// Bloque C: personas + IA (E11)
+// Bloque C: personas + IA (E11) — E11 es exclusiva de ruta eficiencia: re-elegirla en página fresca
+await page.evaluate(() => { try { sessionStorage.clear(); } catch {} });
+await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 90000 }).catch(() => {});
+await page.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'hero', null, { timeout: 60000 }).catch(() => {});
+await page.waitForTimeout(1200);
+await click('[data-route-choice="efficiency"]');
+await page.waitForFunction(() => document.documentElement.dataset.act === 'efficiency', null, { timeout: 30000 }).catch(() => {});
+await page.waitForTimeout(3400);
 await page.bringToFront().catch(() => {});
 await wheelToScene('#escena-e11 [data-demo="personas"]');
 // empujón determinista: re-disparar scroll hasta que el controlador confirme running
