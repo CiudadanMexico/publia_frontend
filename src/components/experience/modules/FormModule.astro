@@ -20,10 +20,9 @@ const c = COPY_7MF.closing;
 const waBase = `https://wa.me/${COPY_7MF.contact.number}?text=`;
 ---
 
-<section class="waf" data-module="form" data-wa-form>
-  <h3 class="waf__title" id={`${scene.id}-form-titulo`}>{c.title}</h3>
-  <p class="waf__lead">{c.lead}</p>
-
+<!-- 7M-I §2: el encabezado y la introducción viven en el módulo cta de E30;
+     aquí únicamente el formulario (su submit es el CTA principal de WhatsApp). -->
+<section class="waf" id="e30-formulario" data-module="form" data-wa-form aria-label="Formulario de contacto por WhatsApp">
   <form class="waf__form" data-wa-form-el novalidate>
     <label class="waf__field">
       <span class="waf__label">{c.name} *</span>
@@ -42,16 +41,14 @@ const waBase = `https://wa.me/${COPY_7MF.contact.number}?text=`;
     </label>
     <p class="waf__error" data-wa-error hidden role="alert">{c.error}</p>
     <div class="waf__actions">
-      <a class="button button--primary waf__submit" data-wa-submit href={waBase} target="_blank" rel="noopener noreferrer">{c.submit} ↗</a>
+      <a class="button button--primary waf__submit" data-wa-submit data-contact-cta="true" href={waBase} target="_blank" rel="noopener noreferrer">{c.submit} ↗</a>
       <p class="waf__privacy">{c.privacy}</p>
     </div>
   </form>
 </section>
 
 <style>
-  .waf { display: grid; gap: 14px; margin-top: 24px; padding: var(--panel-pad, 28px); border: 1px solid var(--scene-border, rgba(128,229,255,.25)); border-radius: 24px; max-width: 46rem; background: rgba(5,11,27,.45); }
-  .waf__title { margin: 0; font-size: clamp(22px, 2vw, 30px); }
-  .waf__lead { margin: 0; max-width: 58ch; line-height: 1.55; opacity: .9; }
+  .waf { display: grid; gap: 14px; margin-top: 24px; scroll-margin-top: 90px; padding: var(--panel-pad, 28px); border: 1px solid var(--scene-border, rgba(128,229,255,.25)); border-radius: 24px; max-width: 46rem; background: rgba(5,11,27,.45); }
   .waf__form { display: grid; gap: 14px; }
   .waf__field { display: grid; gap: 6px; position: relative; }
   .waf__label { font-size: .9rem; font-weight: 600; }
