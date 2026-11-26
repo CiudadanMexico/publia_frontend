@@ -817,6 +817,18 @@ check('7M-F catálogo: OPERACIÓN $3,000', prices['Operación']?.includes('3,000
 check('7M-F catálogo: COBERTURA $4,000', prices['Cobertura']?.includes('4,000'), prices['Cobertura']);
 check('7M-G catálogo: cada plan tiene «Ver alcance» (details) antes de contactar', catalog.plans.every((pl) => pl.scope), JSON.stringify(catalog.plans.map((pl) => pl.scope)));
 check('7M-G catálogo: CTA único «Conversar sobre este plan» con wa.me/525573724660 + planMessage', catalog.cta.startsWith('https://wa.me/525573724660?text=') && decodeURIComponent(catalog.cta).includes('membresía') && decodeURIComponent(catalog.cta).includes('Base'), catalog.cta.slice(0, 100));
+const m7mi = await page.evaluate(() => ({
+  lead: document.querySelector('#escena-e27 .catalog__lead')?.textContent ?? '',
+  summaries: [...document.querySelectorAll('#escena-e27 details[data-memb-scope] summary')].map((x) => x.textContent ?? ''),
+  ctaText: document.querySelector('#escena-e27 [data-memb7-cta]')?.textContent?.trim() ?? '',
+  prices: [...document.querySelectorAll('#escena-e27 [data-memb-plan]')].map((b) => (b.textContent ?? '').match(/\$([\d,]+)/)?.[1] ?? ''),
+  extras: document.querySelector('#escena-e27 .memb__extras h3')?.textContent ?? '',
+  legend: document.querySelector('#escena-e27 .memb__legend')?.textContent ?? '',
+  forwho: document.querySelector('#escena-e27 [data-memb-forwho]')?.textContent ?? '',
+  problem: document.querySelector('#escena-e27 [data-memb-problem]')?.textContent ?? '',
+}));
+check('7M-I E27: intro literal + «¿Qué incluye este plan?» ×5 + «Me interesa este plan» + «Agrega los servicios que necesites.»', m7mi.lead.includes('Empieza con las herramientas que necesita tu negocio hoy') && m7mi.summaries.length === 5 && m7mi.summaries.every((t) => t.includes('¿Qué incluye este plan?')) && m7mi.ctaText.includes('Me interesa este plan') && m7mi.extras.includes('Agrega los servicios que necesites'), JSON.stringify({ lead: m7mi.lead.slice(0, 50), s: m7mi.summaries[0], cta: m7mi.ctaText, ex: m7mi.extras }));
+check('7M-I E27: precios intactos 300/550/2.000/3.000/4.000 MXN + leyenda chatbot/agente/acompañamiento/Housing + para quién/problema visibles', m7mi.prices.join(',') === '300,550,2,000,3,000,4,000' && m7mi.legend.includes('chatbot') && m7mi.legend.includes('Housing') && m7mi.forwho.startsWith('Para negocios') && m7mi.problem.startsWith('Resuelve'), JSON.stringify(m7mi.prices));
 check('7M-G E27: eyebrow único «MEMBRESÍAS PUBLIA» y titular una sola vez', catalog.eyebrows.length === 1 && catalog.eyebrows[0] === 'MEMBRESÍAS PUBLIA' && catalog.titles === 1, JSON.stringify({ eyebrows: catalog.eyebrows, titles: catalog.titles }));
 check('7M-F E22: modalidades Compartido/Privado con textos del JSON', catalog.shares.includes('Compartido') && catalog.shares.includes('Privado'), catalog.shares.join(' | '));
 
@@ -896,6 +908,16 @@ check('7M-F form: sin action de servidor (nunca envía automáticamente)', formI
 check('7M-F form: maxlength 100/150/1000 + contadores', formInfo?.maxlengths?.nombre === '100' && formInfo?.maxlengths?.negocio === '150' && formInfo?.maxlengths?.necesidad === '1000' && formInfo.counters === 3, JSON.stringify(formInfo?.maxlengths));
 check('7M-F form: declara privacidad (closing.privacy)', formInfo?.privacy === true, '');
 check('7M-F form: enlace real wa.me/525573724660 con baseMessage/formMessage', formInfo?.submitHref.startsWith('https://wa.me/525573724660?text='), (formInfo?.submitHref ?? '').slice(0, 80));
+const e30dup = await page.evaluate(() => ({
+  forms: document.querySelectorAll('#escena-e30 [data-wa-form-el]').length,
+  submits: document.querySelectorAll('#escena-e30 [data-wa-submit]').length,
+  waLinks: [...document.querySelectorAll('#escena-e30 a')].filter((a) => (a.getAttribute('href') ?? '').includes('wa.me')).length,
+  h2: [...document.querySelectorAll('#escena-e30 h2')].map((h) => h.textContent ?? '').filter((t) => t.includes('Vamos a conocernos')).length,
+  h3waf: document.querySelectorAll('#escena-e30 .waf__title').length,
+  mail: [...document.querySelectorAll('#escena-e30 a')].some((a) => (a.getAttribute('href') ?? '').startsWith('mailto:')),
+  toform: !!document.querySelector('#escena-e30 a[href="#e30-formulario"]'),
+}));
+check('7M-I E30: UN formulario, UN CTA de WhatsApp, UN encabezado «Vamos a conocernos», correo alternativo y ancla al formulario', e30dup.forms === 1 && e30dup.submits === 1 && e30dup.waLinks === 1 && e30dup.h2 === 1 && e30dup.h3waf === 0 && e30dup.mail && e30dup.toform, JSON.stringify(e30dup));
 
 const waInvalid = await page.evaluate(() => {
   const form = document.querySelector('#escena-e30 [data-wa-form-el]');
@@ -1301,17 +1323,22 @@ const ecoEco = await page.evaluate(() => ({
   cta: document.querySelector('#escena-e25 [data-eco-cta]')?.href ?? '',
 }));
 check('7M-G E25: Ecología (nodo 6) operativa con textos definitivos y CTA wa', ecoEco.pressed === 'ecologia' && ecoEco.title === 'Tecnología y sostenibilidad' && ecoEco.mode === 'Asistido' && ecoEco.steps === 4 && ecoEco.result.includes('mantenimiento y la reutilización') && decodeURIComponent(ecoEco.cta).includes('Tecnología y sostenibilidad'), JSON.stringify(ecoEco).slice(0, 140));
-// Automatización (7 mundos, P0-02): ejecutar recorre las 4 etapas
+// 7M-I §5: E07 arranca solo al entrar en pantalla y recorre las 4 etapas en continuo
 await page.evaluate(() => document.querySelector('#escena-e07')?.scrollIntoView({ behavior: 'instant' }));
-await page.waitForTimeout(1000);
-await click('#escena-e07 [data-flow-run]');
-await page.waitForTimeout(4600);
-const flowRun = await page.evaluate(() => ({
-  count: document.querySelector('#escena-e07 [data-flow-count]')?.textContent ?? '',
-  active: document.querySelectorAll('#escena-e07 [data-flow-stage].is-active').length,
-  feed: (document.querySelector('#escena-e07 [data-flow-feed]')?.textContent ?? '').slice(0, 50),
-}));
-check('automatización: ejecutar recorre las 4 etapas (contador 04 + etapa activa)', flowRun.count === '04' && flowRun.active >= 1, JSON.stringify(flowRun));
+await page.waitForTimeout(1600);
+check('7M-I E07: sin botones «Ejecutar demostración»/«Reiniciar»; queda el control discreto de movimiento', await page.evaluate(() => !document.querySelector('#escena-e07 [data-flow-run]') && !document.querySelector('#escena-e07 [data-flow-reset]') && !!document.querySelector('#escena-e07 [data-flow-motion]')), '');
+const e07a = await page.evaluate(() => ({ count: document.querySelector('#escena-e07 [data-flow-count]')?.textContent ?? '', active: document.querySelectorAll('#escena-e07 [data-flow-stage].is-active').length }));
+await page.waitForTimeout(3400);
+const e07b = await page.evaluate(() => ({ count: document.querySelector('#escena-e07 [data-flow-count]')?.textContent ?? '', feed: (document.querySelector('#escena-e07 [data-flow-feed]')?.textContent ?? '').slice(0, 60) }));
+check('7M-I E07: arranque automático sin clic — etapa activa y contador avanzando (4 etapas cíclicas)', e07a.active === 1 && e07b.count !== e07a.count && e07b.feed.length > 5, JSON.stringify({ a: e07a, b: e07b }));
+// 4 ciclos completos: muestreamos el índice de etapa activa ~28 s (ciclo ≈ 4×1.5 s)
+const e07seq = [];
+for (let i = 0; i < 24; i++) {
+  e07seq.push(await page.evaluate(() => { const a = document.querySelector('#escena-e07 [data-flow-stage].is-active'); return a ? Number(a.dataset.flowStage) : -1; }));
+  await page.waitForTimeout(1200);
+}
+const e07wraps = e07seq.filter((v, i) => i > 0 && v === 0 && e07seq[i - 1] === 3).length;
+check('7M-I E07: 4 ciclos consecutivos completos (etapa 3→0 contado ≥4 veces)', e07wraps >= 4, `seq=${e07seq.join('')} wraps=${e07wraps}`);
 // E11 marfil
 const e11tone = await page.evaluate(() => document.querySelector('#escena-e11')?.dataset.tone);
 check('V4-B E11 personas+IA en marfil (cream)', e11tone === 'cream', `tone=${e11tone}`);
@@ -1391,26 +1418,38 @@ const h22 = await page.evaluate(() => ({
 check('7M-H E22: caso inicial 85 — compartido 3 activas/4 espera (50 usadas), privado 7 activas/0 espera (85 usadas, 15 disp.)', h22.shared.active.startsWith('3') && h22.shared.waiting === '4' && h22.shared.used === '50 / 50' && h22.private.active.startsWith('7') && h22.private.waiting === '0' && h22.private.used === '85 / 100' && h22.private.available === '15', JSON.stringify(h22));
 check('7M-H E22: disclaimer ilustrativo + 4 filas editables + demanda 85 + H2 literal + sin métricas vacías ni tráfico decorativo', h22.disclaimer.includes('no es una medición de rendimiento') && h22.rows === 4 && h22.demand === '85' && h22.h2.includes('¿Cómo quieres repartir tu capacidad?') && h22.noMetrics && h22.noTraffic, JSON.stringify({ d: h22.disclaimer.slice(0, 40), rows: h22.rows, demand: h22.demand }));
 check('7M-H E22: CTA WhatsApp con prefijo «Escenario ilustrativo que quiero dimensionar» + modalidad y cantidades', h22.cta.startsWith('https://wa.me/525573724660') && decodeURIComponent(h22.cta).includes('Escenario ilustrativo que quiero dimensionar') && decodeURIComponent(h22.cta).includes('85 unidades'), h22.cta.slice(0, 100));
+// 7M-I §3: stage de racks recuperado — 3 racks, slots del rack 0 = unidades usadas del modelo
+const h22racks = await page.evaluate(() => ({
+  racks: document.querySelectorAll('#escena-e22 [data-housing-rack]').length,
+  titles: [...document.querySelectorAll('#escena-e22 [data-housing-rack] .housing7__rack-title')].map((t) => t.textContent ?? ''),
+  lit0: document.querySelectorAll('#escena-e22 [data-hslot="0"].is-on').length,
+  reserved: document.querySelectorAll('#escena-e22 [data-hslot="1"].is-reserved, #escena-e22 [data-hslot="2"].is-reserved').length,
+  stageMode: document.querySelector('#escena-e22 [data-housing-stage]')?.dataset.mode ?? '',
+  caption: document.querySelector('#escena-e22 [data-housing-caption]')?.textContent ?? '',
+  gridCols: getComputedStyle(document.querySelector('#escena-e22 .housing7__grid')).gridTemplateColumns.split(' ').length,
+}));
+check('7M-I E22: 3 racks (negocio/socios+becarios/miembros) en 2 columnas desktop; compartido: 10 slots encendidos (50/5) + 20 reservados', h22racks.racks === 3 && h22racks.titles[0] === 'TU NEGOCIO' && h22racks.lit0 === 10 && h22racks.reserved === 20 && h22racks.stageMode === 'compartido' && h22racks.caption.includes('50/25/25') && h22racks.gridCols === 2, JSON.stringify(h22racks));
 await clickJs('#escena-e22 [data-housing-mode="privado"]');
 await page.waitForTimeout(400);
 const h22b = await page.evaluate(() => ({
   persisted: JSON.parse(sessionStorage.getItem('publia.visitor.v1') ?? '{}').housingMode ?? null,
   stageMode: document.querySelector('#escena-e22 [data-housing-stage]')?.dataset.mode ?? '',
-  rackClient: document.querySelector('#escena-e22 [data-hrack-client]')?.style.width ?? '',
-  rackNet: document.querySelector('#escena-e22 [data-hrack-net]')?.style.width ?? '',
-  reservedVisible: getComputedStyle(document.querySelector('#escena-e22 [data-hreserved]')).display !== 'none',
+  lit0: document.querySelectorAll('#escena-e22 [data-hslot="0"].is-on').length,
+  reserved: document.querySelectorAll('#escena-e22 [data-hslot="1"].is-reserved, #escena-e22 [data-hslot="2"].is-reserved').length,
+  foot0: document.querySelector('#escena-e22 [data-hrack-foot="0"]')?.textContent ?? '',
+  caption: document.querySelector('#escena-e22 [data-housing-caption]')?.textContent ?? '',
   inputsKept: document.querySelector('#escena-e22 [data-housing-qty="calls"]')?.value ?? '',
 }));
-check('7M-H E22: privado persiste, stage 100/0 sin reservas visibles, inputs conservados', h22b.persisted === 'privado' && h22b.stageMode === 'privado' && h22b.rackClient === '100%' && h22b.rackNet === '0%' && !h22b.reservedVisible && h22b.inputsKept === '2', JSON.stringify(h22b));
+check('7M-I E22: privado persiste, stage privado — 9 slots encendidos (85/10 redondeado), 0 reservados, pie 100/100, inputs conservados', h22b.persisted === 'privado' && h22b.stageMode === 'privado' && h22b.lit0 === 9 && h22b.reserved === 0 && h22b.foot0.includes('100 / 100') && h22b.caption.includes('100%') && h22b.inputsKept === '2', JSON.stringify(h22b));
 await clickJs('#escena-e22 [data-housing-mode="compartido"]');
 await page.waitForTimeout(300);
 const h22c = await page.evaluate(() => ({
-  rackClient: document.querySelector('#escena-e22 [data-hrack-client]')?.style.width ?? '',
-  reservedVisible: getComputedStyle(document.querySelector('#escena-e22 [data-hreserved]')).display !== 'none',
+  lit0: document.querySelectorAll('#escena-e22 [data-hslot="0"].is-on').length,
+  reserved: document.querySelectorAll('#escena-e22 [data-hslot="1"].is-reserved, #escena-e22 [data-hslot="2"].is-reserved').length,
   chipsOn: document.querySelectorAll('#escena-e22 .housing7__chip--on').length,
   chipsWait: document.querySelectorAll('#escena-e22 .housing7__chip--wait').length,
 }));
-check('7M-H E22: volver a compartido restaura 50/50 con reservas visibles y chips 3 en proceso / 4 en espera', h22c.rackClient === '50%' && h22c.reservedVisible && h22c.chipsOn === 3 && h22c.chipsWait === 4, JSON.stringify(h22c));
+check('7M-I E22: volver a compartido restaura 10 slots + 20 reservados y chips 3 en proceso / 4 en espera', h22c.lit0 === 10 && h22c.reserved === 20 && h22c.chipsOn === 3 && h22c.chipsWait === 4, JSON.stringify(h22c));
 // edición de cantidad recalcula sin cambiar modalidad
 const h22d = await page.evaluate(() => {
   const i = document.querySelector('#escena-e22 [data-housing-qty="auto"]');
@@ -1427,23 +1466,58 @@ check('7M-H E22: editar cantidad (auto→0) recalcula demanda 75 y ambas columna
 await page.evaluate(() => document.querySelector('#escena-e11')?.scrollIntoView({ behavior: 'instant' }));
 await page.waitForTimeout(700);
 await waitBound('[data-demo="personas"]');
-check('7M-B personas: 3 casos + 4 controles', (await page.evaluate(() => document.querySelectorAll('#escena-e11 [data-pers-case]').length)) === 3 && (await page.evaluate(() => ['[data-pers-run]','[data-pers-pause]','[data-pers-step]','[data-pers-reset]'].filter((x) => document.querySelector('#escena-e11 ' + x)).length)) === 4);
+check('7M-I E11: 3 selectores de caso + control discreto de movimiento; SIN ejecutar/pausar/paso/reiniciar ni data-pers-step suelto', (await page.evaluate(() => document.querySelectorAll('#escena-e11 [data-pers-case]').length)) === 3 && !!document.querySelector('#escena-e11 [data-pers-motion]') && (await page.evaluate(() => ['[data-pers-run]','[data-pers-pause]','[data-pers-step]','[data-pers-reset]'].filter((x) => document.querySelector('#escena-e11 ' + x)).length)) === 0 && (await page.evaluate(() => document.querySelectorAll('#escena-e11 [data-pers-stage]').length)) === 4, '');
+// cambio repetido entre casos actualiza textos de inmediato
+const e11c1 = await page.evaluate(() => ({ kind: document.querySelector('#escena-e11 [data-pers-kind]')?.textContent ?? '', human: document.querySelector('#escena-e11 [data-pers-human-name]')?.textContent ?? '' }));
 await clickJs('#escena-e11 [data-pers-case="soporte"]');
-await clickJs('#escena-e11 [data-pers-step]');
-await page.waitForTimeout(300);
-check('7M-B personas: paso a paso avanza etapa (caso soporte activo)', (await page.evaluate(() => document.querySelector('#escena-e11 [data-pers-out-title]')?.textContent ?? '')).includes('🚨') || (await page.evaluate(() => document.querySelector('#escena-e11 [data-pers-out-title]')?.textContent ?? '')).includes('Primer análisis'), await page.evaluate(() => document.querySelector('#escena-e11 [data-pers-out-title]')?.textContent ?? ''));
-await clickJs('#escena-e11 [data-pers-run]');
-await page.waitForFunction(() => {
-  const t = document.querySelector('#escena-e11 [data-pers-run-text]')?.textContent ?? '';
-  const out = document.querySelector('#escena-e11 [data-pers-out-title]')?.textContent ?? '';
-  return t !== '▶ Ver cómo colaboran' && out.length > 2;
-}, null, { timeout: 12000 }).catch(() => {});
-const persRun = await page.evaluate(() => ({
-  text: document.querySelector('#escena-e11 [data-pers-run-text]')?.textContent ?? '',
-  pauseOff: !document.querySelector('#escena-e11 [data-pers-pause]')?.disabled,
+await page.waitForTimeout(400);
+const e11c2 = await page.evaluate(() => ({ kind: document.querySelector('#escena-e11 [data-pers-kind]')?.textContent ?? '', human: document.querySelector('#escena-e11 [data-pers-human-name]')?.textContent ?? '', pressed: document.querySelector('#escena-e11 [data-pers-case="soporte"]')?.getAttribute('aria-pressed') }));
+await clickJs('#escena-e11 [data-pers-case="creatividad"]');
+await page.waitForTimeout(400);
+const e11c3 = await page.evaluate(() => ({ kind: document.querySelector('#escena-e11 [data-pers-kind]')?.textContent ?? '', human: document.querySelector('#escena-e11 [data-pers-human-name]')?.textContent ?? '' }));
+check('7M-I E11: cambio repetido Atención→Soporte→Creatividad actualiza caso y persona al instante', e11c2.pressed === 'true' && e11c2.kind.includes('SOPORTE') && e11c3.kind.includes('CREATIVIDAD') && e11c2.human !== e11c3.human && e11c1.kind !== e11c3.kind, JSON.stringify({ e11c1, e11c2, e11c3 }));
+// demo arranca sola: is-running + etapa activa + slot de retrato + disclaimer ilustrativo
+const persAuto = await page.evaluate(() => ({
+  running: document.querySelector('#escena-e11 .pers__visual')?.classList.contains('is-running') ?? false,
+  active: document.querySelectorAll('#escena-e11 [data-pers-stage].is-active').length,
   out: document.querySelector('#escena-e11 [data-pers-out-title]')?.textContent ?? '',
+  slot: !!document.querySelector('#escena-e11 [data-pers-portrait-slot]'),
+  disclaimer: (document.querySelector('#escena-e11 .pers__foot')?.textContent ?? '').includes('ilustraciones'),
 }));
-check('7M-B personas: ejecutar arranca la demo (texto cambia y hay etapa activa)', /Simulando|Repetir/.test(persRun.text) && persRun.out.length > 2, JSON.stringify(persRun));
+check('7M-I E11: demo arranca sola al entrar en pantalla (is-running + etapa activa) y slot de retrato + disclaimer ilustrativo', persAuto.running && persAuto.active === 1 && persAuto.out.length > 2 && persAuto.slot && persAuto.disclaimer, JSON.stringify(persAuto));
+// 4 ciclos completos automáticos (muestreo del índice de etapa activa, ciclo ≈ 4×1.4 s)
+const e11seq = [];
+for (let i = 0; i < 26; i++) {
+  e11seq.push(await page.evaluate(() => { const a = document.querySelector('#escena-e11 [data-pers-stage].is-active'); return a ? Number(a.dataset.persStage) : -1; }));
+  await page.waitForTimeout(1100);
+}
+const e11wraps = e11seq.filter((v, i) => i > 0 && v === 0 && e11seq[i - 1] === 3).length;
+check('7M-I E11: 4 ciclos consecutivos completos automáticos (3→0 contado ≥4)', e11wraps >= 4, `seq=${e11seq.join('')} wraps=${e11wraps}`);
+// salida y reentrada sin temporizadores duplicados: cadencia estable (~1.4 s por etapa)
+await page.evaluate(() => document.querySelector('#escena-e07')?.scrollIntoView({ behavior: 'instant' }));
+await page.waitForTimeout(2500);
+await page.evaluate(() => document.querySelector('#escena-e11')?.scrollIntoView({ block: 'center', behavior: 'instant' }));
+await page.waitForTimeout(1500);
+const e11t = [];
+for (let i = 0; i < 6; i++) {
+  e11t.push(await page.evaluate(() => { const a = document.querySelector('#escena-e11 [data-pers-stage].is-active'); return a ? Number(a.dataset.persStage) : -1; }));
+  await page.waitForTimeout(1500);
+}
+const e11adv = e11t.filter((v, i) => i > 0 && v !== e11t[i - 1]).length;
+check('7M-I E11: tras salir y volver, un solo avance por intervalo (sin temporizadores acumulados)', e11adv >= 3 && e11adv <= 6, `seq=${e11t.join('')} advances=${e11adv}`);
+// 7M-I §10: en escritorio, selectores + diagrama + panel de etapas caben a la vez en el viewport
+const e11fit = await page.evaluate(() => {
+  const r = (el) => { const b = el?.getBoundingClientRect(); return b ? { top: b.top, bottom: b.bottom } : null; };
+  document.querySelector('#escena-e11')?.scrollIntoView({ block: 'start', behavior: 'instant' });
+  window.scrollBy(0, -80);
+  const vh = window.innerHeight;
+  const c = r(document.querySelector('#escena-e11 .pers__controls'));
+  const v = r(document.querySelector('#escena-e11 .pers__visual'));
+  const f = r(document.querySelector('#escena-e11 .pers__flow'));
+  const visW = document.querySelector('#escena-e11 .pers__visual')?.getBoundingClientRect();
+  return { vh, c, v, f, ratio: visW ? visW.width / visW.height : 0, vw: window.innerWidth };
+});
+check('7M-I §10 E11 escritorio: selectores, diagrama horizontal (2.5–3:1) y panel de 4 etapas visibles a la vez en el viewport', e11fit.c && e11fit.v && e11fit.f && e11fit.c.bottom <= e11fit.vh && e11fit.v.bottom <= e11fit.vh && e11fit.f.bottom <= e11fit.vh && e11fit.ratio >= 2.4 && e11fit.ratio <= 3.2, JSON.stringify({ vh: e11fit.vh, ratio: e11fit.ratio.toFixed(2), cB: e11fit.c?.bottom, vB: e11fit.v?.bottom, fB: e11fit.f?.bottom }));
 
 // Bloque D: membresías (E27)
 await page.evaluate(() => document.querySelector('#escena-e27')?.scrollIntoView({ behavior: 'instant' }));
@@ -1609,11 +1683,11 @@ check('7M-F E27: antes del CTA no hay membresía persistida (selección vacía)'
 // 7M-H Housing en E22: default compartido, rack 50/50, secuencia disponible
 await page.evaluate(() => document.querySelector('#escena-e22')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
 await waitBound('[data-demo="housing"]');
-const hRack0 = await page.evaluate(() => ({ c: document.querySelector('#escena-e22 [data-hrack-client]')?.style.width, n: document.querySelector('#escena-e22 [data-hrack-net]')?.style.width, mode: document.querySelector('#escena-e22 [data-housing-stage]')?.dataset.mode }));
+const hRack0 = await page.evaluate(() => ({ lit0: document.querySelectorAll('#escena-e22 [data-hslot="0"].is-on').length, mode: document.querySelector('#escena-e22 [data-housing-stage]')?.dataset.mode }));
 check('7M-H housing: default compartido con rack 50/50', hRack0.c === '50%' && hRack0.n === '50%' && hRack0.mode === 'compartido', JSON.stringify(hRack0));
 await clickJs('#escena-e22 [data-housing-mode="privado"]');
 await page.waitForTimeout(700);
-check('7M-H housing: privado = rack 100/0 y persiste en state.housingMode', (await page.evaluate(() => document.querySelector('#escena-e22 [data-hrack-client]')?.style.width)) === '100%' && (await sceneState()).housingMode === 'privado', '');
+check('7M-I housing: privado = 9 slots encendidos en rack único y persiste en state.housingMode', hRack0.lit0 === 9 && hRack0.mode === 'privado' && (await sceneState()).housingMode === 'privado', JSON.stringify(hRack0));
 await clickJs('#escena-e22 [data-housing-run]');
 await page.waitForTimeout(1200);
 const hSeq = await page.evaluate(() => ({ status: document.querySelector('#escena-e22 [data-housing-status]')?.textContent ?? '', on: document.querySelectorAll('#escena-e22 .housing7__chip--on').length }));
@@ -1969,6 +2043,7 @@ check('7M-H umbral: 4 summaries + imagen limpia conservada', simDef.panels === 4
 check('7M-H simulador: preset WhatsApp default → 8 h / 3,4 h / 4,6 h (es-MX, 1 decimal)', /8([.,]0)?\s*h/.test(simDef.total) && /3[.,]4/.test(simDef.pot) && /4[.,]6/.test(simDef.rem), `${simDef.total} / ${simDef.pot} / ${simDef.rem}`);
 check('7M-H simulador: 5 presets incl. «Mi propio escenario», badge «Ejemplo editable», barra apilada 42%/58%', simDef.presets.length === 5 && simDef.presets.includes('Mi propio escenario') && simDef.badge.includes('Ejemplo editable') && Math.abs(parseFloat(simDef.barPot) - 42) < 1 && Math.abs(parseFloat(simDef.barRem) - 58) < 1, JSON.stringify({ p: simDef.presets.length, pot: simDef.barPot, rem: simDef.barRem }));
 check('7M-H simulador: nota literal y CTA WhatsApp con categoría+estimaciones (no autoenvío)', simDef.note.includes('Estimación basada en tus datos') && simDef.cta.includes('wa.me/525573724660') && decodeURIComponent(simDef.cta).includes('Consultas por WhatsApp') && decodeURIComponent(simDef.cta).includes('8 h'), decodeURIComponent(simDef.cta).slice(0, 140));
+check('7M-I §7: CTA del simulador nace con destino real wa.me (sin href="#")', simDef.cta.startsWith('https://wa.me/525573724660?text='), simDef.cta.slice(0, 90));
 const simCases = await page.evaluate(() => {
   const set = (k, v) => { const i = document.querySelector(`[data-sim-input="${k}"]`); i.value = String(v); i.dispatchEvent(new Event('input', { bubbles: true })); };
   const read = () => ({ t: document.querySelector('[data-sim-result="total"]').textContent, p: document.querySelector('[data-sim-result="potential"]').textContent, r: document.querySelector('[data-sim-result="remaining"]').textContent, err: !document.querySelector('[data-sim-error]').hidden, badge: document.querySelector('[data-sim-badge]').textContent });
@@ -2189,6 +2264,23 @@ const e00vis = await cycPage.evaluate(async () => {
 check('7M-H umbral: E00 oculto tras elegir empresa y visible de nuevo en exploración libre', e00vis.afterRoute === false && e00vis.afterReset === true, JSON.stringify(e00vis));
 await cycCtx.close().catch(() => {});
 await page.bringToFront().catch(() => {});
+
+// --- 7M-I §7/§8/§9: auditoría global de CTAs y editorial -------------------------
+const ctaAudit = await page.evaluate(() => ({
+  deadHash: [...document.querySelectorAll('a[href="#"]')].length,
+  waNumber: [...document.querySelectorAll('a[href*="wa.me/"]')].every((a) => (a.getAttribute('href') ?? '').startsWith('https://wa.me/525573724660?text=')),
+  waCount: document.querySelectorAll('a[href*="wa.me/"]').length,
+  emptyHref: [...document.querySelectorAll('a')].filter((a) => !a.getAttribute('href') || a.getAttribute('href') === '').length,
+  e23: document.querySelector('#escena-e23 h2')?.textContent ?? '',
+  e24: document.querySelector('#escena-e24 h2')?.textContent ?? '',
+  knowCta: document.querySelector('.know7__cta')?.getAttribute('href') ?? '',
+  typo: ['celularr', 'cooperating', 'Specialists', 'autonomy', 'propose y', 'communications'].filter((w) => document.body.textContent.includes(w)).length,
+  e11cta: document.querySelector('#escena-e11 .pers__cta')?.textContent ?? '',
+}));
+check('7M-I §7: cero enlaces muertos (href="#"/vacíos) en todo el Home; todo wa.me apunta a 525573724660', ctaAudit.deadHash === 0 && ctaAudit.emptyHref === 0 && ctaAudit.waNumber && ctaAudit.waCount >= 5, JSON.stringify({ dead: ctaAudit.deadHash, empty: ctaAudit.emptyHref, wa: ctaAudit.waCount }));
+check('7M-I §8: E23 y E24 con títulos distintos (Capacitación vs Asesoría)', ctaAudit.e23.includes('Capacitación para llevarlo') && ctaAudit.e24.includes('Asesoría para elegir bien') && ctaAudit.e23 !== ctaAudit.e24, JSON.stringify({ e23: ctaAudit.e23.slice(0, 40), e24: ctaAudit.e24.slice(0, 40) }));
+check('7M-I §8/§7: CTA de conocimiento con mensaje contextual de capacitación/asesoría', ctaAudit.knowCta.startsWith('https://wa.me/525573724660?text=') && decodeURIComponent(ctaAudit.knowCta).includes('capacitación'), ctaAudit.knowCta.slice(0, 90));
+check('7M-I §9: sin typos residuales (celularr/cooperating/Specialists/autonomy/propose/communications) ni CTA viejo «Conocer el acompañamiento»', ctaAudit.typo === 0 && ctaAudit.e11cta.includes('Ver opciones de apoyo humano'), JSON.stringify({ typos: ctaAudit.typo, e11: ctaAudit.e11cta.trim() }));
 
 // --- cierre ---------------------------------------------------------------------
 await page.screenshot({ path: `${OUT}/13-cierre.png` });
