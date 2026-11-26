@@ -5,6 +5,7 @@
  * necesidad obligatoria; maxlength + contador; nunca afirma envío.
  */
 import { COPY_7MF } from '../../data/copy7mf';
+import { getState } from './state';
 
 const c = COPY_7MF.closing;
 const waBase = `https://wa.me/${COPY_7MF.contact.number}?text=`;
@@ -39,10 +40,12 @@ export function bindWaForm(): void {
       const need = necesidad.value.trim();
       const valid = name.length > 0 && need.length > 0;
       if (elError) elError.hidden = valid || (name.length === 0 && need.length === 0);
+      const route = getState().rememberedRoute ?? 'sin ruta definida';
       const msg = COPY_7MF.contact.formMessage
         .replace('{name}', name || '—')
         .replace('{business}', negocio.value.trim() || 'Sin especificar')
-        .replace('{need}', need || '—');
+        .replace('{need}', need || '—')
+        + ` Ruta del recorrido: ${route}.`;
       submit.href = `${waBase}${encodeURIComponent(msg)}`;
       return valid;
     };

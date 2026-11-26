@@ -138,6 +138,12 @@ export function bindHousing(): void {
     renderColumn('compartido', rs);
     renderColumn('privado', rp);
     renderStage(mode === 'compartido' ? rs : rp);
+    // 7M-I §7: el CTA de WhatsApp viaja con el modo y los números del escenario
+    if (cta) {
+      const r = mode === 'compartido' ? rs : rp;
+      const msg = `${COPY_7MF.contact.housingMessage} Modo: ${mode}. Demanda: ${demand} unidades. Activas: ${r.activeTasks}, en espera: ${r.waitingTasks}, usadas: ${r.used}/${r.cap}.`;
+      cta.href = `https://wa.me/${COPY_7MF.contact.number}?text=${encodeURIComponent(msg)}`;
+    }
     if (!seqOn) {
       renderChips(mode === 'compartido' ? rs : rp);
     }

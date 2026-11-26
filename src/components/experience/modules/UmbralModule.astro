@@ -9,6 +9,7 @@
  */
 import type { ResolvedScene } from '../../../lib/experience/graph';
 import { UMBRAL_7MH, UMBRAL_TOOLS, UMBRAL_PANELS, SIM_7MH, UMBRAL_PALETTE } from '../../../data/copy7mh';
+import { COPY_7MF } from '../../../data/copy7mf';
 
 interface Props {
   scene: ResolvedScene;
@@ -117,7 +118,7 @@ const TOOL_ICONS: Record<string, string> = {
         <p>{sim.formula}</p>
       </details>
       <p class="umbral7__note">{sim.note}</p>
-      <a class="umbral7__cta" data-sim-cta href="#" target="_blank" rel="noopener">{sim.cta}</a>
+      <a class="umbral7__cta" data-sim-cta data-contact-cta="true" href={`https://wa.me/${COPY_7MF.contact.number}?text=${encodeURIComponent(sim.cta + " — Quiero conversar sobre lo que podría liberar en mi operación.")}`} target="_blank" rel="noopener noreferrer">{sim.cta} ↗</a>
       <p class="umbral7__sim-live" data-sim-live aria-live="polite"></p>
     </div>
   </div>
