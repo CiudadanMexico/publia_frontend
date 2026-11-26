@@ -1364,6 +1364,14 @@ const ecoEco = await page.evaluate(() => ({
 }));
 check('7M-G E25: Ecología (nodo 6) operativa con textos definitivos y CTA wa', ecoEco.pressed === 'ecologia' && ecoEco.title === 'Tecnología y sostenibilidad' && ecoEco.mode === 'Asistido' && ecoEco.steps === 4 && ecoEco.result.includes('mantenimiento y la reutilización') && decodeURIComponent(ecoEco.cta).includes('Tecnología y sostenibilidad'), JSON.stringify(ecoEco).slice(0, 140));
 // 7M-I §5: E07 arranca solo al entrar en pantalla y recorre las 4 etapas en continuo
+// (E07 es exclusiva de la ruta eficiencia: re-elegirla primero)
+await page.evaluate(() => { try { sessionStorage.clear(); } catch {} });
+await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 90000 }).catch(() => {});
+await page.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'hero', null, { timeout: 60000 }).catch(() => {});
+await page.waitForTimeout(1200);
+await click('[data-route-choice="efficiency"]');
+await page.waitForFunction(() => document.documentElement.dataset.act === 'efficiency', null, { timeout: 30000 }).catch(() => {});
+await page.waitForTimeout(3400);
 await page.bringToFront().catch(() => {});
 await wheelToScene('[data-demo="flow"]');
 await page.waitForTimeout(1600);
