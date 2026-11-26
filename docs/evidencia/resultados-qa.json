@@ -46,12 +46,12 @@
     {
       "name": "prisma: la escena 3D se renderiza y cambia (animación real)",
       "ok": true,
-      "detail": "404677 vs 634908 bytes"
+      "detail": "636145 vs 636863 bytes"
     },
     {
       "name": "prisma: pinta una fracción útil del viewport",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.18668827160493828}"
+      "detail": "{\"paintedRatio\":0.1929506172839506}"
     },
     {
       "name": "hero 3D: lienzo único presente con WebGL activo",
@@ -81,12 +81,12 @@
     {
       "name": "hero 3D: pinta la escena (mascota, prisma, tarjetas)",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.1895625}"
+      "detail": "{\"paintedRatio\":0.197375}"
     },
     {
       "name": "hero 3D: la animación ambiental cambia entre fotogramas",
       "ok": true,
-      "detail": "637549 vs 638100 bytes"
+      "detail": "641862 vs 655075 bytes"
     },
     {
       "name": "marca: el encabezado usa el logotipo oficial",
@@ -106,7 +106,7 @@
     {
       "name": "composición 7M-F: hero con titular y 2 CTA (tarjetas trasladadas a E30)",
       "ok": true,
-      "detail": "izq 35 · der 43 (referencia antigua ya no aplica)"
+      "detail": "izq 35 · der 42 (referencia antigua ya no aplica)"
     },
     {
       "name": "transición enterprise: la cámara viaja a otro mundo del mismo universo",
@@ -141,12 +141,12 @@
     {
       "name": "transición cooperative: la cámara viaja a otro mundo del mismo universo",
       "ok": true,
-      "detail": "mundo hero→cooperative · cámara [0,2.4,11.6]→[-0.016666666666666673,2.486793857487109,11.53395467346999] · tinte #050b1b→#060d08"
+      "detail": "mundo hero→cooperative · cámara [0,2.4,11.6]→[-0.016666666666666673,1.5083333333333333,8.8] · tinte #050b1b→#060d08"
     },
     {
       "name": "transición cooperative: el contenido de la escena destino aparece",
       "ok": true,
-      "detail": "scrollY 1400 · act=cooperative"
+      "detail": "scrollY 16900 · act=cooperative"
     },
     {
       "name": "transición cooperative: volver regresa al hero sin recargar",
@@ -171,12 +171,12 @@
     {
       "name": "P0: scroll manual sin clic entra inequívocamente en la ruta exploración",
       "ok": true,
-      "detail": "tras rueda: route=explorer · act=cooperative · world=hero"
+      "detail": "tras rueda: route=explorer · act=cooperative · world=cooperative"
     },
     {
       "name": "P0: el scroll conduce la cámara (scrub) hacia el mundo cooperativo",
       "ok": true,
-      "detail": "world=cooperative · cámara=[0,2.3567900952598704,11.40987641914343] · scrollY=1400"
+      "detail": "world=cooperative · cámara=[-0.016666666666666673,2.486793857487109,11.53395467346999] · scrollY=1400"
     },
     {
       "name": "P0: tras elegir empresa, el scroll NO cambia a exploración",
@@ -286,7 +286,7 @@
     {
       "name": "ruta eficiencia: escena propia visible",
       "ok": true,
-      "detail": "1167px · route=efficiency act=efficiency world=efficiency scrollY=479"
+      "detail": "1167px · route=efficiency act=efficiency world=efficiency scrollY=21"
     },
     {
       "name": "ruta eficiencia: mensaje propio de la escena",
@@ -426,12 +426,12 @@
     {
       "name": "contacto: WhatsApp visible en la página",
       "ok": true,
-      "detail": "6 enlace(s)"
+      "detail": "5 enlace(s)"
     },
     {
       "name": "contacto: número público verificado",
       "ok": true,
-      "detail": "https://wa.me/525573724660?text=Hola%2C%20quiero%20dise%C3%B1ar%20mi%20infraestructura%20con%20Publia.%20Escenario%3A%20IA%20local%20privada."
+      "detail": "https://wa.me/525573724660?text=Dise%C3%B1ar%20mi%20infraestructura%20%E2%80%94%20Infraestructura%3A%20IA%20local%20privada"
     },
     {
       "name": "7M-F form: 3 campos (nombre/negocio/necesidad) con etiqueta",
@@ -541,7 +541,7 @@
     {
       "name": "v3 scroll: la cámara se transforma en 30/60/90% (ida)",
       "ok": true,
-      "detail": "30=[0,2.1372583263739733,10.737012207222987] 60=[0,2.0380952257495597,10.24349200917108] 90=[0,1.5499999969135803,9.019999986419755]"
+      "detail": "30=[-0.02956810631229234,2.1764119385279534,10.42222581855954] 60=[0,2.0380952257495597,10.24349200917108] 90=[0,1.5499999969135803,9.019999986419755]"
     },
     {
       "name": "v3 scroll: recorrido inverso mueve la cámara en sentido inverso (reversible)",
@@ -726,7 +726,7 @@
     {
       "name": "7M-B red: demo ilumina flujo y muestra resultado",
       "ok": true,
-      "detail": "3/3 · EL EQUIPO APRENDE"
+      "detail": "1/3 · LA IA ORGANIZA"
     },
     {
       "name": "7M-F E03: comparación compartida/privada ya NO está en E03 (sólo en E22)",
@@ -881,7 +881,7 @@
     {
       "name": "v4-A transición botón: cámara cambia en 3 momentos (inicio/medio/fin)",
       "ok": true,
-      "detail": "0=[0,2.4,11.6] mid=[2.858471760797342,1.99692 fin=[2.4916943521594686,1.8593"
+      "detail": "0=[0,2.4,11.6] mid=[2.918272425249169,2.01935 fin=[2.4916943521594686,1.8593"
     },
     {
       "name": "v4-A transición botón: portal visible a mitad del viaje",
@@ -926,7 +926,7 @@
     {
       "name": "portal: oculto tras aterrizar (ruta botón)",
       "ok": true,
-      "detail": "{\"progress\":\"0\",\"maxOp\":0,\"visible\":false}"
+      "detail": "{\"progress\":\"0\",\"maxOp\":0.0042,\"visible\":false}"
     },
     {
       "name": "7M-H E03: stage 3D con canvas visible (≥520px alto desktop) y panel con 4 filas",
@@ -1091,7 +1091,7 @@
     {
       "name": "7M-D axe ruta efficiency tras abrir controles: sin violaciones graves/moderadas",
       "ok": false,
-      "detail": "color-contrast×2"
+      "detail": "color-contrast×1"
     },
     {
       "name": "7M-D axe ruta explorer tras abrir controles: sin violaciones graves/moderadas",
@@ -1276,7 +1276,7 @@
     {
       "name": "7M-G hero: UN pin desktop con span = 18×H e invalidateOnRefresh",
       "ok": true,
-      "detail": "{\"total\":108,\"pinned\":1,\"scrub\":0.6,\"span\":16200.001,\"vh\":900,\"invalidate\":true}"
+      "detail": "{\"total\":158,\"pinned\":1,\"scrub\":0.6,\"span\":16200.001,\"vh\":900,\"invalidate\":true}"
     },
     {
       "name": "7M-H cargas: estado ready o silent (sin fallback con mensaje), aria-busy=false, loader oculto, fondo #050b1b, SIN mensaje ni botón de reintento en el DOM",
@@ -1286,7 +1286,7 @@
     {
       "name": "7M-G hero: rebote real — CTA suben a yNear (p=0.12) y bajan a yLow (p=0.25)",
       "ok": true,
-      "detail": "{\"ok\":true,\"p10\":104.00180053710938,\"p25\":558,\"top0\":557.9990234375,\"navbarH\":64,\"H\":900,\"topNear\":104,\"topLow\":558,\"drop\":453.9981994628906}"
+      "detail": "{\"ok\":true,\"p10\":104.00180053710938,\"p25\":558,\"top0\":533.3931884765625,\"navbarH\":64,\"H\":900,\"topNear\":104,\"topLow\":558,\"drop\":453.9981994628906}"
     },
     {
       "name": "7M-G hero: elegir ruta durante el pin lo cancela y aterriza",
