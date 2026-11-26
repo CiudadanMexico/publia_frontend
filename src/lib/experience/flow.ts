@@ -69,7 +69,7 @@ export function bindFlow(universe?: UniverseLike | null): void {
     };
 
     const start = (): void => {
-      if (userStopped || reduced) return;
+      if (userStopped) return; // con reduced-motion el arranque es manual vía el control discreto
       running = true;
       wrap.classList.add('is-running');
       schedule();
