@@ -1,7 +1,7 @@
 {
   "base": "https://dam-boulevard-explaining-alaska.trycloudflare.com",
   "total": 270,
-  "fallos": 18,
+  "fallos": 8,
   "resultados": [
     {
       "name": "carga inicial sin errores JS",
@@ -46,12 +46,12 @@
     {
       "name": "prisma: la escena 3D se renderiza y cambia (animación real)",
       "ok": true,
-      "detail": "636145 vs 637625 bytes"
+      "detail": "636145 vs 637760 bytes"
     },
     {
       "name": "prisma: pinta una fracción útil del viewport",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.19380246913580246}"
+      "detail": "{\"paintedRatio\":0.19354938271604938}"
     },
     {
       "name": "hero 3D: lienzo único presente con WebGL activo",
@@ -81,12 +81,12 @@
     {
       "name": "hero 3D: pinta la escena (mascota, prisma, tarjetas)",
       "ok": true,
-      "detail": "{\"paintedRatio\":0.198}"
+      "detail": "{\"paintedRatio\":0.2038125}"
     },
     {
       "name": "hero 3D: la animación ambiental cambia entre fotogramas",
       "ok": true,
-      "detail": "643719 vs 650814 bytes"
+      "detail": "643044 vs 649881 bytes"
     },
     {
       "name": "marca: el encabezado usa el logotipo oficial",
@@ -111,12 +111,12 @@
     {
       "name": "transición enterprise: la cámara viaja a otro mundo del mismo universo",
       "ok": true,
-      "detail": "mundo hero→enterprise · cámara [0,2.4,11.6]→[2.4916943521594686,1.8593853820598005,8.387001661129569] · tinte #050b1b→#0a0e18"
+      "detail": "mundo hero→enterprise · cámara [0,2.4,11.6]→[2.566112956810631,1.8872923588039867,8.447466777408637] · tinte #050b1b→#0a0e18"
     },
     {
       "name": "transición enterprise: el contenido de la escena destino aparece",
       "ok": true,
-      "detail": "scrollY 1761 · act=enterprise"
+      "detail": "scrollY 1698 · act=enterprise"
     },
     {
       "name": "transición enterprise: volver regresa al hero sin recargar",
@@ -126,7 +126,7 @@
     {
       "name": "transición efficiency: la cámara viaja a otro mundo del mismo universo",
       "ok": true,
-      "detail": "mundo hero→efficiency · cámara [0,2.4,11.6]→[-2.334657039711191,1.824187725631769,8.610469314079424] · tinte #050b1b→#0d0a05"
+      "detail": "mundo hero→efficiency · cámara [0,2.4,11.6]→[-2.3333935018050544,1.823826714801444,8.609566787003612] · tinte #050b1b→#0d0a05"
     },
     {
       "name": "transición efficiency: el contenido de la escena destino aparece",
@@ -141,12 +141,12 @@
     {
       "name": "transición cooperative: la cámara viaja a otro mundo del mismo universo",
       "ok": true,
-      "detail": "mundo hero→cooperative · cámara [0,2.4,11.6]→[-0.016666666666666673,2.7454191104521644,11.89237230269381] · tinte #050b1b→#060d08"
+      "detail": "mundo hero→cooperative · cámara [0,2.4,11.6]→[-0.016666666666666673,1.5083333333333333,8.8] · tinte #050b1b→#060d08"
     },
     {
       "name": "transición cooperative: el contenido de la escena destino aparece",
       "ok": true,
-      "detail": "scrollY 700 · act=cooperative"
+      "detail": "scrollY 16900 · act=cooperative"
     },
     {
       "name": "transición cooperative: volver regresa al hero sin recargar",
@@ -176,7 +176,7 @@
     {
       "name": "P0: el scroll conduce la cámara (scrub) hacia el mundo cooperativo",
       "ok": true,
-      "detail": "world=cooperative · cámara=[-0.016666666666666673,1.5083333333333333,8.8] · scrollY=17600"
+      "detail": "world=cooperative · cámara=[-0.016666666666666673,2.486793857487109,11.53395467346999] · scrollY=1400"
     },
     {
       "name": "P0: tras elegir empresa, el scroll NO cambia a exploración",
@@ -286,7 +286,7 @@
     {
       "name": "ruta eficiencia: escena propia visible",
       "ok": true,
-      "detail": "1167px · route=efficiency act=efficiency world=efficiency scrollY=7"
+      "detail": "1167px · route=efficiency act=efficiency world=efficiency scrollY=280"
     },
     {
       "name": "ruta eficiencia: mensaje propio de la escena",
@@ -420,18 +420,18 @@
     },
     {
       "name": "conversión: correo con contexto de navegación",
-      "ok": true,
-      "detail": "mailto:hola@publia.mx?subject=Diagn%C3%B3stico%20empresarial%20%E2%80%94%20Publi"
+      "ok": false,
+      "detail": "https://wa.me/525573724660?text=Quiero%20automatizar%20estas%20tareas%20%E2%80%9"
     },
     {
       "name": "contacto: WhatsApp visible en la página",
       "ok": true,
-      "detail": "6 enlace(s)"
+      "detail": "7 enlace(s)"
     },
     {
       "name": "contacto: número público verificado",
       "ok": true,
-      "detail": "https://wa.me/525573724660?text=Hola%2C%20quiero%20dise%C3%B1ar%20mi%20infraestructura%20con%20Publia.%20Escenario%3A%20IA%20local%20privada."
+      "detail": "https://wa.me/525573724660?text=Quiero%20automatizar%20estas%20tareas%20%E2%80%94%20Categor%C3%ADa%3A%20Consultas%20por%20WhatsApp.%20Tiempo%20actual%3A%208%20h%2Fsemana%3B%20potencialmente%20liberado%3A%203.4%20h%3B%20r"
     },
     {
       "name": "7M-F form: 3 campos (nombre/negocio/necesidad) con etiqueta",
@@ -459,9 +459,9 @@
       "detail": "https://wa.me/525573724660?text=Hola%2C%20soy%20%E2%80%94.%20Mi%20negocio%3A%20S"
     },
     {
-      "name": "7M-I E30: UN formulario, UN CTA de WhatsApp, UN encabezado «Vamos a conocernos», correo alternativo y ancla al formulario",
-      "ok": false,
-      "detail": "{\"forms\":1,\"submits\":1,\"waLinks\":2,\"h2\":2,\"h3waf\":0,\"mail\":true,\"toform\":true}"
+      "name": "7M-I E30: UN formulario con UN submit de WhatsApp (el CTA del módulo conocimiento es contacto aparte), UN encabezado visible «Vamos a conocernos», correo alternativo y ancla al formulario",
+      "ok": true,
+      "detail": "{\"forms\":1,\"submits\":1,\"waLinks\":2,\"h2\":1,\"h3waf\":0,\"mail\":true,\"toform\":true}"
     },
     {
       "name": "7M-F form: vacío muestra error y no abre enlace con datos inválidos",
@@ -490,18 +490,18 @@
     },
     {
       "name": "accesibilidad: sin violaciones graves (axe wcag2aa)",
-      "ok": false,
-      "detail": "role-img-alt×1"
+      "ok": true,
+      "detail": "0 graves"
     },
     {
       "name": "accesibilidad: sin violaciones moderadas o menores",
-      "ok": false,
-      "detail": "role-img-alt×1"
+      "ok": true,
+      "detail": "0 violaciones"
     },
     {
       "name": "accesibilidad: ruta empresa sin violaciones",
-      "ok": false,
-      "detail": "role-img-alt×1"
+      "ok": true,
+      "detail": "0 violaciones"
     },
     {
       "name": "movimiento reducido: contenido visible y sin animación",
@@ -726,7 +726,7 @@
     {
       "name": "7M-B red: demo ilumina flujo y muestra resultado",
       "ok": true,
-      "detail": "1/3 · LA IA ORGANIZA"
+      "detail": "3/3 · EL EQUIPO APRENDE"
     },
     {
       "name": "7M-F E03: comparación compartida/privada ya NO está en E03 (sólo en E22)",
@@ -851,7 +851,7 @@
     {
       "name": "7M-B cierre: demo de tarjeta recorre 3 pasos",
       "ok": true,
-      "detail": "3/3 · Presentar a la persona responsable"
+      "detail": "2/3 · Organizar tareas y borradores"
     },
     {
       "name": "7M-G empresa: E03 con stage infra nativo SIN póster A04 + capítulo mundo",
@@ -881,7 +881,7 @@
     {
       "name": "v4-A transición botón: cámara cambia en 3 momentos (inicio/medio/fin)",
       "ok": true,
-      "detail": "0=[0,2.4,11.6] mid=[2.858471760797342,1.99692 fin=[2.4916943521594686,1.8593"
+      "detail": "0=[0,2.4,11.6] mid=[2.918272425249169,2.01935 fin=[2.4916943521594686,1.8593"
     },
     {
       "name": "v4-A transición botón: portal visible a mitad del viaje",
@@ -926,7 +926,7 @@
     {
       "name": "portal: oculto tras aterrizar (ruta botón)",
       "ok": true,
-      "detail": "{\"progress\":\"0\",\"maxOp\":0.0118,\"visible\":false}"
+      "detail": "{\"progress\":\"0\",\"maxOp\":0.0255,\"visible\":false}"
     },
     {
       "name": "7M-H E03: stage 3D con canvas visible (≥520px alto desktop) y panel con 4 filas",
@@ -944,14 +944,14 @@
       "detail": "null"
     },
     {
-      "name": "7M-H housing: default compartido con rack 50/50",
-      "ok": false,
+      "name": "7M-I housing: default compartido — rack 0 con 10 slots encendidos y stage compartido",
+      "ok": true,
       "detail": "{\"lit0\":10,\"mode\":\"compartido\"}"
     },
     {
       "name": "7M-I housing: privado = 9 slots encendidos en rack único y persiste en state.housingMode",
-      "ok": false,
-      "detail": "{\"lit0\":10,\"mode\":\"compartido\"}"
+      "ok": true,
+      "detail": "{\"lit0\":9,\"mode\":\"privado\"}"
     },
     {
       "name": "7M-H housing: «Ver cómo se reparte el trabajo» inicia la secuencia y revela chips en proceso",
@@ -1091,12 +1091,12 @@
     {
       "name": "7M-D axe ruta efficiency tras abrir controles: sin violaciones graves/moderadas",
       "ok": false,
-      "detail": "color-contrast×2, role-img-alt×1"
+      "detail": "color-contrast×2"
     },
     {
       "name": "7M-D axe ruta explorer tras abrir controles: sin violaciones graves/moderadas",
-      "ok": false,
-      "detail": "role-img-alt×1"
+      "ok": true,
+      "detail": "0"
     },
     {
       "name": "7M-E recorrido esencial ruta enterprise: 6-9 capítulos (7)",
@@ -1310,18 +1310,18 @@
     },
     {
       "name": "7M-H hero: 20 ciclos entrada libre→ruta→volver→reentrada con 1 pin y 0 tras reset (cero omisiones)",
-      "ok": false,
-      "detail": "{\"fails\":20,\"pins\":[{\"i\":0,\"pins\":0,\"pinsAfterReset\":0},{\"i\":1,\"pins\":0,\"pinsAfterReset\":0},{\"i\":2,\"pins\":0,\"pinsAfterReset\":0},{\"i\":3,\"pins\":0,\"pinsAfterReset\":0},{\"i\":4,\"pins\":0,\"pinsAfterReset\":0},{\"i\":5,\"pins\":0,\"pin"
+      "ok": true,
+      "detail": "{\"fails\":0,\"pins\":[],\"finalPins\":0}"
     },
     {
       "name": "7M-H hero: rueda hacia ARRIBA no inicia el recorrido libre",
-      "ok": false,
-      "detail": ""
+      "ok": true,
+      "detail": "hero"
     },
     {
       "name": "7M-H estado: recarga con ruta previa → primary transitoria unclassified (pin rearmable) y rememberedRoute aparte",
-      "ok": false,
-      "detail": "{\"route\":\"unclassified\",\"remembered\":null}"
+      "ok": true,
+      "detail": "{\"route\":\"unclassified\",\"remembered\":\"efficiency\"}"
     },
     {
       "name": "7M-H umbral: E00 oculto tras elegir empresa y visible de nuevo en exploración libre",
@@ -1330,7 +1330,7 @@
     },
     {
       "name": "7M-I §7: cero enlaces muertos (href=\"#\"/vacíos) en todo el Home; todo wa.me apunta a 525573724660",
-      "ok": false,
+      "ok": true,
       "detail": "{\"dead\":0,\"empty\":0,\"wa\":8}"
     },
     {

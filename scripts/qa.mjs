@@ -85,25 +85,34 @@ const pscroll = (top) => page.evaluate((t) => {
   window.scrollTo({ top: t, behavior: 'instant' });
 }, top);
 
-// 7M-I: bajar con rueda (evento de usuario; el controlador de ruta reimpone scrollTo programático)
+// 7M-I: bajar con rueda sintética in-page (evento de usuario; el controlador de ruta reimpone scrollTo programático y el IO real no siempre despierta con mouse.wheel en headless)
 const wheelToScene = async (sel, max = 60) => {
   for (let i = 0; i < max; i++) {
     const st = await page.evaluate((s2) => {
       const el = document.querySelector(s2);
       if (!el) return { vis: false, dir: 1 };
       const b = el.getBoundingClientRect();
-      const vis = b.top < window.innerHeight * 0.72 && b.bottom > window.innerHeight * 0.15;
-      return { vis, dir: b.bottom <= window.innerHeight * 0.15 ? -1 : 1 }; // elemento arriba → subir
+      return { vis: b.top < window.innerHeight * 0.72 && b.bottom > window.innerHeight * 0.15, dir: b.bottom <= window.innerHeight * 0.15 ? -1 : 1 };
     }, sel);
     if (st.vis) return true;
-    await page.mouse.move(700, 450);
-    await page.mouse.wheel(0, st.dir * 700);
-    await page.waitForTimeout(300);
+    await page.evaluate((d) => {
+      window.__publiaLastProgrammaticScroll = 0;
+      window.dispatchEvent(new WheelEvent('wheel', { deltaY: d * 700, bubbles: true }));
+      window.scrollBy({ top: d * 500, behavior: 'instant' });
+    }, st.dir);
+    await page.waitForTimeout(320);
   }
   return false;
 };
 const wheelAway = async (times = 10) => {
-  for (let i = 0; i < times; i++) { await page.mouse.move(700, 450); await page.mouse.wheel(0, -700); await page.waitForTimeout(260); }
+  for (let i = 0; i < times; i++) {
+    await page.evaluate(() => {
+      window.__publiaLastProgrammaticScroll = 0;
+      window.dispatchEvent(new WheelEvent('wheel', { deltaY: -700, bubbles: true }));
+      window.scrollBy({ top: -500, behavior: 'instant' });
+    });
+    await page.waitForTimeout(280);
+  }
 };
 
 // Rueda real hasta que la ruta libre se active (reintenta si el entorno va lento)
@@ -1543,8 +1552,7 @@ check('7M-I E11: tras salir y volver, un solo avance por intervalo (sin temporiz
 for (let i = 0; i < 24; i++) {
   const top = await page.evaluate(() => Math.round(document.querySelector('#escena-e11 .pers__controls')?.getBoundingClientRect().top ?? -1));
   if (top >= 0 && top <= 30) break;
-  await page.mouse.move(700, 450);
-  await page.mouse.wheel(0, top > 30 ? 160 : -160);
+  await page.evaluate((d) => { window.__publiaLastProgrammaticScroll = 0; window.dispatchEvent(new WheelEvent('wheel', { deltaY: d, bubbles: true })); window.scrollBy({ top: d * 0.55, behavior: 'instant' }); }, top > 30 ? 160 : -160);
   await page.waitForTimeout(240);
 }
 const e11fit = await page.evaluate(() => {

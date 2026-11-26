@@ -44,15 +44,19 @@ const waitReady = (page) => page.waitForFunction(
 
 const wheelTo = async (page, sel) => {
   for (let i = 0; i < 45; i++) {
-    const vis = await page.evaluate((s2) => {
+    const st = await page.evaluate((s2) => {
       const el = document.querySelector(s2);
-      if (!el) return false;
+      if (!el) return { vis: false, dir: 1 };
       const b = el.getBoundingClientRect();
-      return b.top < window.innerHeight * 0.72 && b.bottom > window.innerHeight * 0.15;
+      return { vis: b.top < window.innerHeight * 0.72 && b.bottom > window.innerHeight * 0.15, dir: b.bottom <= window.innerHeight * 0.15 ? -1 : 1 };
     }, sel);
+    const vis = st.vis;
     if (vis) return true;
-    await page.mouse.move(Math.round(w / 2), Math.round(h / 2));
-    await page.mouse.wheel(0, 700);
+    await page.evaluate((d) => {
+      window.__publiaLastProgrammaticScroll = 0;
+      window.dispatchEvent(new WheelEvent('wheel', { deltaY: d * 700, bubbles: true }));
+      window.scrollBy({ top: d * 500, behavior: 'instant' });
+    }, st.dir ?? 1);
     await page.waitForTimeout(280);
   }
   return false;
