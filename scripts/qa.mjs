@@ -2254,8 +2254,9 @@ check('7M-H hero: 20 ciclos entrada libre→ruta→volver→reentrada con 1 pin 
 const wheelUp = await cycPage.evaluate(async () => {
   window.__publiaLastProgrammaticScroll = Date.now();
   window.scrollTo(0, 0);
+  await new Promise((r) => setTimeout(r, 3400)); // esperar a que 'traveling' se libere
   document.querySelector('[data-route-reset]')?.click();
-  await new Promise((r) => setTimeout(r, 900));
+  await new Promise((r) => setTimeout(r, 1200));
   window.dispatchEvent(new WheelEvent('wheel', { deltaY: -400, bubbles: true }));
   await new Promise((r) => setTimeout(r, 700));
   return document.documentElement.dataset.act;
@@ -2265,8 +2266,9 @@ check('7M-H hero: rueda hacia ARRIBA no inicia el recorrido libre', wheelUp === 
 const trans = await cycPage.evaluate(async () => {
   window.__publiaLastProgrammaticScroll = Date.now();
   window.scrollTo(0, 0);
+  await new Promise((r) => setTimeout(r, 3400)); // traveling libre antes de elegir ruta
   document.querySelector('[data-route-choice="efficiency"]')?.click();
-  await new Promise((r) => setTimeout(r, 800));
+  await new Promise((r) => setTimeout(r, 1000));
   return JSON.parse(sessionStorage.getItem('publia.visitor.v1') ?? '{}');
 });
 await cycPage.reload({ waitUntil: 'domcontentloaded' });

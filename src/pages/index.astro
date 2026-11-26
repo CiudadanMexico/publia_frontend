@@ -35,7 +35,7 @@ import { SITE } from '../data/site';
           <span class="muted"> · {SITE.city}, {SITE.country}</span>
         </p>
         <p>
-          <a class="footer__whatsapp" href={SITE.whatsapp} rel="noopener noreferrer" target="_blank">
+          <a class="footer__whatsapp" href={`${SITE.whatsapp}?text=${encodeURIComponent("Hola, quiero conocer las opciones de Publia para mi negocio.")}`} rel="noopener noreferrer" target="_blank">
             WhatsApp {SITE.whatsappLabel}
           </a>
         </p>
