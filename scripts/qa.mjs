@@ -1399,10 +1399,11 @@ for (let i = 0; i < 6; i++) {
 }
 await demoPage.waitForTimeout(1600);
 check('7M-I E07: sin botones «Ejecutar demostración»/«Reiniciar»; queda el control discreto de movimiento', await demoPage.evaluate(() => !document.querySelector('#escena-e07 [data-flow-run]') && !document.querySelector('#escena-e07 [data-flow-reset]') && !!document.querySelector('#escena-e07 [data-flow-motion]')), '');
-const e07a = await demoPage.evaluate(() => ({ count: document.querySelector('#escena-e07 [data-flow-count]')?.textContent ?? '', active: document.querySelectorAll('#escena-e07 [data-flow-stage].is-active').length }));
-await demoPage.waitForTimeout(3400);
-const e07b = await demoPage.evaluate(() => ({ count: document.querySelector('#escena-e07 [data-flow-count]')?.textContent ?? '', feed: (document.querySelector('#escena-e07 [data-flow-feed]')?.textContent ?? '').slice(0, 60) }));
-check('7M-I E07: arranque automático sin clic — etapa activa y contador avanzando (4 etapas cíclicas)', e07a.active === 1 && e07b.count !== e07a.count && e07b.feed.length > 5, JSON.stringify({ a: e07a, b: e07b }));
+const e07a = await demoPage.evaluate(() => ({ count: document.querySelector('#escena-e07 [data-flow-count]')?.textContent ?? '', active: document.querySelectorAll('#escena-e07 [data-flow-stage].is-active').length, running: document.querySelector('[data-demo="flow"]')?.dataset.running ?? '?', cls: document.querySelector('[data-demo="flow"]')?.classList.contains('is-running') ?? false }));
+const e07samples = [e07a.count];
+for (let i = 0; i < 5; i++) { await demoPage.waitForTimeout(1300); e07samples.push(await demoPage.evaluate(() => document.querySelector('#escena-e07 [data-flow-count]')?.textContent ?? '')); }
+const e07changed = new Set(e07samples).size > 1;
+check('7M-I E07: arranque automático sin clic — etapa activa, corriendo y contador avanzando (4 etapas cíclicas)', e07a.active === 1 && e07a.running === '1' && e07a.cls && e07changed, JSON.stringify({ a: e07a, samples: e07samples }));
 // 4 ciclos completos: muestreamos el índice de etapa activa ~28 s (ciclo ≈ 4×1.5 s)
 const e07seq = [];
 for (let i = 0; i < 34; i++) {
@@ -1438,36 +1439,36 @@ const clickJs = (sel) => page.evaluate((s2) => { const el = document.querySelect
 const sceneState = () => page.evaluate(() => { try { return JSON.parse(sessionStorage.getItem('publia.visitor.v1') ?? '{}'); } catch { return {}; } });
 
 // Bloque B: red colaborativa (E15) — boot limpio en ruta unclassified (escenas explorer visibles)
-await demoPage.evaluate(() => { try { sessionStorage.clear(); } catch {} });
+await page.evaluate(() => { try { sessionStorage.clear(); } catch {} });
 await page.goto(BASE, { waitUntil: 'domcontentloaded' });
 await page.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'hero', { timeout: 60000 }).catch(() => {});
-await demoPage.waitForTimeout(1500);
-await demoPage.evaluate(() => document.querySelector('#escena-e15')?.scrollIntoView({ behavior: 'instant' }));
-await demoPage.waitForTimeout(700);
+await page.waitForTimeout(1500);
+await page.evaluate(() => document.querySelector('#escena-e15')?.scrollIntoView({ behavior: 'instant' }));
+await page.waitForTimeout(700);
 await waitBound('[data-demo="red"]');
-check('7M-B red: 6 nodos de capacidad', await demoPage.evaluate(() => document.querySelectorAll('#escena-e15 [data-red-node]').length) === 6);
+check('7M-B red: 6 nodos de capacidad', await page.evaluate(() => document.querySelectorAll('#escena-e15 [data-red-node]').length) === 6);
 await clickJs('#escena-e15 [data-red-node="2"]');
-await demoPage.waitForTimeout(300);
-check('7M-B red: click nodo 3 selecciona y persiste en estado', await demoPage.evaluate(() => document.querySelector('#escena-e15 [data-red-node="2"]')?.getAttribute('aria-pressed') === 'true') && (await sceneState()).red === 'sitios', JSON.stringify((await sceneState()).red));
+await page.waitForTimeout(300);
+check('7M-B red: click nodo 3 selecciona y persiste en estado', await page.evaluate(() => document.querySelector('#escena-e15 [data-red-node="2"]')?.getAttribute('aria-pressed') === 'true') && (await sceneState()).red === 'sitios', JSON.stringify((await sceneState()).red));
 await clickJs('#escena-e15 [data-red-run]');
 await page.waitForFunction(() => (document.querySelector('#escena-e15 [data-red-result]')?.textContent ?? '').length > 3, { timeout: 8000 }).catch(() => {});
-check('7M-B red: demo ilumina flujo y muestra resultado', (await demoPage.evaluate(() => document.querySelector('#escena-e15 [data-red-result]')?.textContent ?? '')).length > 3, await demoPage.evaluate(() => document.querySelector('#escena-e15 [data-red-result]')?.textContent ?? ''));
+check('7M-B red: demo ilumina flujo y muestra resultado', (await page.evaluate(() => document.querySelector('#escena-e15 [data-red-result]')?.textContent ?? '')).length > 3, await page.evaluate(() => document.querySelector('#escena-e15 [data-red-result]')?.textContent ?? ''));
 
 // Bloque A: infraestructura soberana (E03) — requiere ruta enterprise
 await page.goto(BASE, { waitUntil: 'domcontentloaded' });
 await page.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'hero', { timeout: 60000 }).catch(() => {});
 await click('[data-route-choice="enterprise"]');
 await page.waitForFunction(() => document.documentElement.dataset.act === 'enterprise', { timeout: 30000 }).catch(() => {});
-await demoPage.waitForTimeout(1500);
-await demoPage.evaluate(() => document.querySelector('#escena-e03')?.scrollIntoView({ behavior: 'instant' }));
-await demoPage.waitForTimeout(700);
+await page.waitForTimeout(1500);
+await page.evaluate(() => document.querySelector('#escena-e03')?.scrollIntoView({ behavior: 'instant' }));
+await page.waitForTimeout(700);
 await waitBound('[data-demo="infra2"]');
-check('7M-F E03: comparación compartida/privada ya NO está en E03 (sólo en E22)', !await demoPage.evaluate(() => document.querySelector('#escena-e03 [data-housing-mode]')), '');
+check('7M-F E03: comparación compartida/privada ya NO está en E03 (sólo en E22)', !await page.evaluate(() => document.querySelector('#escena-e03 [data-housing-mode]')), '');
 // E22 housing 7M-H: modelo determinista visible en ambas columnas
-await demoPage.evaluate(() => document.querySelector('#escena-e22')?.scrollIntoView({ behavior: 'instant' }));
-await demoPage.waitForTimeout(800);
-check('7M-H E22: 2 modalidades Compartido/Privado', (await demoPage.evaluate(() => [...document.querySelectorAll('#escena-e22 [data-housing-mode]')].map((b) => b.textContent.trim()))).join() === 'Compartido,Privado', '');
-const h22 = await demoPage.evaluate(() => ({
+await page.evaluate(() => document.querySelector('#escena-e22')?.scrollIntoView({ behavior: 'instant' }));
+await page.waitForTimeout(800);
+check('7M-H E22: 2 modalidades Compartido/Privado', (await page.evaluate(() => [...document.querySelectorAll('#escena-e22 [data-housing-mode]')].map((b) => b.textContent.trim()))).join() === 'Compartido,Privado', '');
+const h22 = await page.evaluate(() => ({
   shared: {
     active: document.querySelector('[data-housing-col="compartido"] [data-hs="active"]')?.textContent ?? '',
     waiting: document.querySelector('[data-housing-col="compartido"] [data-hs="waiting"]')?.textContent ?? '',
@@ -1492,7 +1493,7 @@ check('7M-H E22: caso inicial 85 — compartido 3 activas/4 espera (50 usadas), 
 check('7M-H E22: disclaimer ilustrativo + 4 filas editables + demanda 85 + H2 literal + sin métricas vacías ni tráfico decorativo', h22.disclaimer.includes('no es una medición de rendimiento') && h22.rows === 4 && h22.demand === '85' && h22.h2.includes('¿Cómo quieres repartir tu capacidad?') && h22.noMetrics && h22.noTraffic, JSON.stringify({ d: h22.disclaimer.slice(0, 40), rows: h22.rows, demand: h22.demand }));
 check('7M-H E22: CTA WhatsApp con prefijo «Escenario ilustrativo que quiero dimensionar» + modalidad y cantidades', h22.cta.startsWith('https://wa.me/525573724660') && decodeURIComponent(h22.cta).includes('Escenario ilustrativo que quiero dimensionar') && decodeURIComponent(h22.cta).includes('85 unidades'), h22.cta.slice(0, 100));
 // 7M-I §3: stage de racks recuperado — 3 racks, slots del rack 0 = unidades usadas del modelo
-const h22racks = await demoPage.evaluate(() => ({
+const h22racks = await page.evaluate(() => ({
   racks: document.querySelectorAll('#escena-e22 [data-housing-rack]').length,
   titles: [...document.querySelectorAll('#escena-e22 [data-housing-rack] .housing7__rack-title')].map((t) => t.textContent ?? ''),
   lit0: document.querySelectorAll('#escena-e22 [data-hslot="0"].is-on').length,
@@ -1503,8 +1504,8 @@ const h22racks = await demoPage.evaluate(() => ({
 }));
 check('7M-I E22: 3 racks (negocio/socios+becarios/miembros) en 2 columnas desktop; compartido: 10 slots encendidos (50/5) + 20 reservados', h22racks.racks === 3 && h22racks.titles[0] === 'TU NEGOCIO' && h22racks.lit0 === 10 && h22racks.reserved === 20 && h22racks.stageMode === 'compartido' && h22racks.caption.includes('50/25/25') && h22racks.gridCols === 2, JSON.stringify(h22racks));
 await clickJs('#escena-e22 [data-housing-mode="privado"]');
-await demoPage.waitForTimeout(400);
-const h22b = await demoPage.evaluate(() => ({
+await page.waitForTimeout(400);
+const h22b = await page.evaluate(() => ({
   persisted: JSON.parse(sessionStorage.getItem('publia.visitor.v1') ?? '{}').housingMode ?? null,
   stageMode: document.querySelector('#escena-e22 [data-housing-stage]')?.dataset.mode ?? '',
   lit0: document.querySelectorAll('#escena-e22 [data-hslot="0"].is-on').length,
@@ -1515,8 +1516,8 @@ const h22b = await demoPage.evaluate(() => ({
 }));
 check('7M-I E22: privado persiste, stage privado — 9 slots encendidos (85/10 redondeado), 0 reservados, pie 100/100, inputs conservados', h22b.persisted === 'privado' && h22b.stageMode === 'privado' && h22b.lit0 === 9 && h22b.reserved === 0 && h22b.foot0.includes('100 / 100') && h22b.caption.includes('100%') && h22b.inputsKept === '2', JSON.stringify(h22b));
 await clickJs('#escena-e22 [data-housing-mode="compartido"]');
-await demoPage.waitForTimeout(300);
-const h22c = await demoPage.evaluate(() => ({
+await page.waitForTimeout(300);
+const h22c = await page.evaluate(() => ({
   lit0: document.querySelectorAll('#escena-e22 [data-hslot="0"].is-on').length,
   reserved: document.querySelectorAll('#escena-e22 [data-hslot="1"].is-reserved, #escena-e22 [data-hslot="2"].is-reserved').length,
   chipsOn: document.querySelectorAll('#escena-e22 .housing7__chip--on').length,
@@ -1524,7 +1525,7 @@ const h22c = await demoPage.evaluate(() => ({
 }));
 check('7M-I E22: volver a compartido restaura 10 slots + 20 reservados y chips 3 en proceso / 4 en espera', h22c.lit0 === 10 && h22c.reserved === 20 && h22c.chipsOn === 3 && h22c.chipsWait === 4, JSON.stringify(h22c));
 // edición de cantidad recalcula sin cambiar modalidad
-const h22d = await demoPage.evaluate(() => {
+const h22d = await page.evaluate(() => {
   const i = document.querySelector('#escena-e22 [data-housing-qty="auto"]');
   i.value = '0'; i.dispatchEvent(new Event('input', { bubbles: true }));
   return {
