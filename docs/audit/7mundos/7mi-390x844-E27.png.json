@@ -1,0 +1,21 @@
+{
+  "viewport": [
+    390,
+    844
+  ],
+  "scene": "E27",
+  "expectedTitle": "Elige tu combinación",
+  "found": true,
+  "visible": true,
+  "rect": {
+    "x": 0,
+    "y": 141,
+    "w": 390,
+    "h": 2541
+  },
+  "opacity": "1",
+  "loadState": "ready",
+  "title": "Una membresía para tu siguiente paso.",
+  "route": "efficiency",
+  "act": "efficiency"
+}

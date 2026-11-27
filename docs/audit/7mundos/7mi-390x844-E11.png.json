@@ -1,0 +1,22 @@
+{
+  "viewport": [
+    390,
+    844
+  ],
+  "scene": "E11",
+  "expectedTitle": "Persona real",
+  "note": "demo auto-cíclica horizontal",
+  "found": true,
+  "visible": true,
+  "rect": {
+    "x": 0,
+    "y": 379,
+    "w": 390,
+    "h": 1568
+  },
+  "opacity": "1",
+  "loadState": "ready",
+  "title": "Persona real, criterio real.",
+  "route": "efficiency",
+  "act": "efficiency"
+}

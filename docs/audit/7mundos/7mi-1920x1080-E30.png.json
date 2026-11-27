@@ -1,0 +1,22 @@
+{
+  "viewport": [
+    1920,
+    1080
+  ],
+  "scene": "E30",
+  "expectedTitle": "Vamos a conocernos",
+  "note": "un solo formulario",
+  "found": true,
+  "visible": true,
+  "rect": {
+    "x": 0,
+    "y": 306,
+    "w": 1920,
+    "h": 1928
+  },
+  "opacity": "1",
+  "loadState": "ready",
+  "title": "Vamos a conocernos.",
+  "route": "efficiency",
+  "act": "efficiency"
+}

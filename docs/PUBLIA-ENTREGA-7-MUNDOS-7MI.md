@@ -63,7 +63,7 @@
 
 ## Pruebas
 - Unitarias: 25/25 (`npm test`).
-- QA E2E staging (`scripts/qa.mjs`): ver resultado final abajo (256+ criterios incl. regresión hero/scroll/navegación + nuevos 7M-I: 1 formulario E30, 4 ciclos E11, 4 ciclos E07, cambio repetido de casos, reentrada sin timers duplicados, correspondencia modelo↔racks E22, fit de viewport E11, CTAs funcionales, a11y/teclado/reduced-motion, sin overflow).
+- QA E2E staging (`scripts/qa.mjs`): **271/271 criterios verificados, EXIT=0** (log `.tmp/qa-7mi-final.log`; incluye regresión hero/scroll/navegación y todos los nuevos 7M-I: 1 formulario E30, ciclos E11 (5 wraps en ~28 s), ciclos E07 (6 wraps en ~32 s), cambio repetido de casos, reentrada sin timers duplicados, correspondencia modelo↔racks E22 (10 lit compartido / 9 lit privado, 20 reservados), fit de viewport E11 (2.8:1, todo visible), CTAs funcionales sin `href="#"`, a11y/axe/teclado/reduced-motion, sin overflow; 5 viewports 390×844→1920×1080).
 - Capturas: `docs/audit/7mundos/7mi-{viewport}-{E07,E11,E22-compartido,E22-privado,E27,E30}.png` (+sidecars JSON acreditados; "antes" = `7mh-*` de 7M-H). Videos continuos: `.tmp-vids/7mi-e07-continuo/`, `7mi-e11-continuo/` (1440×900).
 
 ## Funcionalidades comerciales pendientes (explícitas)

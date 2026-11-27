@@ -1,0 +1,22 @@
+{
+  "viewport": [
+    768,
+    1024
+  ],
+  "scene": "E22-privado",
+  "housing": "privado",
+  "note": "racks privados",
+  "found": true,
+  "visible": true,
+  "rect": {
+    "x": 0,
+    "y": 405,
+    "w": 768,
+    "h": 2741
+  },
+  "opacity": "1",
+  "loadState": "ready",
+  "title": "¿Cómo quieres repartir tu capacidad?",
+  "route": "efficiency",
+  "act": "efficiency"
+}

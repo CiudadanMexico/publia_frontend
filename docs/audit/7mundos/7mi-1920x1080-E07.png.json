@@ -1,0 +1,22 @@
+{
+  "viewport": [
+    1920,
+    1080
+  ],
+  "scene": "E07",
+  "expectedTitle": "RECUPÉRALO",
+  "note": "demo auto-cíclica",
+  "found": true,
+  "visible": true,
+  "rect": {
+    "x": 0,
+    "y": 400,
+    "w": 1920,
+    "h": 1205
+  },
+  "opacity": "1",
+  "loadState": "ready",
+  "title": "EL TIEMPO NO VUELVE. **RECUPÉRALO.**",
+  "route": "efficiency",
+  "act": "efficiency"
+}
