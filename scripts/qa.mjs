@@ -2110,7 +2110,7 @@ if (!browser.isConnected()) await relaunch();
 await page.goto(BASE, { waitUntil: 'domcontentloaded' });
 await page.waitForFunction(() => document.querySelector('[data-prism-canvas]')?.dataset.world === 'hero', { timeout: 60000 }).catch(() => {});
 await page.waitForTimeout(1200);
-await page.evaluate(() => document.querySelector('#escena-e00')?.scrollIntoView({ behavior: 'instant' }));
+await wheelToScene('#escena-e00 [data-simulator]');
 await page.waitForTimeout(900);
 await waitBound('[data-simulator]');
 const simDef = await page.evaluate(() => ({

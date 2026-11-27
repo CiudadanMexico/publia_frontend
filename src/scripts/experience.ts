@@ -142,7 +142,8 @@ function applySceneVariants(state: VisitorState): void {
  * se envía ningún dato personal ni sensible.
  */
 function applyContactContext(state: VisitorState): void {
-  const links = document.querySelectorAll<HTMLAnchorElement>('[data-contact-cta="true"]');
+  // sólo los enlaces de correo (mailto:) reciben el contexto por body; los CTA de WhatsApp conservan su wa.me?text= contextual (7M-I §7)
+  const links = document.querySelectorAll<HTMLAnchorElement>('[data-contact-cta="true"][href^="mailto:"]');
   links.forEach((link) => {
     link.href = buildMailto({ route: state.primary, traits: state.traits });
   });
