@@ -2040,7 +2040,8 @@ await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 90000 }).catch((
 await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 90000 }).catch(() => {});
 await page.waitForTimeout(2400);
 check('7M-E P0-01: al cargar, answers.servicio sigue vacío (select(0) no persiste)', (await sceneState()).answers?.servicio == null, JSON.stringify((await sceneState()).answers));
-await page.evaluate(() => document.querySelector('#escena-e25')?.scrollIntoView({ behavior: 'instant', block: 'center' }));
+await wheelToScene('#escena-e25 [data-demo="ecosystem"]');
+await page.waitForTimeout(400);
 await waitBound('[data-demo="ecosystem"]');
 await clickJs('#escena-e25 [data-eco-node="3"]');
 await page.waitForTimeout(400);
