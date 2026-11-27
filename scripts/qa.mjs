@@ -1417,21 +1417,22 @@ check('7M-I E07: 4 ciclos consecutivos completos (3→0 contado ≥3 en ~32 s co
 const e11tone = await demoPage.evaluate(() => document.querySelector('#escena-e11')?.dataset.tone);
 check('V4-B E11 personas+IA en marfil (cream)', e11tone === 'cream', `tone=${e11tone}`);
 // recomendación en E29 según ruta empresa
-await demoPage.evaluate(() => { try { sessionStorage.clear(); } catch {} });
+await page.evaluate(() => { try { sessionStorage.clear(); } catch {} });
 await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 90000 }).catch(() => {});
-await demoPage.waitForTimeout(2600);
+await page.waitForTimeout(2600);
 await click('[data-route-choice="enterprise"]');
-await demoPage.waitForTimeout(3400);
-await demoPage.evaluate(() => document.querySelector('#escena-e29')?.scrollIntoView({ behavior: 'instant' }));
-await demoPage.waitForTimeout(900);
+await page.waitForTimeout(3400);
+await wheelToScene('#escena-e29 [data-recommendation]');
+await page.waitForTimeout(900);
 await waitBound('[data-recommendation]');
-const rec = await demoPage.evaluate(() => ({
+await page.waitForFunction(() => (document.querySelector('[data-recommendation-status]')?.textContent ?? '') !== '' && !(document.querySelector('[data-recommendation-status]')?.textContent ?? '').includes('Preparando'), null, { timeout: 20000 }).catch(() => {});
+const rec = await page.evaluate(() => ({
   items: document.querySelectorAll('[data-recommendation-list] .recommendation__item').length,
   text: document.querySelector('[data-recommendation-list]')?.textContent ?? '',
   status: document.querySelector('[data-recommendation-status]')?.textContent ?? '',
 }));
 check('V4-B cierre: recomendación con >=3 items', rec.items >= 3, `items=${rec.items} status=${rec.status.slice(0, 60)}`);
-check('cierre V2: botón copiar resumen presente', await demoPage.evaluate(() => !!document.querySelector('[data-rec-copy]')));
+check('cierre V2: botón copiar resumen presente', await page.evaluate(() => !!document.querySelector('[data-rec-copy]')));
 
 // --- 7M-B: bloques A/B/C/D/E ------------------------------------------------------
 const q = (sel) => page.evaluate((s2) => !!document.querySelector(s2), sel);
