@@ -1888,6 +1888,8 @@ await page.waitForFunction(() => {
   const btn = document.querySelector('#escena-e15 [data-red-run]');
   return r.length > 10 && btn && !btn.disabled;
 }, null, { timeout: 15000 }).catch(() => {});
+// a 2 FPS el pressed se restaura unos ms después del resultado: esperar explícitamente
+await page.waitForFunction(() => document.querySelector('#escena-e15 [data-red-node="2"]')?.getAttribute('aria-pressed') === 'true', null, { timeout: 15000 }).catch(() => {});
 const afterDemo = await page.evaluate(() => ({
   red: JSON.parse(sessionStorage.getItem('publia.visitor.v1') ?? '{}').red,
   pressed: document.querySelector('#escena-e15 [data-red-node="2"]')?.getAttribute('aria-pressed'),
